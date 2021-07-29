@@ -59,6 +59,14 @@ struct ParticleGroupDesc {
 
 	Rangef m_particleLife = Rangef(1.f);
 
+	//
+	bool useAlphaFadeInAfterBirth = true;
+	float alphaFadeInAfterBirthSeconds = 0.5f;
+
+	//
+	bool useAlphaFadeOutBeforeDeath = true;
+	float alphaFadeOutAfterBeforeDeath = 0.5f;
+
 	// Shape
 	SpawnShape m_spawnShape = spawnShape_sphere;
 	float m_shapeRadius = 1.f;
@@ -94,6 +102,7 @@ struct SGE_ENGINE_API ParticleGroupState {
 		vec3f velocity = vec3f::getAxis(0);
 		float scale = 1.f;
 		float m_maxLife = 0.f;
+		float opacity = 1.f;
 
 		float m_timeSpendAlive = 0.f;
 		float m_fSpriteIndex = 0.f; // The sprites are used for rendering this points to the sub-image being used for visualization.
@@ -183,6 +192,7 @@ struct SGE_ENGINE_API TraitParticlesProgrammable : public Trait {
 			float scale = 1.f;
 			float angularSpeed = 0.f;
 			float age = 0.f;
+			float alpha = 1.f; // Controlas the opacity of the particle - 0 transparent, 1 opaque.
 			int frameIndex = 0;
 			int isDead = false;
 			int tag = 0;

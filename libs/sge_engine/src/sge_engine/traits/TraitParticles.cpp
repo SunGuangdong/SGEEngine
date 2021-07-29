@@ -224,7 +224,18 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 	}
 
 	// Update the particles.
+	// Compute the alpha of the particle.
 	for (ParticleState& particle : m_particles) {
+
+		// Compute the opacity of the particle.
+		if (pdesc.useAlphaFadeInAfterBirth && particle.m_timeSpendAlive < pdesc.alphaFadeInAfterBirthSeconds) {
+			particle.opacity = sqr(maxOf(1.f, particle.m_timeSpendAlive / pdesc.alphaFadeInAfterBirthSeconds));
+		} else if (pdesc.useAlphaFadeOutBeforeDeath && particle.m_timeSpendAlive > particle.m_maxLife - pdesc.alphaFadeOutAfterBeforeDeath) {
+			particle.opacity = sqr(1.f - maxOf(1.f, particle.m_maxLife - particle.m_timeSpendAlive) / pdesc.alphaFadeOutAfterBeforeDeath);
+		} else {
+			particle.opacity = 1.f;
+		}
+
 		// Apply gravity and drag.
 		particle.velocity -= particle.velocity.x0z() * pdesc.m_xzDrag * dt + particle.velocity.yOnly() * pdesc.m_yDrag * dt;
 		particle.velocity += pdesc.m_gravity * dt;
@@ -250,7 +261,7 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 
 		particle.m_fSpriteIndex += dt * pdesc.m_spriteFPS;
 
-		// Apply the velocity and acommodate the time change/
+		// Apply the velocity and acommodate the time change.
 		particle.pos += particle.velocity * dt;
 		particle.m_timeSpendAlive += dt;
 		m_bboxFromLastUpdate.expand(particle.pos);
@@ -264,6 +275,7 @@ ParticleGroupState::SpriteRendData*
     ParticleGroupState::computeSpriteRenderData(SGEContext& sgecon, const ParticleGroupDesc& pdesc, const ICamera& camera) {
 	struct Vertex {
 		vec3f pos = vec3f(0.f);
+		vec4f color = vec4f(1.f);
 		vec3f normal = vec3f(1.f, 0.f, 0.f);
 		vec2f uv = vec2f(0.f);
 	};
@@ -346,14 +358,17 @@ ParticleGroupState::SpriteRendData*
 		// A template vertices represeting a quad, centered at (0,0,0) with correct size,
 		// later we are going to transform these vertices to get the final transform
 		// for the vertex buffer.
-		const Vertex templateVetex[6] = {
-		    Vertex{vec3f(-hx, -hy, 0.f), vec3f::getAxis(2), uv0},
-		    Vertex{vec3f(+hx, -hy, 0.f), vec3f::getAxis(2), vec2f(uv1.x, uv0.y)},
-		    Vertex{vec3f(+hx, +hy, 0.f), vec3f::getAxis(2), vec2f(uv1.x, uv1.y)},
 
-		    Vertex{vec3f(-hx, -hy, 0.f), vec3f::getAxis(2), vec2f(uv0.x, uv0.y)},
-		    Vertex{vec3f(+hx, +hy, 0.f), vec3f::getAxis(2), uv1},
-		    Vertex{vec3f(-hx, +hy, 0.f), vec3f::getAxis(2), vec2f(uv0.x, uv1.y)},
+		vec4f particleColor = vec4f(1.f, 1.f, 1.f, p.opacity);
+
+		const Vertex templateVetex[6] = {
+		    Vertex{vec3f(-hx, -hy, 0.f), particleColor, vec3f::getAxis(2), uv0},
+		    Vertex{vec3f(+hx, -hy, 0.f), particleColor, vec3f::getAxis(2), vec2f(uv1.x, uv0.y)},
+		    Vertex{vec3f(+hx, +hy, 0.f), particleColor, vec3f::getAxis(2), vec2f(uv1.x, uv1.y)},
+
+		    Vertex{vec3f(-hx, -hy, 0.f), particleColor, vec3f::getAxis(2), vec2f(uv0.x, uv0.y)},
+		    Vertex{vec3f(+hx, +hy, 0.f), particleColor, vec3f::getAxis(2), uv1},
+		    Vertex{vec3f(-hx, +hy, 0.f), particleColor, vec3f::getAxis(2), vec2f(uv0.x, uv1.y)},
 		};
 
 		for (const Vertex& templateVtx : templateVetex) {
@@ -389,10 +404,11 @@ ParticleGroupState::SpriteRendData*
 		sgecon.unMap(spriteRenderData->vertexBuffer);
 	}
 
-	VertexDecl vertexDecl[3] = {
+	VertexDecl vertexDecl[4] = {
 	    VertexDecl(0, "a_position", UniformType::Float3, 0),
-	    VertexDecl(0, "a_normal", UniformType::Float3, 3 * sizeof(float)),
-	    VertexDecl(0, "a_uv", UniformType::Float2, 6 * sizeof(float)),
+	    VertexDecl(0, "a_color", UniformType::Float4, 3),
+	    VertexDecl(0, "a_normal", UniformType::Float3, 7 * sizeof(float)),
+	    VertexDecl(0, "a_uv", UniformType::Float2, 10 * sizeof(float)),
 	};
 
 	VertexDeclIndex vertexDeclIdx = sgecon.getDevice()->getVertexDeclIndex(vertexDecl, SGE_ARRSZ(vertexDecl));
@@ -467,10 +483,10 @@ void TraitParticlesProgrammable::getRenderItems(std::vector<TraitParticlesProgra
 	// TODO: Is this the best alpha sorting point that we can come up with?
 	// TODO: We do not really always need alpha sorting for particles. Add some logic to determine if we need it.
 	renderItem.needsAlphaSorting = false;
-	
 
-	
-	//renderItem.zSortingPositionWs = mat_mul_pos(getActor()->getTransformMtx(), getBBoxOS().center());
+
+
+	// renderItem.zSortingPositionWs = mat_mul_pos(getActor()->getTransformMtx(), getBBoxOS().center());
 
 
 
