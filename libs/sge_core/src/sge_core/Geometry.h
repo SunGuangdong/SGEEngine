@@ -62,6 +62,12 @@ struct Geometry {
 
 /// @brief Currently represent a PBR'ish material. Ideally this needs to be an interface usable for all kind of materials.
 struct Material {
+	enum DiffuseColorSource {
+		diffuseColorSource_vertexColor,
+		diffuseColorSource_constantColor,
+		diffuseColorSource_diffuseMap,
+	};
+
 	mat4f uvwTransform = mat4f::getIdentity();
 
 	vec4f diffuseColor = vec4f(1.f, 1.f, 1.f, 1.f);
@@ -75,6 +81,9 @@ struct Material {
 	Texture* texRoughness = nullptr;
 
 	vec3f diffuseTexXYZScaling = vec3f(1.f); // Triplanar scaling for each axis.
+
+	DiffuseColorSource diffuseColorSrc = diffuseColorSource_constantColor;
+	bool tintByVertexColor = false;
 
 	vec4f fluidColor0 = vec4f(1.f);
 	vec4f fluidColor1 = vec4f(1.f);

@@ -72,6 +72,10 @@ ReflBlock() {
 		ReflMember(ParticleGroupDesc, m_veclotiyType)
 		ReflMember(ParticleGroupDesc, m_coneHalfAngle).addMemberFlag(MFF_FloatAsDegrees)
 		ReflMember(ParticleGroupDesc, m_particleLife)
+		ReflMember(ParticleGroupDesc, useAlphaFadeInAfterBirth)
+		ReflMember(ParticleGroupDesc, alphaFadeInAfterBirthSeconds)
+		ReflMember(ParticleGroupDesc, useAlphaFadeOutBeforeDeath)
+		ReflMember(ParticleGroupDesc, alphaFadeOutAfterBeforeDeath)
 		ReflMember(ParticleGroupDesc, m_particleVelocity)
 		ReflMember(ParticleGroupDesc, m_gravity)
 		ReflMember(ParticleGroupDesc, m_xzDrag)
@@ -226,14 +230,18 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 	// Update the particles.
 	// Compute the alpha of the particle.
 	for (ParticleState& particle : m_particles) {
-
 		// Compute the opacity of the particle.
-		if (pdesc.useAlphaFadeInAfterBirth && particle.m_timeSpendAlive < pdesc.alphaFadeInAfterBirthSeconds) {
-			particle.opacity = sqr(maxOf(1.f, particle.m_timeSpendAlive / pdesc.alphaFadeInAfterBirthSeconds));
-		} else if (pdesc.useAlphaFadeOutBeforeDeath && particle.m_timeSpendAlive > particle.m_maxLife - pdesc.alphaFadeOutAfterBeforeDeath) {
-			particle.opacity = sqr(1.f - maxOf(1.f, particle.m_maxLife - particle.m_timeSpendAlive) / pdesc.alphaFadeOutAfterBeforeDeath);
-		} else {
-			particle.opacity = 1.f;
+		particle.opacity = 1.f;
+
+		// Fade-in after birth.
+		if (pdesc.alphaFadeInAfterBirthSeconds > 1e-3f && particle.m_timeSpendAlive < pdesc.alphaFadeInAfterBirthSeconds) {
+			particle.opacity *= sqr(clamp01(particle.m_timeSpendAlive / pdesc.alphaFadeInAfterBirthSeconds));
+		}
+
+		// Fade-out before death.
+		if (pdesc.alphaFadeOutAfterBeforeDeath > 1e-3f &&
+		    (particle.m_timeSpendAlive > particle.m_maxLife - pdesc.alphaFadeOutAfterBeforeDeath)) {
+			particle.opacity *= sqr(clamp01((particle.m_maxLife - particle.m_timeSpendAlive) / pdesc.alphaFadeOutAfterBeforeDeath));
 		}
 
 		// Apply gravity and drag.
@@ -406,7 +414,7 @@ ParticleGroupState::SpriteRendData*
 
 	VertexDecl vertexDecl[4] = {
 	    VertexDecl(0, "a_position", UniformType::Float3, 0),
-	    VertexDecl(0, "a_color", UniformType::Float4, 3),
+	    VertexDecl(0, "a_color", UniformType::Float4, 3 * sizeof(float)),
 	    VertexDecl(0, "a_normal", UniformType::Float3, 7 * sizeof(float)),
 	    VertexDecl(0, "a_uv", UniformType::Float2, 10 * sizeof(float)),
 	};
@@ -414,10 +422,12 @@ ParticleGroupState::SpriteRendData*
 	VertexDeclIndex vertexDeclIdx = sgecon.getDevice()->getVertexDeclIndex(vertexDecl, SGE_ARRSZ(vertexDecl));
 
 	spriteRenderData->geometry =
-	    Geometry(spriteRenderData->vertexBuffer, nullptr, nullptr, -1, vertexDeclIdx, false, true, true, false,
+	    Geometry(spriteRenderData->vertexBuffer, nullptr, nullptr, -1, vertexDeclIdx, true, true, true, false,
 	             PrimitiveTopology::TriangleList, 0, 0, strideSizeBytes, UniformType::Unknown, int(vertices.size()));
 
+	spriteRenderData->material.diffuseColorSrc = Material::diffuseColorSource_diffuseMap;
 	spriteRenderData->material.diffuseTexture = sprite;
+	spriteRenderData->material.tintByVertexColor = true;
 	return &spriteRenderData.get();
 }
 

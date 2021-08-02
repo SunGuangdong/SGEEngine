@@ -59,12 +59,7 @@ struct ParticleGroupDesc {
 
 	Rangef m_particleLife = Rangef(1.f);
 
-	//
-	bool useAlphaFadeInAfterBirth = true;
 	float alphaFadeInAfterBirthSeconds = 0.5f;
-
-	//
-	bool useAlphaFadeOutBeforeDeath = true;
 	float alphaFadeOutAfterBeforeDeath = 0.5f;
 
 	// Shape

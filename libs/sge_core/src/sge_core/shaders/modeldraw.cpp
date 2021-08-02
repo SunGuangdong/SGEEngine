@@ -203,10 +203,15 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	}
 
 	enum : int {
-		OPT_UseNormalMap,
-		OPT_DiffuseColorSrc,
-		OPT_Lighting,
+		OPT_HasVertexColor,
+		OPT_HasUV,
+		OPT_HasTangentSpace,
 		OPT_HasVertexSkinning,
+
+		// OPT_UseNormalMap,
+		// OPT_DiffuseColorSrc,
+		// OPT_Lighting,
+		// OPT_HasVertexSkinning,
 		kNumOptions,
 	};
 
@@ -239,12 +244,30 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	if (shadingPermutFWDShading.isValid() == false) {
 		shadingPermutFWDShading = ShadingProgramPermuator();
 
+		// clang-format off
 		const std::vector<OptionPermuataor::OptionDesc> compileTimeOptions = {
-		    {OPT_UseNormalMap, "OPT_UseNormalMap", {"0", "1"}},
-		    {OPT_DiffuseColorSrc, "OPT_DiffuseColorSrc", {"0", "1", "2", "3", "4"}},
-		    {OPT_Lighting, "OPT_Lighting", {SGE_MACRO_STR(kLightingShaded), SGE_MACRO_STR(kLightingForceNoLighting)}},
-		    {OPT_HasVertexSkinning, "OPT_HasVertexSkinning", {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
+			{OPT_HasVertexColor, "OPT_HasVertexColor", {
+				SGE_MACRO_STR(kHasVertexColor_No), 
+				SGE_MACRO_STR(kHasVertexColor_Yes)
+			}},
+			{OPT_HasUV, "OPT_HasUV", {
+				SGE_MACRO_STR(kHasUV_No), 
+				SGE_MACRO_STR(kHasUV_Yes)
+			}},
+			{OPT_HasTangentSpace, "OPT_HasTangentSpace", { 
+				SGE_MACRO_STR(kHasTangetSpace_No), 
+				SGE_MACRO_STR(kHasTangetSpace_Yes)
+			}},
+			{OPT_HasVertexSkinning, "OPT_HasVertexSkinning", { 
+				SGE_MACRO_STR(kHasVertexSkinning_No), 
+			    SGE_MACRO_STR(kHasVertexSkinning_Yes)
+			}},
+		    //{OPT_UseNormalMap, "OPT_UseNormalMap", {"0", "1"}},
+		    //{OPT_DiffuseColorSrc, "OPT_DiffuseColorSrc", {"0", "1", "2", "3", "4"}},
+		    //{OPT_Lighting, "OPT_Lighting", {SGE_MACRO_STR(kLightingShaded), SGE_MACRO_STR(kLightingForceNoLighting)}},
+		    //{OPT_HasVertexSkinning, "OPT_HasVertexSkinning", {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
 		};
+		// clang-format on
 
 		// Caution: It is important that the order of the elements here MATCHES the order in the enum above.
 		const std::vector<ShadingProgramPermuator::Unform> uniformsToCache = {
@@ -274,34 +297,75 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		shadingPermutFWDShading->createFromFile(sgedev, "core_shaders/FWDDefault_shading.shader", compileTimeOptions, uniformsToCache);
 	}
 
-	int optDiffuseColorSrc = kDiffuseColorSrcConstant;
-	{
-		if (!material.diffuseTexture) {
-			if (geometry->vertexDeclHasVertexColor) {
-				optDiffuseColorSrc = kDiffuseColorSrcVertex;
-			}
-		}
-		if (material.diffuseTexture)
-			optDiffuseColorSrc = kDiffuseColorSrcTexture;
-		if (material.diffuseTextureX && material.diffuseTextureY && material.diffuseTextureZ) {
-			optDiffuseColorSrc = kDiffuseColorSrcTriplanarTex;
+	// Find the values of the shader options that are going to be used.
+	// This is needed for find the permutation of the shader compilation flags that we need.
+	const int OPT_HasVertexColor_choice = geometry->vertexDeclHasVertexColor ? kHasVertexColor_Yes : kHasVertexColor_No;
+	const int OPT_HasUV_choice = geometry->vertexDeclHasUv ? kHasUV_Yes : kHasUV_No;
+	int OPT_HasNormals_choice = kHasTangetSpace_No;
+	if (geometry->vertexDeclHasNormals) {
+		if (geometry->vertexDeclHasTangentSpace) {
+			OPT_HasNormals_choice = kHasTangetSpace_Yes;
 		}
 	}
+	const int OPT_HasVertexSkinning_choice = geometry->hasVertexSkinning() ? kHasVertexColor_Yes : kHasVertexColor_No;
 
-	const int optLighting = (mods.forceNoLighting ? kLightingForceNoLighting : kLightingShaded);
+	// Compute the shader material flags.
+	// Depending on the shader settings we might turn off some options as we would not need them.
+	int pbrMtlFlags = 0;
 
-	const int optUseNormalMap = !!(geometry->vertexDeclHasTangentSpace && material.texNormalMap);
-	const int optHasVertexSkinning = (geometry->hasVertexSkinning()) ? kHasVertexSkinning_Yes : kHasVertexSkinning_No;
+	if (OPT_HasUV_choice != kHasUV_No && OPT_HasNormals_choice == kHasTangetSpace_Yes && material.texNormalMap != nullptr) {
+		pbrMtlFlags |= kPBRMtl_Flags_HasNormalMap;
+	}
 
-	const OptionPermuataor::OptionChoice optionChoice[kNumOptions] = {{OPT_UseNormalMap, optUseNormalMap},
-	                                                                  {OPT_DiffuseColorSrc, optDiffuseColorSrc},
-	                                                                  {OPT_Lighting, optLighting},
-	                                                                  {OPT_HasVertexSkinning, optHasVertexSkinning}};
+	if (OPT_HasUV_choice != kHasUV_No && material.texMetalness != nullptr) {
+		pbrMtlFlags |= kPBRMtl_Flags_HasMetalnessMap;
+	}
+
+	if (OPT_HasUV_choice != kHasUV_No && material.texRoughness != nullptr) {
+		pbrMtlFlags |= kPBRMtl_Flags_HasRoughnessMap;
+	}
+
+	switch (material.diffuseColorSrc) {
+		case Material::diffuseColorSource_vertexColor: {
+			if (OPT_HasVertexColor_choice == kHasVertexColor_Yes) {
+				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromVertexColor;
+			} else {
+				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
+			}
+		} break;
+		case Material::diffuseColorSource_constantColor: {
+			pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
+		} break;
+		case Material::diffuseColorSource_diffuseMap: {
+			if (OPT_HasUV_choice != kHasUV_No) {
+				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromTexture;
+			}
+		} break;
+		default:
+			sgeAssert(false);
+			pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
+			break;
+	}
+
+	if (material.tintByVertexColor) {
+		pbrMtlFlags |= kPBRMtl_Flags_DiffuseTintByVertexColor;
+	}
+
+	if (mods.forceNoLighting) {
+		pbrMtlFlags |= kPBRMtl_Flags_NoLighting;
+	}
+
+	// Find the shader permuatation that we are going to use.
+	const OptionPermuataor::OptionChoice optionChoice[kNumOptions] = {{OPT_HasVertexColor, OPT_HasVertexColor_choice},
+	                                                                  {OPT_HasUV, OPT_HasUV_choice},
+	                                                                  {OPT_HasTangentSpace, OPT_HasNormals_choice},
+	                                                                  {OPT_HasVertexSkinning, OPT_HasVertexSkinning_choice}};
 
 	const int iShaderPerm =
 	    shadingPermutFWDShading->getCompileTimeOptionsPerm().computePermutationIndex(optionChoice, SGE_ARRSZ(optionChoice));
 	const ShadingProgramPermuator::Permutation& shaderPerm = shadingPermutFWDShading->getShadersPerPerm()[iShaderPerm];
 
+	// Assemble the draw call.
 	DrawCall dc;
 
 	stateGroup.setProgram(shaderPerm.shadingProgram.GetPtr());
@@ -348,34 +412,28 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	paramsCb.uMetalness = material.metalness;
 	paramsCb.uRoughness = material.roughness;
 	paramsCb.uSkinningFirstBoneOffsetInTex = geometry->firstBoneOffset;
+	paramsCb.uPBRMtlFlags = pbrMtlFlags;
+	paramsCb.alphaMultiplier = material.alphaMultiplier;
 
-	if (optDiffuseColorSrc == kDiffuseColorSrcConstant) {
-		// Nothing, uColor is used here.
-	} else if (optDiffuseColorSrc == kDiffuseColorSrcVertex) {
-		// Nothing.
-	} else if (optDiffuseColorSrc == kDiffuseColorSrcTexture) {
+	if (material.diffuseTexture) {
 		shaderPerm.bind<64>(uniforms, uTexDiffuse, (void*)material.diffuseTexture);
 #ifdef SGE_RENDERER_D3D11
 		shaderPerm.bind<64>(uniforms, uTexDiffuseSampler, (void*)material.diffuseTexture->getSamplerState());
 #endif
-	} else if (optDiffuseColorSrc == kDiffuseColorSrcTriplanarTex) {
-		shaderPerm.bind<64>(uniforms, uTexDiffuseX, (void*)material.diffuseTextureX);
-		shaderPerm.bind<64>(uniforms, uTexDiffuseY, (void*)material.diffuseTextureY);
-		shaderPerm.bind<64>(uniforms, uTexDiffuseZ, (void*)material.diffuseTextureZ);
-#ifdef SGE_RENDERER_D3D11
-		shaderPerm.bind<64>(uniforms, uTexDiffuseXSampler, (void*)material.diffuseTextureX->getSamplerState());
-		shaderPerm.bind<64>(uniforms, uTexDiffuseYSampler, (void*)material.diffuseTextureY->getSamplerState());
-		shaderPerm.bind<64>(uniforms, uTexDiffuseZSampler, (void*)material.diffuseTextureZ->getSamplerState());
-#endif
-		shaderPerm.bind<64>(uniforms, uTexDiffuseXYZScaling, (void*)&material.diffuseTexXYZScaling);
-	} else {
-		sgeAssert(false);
 	}
 
-	int pbrFlags = 0;
+	// TRIPLANAR LEGACY
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseX, (void*)material.diffuseTextureX);
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseY, (void*)material.diffuseTextureY);
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZ, (void*)material.diffuseTextureZ);
+	//#ifdef SGE_RENDERER_D3D11
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXSampler, (void*)material.diffuseTextureX->getSamplerState());
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseYSampler, (void*)material.diffuseTextureY->getSamplerState());
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZSampler, (void*)material.diffuseTextureZ->getSamplerState());
+	//#endif
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXYZScaling, (void*)&material.diffuseTexXYZScaling);
 
 	if (material.texMetalness != nullptr) {
-		pbrFlags |= kPBRMtl_Flags_HasMetalnessMap;
 		shaderPerm.bind<64>(uniforms, uTexMetalness, (void*)material.texMetalness);
 #ifdef SGE_RENDERER_D3D11
 		shaderPerm.bind<64>(uniforms, uTexMetalnessSampler, (void*)material.texMetalness->getSamplerState());
@@ -383,17 +441,13 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	}
 
 	if (material.texRoughness != nullptr) {
-		pbrFlags |= kPBRMtl_Flags_HasRoughnessMap;
 		shaderPerm.bind<64>(uniforms, uTexRoughness, (void*)material.texRoughness);
 #ifdef SGE_RENDERER_D3D11
 		shaderPerm.bind<64>(uniforms, uTexRoughnessSampler, (void*)material.texRoughness->getSamplerState());
 #endif
 	}
 
-	paramsCb.uPBRMtlFlags = pbrFlags;
-	paramsCb.alphaMultiplier = material.alphaMultiplier;
-
-	if (optUseNormalMap) {
+	if (material.texNormalMap) {
 		shaderPerm.bind<64>(uniforms, uTexNormalMap, (void*)material.texNormalMap);
 #ifdef SGE_RENDERER_D3D11
 		shaderPerm.bind<64>(uniforms, uTexNormalMapSampler, (void*)material.texNormalMap->getSamplerState());
@@ -421,7 +475,7 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
 
-	if (optHasVertexSkinning == kHasVertexSkinning_Yes) {
+	if (OPT_HasVertexSkinning_choice == kHasVertexSkinning_Yes) {
 		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uTexSkinningBones], (geometry->skinningBoneTransforms)));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
@@ -434,18 +488,16 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		uniforms.resize(preLightsNumUnuforms);
 
 		// Do the ambient lighting only with the 1st light.
-		if (optLighting == kLightingShaded) {
-			if (iLight == 0) {
-				paramsCb.ambientLightColor = generalMods.ambientLightColor;
-				paramsCb.uRimLightColorWWidth = generalMods.uRimLightColorWWidth;
-			} else {
-				vec4f zeroColor(0.f);
-				paramsCb.ambientLightColor = vec3f(0.f);
-				paramsCb.uRimLightColorWWidth = vec4f(0.f);
-			}
+		if (iLight == 0) {
+			paramsCb.ambientLightColor = generalMods.ambientLightColor;
+			paramsCb.uRimLightColorWWidth = generalMods.uRimLightColorWWidth;
+		} else {
+			vec4f zeroColor(0.f);
+			paramsCb.ambientLightColor = vec3f(0.f);
+			paramsCb.uRimLightColorWWidth = vec4f(0.f);
 		}
 
-		if (mods.forceNoLighting == false) {
+		if ((pbrMtlFlags & kPBRMtl_Flags_NoLighting) == 0) {
 			paramsCb.lightPosition = shadingLight.lightPositionAndType;
 			paramsCb.lightSpotDirAndCosAngle = shadingLight.lightSpotDirAndCosAngle;
 			paramsCb.lightColorWFlag = shadingLight.lightColorWFlags;
@@ -500,7 +552,7 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		paramsCb.uRimLightColorWWidth = generalMods.uRimLightColorWWidth;
 
 		vec4f colorWFlags(0.f);
-		colorWFlags.w = float(kLightFlt_DontLight);
+		colorWFlags.w = float(kLightFlg_DontLight);
 		paramsCb.lightColorWFlag = colorWFlags;
 
 		void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);

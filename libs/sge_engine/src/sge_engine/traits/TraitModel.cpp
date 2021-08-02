@@ -250,6 +250,11 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 					                            ? mtl.texRoughness->asTextureView()->tex.GetPtr()
 					                            : nullptr;
 
+					if (material.diffuseTexture != nullptr) {
+						material.diffuseColorSrc = Material::diffuseColorSource_diffuseMap;
+					} else if(evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor) {
+						material.diffuseColorSrc = Material::diffuseColorSource_vertexColor;
+					}
 
 					renderItem.mtl = material;
 					renderItem.zSortingPositionWs = mat_mul_pos(node2world, evalNode.aabbGlobalSpace.center());
