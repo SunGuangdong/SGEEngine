@@ -1,8 +1,8 @@
 #include "AParticles.h"
+#include "sge_core/SGEImGui.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 #include "sge_utils/utils/strings.h"
-#include "sge_core/SGEImGui.h"
 namespace sge {
 
 //--------------------------------------------------------------------
@@ -153,32 +153,17 @@ void AParticlesSimple::doAttributeEditor(GameInspector* inspector) {
 			}
 
 			if (ImGui::CollapsingHeader("Transparency")) {
-
-				ImGuiEx::BeginGroupPanel("Opacity at Birth");
-				chain.add(tdPartDesc->findMember(&ParticleGroupDesc::useAlphaFadeInAfterBirth));
+				chain.add(tdPartDesc->findMember(&ParticleGroupDesc::alphaFadeInAfterBirthSeconds));
 				ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
 				chain.pop();
 
-				if (pdesc.useAlphaFadeInAfterBirth) {
-					chain.add(tdPartDesc->findMember(&ParticleGroupDesc::alphaFadeInAfterBirthSeconds));
-					ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
-					chain.pop();
-				}
-				ImGuiEx::EndGroupPanel();
 
-				ImGuiEx::BeginGroupPanel("Opacity before Death");
-				chain.add(tdPartDesc->findMember(&ParticleGroupDesc::useAlphaFadeOutBeforeDeath));
+				chain.add(tdPartDesc->findMember(&ParticleGroupDesc::alphaFadeOutAfterBeforeDeath));
 				ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
 				chain.pop();
 
-				if (pdesc.useAlphaFadeOutBeforeDeath) {
-					chain.add(tdPartDesc->findMember(&ParticleGroupDesc::alphaFadeOutAfterBeforeDeath));
-					ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
-					chain.pop();
-				}
 				ImGuiEx::EndGroupPanel();
 			}
-
 
 			if (ImGui::CollapsingHeader("Spawning Shape")) {
 				chain.add(tdPartDesc->findMember(&ParticleGroupDesc::m_spawnShape));

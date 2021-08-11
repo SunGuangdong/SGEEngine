@@ -11,6 +11,7 @@
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/mat4.h"
 
+#include "sge_engine/GameDrawer/RenderItems/HelperDrawRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitParticlesRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitSpriteRrenderItem.h"
@@ -33,13 +34,22 @@ struct LightShadowInfo {
 };
 
 struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
-	void prepareForNewFrame() final;
-	void updateShadowMaps(const GameDrawSets& drawSets) final;
+	void prepareForNewFrame() override;
+	void updateShadowMaps(const GameDrawSets& drawSets) override;
 
-	void getRenderItemsForActor(const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason);
 	void drawItem(const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason) override;
 	void drawWorld(const GameDrawSets& drawSets, const DrawReason drawReason) override;
+
+  private:
+	/// @brief Gets all the render items needed to draw the actor for the specified draw reason.
+	/// @param [in] item describes the actor (and/if its subparts that we want to render).
+	void getRenderItemsForActor(const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason);
+
 	void drawSky(const GameDrawSets& drawSets, const DrawReason drawReason);
+
+
+	/// @brief A helper function that is called in @drawItem or @drawWorld. These functions get render items
+	/// form actors and the actual rendering is done by this function.
 	void drawCurrentRenderItems(const GameDrawSets& drawSets, DrawReason drawReason, bool shouldDrawSky);
 
 	void drawRenderItem_TraitModel(TraitModelRenderItem& ri,
@@ -62,23 +72,20 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	                                               const GameDrawSets& drawSets,
 	                                               DrawReasonInfo generalMods);
 
-	// Legacy Functions to be removed:
-
-	void drawActor(const GameDrawSets& drawSets, EditMode const editMode, Actor* actor, int const itemIndex, DrawReason const drawReason);
-
-	// A Legacy function that should end up not being used.
-	void drawActorLegacy(Actor* actor,
+	/// @brief A function usually called as a result of HelperDrawRenderItem.
+	/// intented be used for objects that need to be visible in the editor and not during gameplay.
+	void drawHelperActor(Actor* actor,
 	                     const GameDrawSets& drawSets,
 	                     EditMode const editMode,
 	                     int const itemIndex,
 	                     const DrawReasonInfo& generalMods,
 	                     DrawReason const drawReason);
 
-	void drawANavMesh(ANavMesh* navMesh,
-	                  const GameDrawSets& drawSets,
-	                  const DrawReasonInfo& generalMods,
-	                  DrawReason const drawReason,
-	                  const uint32 wireframeColor);
+	void drawHelperActor_drawANavMesh(ANavMesh& navMesh,
+	                                  const GameDrawSets& drawSets,
+	                                  const DrawReasonInfo& generalMods,
+	                                  const DrawReason drawReason,
+	                                  const vec4f wireframeColor);
 
   private:
 	/// @brief Returns true if the bounding box of the actor (Actor::getBBoxOs) is in the specified
@@ -95,6 +102,7 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 		m_RIs_traitViewportIcon.clear();
 		m_RIs_traitParticles.clear();
 		m_RIs_traitParticlesProgrammable.clear();
+		m_RIs_helpers.clear();
 	}
 
   public:
@@ -124,6 +132,7 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	std::vector<TraitViewportIconRenderItem> m_RIs_traitViewportIcon;
 	std::vector<TraitParticlesSimpleRenderItem> m_RIs_traitParticles;
 	std::vector<TraitParticlesProgrammableRenderItem> m_RIs_traitParticlesProgrammable;
+	std::vector<HelperDrawRenderItem> m_RIs_helpers;
 };
 
 } // namespace sge

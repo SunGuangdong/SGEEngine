@@ -173,7 +173,7 @@ inline void Style() {
 
 	// ImGui::StyleColorsLight(&style);
 	// ImGui::StyleColorsDark(&style);
-	StyleColorsLightGreen(&style);
+	//StyleColorsLightGreen(&style);
 }
 
 namespace {

@@ -52,13 +52,19 @@ struct SGE_ENGINE_API ANavMesh : public Actor, public IActorCustomAttributeEdito
 	              const vec3f& endPos,
 	              const vec3f nearestPointSearchHalfDiagonal = vec3f(0.5f)) final;
 
+  private:
+	void clearRecastAndDetourState() {
+		m_detourNavMesh.freeExisting();
+		m_detourNavMeshQuery.freeExisting();
+
+		m_debugDrawNavMeshBuildTriListWs = std::vector<vec3f>();
+		m_debugDrawNavMeshTriListWs = std::vector<vec3f>();
+	}
+
   public:
 	NavMeshBuildSets m_buildSettings;
 	rcPolyMeshWrapper m_recastPolyMesh;
 
-	// This could be just a dtNavMesh, however the class
-	// doesn't have a good way to clean itself up, so to do this we
-	// wrap it in an unique_pointer
 	dtNavMeshWrapper m_detourNavMesh;
 	dtNavMeshQueryWrapper m_detourNavMeshQuery;
 

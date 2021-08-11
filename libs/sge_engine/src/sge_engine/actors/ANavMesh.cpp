@@ -88,7 +88,7 @@ bool ANavMesh::findPath(std::vector<vec3f>& outPath,
 	outPath.clear();
 
 	if (m_detourNavMeshQuery.object == nullptr || m_detourNavMeshQuery->getNodePool() == nullptr) {
-		sgeAssert(false && "ANavMesh isn't initialzied yet!");
+		// The navmesh isn't initialzied yet or no navmesh was generated for the input geometry.
 		return false;
 	}
 
@@ -202,7 +202,8 @@ void ANavMesh::build() {
 
 	if (!rcCreateHeightfield(&recastLogging, recastHeightFiled.ref(), recastCfg.width, recastCfg.height, recastCfg.bmin, recastCfg.bmax,
 	                         recastCfg.cs, recastCfg.ch)) {
-		sgeAssert(false);
+		sgeAssert(false && "rcCreateHeightfield failed!");
+		clearRecastAndDetourState();
 		return;
 	}
 
@@ -215,7 +216,9 @@ void ANavMesh::build() {
 	if (!rcRasterizeTriangles(&recastLogging, (float*)trianglesVerticesWorldSpace.data(), int(trianglesVerticesWorldSpace.size()),
 	                          trianglesIndices.data(), recastPerTriangleFlags.data(), numTriangles, recastHeightFiled.ref(),
 	                          recastCfg.walkableClimb)) {
-		sgeAssert(false);
+		sgeAssert(false && "rcRasterizeTriangles failed!");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	// Filter walkables surfaces.
@@ -229,43 +232,57 @@ void ANavMesh::build() {
 	rcCompactHeightfieldWrapper compactHeightField;
 	if (!rcBuildCompactHeightfield(&recastLogging, recastCfg.walkableHeight, recastCfg.walkableClimb, recastHeightFiled.ref(),
 	                               compactHeightField.ref())) {
-		sgeAssert(false);
+		sgeAssert(false && "rcBuildCompactHeightfield failed!");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	// Clean-up the height field as we aren't going to use it anymore.
 	recastHeightFiled.freeExisting();
 
 	if (!rcErodeWalkableArea(&recastLogging, recastCfg.walkableRadius, compactHeightField.ref())) {
-		sgeAssert(false);
+		sgeAssert(false && "rcErodeWalkableArea failed!");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	// Here I've skipped a step where we mark different area types
 
 	// Partition the walkable surface into simple regions without holes.
 	if (!rcBuildDistanceField(&recastLogging, compactHeightField.ref())) {
-		sgeAssert(false);
+		sgeAssert(false && "rcBuildDistanceField failed!");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	if (!rcBuildRegions(&recastLogging, compactHeightField.ref(), 0, recastCfg.minRegionArea, recastCfg.mergeRegionArea)) {
-		sgeAssert(false);
+		sgeAssert(false && "rcBuildRegions failed!");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	rcContourSetWrapper contourSet;
 	if (!rcBuildContours(&recastLogging, compactHeightField.ref(), recastCfg.maxSimplificationError, recastCfg.maxEdgeLen,
 	                     contourSet.ref())) {
-		sgeAssert(false);
+		sgeAssert(false && "rcBuildContours failed!");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	// Build the recast poly mesh.
 	m_recastPolyMesh.createNew();
 	if (!rcBuildPolyMesh(&recastLogging, contourSet.ref(), recastCfg.maxVertsPerPoly, m_recastPolyMesh.ref())) {
-		sgeAssert(false);
+		sgeAssert(false && "rcBuildPolyMesh failed!");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	rcPolyMeshDetailWrapper recastDetailMesh;
 	if (!rcBuildPolyMeshDetail(&recastLogging, m_recastPolyMesh.ref(), compactHeightField.ref(), recastCfg.detailSampleDist,
 	                           recastCfg.detailSampleMaxError, recastDetailMesh.ref())) {
-		sgeAssert(false);
+		sgeAssert(false && "rcBuildPolyMeshDetail failed");
+		clearRecastAndDetourState();
+		return;
 	}
 
 	// Mark all resulting polygons as walkable
@@ -274,8 +291,19 @@ void ANavMesh::build() {
 		m_recastPolyMesh->flags[iPoly] = 1;
 	}
 
+	if (m_recastPolyMesh->npolys == 0) {
+		// No geomety has been found, there will be no navmesh.
+		clearRecastAndDetourState();
+		return;
+	}
+
 	// Build the path-finding mesh for Detour.
-	if_checked(recastCfg.maxVertsPerPoly <= DT_VERTS_PER_POLYGON) {
+	if (recastCfg.maxVertsPerPoly > DT_VERTS_PER_POLYGON) {
+		// Should never happen.
+		sgeAssert(false && "recastCfg.maxVertsPerPoly > DT_VERTS_PER_POLYGON failed");
+		clearRecastAndDetourState();
+		return;
+	} else {
 		dtNavMeshCreateParams params;
 		memset(&params, 0, sizeof(params));
 		params.verts = m_recastPolyMesh->verts;
@@ -310,6 +338,7 @@ void ANavMesh::build() {
 		int navDataSize = 0;
 		if (!dtCreateNavMeshData(&params, &navData, &navDataSize)) {
 			dtFree(navData); // If the function succeedes the bookkeeping of the data is done with m_detourNavMesh
+			navData = nullptr;
 			sgeAssert(false);
 		}
 
@@ -318,6 +347,7 @@ void ANavMesh::build() {
 		m_detourNavMeshQuery.createNew();
 		m_detourNavMeshQuery->init(m_detourNavMesh.object, 2048); // TODO: Why 2048?
 	}
+
 
 	// Build the debug draw mesh.
 	{

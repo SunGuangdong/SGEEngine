@@ -350,6 +350,14 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 			trait->getRenderItems(m_RIs_traitViewportIcon);
 		}
 	}
+
+	const TypeId actorType = actor->getType();
+
+	if (actorType == sgeTypeId(ACamera) || actorType == sgeTypeId(ALight) || actorType == sgeTypeId(ALine) ||
+	    actorType == sgeTypeId(ACRSpline) || actorType == sgeTypeId(ALocator) || actorType == sgeTypeId(AInvisibleRigidObstacle) ||
+	    actorType == sgeTypeId(AInfinitePlaneObstacle) || actorType == sgeTypeId(ANavMesh)) {
+		m_RIs_helpers.push_back(HelperDrawRenderItem(item, drawReason));
+	}
 }
 
 void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, DrawReason drawReason, bool shouldDrawSky) {
@@ -424,6 +432,16 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 		}
 	}
 
+	for (auto& ri : m_RIs_helpers) {
+		ri.zSortingValue = zSortPlane.Distance(ri.zSortingPositionWs);
+
+		if (ri.needsAlphaSorting) {
+			m_RIs_alphaSorted.push_back(&ri);
+		} else {
+			m_RIs_opaque.push_back(&ri);
+		}
+	}
+
 	// The opaque items don't need to be sorted in any way for the rendering to appear correct.
 	// However, if we sort them fron-to-back we would reduce the pixel shader overdraw,
 	// as for objects further back, there would be already a bigger z-depth value.
@@ -458,6 +476,8 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 				drawRenderItem_TraitParticlesSimple(*riTraitParticles, drawSets, generalMods);
 			} else if (auto riTraitParticlesProgrammable = dynamic_cast<TraitParticlesProgrammableRenderItem*>(riRaw)) {
 				drawRenderItem_TraitParticlesProgrammable(*riTraitParticlesProgrammable, drawSets, generalMods);
+			} else if (auto riHelper = dynamic_cast<HelperDrawRenderItem*>(riRaw)) {
+				drawHelperActor(riHelper->item.gameObject->getActor(), drawSets, riHelper->item.editMode, 0, generalMods, drawReason);
 			} else {
 				sgeAssert(false && "Render Item does not have a drawing implementation");
 			}
@@ -696,50 +716,6 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 }
 
 
-void DefaultGameDrawer::drawActor(
-    const GameDrawSets& drawSets, EditMode const editMode, Actor* actor, int const itemIndex, DrawReason const drawReason) {
-	const bool useWireframe = drawReason_IsVisualizeSelection(drawReason);
-
-	const vec4f wireframeColor =
-	    (drawReason == drawReason_visualizeSelectionPrimary) ? getPrimarySelectionColor() : kSecondarySelectionColor;
-	const int wireframeColorInt = colorToIntRgba(wireframeColor);
-
-	vec4f selectionTint = useWireframe ? wireframeColor : vec4f(0.f);
-	selectionTint.w = useWireframe ? 1.f : 0.f;
-
-	// Build the general modifications for the actor drawing.
-	DrawReasonInfo generalMods;
-
-	generalMods.selectionTint = selectionTint;
-	generalMods.isRenderingShadowMap = (drawReason == drawReason_gameplayShadow);
-	generalMods.ambientLightColor = getWorld()->m_ambientLight;
-	generalMods.uRimLightColorWWidth = vec4f(getWorld()->m_rimLight, getWorld()->m_rimCosineWidth);
-
-	// If the camera frustum is present, try to clip the object.
-	if (isInFrustum(drawSets, actor) == false) {
-		return;
-	}
-
-	// Find all the lights that can affect this object.
-	fillGeneralModsWithLights(actor, generalMods);
-
-	//if (TraitParticlesProgrammable* const particles2Trait = getTrait<TraitParticlesProgrammable>(actor);
-	//    editMode == editMode_actors && particles2Trait) {
-	//	drawTraitParticles2(particles2Trait, drawSets, generalMods);
-	//}
-
-	// if (TraitModel* const modelTrait = getTrait<TraitModel>(actor); editMode == editMode_actors && modelTrait) {
-	//	drawTraitModel(modelTrait, drawSets, generalMods, drawReason);
-	//}
-
-	const TypeId actorType = actor->getType();
-	if (actorType == sgeTypeId(ANavMesh) && drawReason_IsEditOrSelectionTool(drawReason)) {
-		drawANavMesh(static_cast<ANavMesh*>(actor), drawSets, generalMods, drawReason, wireframeColorInt);
-	}
-
-	drawActorLegacy(actor, drawSets, editMode, itemIndex, generalMods, drawReason);
-}
-
 #if 0
 void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
                                        const GameDrawSets& drawSets,
@@ -823,36 +799,44 @@ void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
 }
 #endif
 
+void DefaultGameDrawer::drawHelperActor_drawANavMesh(ANavMesh& navMesh,
+                                                     const GameDrawSets& drawSets,
+                                                     const DrawReasonInfo& UNUSED(generalMods),
+                                                     const DrawReason drawReason,
+                                                     const vec4f wireframeColor) {
+	// Draw the bounding box of the nav-mesh. This box basically shows where is the area where the nav-mesh is going to be built.
+	if (drawReason_IsEditOrSelectionTool(drawReason)) {
+		drawSets.quickDraw->drawWiredAdd_Box(navMesh.getTransformMtx(), colorToIntRgba(wireframeColor));
+		drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+	}
 
+	if (drawReason_IsVisualizeSelection(drawReason)) {
+		vec4f wireframeColorAlphaFloat = wireframeColor;
+		wireframeColorAlphaFloat.w = 0.5f;
+		uint32 wireframeColorAlpha = colorToIntRgba(wireframeColorAlphaFloat);
 
-void DefaultGameDrawer::drawANavMesh(ANavMesh* navMesh,
-                                     const GameDrawSets& drawSets,
-                                     const DrawReasonInfo& UNUSED(generalMods),
-                                     DrawReason const drawReason,
-                                     const uint32 wireframeColor) {
-	vec4f wireframeColorAlphaFloat = colorFromIntRgba(wireframeColor);
-	wireframeColorAlphaFloat.w = 0.5f;
-	uint32 wireframeColorAlpha = colorToIntRgba(wireframeColorAlphaFloat);
-
-	if (drawReason_IsEditOrSelectionTool(drawReason) && !drawReason_IsSelection(drawReason)) {
 		drawSets.quickDraw->drawWired_Clear();
-		drawSets.quickDraw->drawWiredAdd_Box(navMesh->getTransformMtx(), wireframeColor);
+		// A small value that we add to each vertex (in world space) so that the contruction and nav-mesh
+		// geometry does not end-up z-fighting in the viewport.
+		// The proper solution would be an actual depth bias, but since this is an editor only (and used usuually only for debug)
+		// this is a good enough solution.
+		const vec3f fightingPositionBias = -drawSets.drawCamera->getCameraLookDir() * 0.001f;
 
-		for (size_t iTri = 0; iTri < navMesh->m_debugDrawNavMeshTriListWs.size() / 3; ++iTri) {
-			vec3f a = navMesh->m_debugDrawNavMeshTriListWs[iTri * 3 + 0];
-			vec3f b = navMesh->m_debugDrawNavMeshTriListWs[iTri * 3 + 1];
-			vec3f c = navMesh->m_debugDrawNavMeshTriListWs[iTri * 3 + 2];
+		for (size_t iTri = 0; iTri < navMesh.m_debugDrawNavMeshTriListWs.size() / 3; ++iTri) {
+			vec3f a = navMesh.m_debugDrawNavMeshTriListWs[iTri * 3 + 0] + fightingPositionBias;
+			vec3f b = navMesh.m_debugDrawNavMeshTriListWs[iTri * 3 + 1] + fightingPositionBias;
+			vec3f c = navMesh.m_debugDrawNavMeshTriListWs[iTri * 3 + 2] + fightingPositionBias;
 
 			drawSets.quickDraw->drawSolidAdd_Triangle(a, b, c, wireframeColorAlpha);
-			drawSets.quickDraw->drawWiredAdd_triangle(a, b, c, wireframeColor);
+			drawSets.quickDraw->drawWiredAdd_triangle(a, b, c, colorToIntRgba(wireframeColor));
 		}
 
-		uint32 buildMeshColorInt = colorIntFromRGBA255(246, 189, 85);
-		uint32 buildMeshColorAlphaInt = colorIntFromRGBA255(246, 189, 85, 127);
-		for (size_t iTri = 0; iTri < navMesh->m_debugDrawNavMeshBuildTriListWs.size() / 3; ++iTri) {
-			vec3f a = navMesh->m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 0];
-			vec3f b = navMesh->m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 1];
-			vec3f c = navMesh->m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 2];
+		const uint32 buildMeshColorInt = colorIntFromRGBA255(246, 189, 85);
+		const uint32 buildMeshColorAlphaInt = colorIntFromRGBA255(246, 189, 85, 127);
+		for (size_t iTri = 0; iTri < navMesh.m_debugDrawNavMeshBuildTriListWs.size() / 3; ++iTri) {
+			vec3f a = navMesh.m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 0] + fightingPositionBias;
+			vec3f b = navMesh.m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 1] + fightingPositionBias;
+			vec3f c = navMesh.m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 2] + fightingPositionBias;
 
 			drawSets.quickDraw->drawSolidAdd_Triangle(a, b, c, buildMeshColorAlphaInt);
 			drawSets.quickDraw->drawWiredAdd_triangle(a, b, c, buildMeshColorInt);
@@ -864,8 +848,7 @@ void DefaultGameDrawer::drawANavMesh(ANavMesh* navMesh,
 	}
 }
 
-// A Legacy function that should end up not being used.
-void DefaultGameDrawer::drawActorLegacy(Actor* actor,
+void DefaultGameDrawer::drawHelperActor(Actor* actor,
                                         const GameDrawSets& drawSets,
                                         EditMode const editMode,
                                         int const itemIndex,
@@ -913,8 +896,7 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 
 			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
-	}
-	if (actorType == sgeTypeId(ABlockingObstacle) && editMode == editMode_actors) {
+	} else if (actorType == sgeTypeId(ABlockingObstacle) && editMode == editMode_actors) {
 		ABlockingObstacle* const simpleObstacle = static_cast<ABlockingObstacle*>(const_cast<Actor*>(actor));
 
 		if (simpleObstacle->geometry.hasData()) {
@@ -927,8 +909,7 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 				                         simpleObstacle->material, InstanceDrawMods());
 			}
 		}
-	}
-	if (actorType == sgeTypeId(ACamera) && drawReason_IsVisualizeSelection(drawReason)) {
+	} else if (actorType == sgeTypeId(ACamera) && drawReason_IsVisualizeSelection(drawReason)) {
 		if (editMode == editMode_actors) {
 			float const bodyEnd = -0.3f;
 			float const sizeZ = 0.35f;
@@ -999,8 +980,7 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * -sizeZ),
 			};
 
-			const TraitCamera* const trait = getTrait<TraitCamera>(actor);
-			if (trait) {
+			if (const TraitCamera* const traitCamera = getTrait<TraitCamera>(actor)) {
 				const auto intersectPlanes = [](const Plane& p0, const Plane& p1, const Plane& p2) -> vec3f {
 					// http://www.ambrsoft.com/TrigoCalc/Plan3D/3PlanesIntersection_.htm
 					float const det = -triple(p0.norm(), p1.norm(), p2.norm()); // Caution: I'm not sure about that minus...
@@ -1013,7 +993,7 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 				};
 
 
-				const ICamera* const icam = trait->getCamera();
+				const ICamera* const icam = traitCamera->getCamera();
 				const Frustum* const f = icam->getFrustumWS();
 				if (f) {
 					const vec3f frustumVerts[8] = {
@@ -1064,8 +1044,7 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 				}
 			}
 		}
-	}
-	if (actorType == sgeTypeId(ALine) && drawReason_IsEditOrSelectionTool(drawReason)) {
+	} else if (actorType == sgeTypeId(ALine) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		const ALine* const spline = static_cast<const ALine*>(actor);
 
 		if (editMode == editMode_actors) {
@@ -1102,8 +1081,7 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 			                                              useWireframe ? 0x550055FF : 0xFFFFFFFF, 0.2f, 3);
 			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
-	}
-	if (actorType == sgeTypeId(ACRSpline) && drawReason_IsEditOrSelectionTool(drawReason)) {
+	} else if (actorType == sgeTypeId(ACRSpline) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		ACRSpline* const spline = static_cast<ACRSpline*>(actor);
 
 		mat4f const tr = spline->getTransformMtx();
@@ -1142,18 +1120,14 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 			                                              useWireframe ? 0x550055FF : 0xFFFFFFFF, pointScale, 3);
 			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
-	}
-
-	if (actorType == sgeTypeId(ALocator) && drawReason_IsEditOrSelectionTool(drawReason)) {
+	} else if (actorType == sgeTypeId(ALocator) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		if (editMode == editMode_actors) {
 			drawSets.quickDraw->drawWired_Clear();
 			drawSets.quickDraw->drawWiredAdd_Basis(actor->getTransformMtx());
 			drawSets.quickDraw->drawWiredAdd_Box(actor->getTransformMtx(), wireframeColorInt);
 			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
-	}
-
-	if (actorType == sgeTypeId(ABone) && drawReason_IsEditOrSelectionTool(drawReason)) {
+	} else if (actorType == sgeTypeId(ABone) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		if (editMode == editMode_actors) {
 			drawSets.quickDraw->drawWired_Clear();
 
@@ -1197,17 +1171,13 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr,
 			                                      getCore()->getGraphicsResources().DSS_always_noTest);
 		}
-	}
-
-	if ((actorType == sgeTypeId(AInvisibleRigidObstacle)) && drawReason_IsEditOrSelectionTool(drawReason)) {
+	} else if ((actorType == sgeTypeId(AInvisibleRigidObstacle)) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		if (editMode == editMode_actors) {
 			drawSets.quickDraw->drawWired_Clear();
 			drawSets.quickDraw->drawWiredAdd_Box(actor->getTransformMtx(), actor->getBBoxOS(), wireframeColorInt);
 			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
-	}
-
-	if (actorType == sgeTypeId(AInfinitePlaneObstacle) && drawReason_IsEditOrSelectionTool(drawReason)) {
+	} else if (actorType == sgeTypeId(AInfinitePlaneObstacle) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		if (editMode == editMode_actors) {
 			AInfinitePlaneObstacle* plane = static_cast<AInfinitePlaneObstacle*>(actor);
 			const float scale = plane->displayScale * plane->getTransform().s.componentMaxAbs();
@@ -1219,6 +1189,12 @@ void DefaultGameDrawer::drawActorLegacy(Actor* actor,
 			                                      wireframeColorInt);
 			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
+	} else if (actorType == sgeTypeId(ANavMesh)) {
+		if (ANavMesh* navMesh = static_cast<ANavMesh*>(actor)) {
+			drawHelperActor_drawANavMesh(*navMesh, drawSets, generalMods, drawReason, wireframeColor);
+		}
+	} else {
+		// Not implemented.
 	}
 }
 
