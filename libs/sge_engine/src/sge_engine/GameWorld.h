@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "Actor.h"
-#include "Camera.h"
+#include "EditorCamera.h"
 #include "PhysicsDebugDraw.h"
 #include "sge_core/application/input.h"
 #include "sge_engine/Physics.h"

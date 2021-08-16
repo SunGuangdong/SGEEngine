@@ -22,7 +22,6 @@ struct ParamsCbFWDDefaultShading {
 	vec4f cameraPositionWs;
 	vec4f uCameraLookDirWs;
 
-	vec4f uiHighLightColor;
 	vec4f uDiffuseColorTint;
 	vec3f texDiffuseXYZScaling;
 	float uMetalness;
@@ -62,129 +61,10 @@ void BasicModelDraw::drawGeometry(const RenderDestination& rdest,
                                   const Geometry* geometry,
                                   const Material& material,
                                   const InstanceDrawMods& mods) {
-	if (generalMods.isRenderingShadowMap) {
-		drawGeometry_FWDBuildShadowMap(rdest, camPos, camLookDir, projView, world, generalMods, geometry, material, mods);
-	} else {
-		drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, generalMods, geometry, material, mods);
-	}
+	drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, generalMods, geometry, material, mods);
 }
 
 
-void BasicModelDraw::drawGeometry_FWDBuildShadowMap(const RenderDestination& rdest,
-                                                    const vec3f& camPos,
-                                                    const vec3f& UNUSED(camLookDir),
-                                                    const mat4f& projView,
-                                                    const mat4f& world,
-                                                    const DrawReasonInfo& generalMods,
-                                                    const Geometry* geometry,
-                                                    const Material& UNUSED(material),
-                                                    const InstanceDrawMods& mods) {
-	enum {
-		OPT_LightType,
-		OPT_HasVertexSkinning,
-		kNumOptions,
-	};
-
-	enum : int { uWorld, uProjView, uPointLightPositionWs, uPointLightFarPlaneDistance, uSkinningBones, uSkinningFirstBoneOffsetInTex };
-
-	if (shadingPermutFWDBuildShadowMaps.isValid() == false) {
-		shadingPermutFWDBuildShadowMaps = ShadingProgramPermuator();
-
-		const std::vector<OptionPermuataor::OptionDesc> compileTimeOptions = {
-		    {OPT_LightType,
-		     "OPT_LightType",
-		     {SGE_MACRO_STR(FWDDBSM_OPT_LightType_SpotOrDirectional), SGE_MACRO_STR(FWDDBSM_OPT_LightType_Point)}},
-		    {OPT_HasVertexSkinning, "OPT_HasVertexSkinning", {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
-		};
-
-		const std::vector<ShadingProgramPermuator::Unform> uniformsToCache = {
-		    {uWorld, "world", ShaderType::VertexShader},
-		    {uProjView, "projView", ShaderType::VertexShader},
-		    {uPointLightPositionWs, "uPointLightPositionWs", ShaderType::PixelShader},
-		    {uPointLightFarPlaneDistance, "uPointLightFarPlaneDistance", ShaderType::PixelShader},
-		    {uSkinningBones, "uSkinningBones", ShaderType::VertexShader},
-		    {uSkinningFirstBoneOffsetInTex, "uSkinningFirstBoneOffsetInTex", ShaderType::VertexShader}};
-
-		SGEDevice* const sgedev = rdest.getDevice();
-		shadingPermutFWDBuildShadowMaps->createFromFile(sgedev, "core_shaders/FWDDefault_buildShadowMaps.shader", compileTimeOptions,
-		                                                uniformsToCache);
-	}
-
-	const int optHasVertexSkinning = (geometry->hasVertexSkinning()) ? kHasVertexSkinning_Yes : kHasVertexSkinning_No;
-
-	const OptionPermuataor::OptionChoice optionChoice[kNumOptions] = {
-	    {OPT_LightType, generalMods.isShadowMapForPointLight ? FWDDBSM_OPT_LightType_Point : FWDDBSM_OPT_LightType_SpotOrDirectional},
-	    {OPT_HasVertexSkinning, optHasVertexSkinning},
-	};
-
-	const int iShaderPerm =
-	    shadingPermutFWDBuildShadowMaps->getCompileTimeOptionsPerm().computePermutationIndex(optionChoice, SGE_ARRSZ(optionChoice));
-	const ShadingProgramPermuator::Permutation& shaderPerm = shadingPermutFWDBuildShadowMaps->getShadersPerPerm()[iShaderPerm];
-
-	StaticArray<BoundUniform, 8> uniforms;
-
-	shaderPerm.bind<8>(uniforms, (int)uWorld, (void*)&world);
-	shaderPerm.bind<8>(uniforms, (int)uProjView, (void*)&projView);
-
-	if (generalMods.isShadowMapForPointLight) {
-		vec3f pointLightPositionWs = camPos;
-		shaderPerm.bind<8>(uniforms, uPointLightPositionWs, (void*)&pointLightPositionWs);
-		shaderPerm.bind<8>(uniforms, uPointLightFarPlaneDistance, (void*)&generalMods.shadowMapPointLightDepthRange);
-	}
-
-	if (optHasVertexSkinning == kHasVertexSkinning_Yes) {
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uSkinningBones], (geometry->skinningBoneTransforms)));
-		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uSkinningFirstBoneOffsetInTex], (void*)&geometry->firstBoneOffset));
-		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-	}
-
-	// Feed the draw call data to the state group.
-	stateGroup.setProgram(shaderPerm.shadingProgram.GetPtr());
-	stateGroup.setPrimitiveTopology(PrimitiveTopology::TriangleList);
-	stateGroup.setVBDeclIndex(geometry->vertexDeclIndex);
-	stateGroup.setVB(0, geometry->vertexBuffer, uint32(geometry->vbByteOffset), geometry->stride);
-
-	RasterizerState* rasterState = nullptr;
-	if (mods.forceNoCulling) {
-		rasterState = getCore()->getGraphicsResources().RS_noCulling;
-	} else {
-		// We are baking shadow maps and we want to render the backfaces
-		// *opposing to the regular rendering which uses front faces... duh).
-		// This is done to avoid the Shadow Acne artifacts caused by floating point
-		// innacuraties introduced by the depth texture.
-		bool flipCulling = determinant(world) > 0.f;
-
-		// Caution: [POINT_LIGHT_SHADOWMAP_TRIANGLE_WINING_FLIP]
-		// Triangle winding would need an aditional flip based on the rendering API.
-		if (generalMods.isShadowMapForPointLight && kIsTexcoordStyleD3D) {
-			flipCulling = !flipCulling;
-		}
-
-		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_defaultBackfaceCCW : getCore()->getGraphicsResources().RS_default;
-	}
-
-	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual);
-
-	if (geometry->ibFmt != UniformType::Unknown) {
-		stateGroup.setIB(geometry->indexBuffer, geometry->ibFmt, geometry->ibByteOffset);
-	} else {
-		stateGroup.setIB(nullptr, UniformType::Unknown, 0);
-	}
-
-	DrawCall dc;
-	dc.setUniforms(uniforms.data(), uniforms.size());
-	dc.setStateGroup(&stateGroup);
-
-	if (geometry->ibFmt != UniformType::Unknown) {
-		dc.drawIndexed(geometry->numElements, 0, 0);
-	} else {
-		dc.draw(geometry->numElements, 0);
-	}
-
-	// Exexute the draw call.
-	rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
-}
 
 void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
                                              const vec3f& camPos,
@@ -387,13 +267,6 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		// This is done to avoid the Shadow Acne artifacts caused by floating point
 		// innacuraties introduced by the depth texture.
 		bool flipCulling = determinant(world) > 0.f;
-
-		// Caution: [POINT_LIGHT_SHADOWMAP_TRIANGLE_WINING_FLIP]
-		// Triangle winding would need an aditional flip based on the rendering API.
-		if (generalMods.isShadowMapForPointLight && kIsTexcoordStyleD3D) {
-			flipCulling = !flipCulling;
-		}
-
 		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
 	}
 
@@ -405,7 +278,6 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	paramsCb.cameraPositionWs = vec4f(camPos, 1.f);
 	paramsCb.uCameraLookDirWs = vec4f(camLookDir, 0.f);
 	paramsCb.projView = projView;
-	paramsCb.uiHighLightColor = generalMods.selectionTint;
 	paramsCb.uDiffuseColorTint = material.diffuseColor;
 	paramsCb.uvwTransform = combinedUVWTransform;
 	paramsCb.texDiffuseXYZScaling = material.diffuseTexXYZScaling;

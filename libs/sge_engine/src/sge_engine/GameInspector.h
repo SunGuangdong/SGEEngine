@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Camera.h"
+#include "EditorCamera.h"
 #include "GameWorld.h"
 #include "InspectorCmd.h"
 #include "PlantingTool.h"

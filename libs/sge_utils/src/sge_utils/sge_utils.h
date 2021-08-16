@@ -92,6 +92,7 @@ int assertAskDisable(const char* const file, const int line, const char* expr);
 
 #define sgeAssertFalse(msg) sgeAssert(false && msg)
 
+/// Expands the value of the specified expression or a macro and converts it to a string.
 #define SGE_MACRO_STR_IMPL(m) #m
 #define SGE_MACRO_STR(m) SGE_MACRO_STR_IMPL(m)
 

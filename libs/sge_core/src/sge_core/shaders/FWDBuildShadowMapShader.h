@@ -1,0 +1,29 @@
+#pragma once
+
+#include "ShadingProgramPermuator.h"
+#include "sge_core/model/EvaluatedModel.h"
+#include "sge_core/sgecore_api.h"
+#include "sge_utils/math/mat4.h"
+#include "sge_utils/utils/OptionPermutator.h"
+#include "sge_utils/utils/optional.h"
+
+namespace sge {
+
+struct ShadowMapBuildInfo;
+
+struct SGE_CORE_API FWDBuildShadowMapShader {
+	FWDBuildShadowMapShader() = default;
+
+	void drawGeometry(const RenderDestination& rdest,
+	                  const vec3f& camPos,
+	                  const mat4f& projView,
+	                  const mat4f& world,
+	                  const ShadowMapBuildInfo& shadowMapBuildInfo,
+	                  const Geometry& geometry);
+
+  private:
+	Optional<ShadingProgramPermuator> shadingPermutFWDBuildShadowMaps;
+	StateGroup stateGroup;
+};
+
+} // namespace sge

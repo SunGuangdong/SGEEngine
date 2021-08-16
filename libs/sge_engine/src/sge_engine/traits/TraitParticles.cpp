@@ -1,5 +1,5 @@
 #include "sge_engine/traits/TraitParticles.h"
-#include "sge_engine/Camera.h"
+#include "sge_core/Camera.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitParticlesRenderItem.h"
 #include "sge_engine/GameWorld.h"
 

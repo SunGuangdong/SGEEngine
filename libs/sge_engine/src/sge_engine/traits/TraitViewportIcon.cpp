@@ -1,6 +1,6 @@
 #include "TraitViewportIcon.h"
+#include "sge_core/Camera.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitViewportIconRenderItem.h"
-#include "sge_engine/Camera.h"
 #include "sge_engine/enums2d.h"
 
 namespace sge {

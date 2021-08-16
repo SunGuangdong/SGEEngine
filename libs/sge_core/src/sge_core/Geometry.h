@@ -45,7 +45,7 @@ struct Geometry {
 	Buffer* indexBuffer = nullptr;
 	Texture* skinningBoneTransforms = nullptr;
 	int firstBoneOffset = -1;
-	VertexDeclIndex vertexDeclIndex = VertexDeclIndex_Null;
+	VertexDeclIndex vertexDeclIndex = VertexDeclIndex_Null; // The index of the vertex memory layout. See SGEDevice for more info.
 	bool vertexDeclHasVertexColor = false;
 	bool vertexDeclHasUv = false;
 	bool vertexDeclHasNormals = false;

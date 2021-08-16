@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sge_core/shaders/ConstantColorShader.h"
+#include "sge_core/shaders/FWDBuildShadowMapShader.h"
 #include "sge_core/shaders/SkyShader.h"
 #include "sge_core/shaders/modeldraw.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
@@ -54,23 +55,25 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 
 	void drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 	                               const GameDrawSets& drawSets,
-	                               const DrawReasonInfo& generalMods,
+	                               const DrawReasonInfo& drawReasonInfo,
 	                               DrawReason const drawReason);
 
 	void drawRenderItem_TraitSprite(const TraitSpriteRenderItem& ri,
 	                                const GameDrawSets& drawSets,
-	                                const DrawReasonInfo& generalMods,
+	                                const DrawReasonInfo& drawReasonInfo,
 	                                DrawReason const drawReason);
 
 	void drawRenderItem_TraitViewportIcon(TraitViewportIconRenderItem& viewportIcon,
 	                                      const GameDrawSets& drawSets,
-	                                      DrawReason const drawReason);
+	                                      const DrawReason& drawReason);
 
-	void drawRenderItem_TraitParticlesSimple(TraitParticlesSimpleRenderItem& ri, const GameDrawSets& drawSets, DrawReasonInfo generalMods);
+	void drawRenderItem_TraitParticlesSimple(TraitParticlesSimpleRenderItem& ri,
+	                                         const GameDrawSets& drawSets,
+	                                         const DrawReasonInfo& generalMods);
 
 	void drawRenderItem_TraitParticlesProgrammable(TraitParticlesProgrammableRenderItem& ri,
 	                                               const GameDrawSets& drawSets,
-	                                               DrawReasonInfo generalMods);
+	                                               const DrawReasonInfo& drawReasonInfo);
 
 	/// @brief A function usually called as a result of HelperDrawRenderItem.
 	/// intented be used for objects that need to be visible in the editor and not during gameplay.
@@ -78,12 +81,12 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	                     const GameDrawSets& drawSets,
 	                     EditMode const editMode,
 	                     int const itemIndex,
-	                     const DrawReasonInfo& generalMods,
+	                     const DrawReasonInfo& drawReasonInfo,
 	                     DrawReason const drawReason);
 
 	void drawHelperActor_drawANavMesh(ANavMesh& navMesh,
 	                                  const GameDrawSets& drawSets,
-	                                  const DrawReasonInfo& generalMods,
+	                                  const DrawReasonInfo& drawReasonInfo,
 	                                  const DrawReason drawReason,
 	                                  const vec4f wireframeColor);
 
@@ -91,7 +94,7 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	/// @brief Returns true if the bounding box of the actor (Actor::getBBoxOs) is in the specified
 	/// draw camera frustum.
 	bool isInFrustum(const GameDrawSets& drawSets, Actor* actor) const;
-	void fillGeneralModsWithLights(Actor* actor, DrawReasonInfo& generalMods);
+	void fillGeneralModsWithLights(Actor* actor, DrawReasonInfo& drawReasonInfo);
 
 	void clearRenderItems() {
 		m_RIs_opaque.clear();
@@ -107,6 +110,7 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 
   public:
 	BasicModelDraw m_modeldraw;
+	FWDBuildShadowMapShader m_shadowMapBuilder;
 	ConstantColorWireShader m_constantColorShader;
 	SkyShader m_skyShader;
 	TexturedPlaneDraw m_texturedPlaneDraw;

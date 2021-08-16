@@ -20,7 +20,6 @@ cbuffer ParamsCbFWDDefaultShading {
 	float4 cameraPositionWs;
 	float4 uCameraLookDirWs;
 
-	float4 uiHighLightColor;
 	float4 uDiffuseColorTint;
 	float3 texDiffuseXYZScaling;
 	float uMetalness;

@@ -1,6 +1,6 @@
-#include "Camera.h"
-#include "sge_core/application/input.h"
+#include "EditorCamera.h"
 #include "sge_renderer/renderer/renderer.h"
+#include "sge_core/application/input.h"
 
 namespace sge {
 
@@ -38,12 +38,5 @@ bool EditorCamera::update(const InputState& is, float aspectRatio) {
 	return updated;
 }
 
-RawCamera::RawCamera(const vec3f& camPos, const mat4f& view, const mat4f& proj)
-    : m_camPos(camPos)
-    , m_view(view)
-    , m_proj(proj) {
-	m_projView = proj * view;
-	m_frustum = Frustum::extractClippingPlanes(m_projView, kIsTexcoordStyleD3D);
-}
 
 } // namespace sge

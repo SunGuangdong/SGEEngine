@@ -41,24 +41,17 @@ struct ShadingLightData {
 //------------------------------------------------------------
 // DrawReasonInfo
 //------------------------------------------------------------
+
+
 struct DrawReasonInfo {
-	/// True if the drawing is reandering a shadow map.
-	bool isRenderingShadowMap = false;
-	/// True if the current render is targeting a shadow map for a point light.
-	bool isShadowMapForPointLight = false;
-	float shadowMapPointLightDepthRange = 0.f;
-
-	/// If editor wants to visualize a selection, the user should use this color to somehow
-	/// modify the rendering of the object so it is visible that it is selected.
-	vec4f selectionTint = vec4f(0.f);
-
-	/// The ambient light in the scene.
+	/// The ambient light color and intensity to be applied to the object.
+	/// Usually this is the same as the one in the scene.
 	vec3f ambientLightColor = vec3f(1.f);
 
 	/// The rim light in the scene.
 	vec4f uRimLightColorWWidth = vec4f(vec3f(0.1f), 0.7f);
 
-	/// lightsCount is the size of the aaray pointed by @ppLightData.
+	/// lightsCount is the size of the array pointed by @ppLightData.
 	int lightsCount = 0;
 
 	/// An array of all lights that affect the object. The size of the array is @lightsCount.
@@ -85,7 +78,7 @@ struct SGE_CORE_API BasicModelDraw {
 	          const vec3f& camLookDir,
 	          const mat4f& projView,
 	          const mat4f& preRoot,
-	          const DrawReasonInfo& generalMods,
+	          const DrawReasonInfo& drawReasonInfo,
 	          const EvaluatedModel& model,
 	          const InstanceDrawMods& mods,
 	          const std::vector<MaterialOverride>* mtlOverrides = nullptr);
@@ -95,7 +88,7 @@ struct SGE_CORE_API BasicModelDraw {
 	                  const vec3f& camLookDir,
 	                  const mat4f& projView,
 	                  const mat4f& world,
-	                  const DrawReasonInfo& generalMods,
+	                  const DrawReasonInfo& drawReasonInfo,
 	                  const Geometry* geometry,
 	                  const Material& material,
 	                  const InstanceDrawMods& mods);
@@ -106,20 +99,10 @@ struct SGE_CORE_API BasicModelDraw {
 	                             const vec3f& camLookDir,
 	                             const mat4f& projView,
 	                             const mat4f& world,
-	                             const DrawReasonInfo& generalMods,
+	                             const DrawReasonInfo& drawReasonInfo,
 	                             const Geometry* geometry,
 	                             const Material& material,
 	                             const InstanceDrawMods& mods);
-
-	void drawGeometry_FWDBuildShadowMap(const RenderDestination& rdest,
-	                                    const vec3f& camPos,
-	                                    const vec3f& camLookDir,
-	                                    const mat4f& projView,
-	                                    const mat4f& world,
-	                                    const DrawReasonInfo& generalMods,
-	                                    const Geometry* geometry,
-	                                    const Material& material,
-	                                    const InstanceDrawMods& mods);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermutFWDShading;
