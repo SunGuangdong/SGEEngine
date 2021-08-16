@@ -14,7 +14,7 @@ struct TraitModelRenderItem : public IRenderItem {
 	int iEvalNode = -1; // The mesh to be rendered from the model.
 	int iEvalNodeMechAttachmentIndex = -1;
 
-	Material mtl;
+	PBRMaterial mtl;
 };
 
 } // namespace sge

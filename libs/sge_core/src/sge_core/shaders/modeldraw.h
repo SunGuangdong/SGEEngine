@@ -14,7 +14,7 @@ struct ModelMesh;
 
 struct MaterialOverride {
 	std::string name;
-	Material mtl;
+	PBRMaterial mtl;
 };
 
 //------------------------------------------------------------
@@ -88,7 +88,7 @@ struct SGE_CORE_API BasicModelDraw {
 	                  const mat4f& world,
 	                  const ObjectLighting& lighting,
 	                  const Geometry* geometry,
-	                  const Material& material,
+	                  const PBRMaterial& material,
 	                  const InstanceDrawMods& mods);
 
   private:
@@ -99,7 +99,7 @@ struct SGE_CORE_API BasicModelDraw {
 	                             const mat4f& world,
 	                             const ObjectLighting& lighting,
 	                             const Geometry* geometry,
-	                             const Material& material,
+	                             const PBRMaterial& material,
 	                             const InstanceDrawMods& mods);
 
   private:

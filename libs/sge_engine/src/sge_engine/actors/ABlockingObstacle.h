@@ -46,7 +46,7 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 	GpuHandle<Buffer> vertexBuffer;
 	GpuHandle<Buffer> indexBuffer;
 	Geometry geometry;
-	Material material;
+	PBRMaterial material;
 	int numVerts = 0;
 	int numIndices = 0;
 	TraitRigidBody m_traitRB;

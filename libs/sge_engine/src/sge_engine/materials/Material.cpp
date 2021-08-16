@@ -25,8 +25,8 @@ ReflBlock() {
 }
 // clang-format on
 
-Material MDiffuseMaterial::getMaterial() {
-	Material result;
+PBRMaterial MDiffuseMaterial::getMaterial() {
+	PBRMaterial result;
 
 	result.uvwTransform =
 	    mat4f::getTRS(vec3f(textureShift, 0.f), quatf::getAxisAngle(vec3f(0.f, 0.f, 1.f), textureRotation), vec3f(textureTiling, 1.f));

@@ -131,8 +131,8 @@ Geometry TexturedPlaneDraw::getGeometry(SGEDevice* sgedev) {
 	return geom;
 }
 
-Material TexturedPlaneDraw::getMaterial(Texture* texture) const {
-	Material mtl;
+PBRMaterial TexturedPlaneDraw::getMaterial(Texture* texture) const {
+	PBRMaterial mtl;
 	mtl.diffuseTexture = texture;
 	return mtl;
 }

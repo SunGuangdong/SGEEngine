@@ -621,7 +621,7 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 		                                *drawSets.shadowMapBuildInfo, texPlaneGeom);
 	} else {
 		// Gameplay shaded.
-		Material texPlaneMtl = m_texturedPlaneDraw.getMaterial(ri.spriteTexture);
+		PBRMaterial texPlaneMtl = m_texturedPlaneDraw.getMaterial(ri.spriteTexture);
 		texPlaneMtl.diffuseColor = ri.colorTint;
 
 		InstanceDrawMods mods;

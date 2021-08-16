@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
 
 namespace sge {
@@ -59,9 +60,13 @@ struct Geometry {
 	uint32 numElements = 0;                         ///< The number of vertices/indices used by this mesh.
 };
 
+struct SGE_CORE_API IMaterial {
+	IMaterial() = default;
+	virtual ~IMaterial() = default;
+};
 
 /// @brief Currently represent a PBR'ish material. Ideally this needs to be an interface usable for all kind of materials.
-struct Material {
+struct SGE_CORE_API PBRMaterial : public IMaterial {
 	enum DiffuseColorSource {
 		diffuseColorSource_vertexColor,
 		diffuseColorSource_constantColor,

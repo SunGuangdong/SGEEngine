@@ -226,7 +226,7 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 				int numAttachments = int(node->meshAttachments.size());
 				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
 					const EvaluatedMaterial& mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex);
-					Material material;
+					PBRMaterial material;
 					
 					material.alphaMultiplier = modelSets.alphaMultiplier * mtl.alphaMultiplier;
 
@@ -251,9 +251,9 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 					                            : nullptr;
 
 					if (material.diffuseTexture != nullptr) {
-						material.diffuseColorSrc = Material::diffuseColorSource_diffuseMap;
+						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_diffuseMap;
 					} else if(evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor) {
-						material.diffuseColorSrc = Material::diffuseColorSource_vertexColor;
+						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_vertexColor;
 					}
 
 					renderItem.mtl = material;

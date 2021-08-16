@@ -15,7 +15,7 @@ struct SGE_ENGINE_API TexturedPlaneDraw {
 	          const vec4f uvRegion = vec4f(0.f, 0.f, 1.f, 1.f));
 
 	Geometry getGeometry(SGEDevice* sgedev);
-	Material getMaterial(Texture* texture) const;
+	PBRMaterial getMaterial(Texture* texture) const;
 
   private:
 	struct Vertex {

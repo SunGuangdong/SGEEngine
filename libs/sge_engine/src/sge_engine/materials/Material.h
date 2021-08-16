@@ -8,12 +8,12 @@
 
 namespace sge {
 
-struct Material;
+struct PBRMaterial;
 
 struct SGE_ENGINE_API OMaterial : public GameObject {
 	void create() override {}
 
-	virtual Material getMaterial() = 0;
+	virtual PBRMaterial getMaterial() = 0;
 };
 
 struct SGE_ENGINE_API MDiffuseMaterial : public OMaterial {
@@ -25,7 +25,7 @@ struct SGE_ENGINE_API MDiffuseMaterial : public OMaterial {
 
 	void create() override {}
 
-	Material getMaterial() override;
+	PBRMaterial getMaterial() override;
 
 	vec2f textureShift = vec2f(0.f);
 	vec2f textureTiling = vec2f(1.f);

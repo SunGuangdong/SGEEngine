@@ -111,7 +111,7 @@ struct SGE_ENGINE_API ParticleGroupState {
 		// GpuHandle<Buffer> indexBuffer;
 
 		Geometry geometry;
-		Material material;
+		PBRMaterial material;
 	};
 
 	mat4f getParticlesToWorldMtx() const { return m_isInWorldSpace ? mat4f::getIdentity() : m_n2w; }
@@ -231,7 +231,7 @@ struct SGE_ENGINE_API ParticleRenderDataGen {
 
 	GpuHandle<Buffer> vertexBuffer;
 	Geometry geometry;
-	Material material;
+	PBRMaterial material;
 };
 
 } // namespace sge

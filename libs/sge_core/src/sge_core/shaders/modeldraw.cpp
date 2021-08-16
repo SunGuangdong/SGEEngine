@@ -59,7 +59,7 @@ void BasicModelDraw::drawGeometry(const RenderDestination& rdest,
                                   const mat4f& world,
                                   const ObjectLighting& lighting,
                                   const Geometry* geometry,
-                                  const Material& material,
+                                  const PBRMaterial& material,
                                   const InstanceDrawMods& mods) {
 	drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, lighting, geometry, material, mods);
 }
@@ -73,7 +73,7 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
                                              const mat4f& world,
                                              const ObjectLighting& lighting,
                                              const Geometry* geometry,
-                                             const Material& material,
+                                             const PBRMaterial& material,
                                              const InstanceDrawMods& mods) {
 	SGEDevice* const sgedev = rdest.getDevice();
 	if (!paramsBuffer.IsResourceValid()) {
@@ -206,17 +206,17 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	}
 
 	switch (material.diffuseColorSrc) {
-		case Material::diffuseColorSource_vertexColor: {
+		case PBRMaterial::diffuseColorSource_vertexColor: {
 			if (OPT_HasVertexColor_choice == kHasVertexColor_Yes) {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromVertexColor;
 			} else {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
 			}
 		} break;
-		case Material::diffuseColorSource_constantColor: {
+		case PBRMaterial::diffuseColorSource_constantColor: {
 			pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
 		} break;
-		case Material::diffuseColorSource_diffuseMap: {
+		case PBRMaterial::diffuseColorSource_diffuseMap: {
 			if (OPT_HasUV_choice != kHasUV_No) {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromTexture;
 			}
@@ -469,7 +469,7 @@ void BasicModelDraw::draw(const RenderDestination& rdest,
 			const EvaluatedMesh& evalMesh = evalModel.getEvalMesh(meshAttachment.attachedMeshIndex);
 			mat4f const finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? preRoot : preRoot * evalNode.evalGlobalTransform;
 
-			Material material;
+			PBRMaterial material;
 
 			if (meshAttachment.attachedMaterialIndex >= 0) {
 				const EvaluatedMaterial& mtl = evalModel.getEvalMaterial(meshAttachment.attachedMaterialIndex);

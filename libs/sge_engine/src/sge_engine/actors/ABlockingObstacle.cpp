@@ -159,7 +159,7 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 		                    PrimitiveTopology::TriangleList, 0, 0, sizeof(vec3f) * 2, UniformType::Uint, numIndices);
 	}
 
-	material = Material();
+	material = PBRMaterial();
 
 	material.diffuseTextureX = m_textureX.getAssetTexture() ? m_textureX.getAssetTexture()->tex.GetPtr() : nullptr;
 	material.diffuseTextureY = m_textureY.getAssetTexture() ? m_textureY.getAssetTexture()->tex.GetPtr() : nullptr;
