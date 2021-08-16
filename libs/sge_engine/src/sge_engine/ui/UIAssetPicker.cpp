@@ -138,7 +138,7 @@ bool assetPicker(
 
 						RenderDestination rdest(getCore()->getDevice()->getContext(), frameTarget);
 						getCore()->getModelDraw().draw(rdest, camPos, -camPos.normalized0(), proj * lookAt, mat4f::getIdentity(),
-						                               DrawReasonInfo(), model->staticEval, InstanceDrawMods());
+						                               ObjectLighting(), model->staticEval, InstanceDrawMods());
 
 						ImGui::Image(frameTarget->getRenderTarget(0), ImVec2(textureSize, textureSize));
 						ImGui::EndTooltip();

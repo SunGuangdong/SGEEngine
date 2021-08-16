@@ -68,12 +68,12 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	debugDraw.drawWiredAdd_Grid(vec3f(0), vec3f::getAxis(0), vec3f::getAxis(2), 5, 5, 0xFF333733);
 	debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
-	DrawReasonInfo mods;
+	ObjectLighting mods;
 	InstanceDrawMods imods;
 	imods.forceNoLighting = true;
 
 	getCore()->getModelDraw().draw(rdest, camera.eyePosition(), -camera.orbitPoint.normalized0(), proj * lookAt, mat4f::getIdentity(),
-	                               DrawReasonInfo(), m_eval, imods);
+	                               ObjectLighting(), m_eval, imods);
 
 	if (kIsTexcoordStyleD3D) {
 		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y));
@@ -225,7 +225,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
 			getCore()->getModelDraw().draw(rdest, camera.eyePosition(), -camera.orbitPoint.normalized0(), proj * lookAt,
-			                               mat4f::getIdentity(), DrawReasonInfo(), m_eval, InstanceDrawMods());
+			                               mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods());
 
 			ImGui::InvisibleButton("TextureCanvasIB", canvas_size);
 

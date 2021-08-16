@@ -39,11 +39,9 @@ struct ShadingLightData {
 };
 
 //------------------------------------------------------------
-// DrawReasonInfo
+// ObjectLighting
 //------------------------------------------------------------
-
-
-struct DrawReasonInfo {
+struct ObjectLighting {
 	/// The ambient light color and intensity to be applied to the object.
 	/// Usually this is the same as the one in the scene.
 	vec3f ambientLightColor = vec3f(1.f);
@@ -78,7 +76,7 @@ struct SGE_CORE_API BasicModelDraw {
 	          const vec3f& camLookDir,
 	          const mat4f& projView,
 	          const mat4f& preRoot,
-	          const DrawReasonInfo& drawReasonInfo,
+	          const ObjectLighting& lighting,
 	          const EvaluatedModel& model,
 	          const InstanceDrawMods& mods,
 	          const std::vector<MaterialOverride>* mtlOverrides = nullptr);
@@ -88,7 +86,7 @@ struct SGE_CORE_API BasicModelDraw {
 	                  const vec3f& camLookDir,
 	                  const mat4f& projView,
 	                  const mat4f& world,
-	                  const DrawReasonInfo& drawReasonInfo,
+	                  const ObjectLighting& lighting,
 	                  const Geometry* geometry,
 	                  const Material& material,
 	                  const InstanceDrawMods& mods);
@@ -99,7 +97,7 @@ struct SGE_CORE_API BasicModelDraw {
 	                             const vec3f& camLookDir,
 	                             const mat4f& projView,
 	                             const mat4f& world,
-	                             const DrawReasonInfo& drawReasonInfo,
+	                             const ObjectLighting& lighting,
 	                             const Geometry* geometry,
 	                             const Material& material,
 	                             const InstanceDrawMods& mods);

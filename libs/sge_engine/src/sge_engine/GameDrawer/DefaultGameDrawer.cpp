@@ -303,7 +303,7 @@ bool DefaultGameDrawer::isInFrustum(const GameDrawSets& drawSets, Actor* actor) 
 	return true;
 }
 
-void DefaultGameDrawer::fillGeneralModsWithLights(Actor* actor, DrawReasonInfo& drawReasonInfo) {
+void DefaultGameDrawer::getActorObjectLighting(Actor* actor, ObjectLighting& lighting) {
 	// Find all the lights that can affect this object.
 	m_shadingLightPerObject.clear();
 	AABox3f bboxOS = actor->getBBoxOS();
@@ -314,8 +314,8 @@ void DefaultGameDrawer::fillGeneralModsWithLights(Actor* actor, DrawReasonInfo& 
 		}
 	}
 
-	drawReasonInfo.ppLightData = m_shadingLightPerObject.data();
-	drawReasonInfo.lightsCount = int(m_shadingLightPerObject.size());
+	lighting.ppLightData = m_shadingLightPerObject.data();
+	lighting.lightsCount = int(m_shadingLightPerObject.size());
 }
 
 void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason) {
@@ -374,8 +374,8 @@ vec4f getSelectionTintColor(DrawReason drawReason) {
 }
 
 void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, DrawReason drawReason, bool shouldDrawSky) {
-	// DrawReasonInfo is overused for multiple things.
-	DrawReasonInfo drawReasonInfo;
+	// ObjectLighting is overused for multiple things.
+	ObjectLighting lighting;
 	// const bool useWireframe = drawReason_IsVisualizeSelection(drawReason);
 	// const vec4f wireframeColor =
 	//    (drawReason == drawReason_visualizeSelectionPrimary) ? getPrimarySelectionColor() : kSecondarySelectionColor;
@@ -383,8 +383,8 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 	// vec4f selectionTint = useWireframe ? wireframeColor : vec4f(0.f);
 	// selectionTint.w = useWireframe ? 1.f : 0.f;
 
-	drawReasonInfo.ambientLightColor = getWorld()->m_ambientLight;
-	drawReasonInfo.uRimLightColorWWidth = vec4f(getWorld()->m_rimLight, getWorld()->m_rimCosineWidth);
+	lighting.ambientLightColor = getWorld()->m_ambientLight;
+	lighting.uRimLightColorWWidth = vec4f(getWorld()->m_rimLight, getWorld()->m_rimCosineWidth);
 
 	// Extract the alpha sorting plane.
 	const vec3f zSortingPlanePosWs = drawSets.drawCamera->getCameraPosition();
@@ -469,24 +469,24 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 		for (auto& riRaw : renderItems) {
 			if (auto riTraitModel = dynamic_cast<TraitModelRenderItem*>(riRaw)) {
 				// Find all the lights that can affect this object.
-				DrawReasonInfo reasonInfo = drawReasonInfo;
-				fillGeneralModsWithLights(riTraitModel->traitModel->getActor(), reasonInfo);
+				ObjectLighting reasonInfo = lighting;
+				getActorObjectLighting(riTraitModel->traitModel->getActor(), reasonInfo);
 
 				drawRenderItem_TraitModel(*riTraitModel, drawSets, reasonInfo, drawReason);
 			} else if (auto riSprite = dynamic_cast<TraitSpriteRenderItem*>(riRaw)) {
 				// Find all the lights that can affect this object.
-				DrawReasonInfo reasonInfo = drawReasonInfo;
-				fillGeneralModsWithLights(riSprite->actor, reasonInfo);
+				ObjectLighting reasonInfo = lighting;
+				getActorObjectLighting(riSprite->actor, reasonInfo);
 
 				drawRenderItem_TraitSprite(*riSprite, drawSets, reasonInfo, drawReason);
 			} else if (auto riTraitViewportIcon = dynamic_cast<TraitViewportIconRenderItem*>(riRaw)) {
 				drawRenderItem_TraitViewportIcon(*riTraitViewportIcon, drawSets, drawReason);
 			} else if (auto riTraitParticles = dynamic_cast<TraitParticlesSimpleRenderItem*>(riRaw)) {
-				drawRenderItem_TraitParticlesSimple(*riTraitParticles, drawSets, drawReasonInfo);
+				drawRenderItem_TraitParticlesSimple(*riTraitParticles, drawSets, lighting);
 			} else if (auto riTraitParticlesProgrammable = dynamic_cast<TraitParticlesProgrammableRenderItem*>(riRaw)) {
-				drawRenderItem_TraitParticlesProgrammable(*riTraitParticlesProgrammable, drawSets, drawReasonInfo);
+				drawRenderItem_TraitParticlesProgrammable(*riTraitParticlesProgrammable, drawSets, lighting);
 			} else if (auto riHelper = dynamic_cast<HelperDrawRenderItem*>(riRaw)) {
-				drawHelperActor(riHelper->item.gameObject->getActor(), drawSets, riHelper->item.editMode, 0, drawReasonInfo, drawReason);
+				drawHelperActor(riHelper->item.gameObject->getActor(), drawSets, riHelper->item.editMode, 0, lighting, drawReason);
 			} else {
 				sgeAssert(false && "Render Item does not have a drawing implementation");
 			}
@@ -568,7 +568,7 @@ void DefaultGameDrawer::drawSky(const GameDrawSets& drawSets, const DrawReason d
 
 void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
                                                   const GameDrawSets& drawSets,
-                                                  const DrawReasonInfo& drawReasonInfo,
+                                                  const ObjectLighting& lighting,
                                                   DrawReason const drawReason) {
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
 	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
@@ -590,7 +590,7 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 			m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), finalTrasform,
 			                                *drawSets.shadowMapBuildInfo, geom);
 		} else {
-			m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), finalTrasform, drawReasonInfo,
+			m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), finalTrasform, lighting,
 			                         &geom, ri.mtl, ri.traitModel->m_models[ri.iModel].instanceDrawMods);
 		}
 	} else {
@@ -601,7 +601,7 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 
 void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& ri,
                                                    const GameDrawSets& drawSets,
-                                                   const DrawReasonInfo& drawReasonInfo,
+                                                   const ObjectLighting& lighting,
                                                    DrawReason const drawReason) {
 	if (ri.spriteTexture == nullptr) {
 		return;
@@ -629,7 +629,7 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 		mods.forceNoLighting = ri.forceNoLighting;
 		mods.forceNoCulling = ri.forceNoCulling;
 
-		m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), ri.obj2world, drawReasonInfo,
+		m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), ri.obj2world, lighting,
 		                         &texPlaneGeom, texPlaneMtl, mods);
 	}
 }
@@ -652,7 +652,7 @@ void DefaultGameDrawer::drawRenderItem_TraitViewportIcon(TraitViewportIconRender
 
 void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimpleRenderItem& ri,
                                                             const GameDrawSets& drawSets,
-                                                            const DrawReasonInfo& drawReasonInfo) {
+                                                            const ObjectLighting& lighting) {
 	TraitParticlesSimple* traitParticles = ri.traitParticles;
 
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
@@ -671,7 +671,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 						mat4f particleTForm = n2w * mat4f::getTranslation(particle.pos) * mat4f::getScaling(particle.scale);
 
 						m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm,
-						                 drawReasonInfo, model->staticEval, InstanceDrawMods());
+						                 lighting, model->staticEval, InstanceDrawMods());
 					}
 				}
 			}
@@ -688,7 +688,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 					mods.forceNoLighting = true;
 					mods.forceAdditiveBlending = true;
 
-					m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, drawReasonInfo,
+					m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
 					                         &srd->geometry, srd->material, mods);
 				}
 			}
@@ -698,7 +698,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 
 void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticlesProgrammableRenderItem& ri,
                                                                   const GameDrawSets& drawSets,
-                                                                  const DrawReasonInfo& drawReasonInfo) {
+                                                                  const ObjectLighting& lighting) {
 	TraitParticlesProgrammable* particlesTrait = ri.traitParticles;
 
 	const mat4f n2w = particlesTrait->getActor()->getTransformMtx();
@@ -715,7 +715,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 				mat4f particleTForm =
 				    mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) * mat4f::getScaling(particle.scale);
 
-				m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, drawReasonInfo,
+				m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, lighting,
 				                 pgrp->spriteTexture->asModel()->staticEval, InstanceDrawMods());
 			}
 		} else {
@@ -725,7 +725,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 				mods.forceAdditiveBlending = true;
 
 				const mat4f identity = mat4f::getIdentity();
-				m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), identity, drawReasonInfo,
+				m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), identity, lighting,
 				                         &m_partRendDataGen.geometry, m_partRendDataGen.material, mods);
 			}
 		}
@@ -736,7 +736,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 #if 0
 void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
                                        const GameDrawSets& drawSets,
-                                       const DrawReasonInfo& drawReasonInfo,
+                                       const ObjectLighting& lighting,
                                        DrawReason const drawReason) {
 	if (modelTrait->isRenderable == false) {
 		return;
@@ -773,17 +773,17 @@ void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
 					// Draw
 					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
 					model->sharedEval.evaluateFromNodesGlobalTransform(boneOverrides);
-					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, drawReasonInfo,
+					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
 					                 model->sharedEval, modelTrait->instanceDrawMods, &mtlOverrides);
 				}
 			} else {
 				if (modelTrait->m_evalModel) {
 					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, drawReasonInfo,
+					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
 					                 *modelTrait->m_evalModel, modelTrait->instanceDrawMods, &mtlOverrides);
 				} else if (model && model->staticEval.isInitialized()) {
 					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, drawReasonInfo,
+					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
 					                 model->staticEval, modelTrait->instanceDrawMods, &mtlOverrides);
 				}
 			}
@@ -798,17 +798,17 @@ void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
 					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
 					model->sharedEval.evaluateFromNodesGlobalTransform(boneOverrides);
 					m_constantColorShader.draw(drawSets.rdest, drawSets.drawCamera->getProjView(), n2w, model->sharedEval,
-					                           drawReasonInfo.selectionTint);
+					                           lighting.selectionTint);
 				}
 			} else {
 				if (modelTrait->m_evalModel) {
 					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
 					m_constantColorShader.draw(drawSets.rdest, drawSets.drawCamera->getProjView(), n2w, *modelTrait->m_evalModel,
-					                           drawReasonInfo.selectionTint);
+					                           lighting.selectionTint);
 				} else if (model && model->staticEval.isInitialized()) {
 					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
 					m_constantColorShader.draw(drawSets.rdest, drawSets.drawCamera->getProjView(), n2w, model->staticEval,
-					                           drawReasonInfo.selectionTint);
+					                           lighting.selectionTint);
 				}
 			}
 		}
@@ -818,7 +818,7 @@ void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
 
 void DefaultGameDrawer::drawHelperActor_drawANavMesh(ANavMesh& navMesh,
                                                      const GameDrawSets& drawSets,
-                                                     const DrawReasonInfo& UNUSED(drawReasonInfo),
+                                                     const ObjectLighting& UNUSED(lighting),
                                                      const DrawReason drawReason,
                                                      const vec4f wireframeColor) {
 	// Draw the bounding box of the nav-mesh. This box basically shows where is the area where the nav-mesh is going to be built.
@@ -869,7 +869,7 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
                                         const GameDrawSets& drawSets,
                                         EditMode const editMode,
                                         int const itemIndex,
-                                        const DrawReasonInfo& drawReasonInfo,
+                                        const ObjectLighting& lighting,
                                         DrawReason const drawReason) {
 	TypeId actorType = actor->getType();
 
@@ -915,7 +915,7 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 				                                   simpleObstacle->geometry, selectionTint);
 			} else {
 				m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(),
-				                         simpleObstacle->getTransformMtx(), drawReasonInfo, &simpleObstacle->geometry,
+				                         simpleObstacle->getTransformMtx(), lighting, &simpleObstacle->geometry,
 				                         simpleObstacle->material, InstanceDrawMods());
 			}
 		}
@@ -1201,7 +1201,7 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 		}
 	} else if (actorType == sgeTypeId(ANavMesh)) {
 		if (ANavMesh* navMesh = static_cast<ANavMesh*>(actor)) {
-			drawHelperActor_drawANavMesh(*navMesh, drawSets, drawReasonInfo, drawReason, selectionTint);
+			drawHelperActor_drawANavMesh(*navMesh, drawSets, lighting, drawReason, selectionTint);
 		}
 	} else {
 		// Not implemented.

@@ -57,11 +57,11 @@ void BasicModelDraw::drawGeometry(const RenderDestination& rdest,
                                   const vec3f& camLookDir,
                                   const mat4f& projView,
                                   const mat4f& world,
-                                  const DrawReasonInfo& generalMods,
+                                  const ObjectLighting& lighting,
                                   const Geometry* geometry,
                                   const Material& material,
                                   const InstanceDrawMods& mods) {
-	drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, generalMods, geometry, material, mods);
+	drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, lighting, geometry, material, mods);
 }
 
 
@@ -71,7 +71,7 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
                                              const vec3f& camLookDir,
                                              const mat4f& projView,
                                              const mat4f& world,
-                                             const DrawReasonInfo& generalMods,
+                                             const ObjectLighting& lighting,
                                              const Geometry* geometry,
                                              const Material& material,
                                              const InstanceDrawMods& mods) {
@@ -354,15 +354,15 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 
 	// Lights and draw call.
 	const int preLightsNumUnuforms = uniforms.size();
-	for (int iLight = 0; iLight < generalMods.lightsCount; ++iLight) {
-		const ShadingLightData& shadingLight = *generalMods.ppLightData[iLight];
+	for (int iLight = 0; iLight < lighting.lightsCount; ++iLight) {
+		const ShadingLightData& shadingLight = *lighting.ppLightData[iLight];
 		// Delete the uniforms form the previous light.
 		uniforms.resize(preLightsNumUnuforms);
 
 		// Do the ambient lighting only with the 1st light.
 		if (iLight == 0) {
-			paramsCb.ambientLightColor = generalMods.ambientLightColor;
-			paramsCb.uRimLightColorWWidth = generalMods.uRimLightColorWWidth;
+			paramsCb.ambientLightColor = lighting.ambientLightColor;
+			paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 		} else {
 			vec4f zeroColor(0.f);
 			paramsCb.ambientLightColor = vec3f(0.f);
@@ -419,9 +419,9 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	// if the number of lights affecting the object is zero,
 	// then there were no draw call created. However we need to draw the object
 	// in order for it to affect the z-depth or even get light by the ambient lighting.
-	if (generalMods.lightsCount == 0) {
-		paramsCb.ambientLightColor = generalMods.ambientLightColor;
-		paramsCb.uRimLightColorWWidth = generalMods.uRimLightColorWWidth;
+	if (lighting.lightsCount == 0) {
+		paramsCb.ambientLightColor = lighting.ambientLightColor;
+		paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 
 		vec4f colorWFlags(0.f);
 		colorWFlags.w = float(kLightFlg_DontLight);
@@ -456,7 +456,7 @@ void BasicModelDraw::draw(const RenderDestination& rdest,
                           const vec3f& camLookDir,
                           const mat4f& projView,
                           const mat4f& preRoot,
-                          const DrawReasonInfo& generalMods,
+                          const ObjectLighting& lighting,
                           const EvaluatedModel& evalModel,
                           const InstanceDrawMods& mods,
                           const std::vector<MaterialOverride>* mtlOverrides) {
@@ -504,7 +504,7 @@ void BasicModelDraw::draw(const RenderDestination& rdest,
 				}
 			}
 
-			drawGeometry(rdest, camPos, camLookDir, projView, finalTrasform, generalMods, &evalMesh.geometry, material, mods);
+			drawGeometry(rdest, camPos, camLookDir, projView, finalTrasform, lighting, &evalMesh.geometry, material, mods);
 		}
 	}
 }

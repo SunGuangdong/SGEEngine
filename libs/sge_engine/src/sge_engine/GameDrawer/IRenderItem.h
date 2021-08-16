@@ -4,7 +4,7 @@
 
 namespace sge {
 
-struct DrawReasonInfo;
+struct ObjectLighting;
 
 /// IRenderItem is an interface providing a shell around a particular thing around rendering.
 /// It's idea is to provide a way each actor to specify all of its different rendering components.
