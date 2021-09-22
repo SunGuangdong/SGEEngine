@@ -16,6 +16,7 @@ struct PerspectiveCameraSettings {
 	float fov = deg2rad(60.f);
 	float orthographicWidth = 1.f;
 	float orthographicHeight = 1.f;
+	float heightShift = 0.f;
 	bool orthographicMantainRatio = true;
 
 	mat4f calcMatrix(float const aspect) const {
@@ -27,10 +28,10 @@ struct PerspectiveCameraSettings {
 				w = h * aspect;
 			}
 
-			return mat4f::getOrthoRH(-w, w, h, -h, nearPlane, farPlane, kIsTexcoordStyleD3D);
+			return mat4f::getOrthoRH(-w, w, h + heightShift, -h + heightShift, nearPlane, farPlane, kIsTexcoordStyleD3D);
 		}
 
-		return mat4f::getPerspectiveFovRH(fov, aspect, nearPlane, farPlane, kIsTexcoordStyleD3D);
+		return mat4f::getPerspectiveFovRH(fov, aspect, nearPlane, farPlane, heightShift, kIsTexcoordStyleD3D);
 	}
 };
 

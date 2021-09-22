@@ -467,7 +467,8 @@ struct mat4 {
 	static SELF_TYPE getPerspectiveFovRH_DirectX(const DATA_TYPE& verticalFieldOfView,
 	                                             const DATA_TYPE& ratioWidthByHeight,
 	                                             const DATA_TYPE& nearZ,
-	                                             const DATA_TYPE& farZ) {
+	                                             const DATA_TYPE& farZ,
+	                                             const DATA_TYPE& heightShift) {
 		float SinFov;
 		float CosFov;
 		SinCos(0.5f * verticalFieldOfView, SinFov, CosFov);
@@ -475,13 +476,14 @@ struct mat4 {
 		float Height = (SinFov * nearZ) / CosFov;
 		float Width = ratioWidthByHeight * Height;
 
-		return getPerspectiveOffCenterRH_DirectX(-Width, Width, -Height, Height, nearZ, farZ);
+		return getPerspectiveOffCenterRH_DirectX(-Width, Width, -Height + heightShift, Height + heightShift, nearZ, farZ);
 	}
 
 	static SELF_TYPE getPerspectiveFovRH_OpenGL(const DATA_TYPE& verticalFieldOfView,
 	                                            const DATA_TYPE& ratioWidthByHeight,
 	                                            const DATA_TYPE& nearZ,
-	                                            const DATA_TYPE& farZ) {
+	                                            const DATA_TYPE& farZ,
+	                                            const DATA_TYPE& heightShift) {
 		float SinFov;
 		float CosFov;
 		SinCos(0.5f * verticalFieldOfView, SinFov, CosFov);
@@ -489,15 +491,15 @@ struct mat4 {
 		float Height = (SinFov * nearZ) / CosFov;
 		float Width = ratioWidthByHeight * Height;
 
-		return getPerspectiveOffCenterRH_OpenGL(-Width, Width, -Height, Height, nearZ, farZ);
+		return getPerspectiveOffCenterRH_OpenGL(-Width, Width, -Height + heightShift, Height + heightShift, nearZ, farZ);
 	}
 
 	static SELF_TYPE getPerspectiveFovRH(
-	    const DATA_TYPE& fov, const DATA_TYPE& aspect, const DATA_TYPE& nearZ, const DATA_TYPE& farZ, const bool d3dStyle) {
+	    const DATA_TYPE& fov, const DATA_TYPE& aspect, const DATA_TYPE& nearZ, const DATA_TYPE& farZ, const DATA_TYPE& heightShift, const bool d3dStyle) {
 		if (d3dStyle)
-			return getPerspectiveFovRH_DirectX(fov, aspect, nearZ, farZ);
+			return getPerspectiveFovRH_DirectX(fov, aspect, nearZ, farZ, heightShift);
 		else
-			return getPerspectiveFovRH_OpenGL(fov, aspect, nearZ, farZ);
+			return getPerspectiveFovRH_OpenGL(fov, aspect, nearZ, farZ, heightShift);
 	}
 
 	//----------------------------------------------------------------

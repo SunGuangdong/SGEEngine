@@ -9,6 +9,7 @@ namespace sge {
 enum Billboarding : int {
 	billboarding_none,
 	billboarding_yOnly,
+	billboarding_xOnly,
 	billboarding_faceCamera,
 };
 

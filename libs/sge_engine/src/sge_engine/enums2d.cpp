@@ -11,6 +11,7 @@ ReflBlock() {
 	ReflAddType(Billboarding)
 		ReflEnumVal(billboarding_none, "None")
 		ReflEnumVal(billboarding_yOnly, "UpOnly")
+		ReflEnumVal(billboarding_xOnly, "XOnly")
 		ReflEnumVal(billboarding_faceCamera, "FacingCamera");
 
 	ReflAddType(Anchor)
@@ -63,6 +64,15 @@ mat4f billboarding_getOrentationMtx(
 			trNoRotation.r = quatf::getIdentity();
 
 			mat4f result = trNoRotation.toMatrix() * mat4f::getRotationY(angle);
+			return result;
+		} break;
+		case billboarding_xOnly: {
+			vec3f diff = objectTr.p - camPos;
+			float angle = atan2(-diff.y, diff.z) + sgePi;
+			transf3d trNoRotation = objectTr;
+			trNoRotation.r = quatf::getIdentity();
+
+			mat4f result = trNoRotation.toMatrix() * mat4f::getRotationX(angle) * mat4f::getRotationY(deg2rad(-90.f));
 			return result;
 		} break;
 		case billboarding_faceCamera: {

@@ -1,9 +1,9 @@
 #include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_core/Camera.h"
-#include "sge_core/shaders/LightDesc.h"
 #include "sge_core/DebugDraw.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
+#include "sge_core/shaders/LightDesc.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/IWorldScript.h"
@@ -266,6 +266,7 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets) {
 
 		shadingLight.lightPositionAndType = position;
 		shadingLight.lightColorWFlags = vec4f(color, float(flags));
+		shadingLight.shadowMapBias = lightDesc.shadowMapBias;
 		shadingLight.lightSpotDirAndCosAngle = vec4f(light->getTransformMtx().c0.xyz().normalized0(), spotLightCosAngle);
 		shadingLight.lightXShadowRange = vec4f(lightDesc.range, 0.f, 0.f, 0.f);
 
@@ -533,6 +534,22 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 	// Draw the render items.
 	drawCurrentRenderItems(drawSets, drawReason, true);
 
+	if (getWorld()->inspector && getWorld()->inspector->m_physicsDebugDrawEnabled) {
+		drawSets.rdest.sgecon->clearDepth(drawSets.rdest.frameTarget, 1.f);
+
+		getWorld()->m_physicsDebugDraw.preDebugDraw(drawSets.drawCamera->getProjView(), drawSets.quickDraw, drawSets.rdest);
+		getWorld()->physicsWorld.dynamicsWorld->debugDrawWorld();
+		getWorld()->m_physicsDebugDraw.postDebugDraw();
+	}
+
+	if (drawReason == drawReason_gameplay || drawReason == drawReason_editing) {
+		for (ObjectId scriptObj : getWorld()->m_scriptObjects) {
+			if (IWorldScript* script = dynamic_cast<IWorldScript*>(getWorld()->getObjectById(scriptObj))) {
+				script->onPostDraw(drawSets);
+			}
+		}
+	}
+
 	// Draw the debug draw commands.
 	getCore()->getDebugDraw().draw(drawSets.rdest, drawSets.drawCamera->getProjView());
 }
@@ -588,10 +605,10 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 	if (!drawReason_IsVisualizeSelection(drawReason)) {
 		if (drawReason == drawReason_gameplayShadow) {
 			m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), finalTrasform,
-			                                *drawSets.shadowMapBuildInfo, geom);
+			                                *drawSets.shadowMapBuildInfo, geom, ri.mtl.diffuseTexture, false);
 		} else {
-			m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), finalTrasform, lighting,
-			                         &geom, ri.mtl, ri.traitModel->m_models[ri.iModel].instanceDrawMods);
+			m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), finalTrasform, lighting, &geom,
+			                         ri.mtl, ri.traitModel->m_models[ri.iModel].instanceDrawMods);
 		}
 	} else {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), finalTrasform, geom,
@@ -618,7 +635,7 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 	} else if (drawReason == drawReason_gameplayShadow) {
 		// Shadow maps.
 		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), ri.obj2world,
-		                                *drawSets.shadowMapBuildInfo, texPlaneGeom);
+		                                *drawSets.shadowMapBuildInfo, texPlaneGeom, ri.spriteTexture, ri.forceNoCulling);
 	} else {
 		// Gameplay shaded.
 		PBRMaterial texPlaneMtl = m_texturedPlaneDraw.getMaterial(ri.spriteTexture);
@@ -670,8 +687,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 					for (const ParticleGroupState::ParticleState& particle : pstate.getParticles()) {
 						mat4f particleTForm = n2w * mat4f::getTranslation(particle.pos) * mat4f::getScaling(particle.scale);
 
-						m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm,
-						                 lighting, model->staticEval, InstanceDrawMods());
+						m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, lighting,
+						                 model->staticEval, InstanceDrawMods());
 					}
 				}
 			}
@@ -915,8 +932,8 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 				                                   simpleObstacle->geometry, selectionTint);
 			} else {
 				m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(),
-				                         simpleObstacle->getTransformMtx(), lighting, &simpleObstacle->geometry,
-				                         simpleObstacle->material, InstanceDrawMods());
+				                         simpleObstacle->getTransformMtx(), lighting, &simpleObstacle->geometry, simpleObstacle->material,
+				                         InstanceDrawMods());
 			}
 		}
 	} else if (actorType == sgeTypeId(ACamera) && drawReason_IsVisualizeSelection(drawReason)) {

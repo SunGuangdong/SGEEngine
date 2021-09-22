@@ -8,9 +8,12 @@ namespace sge::gamegui {
 
 enum UnitMeasure : int {
 	unitMeasure_pixels,
-	unitMeasure_fraction,  // same as percentage but in range [0;1]
-	unitMeasure_wFraction, // fraction but from the width of the parent widget
-	unitMeasure_hFraction, // fraction but from the height of the parent widget
+	unitMeasure_fraction,      // same as percentage but in range [0;1]
+	unitMeasure_wFraction,     // fraction but from the width of the parent widget
+	unitMeasure_hFraction,     // fraction but from the height of the parent widget
+	unitMeasure_wSelfFraction, // fraction but from the self width.
+	unitMeasure_hSelfFraction, // fraction but from the self width.
+	
 };
 
 struct Unit {
@@ -59,10 +62,24 @@ struct Unit {
 				float result = value * dim.x;
 				return result;
 			}
+			case unitMeasure_wSelfFraction: {
+				float result = value * dim.x;
+				return result;
+			}
+			case unitMeasure_hSelfFraction: {
+				float result = value * dim.x;
+				return result;
+			}
 			default:
 				sgeAssert(false && "Unimplemented unit mode!");
 				return 0.f;
 		}
+	}
+
+	Unit operator*(float f) const {
+		Unit result = *this;
+		result.value *= f;
+		return result;
 	}
 
 	UnitMeasure mode = unitMeasure_pixels;

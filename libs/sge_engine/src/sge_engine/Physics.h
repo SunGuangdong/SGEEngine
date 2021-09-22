@@ -206,7 +206,8 @@ struct SGE_ENGINE_API RigidBody {
 	void create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce);
 	void create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce);
 
-	/// Specifies is the rigid body should not respond to collsions with other objects.
+	/// Specifies if the rigid body should not respond to collsions with other objects.
+	/// The contant points will still be generated.
 	void setNoCollisionResponse(bool dontRespontToCollisions);
 	bool hasNoCollisionResponse() const;
 

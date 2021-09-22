@@ -399,7 +399,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 						if (ImGui::Button("Extract Skeleton")) {
 							AssetModel* modelAsset = modelSets.m_assetProperty.getAssetModel();
 							GameWorld* world = inspector.getWorld();
-							ALocator* allBonesParent = world->m_allocator<ALocator>();
+							ALocator* allBonesParent = world->allocObjectT<ALocator>();
 							allBonesParent->setTransform(traitModel.getActor()->getTransform());
 
 							struct NodeRemapEl {
@@ -417,7 +417,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 								const float boneLength = node->limbLength > 0.f ? node->limbLength : boneLengthAuto;
 
 								nodeRemap[iNode].localTransform = node->staticLocalTransform;
-								nodeRemap[iNode].boneActor = inspector.getWorld()->m_allocator<ABone>(ObjectId(), node->name.c_str());
+								nodeRemap[iNode].boneActor = inspector.getWorld()->allocObjectT<ABone>(ObjectId(), node->name.c_str());
 								nodeRemap[iNode].boneActor->boneLength = boneLength;
 							}
 

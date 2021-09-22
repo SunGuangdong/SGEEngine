@@ -1,7 +1,7 @@
 #include "LightDesc.h"
-#include "sge_utils/math/transform.h"
-#include "sge_utils/math/Frustum.h"
 #include "sge_renderer/renderer/renderer.h"
+#include "sge_utils/math/Frustum.h"
+#include "sge_utils/math/transform.h"
 
 namespace sge {
 
@@ -56,14 +56,14 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 			lightToWsNoScaling.s = vec3f(1.f);
 
 			const mat4f shadowViewMtx = mat4f::getRotationY(half_pi()) * lightToWsNoScaling.toMatrix().inverse();
-			const mat4f shadowProjMtx = mat4f::getPerspectiveFovRH(spotLightAngle * 2.f, 1.f, 0.1f, range, kIsTexcoordStyleD3D);
+			const mat4f shadowProjMtx = mat4f::getPerspectiveFovRH(spotLightAngle * 2.f, 1.f, 0.1f, range, 0.f, kIsTexcoordStyleD3D);
 			const RawCamera shadowMapCamera = RawCamera(lightToWsNoScaling.p, shadowViewMtx, shadowProjMtx);
 
 			return ShadowMapBuildInfo(shadowMapCamera);
 		}
 		case light_point: {
 			const vec3f camPosWs = lightWs.p;
-			mat4f shadowProjMtx = mat4f::getPerspectiveFovRH(half_pi(), 1.f, 0.1f, range, kIsTexcoordStyleD3D);
+			mat4f shadowProjMtx = mat4f::getPerspectiveFovRH(half_pi(), 1.f, 0.1f, range, 0.f, kIsTexcoordStyleD3D);
 
 			// Caution: [POINT_LIGHT_SHADOWMAP_TRIANGLE_WINING_FLIP]
 			// When we render Cube maps depending on the rendering API we need to
@@ -120,4 +120,4 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 	return NullOptional();
 }
 
-}
+} // namespace sge

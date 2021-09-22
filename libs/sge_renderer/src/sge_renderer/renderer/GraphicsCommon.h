@@ -392,6 +392,14 @@ struct Texture2DDesc {
 	    , numSamples(numSamples)
 	    , sampleQuality(sampleQuality) {}
 
+	float widthByHeight() const {
+		return float(width) / float(height);
+	}
+
+	float heightByWidth() const {
+		return float(height) / float(width);
+	}
+
 	int width;
 	int height;
 	int numMips;

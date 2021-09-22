@@ -71,7 +71,7 @@ mat4f TraitSprite::ImageSettings::computeObjectToWorldTransform(const Asset& ass
 		if (drawCamera != nullptr) {
 			const mat4f billboardFacingMtx = billboarding_getOrentationMtx(
 			    m_billboarding, nodeToWorldTransform, drawCamera->getCameraPosition(), drawCamera->getView(), defaultFacingAxisZ);
-			objToWorld = billboardFacingMtx * anchorAlignMtx * localOffsetmtx * additionaTransform;
+			objToWorld = billboardFacingMtx * additionaTransform * anchorAlignMtx * localOffsetmtx;
 		} else {
 			objToWorld = anchorAlignMtx * localOffsetmtx * additionaTransform;
 
@@ -129,6 +129,13 @@ AABox3f TraitSprite::ImageSettings::computeBBoxOS(const Asset& asset, const mat4
 			bboxOs.expand(vec3f(0.f, 0.f, -pExtreme.z));
 			bboxOs.expand(vec3f(pExtreme.z, 0.f, 0.f));
 			bboxOs.expand(vec3f(-pExtreme.z, 0.f, 0.f));
+		} break;
+		case billboarding_xOnly: {
+			vec3f pExtreme = p0.getAbs().pickMax(p1.getAbs());
+			bboxOs.expand(vec3f(0.f, 0.f, pExtreme.x));
+			bboxOs.expand(vec3f(0.f, 0.f, -pExtreme.x));
+			bboxOs.expand(vec3f(0.f, pExtreme.x, 0.f));
+			bboxOs.expand(vec3f(0.f, -pExtreme.x, 0.f));
 		} break;
 		case billboarding_faceCamera: {
 			vec3f pExtreme = p0.getAbs().pickMax(p1.getAbs());

@@ -19,6 +19,7 @@ ReflBlock()
 		.addMemberFlag(MFF_FloatAsDegrees)
 	ReflMember(PerspectiveCameraSettings, orthographicWidth)
 	ReflMember(PerspectiveCameraSettings, orthographicHeight)
+	ReflMember(PerspectiveCameraSettings, heightShift).uiRange(-FLT_MAX, FLT_MAX, 0.01f)
 	ReflMember(PerspectiveCameraSettings, orthographicMantainRatio)
 ;
 	

@@ -54,9 +54,6 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 	void setNoLighting(bool v) { instanceDrawMods.forceNoLighting = v; }
 	bool getNoLighting() const { return instanceDrawMods.forceNoLighting; }
 
-	void computeNodeToBoneIds();
-	void computeSkeleton(std::vector<mat4f>& boneOverrides);
-
 	void getRenderItems(const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
 
   private:

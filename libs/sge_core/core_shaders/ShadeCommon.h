@@ -21,6 +21,9 @@
 #define kHasVertexSkinning_No 0
 #define kHasVertexSkinning_Yes 1
 
+// OPT_DiffuseTexForAlphaMasking
+#define kasDiffuseTexForAlphaMasking_No 0
+#define kasDiffuseTexForAlphaMasking_Yes 1
 
 // // Settings for OPT_DiffuseColorSrc
 // #define kDiffuseColorSrcConstant 0

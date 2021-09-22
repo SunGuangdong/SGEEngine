@@ -102,11 +102,23 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	const Pos& getContentsOrigin() const { return m_contentsOrigin; }
 	void setContentsOrigin(const Pos& o) { m_contentsOrigin = o; }
 
+	float getOpacity() const { return opacity; }
+	void setOpacity(float opacity) { this->opacity = opacity; }
+
+	float calcTotalOpacity() {
+		std::shared_ptr<IWidget> parent = getParent();
+		if (parent) {
+			return parent->calcTotalOpacity() * opacity;
+		}
+		return opacity;
+	}
+
   protected:
 	AABox2f getParentBBoxSS() const;
 	Pos getParentContentOrigin() const;
 
   private:
+	float opacity = 1.f;
 	Pos m_position;
 	Size m_size;
 	bool m_isSuspended = false;
@@ -204,6 +216,7 @@ struct SGE_CORE_API ImageWidget final : public IWidget {
 	}
 
 	static std::shared_ptr<ImageWidget> create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture);
+	static std::shared_ptr<ImageWidget> createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture);
 	virtual void draw(const UIDrawSets& drawSets) override;
 
   private:

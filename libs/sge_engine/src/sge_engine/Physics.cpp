@@ -342,7 +342,7 @@ void SgeCustomMoutionState::setWorldTransform(const btTransform& UNUSED(centerOf
 		// Caution:
 		// Bullet cannot change the scaling of the object so use the one inside the actor.
 		newActorTransform.s = m_pRigidBody->actor->getTransform().s;
-		m_pRigidBody->actor->setTransform(newActorTransform, false);
+		m_pRigidBody->actor->setTransformEx(newActorTransform, false, false, false);
 #endif
 	}
 }

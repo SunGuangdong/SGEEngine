@@ -38,6 +38,7 @@ cbuffer ParamsCbFWDDefaultShading {
 
 	float4x4 lightShadowMapProjView;
 	float4 lightShadowRange;
+	float4 lightShadowBias;
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
@@ -270,8 +271,12 @@ float4 psMain(VS_OUTPUT IN)
 			const float NdotL = max(dot(N, L), 0.0);
 
 			const bool useShadowsMap = (fLightFlags & kLightFlg_HasShadowMap) != 0;
-
-			float shadowScale = 1.f;
+			
+			// A  multiplier telling us how much the shadow should dim the lighting.
+			// Usually it is a boolean telling if the object is in shadow or not.
+			// However to make the shadows softer we use PCF filtering. This returns 
+			// a value in [0;1] where 1 means there is no shadow, and 0 mean the object is totally in shadow.
+			float lightMultDueToShadow = 1.f;
 #if 1
 			if (useShadowsMap != 0) {
 				if (lightPosF4.w == 0.f) {
@@ -283,8 +288,8 @@ float4 psMain(VS_OUTPUT IN)
 					    lightShadowRange.x * texCUBE(uPointLightShadowMap, lightToVertexWs / lightToVertexWsLength).x;
 					const float currentFragmentDistanceToLight = lightToVertexWsLength;
 
-					if (shadowSampleDistanceToLight < currentFragmentDistanceToLight || NdotL <= 0.0) {
-						shadowScale = 0.f;
+					if (shadowSampleDistanceToLight < (currentFragmentDistanceToLight - lightShadowBias.x) || NdotL <= 0.0) {
+						lightMultDueToShadow = 0.f;
 					}
 				} else {
 					// Direction and Spot lights.
@@ -301,8 +306,9 @@ float4 psMain(VS_OUTPUT IN)
 					const float2 pixelSizeUVShadow = (1.0 / tex2Dsize(lightShadowMap));
 
 					float samplesWeights = 0.f;
-					const int pcfWidth = 1;
-					const int pcfTotalSamples = (2 * pcfWidth + 1) * (2 * pcfWidth + 1);
+					const int pcfWidth = 0;
+					const int pcfTotalSampleCnt = (2 * pcfWidth + 1) * (2 * pcfWidth + 1);
+					int pcfTotalSampleCnt2 = 0;
 					for (int ix = -pcfWidth; ix <= pcfWidth; ix += 1) {
 						for (int iy = -pcfWidth; iy <= pcfWidth; iy += 1) {
 							const float2 sampleUv =
@@ -316,30 +322,36 @@ float4 psMain(VS_OUTPUT IN)
 							const float currentZ = (pixelShadowNDC.z + 1.0) * 0.5;
 #endif
 
-							float fadeOutMult = 1.f;
-
-							// Make directional light fade as they capture some limited area, and when the shadow map ends in the distance
-							// this will hide the rough edge.
-							if (lightPosF4.w == 1.f) {
-								const float distanceFromCamera = min(length(IN.v_posWS - cameraPositionWs), lightShadowRange.x);
-								const float fadeStart = lightShadowRange.x * 0.90f;
-								if (distanceFromCamera > fadeStart) {
-									fadeOutMult = lerp(1.f, 0.f, (distanceFromCamera - fadeStart) / (lightShadowRange.x * 0.1f));
-								}
+							if (shadowZ < (currentZ - lightShadowBias.x) || NdotL <= 0.0) {
+								samplesWeights += 1.f;
 							}
-
-							if (shadowZ < currentZ || NdotL <= 0.0) {
-								samplesWeights += fadeOutMult;
-							}
+							
+							pcfTotalSampleCnt2++;
 						}
 					}
 
-					shadowScale = 1.f - (samplesWeights / (float)(pcfTotalSamples));
+					lightMultDueToShadow = 1.f - (samplesWeights / (float)(pcfTotalSampleCnt2));
+					
+					// Make directional light fade as they capture some limited area,
+					// and when the shadow map ends in the distance this will hide the rough edge
+					// where the shadow map ends.
+					if (lightPosF4.w == 1.f) {
+						const float distanceFromCamera = length(IN.v_posWS - cameraPositionWs);
+						const float fadeStart = lightShadowRange.x * 0.80f;
+						if(distanceFromCamera > fadeStart) {
+							const float fadeOffDistance = lightShadowRange.x * 0.2f;
+							float k = min(1.f, (distanceFromCamera - fadeStart) / fadeOffDistance);
+							
+							// Slowly add up to lightMultDueToShadow until it reaches 1.
+							lightMultDueToShadow = lightMultDueToShadow + (1.f - lightMultDueToShadow) * k;
+						}
+					}
+					
 				}
 			}
 #endif // shadow map enabled
 
-			if (NdotL > 1e-6f && shadowScale > 1e-6f) {
+			if (NdotL > 1e-6f && lightMultDueToShadow > 1e-6f) {
 				const float3 H = normalize(V + L);
 
 				// cook-torrance brdf
@@ -355,9 +367,9 @@ float4 psMain(VS_OUTPUT IN)
 				const float denominator = 4.f * max(dot(N, V), 0.f) * max(dot(N, L), 0.f);
 				const float3 specular = numerator / max(denominator, 0.001f);
 
-				lighting += shadowScale * (kD * diffuseColor.xyz / PI + specular) * lightRadiance * NdotL;
+				lighting += lightMultDueToShadow * (kD * diffuseColor.xyz / PI + specular) * lightRadiance * NdotL;
 #else
-				const float3 lightLighting = shadowScale * diffuseColor.xyz * lightRadiance * NdotL;
+				const float3 lightLighting = lightMultDueToShadow * diffuseColor.xyz * lightRadiance * NdotL;
 				lighting += lightLighting;
 #endif
 			}
@@ -368,6 +380,8 @@ float4 psMain(VS_OUTPUT IN)
 			}
 		}
 	}
+
+	
 
 	float4 finalColor = diffuseColor;
 

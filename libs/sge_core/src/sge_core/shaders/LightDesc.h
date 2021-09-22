@@ -46,6 +46,7 @@ struct SGE_CORE_API LightDesc {
 	/// The resolution of the shadow map image.
 	/// Depending on the light type it can be used a bit differently.
 	int shadowMapRes = 128;
+	float shadowMapBias = 0.0001f;
 
 	/// @brief Returns the settings to be used when building the shadow map for the light.
 	/// @return The settings for the shadow map rendering or null if shadows are disabled for this light.

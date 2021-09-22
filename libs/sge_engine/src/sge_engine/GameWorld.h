@@ -104,7 +104,7 @@ struct SGE_ENGINE_API GameWorld {
 
 	/// @brief Type-safe allocation of a GameObject.
 	template <typename T>
-	T* m_allocator(ObjectId const specificId = ObjectId(), const char* name = nullptr) {
+	T* allocObjectT(ObjectId const specificId = ObjectId(), const char* name = nullptr) {
 		return dynamic_cast<T*>(allocObject(sgeTypeId(T), specificId, name));
 	}
 

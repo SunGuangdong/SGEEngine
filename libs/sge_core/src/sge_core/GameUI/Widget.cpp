@@ -136,11 +136,25 @@ std::shared_ptr<ImageWidget> ImageWidget::create(UIContext& owningContext, Pos p
 	return w;
 }
 
+std::shared_ptr<ImageWidget> ImageWidget::createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture) {
+	float(texture->getDesc().texture2D.width), float(texture->getDesc().texture2D.height);
+	gamegui::Size size;
+	size.sizeX = height;
+	size.sizeY = height;
+	size.sizeX.value *= float(texture->getDesc().texture2D.width) / float(texture->getDesc().texture2D.height);
+
+	auto w = std::make_shared<ImageWidget>(owningContext, position, size);
+	w->m_texture = texture;
+	return w;
+}
+
 
 void ImageWidget::draw(const UIDrawSets& drawSets) {
 	if (m_texture.IsResourceValid()) {
 		const AABox2f bboxSS = getBBoxPixels();
-		drawSets.quickDraw->drawRectTexture(drawSets.rdest, bboxSS, m_texture, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		float opacity = calcTotalOpacity();
+		drawSets.quickDraw->drawRectTexture(drawSets.rdest, bboxSS, m_texture, getCore()->getGraphicsResources().BS_backToFrontAlpha,
+		                                    vec2f(0), vec2f(1.f), opacity);
 	}
 }
 

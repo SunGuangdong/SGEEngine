@@ -39,17 +39,19 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 
 	// Compute the facing direction.
 	if (input.walkDir.length() > 1e-5f) {
-		m_targetFacingDir = input.walkDir.normalized();
+		m_targetFacingDir = input.walkDir;
 	}
 
-	{
+	if (false) {
 		float k = (dot(input.facingDir, m_targetFacingDir) + 1.f) * 0.5f;
 		float rotationSpeed = deg2rad(480.f) + deg2rad(480.f) * (1.f - k);
 		outcome.facingDir =
 		    rotateTowards(input.facingDir, m_targetFacingDir, updateSets.dt * rotationSpeed, vec3f(0.f, 1.f, 0.f)).normalized();
+	} else {
+		outcome.facingDir = m_targetFacingDir;
 	}
 
-	float walkDirInputMagnitude = input.walkDir.length();
+	const float walkDirInputMagnitude = input.walkDir.length();
 
 	if (walkDirInputMagnitude > 1e-3f) {
 		float k = pow((dot(outcome.facingDir, input.walkDir / walkDirInputMagnitude) + 1.f) * 0.5f, 5.f);
@@ -119,7 +121,7 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 		}
 	} // end for each manifold
 
-	if (groundCosine >= m_cfg.minClimbableIncline) {
+	if (isLogicallyGrounded && groundCosine >= m_cfg.minClimbableIncline) {
 		isGroundSlopeClimbable = true;
 	}
 
@@ -133,6 +135,7 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 
 	if (isGroundSlopeClimbable) {
 		m_timeInAir = 0.f;
+		// m_jumpCounter = 0;
 	} else {
 		m_timeInAir += updateSets.dt;
 	}
@@ -170,10 +173,12 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 		sgeAssert(walkDirProjectedOnGround.hasNan() == false);
 
 #if 1
+		walkDirProjectedOnGround *= walkDirInputMagnitude;
+
 		// TODO: move the a cfg variable.
-		float velocityChangeSpeed = 20.f;
+		float velocityChangeSpeed = 200.f;
 		if (input.walkDir == vec3f(0.f)) {
-			velocityChangeSpeed = 20.f;
+			velocityChangeSpeed = 200.f;
 		}
 
 		// if (justStepOnGround) {

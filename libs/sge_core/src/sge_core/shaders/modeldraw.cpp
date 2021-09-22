@@ -44,6 +44,9 @@ struct ParamsCbFWDDefaultShading {
 	mat4f lightShadowMapProjView;
 	vec4f lightShadowRange;
 
+	vec4f lightShadowBias;
+	//float lightShadowBias_padding[3];
+
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
 	int uSkinningFirstBoneOffsetInTex_padding[3];
@@ -386,6 +389,7 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 
 			paramsCb.lightShadowMapProjView = shadingLight.shadowMapProjView;
 			paramsCb.lightShadowRange = shadingLight.lightXShadowRange;
+			paramsCb.lightShadowBias = vec4f(shadingLight.shadowMapBias);
 		}
 
 		if (mods.forceAdditiveBlending) {
