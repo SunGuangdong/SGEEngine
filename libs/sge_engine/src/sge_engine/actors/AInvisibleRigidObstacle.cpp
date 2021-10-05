@@ -4,7 +4,7 @@
 
 namespace sge {
 
-DefineTypeId(AInvisibleRigidObstacle, 20'08'17'0001);
+RelfAddTypeId(AInvisibleRigidObstacle, 20'08'17'0001);
 ReflBlock() {
 	ReflAddActor(AInvisibleRigidObstacle);
 }

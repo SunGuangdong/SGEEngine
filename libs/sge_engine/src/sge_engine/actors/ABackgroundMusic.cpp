@@ -8,7 +8,7 @@ namespace sge {
 // ABackgroundMusic
 //--------------------------------------------------------------------
 // clang-format off
-DefineTypeId(ABackgroundMusic, 21'04'28'0001);
+RelfAddTypeId(ABackgroundMusic, 21'04'28'0001);
 ReflBlock() {
 	ReflAddActor(ABackgroundMusic)
 		ReflMember(ABackgroundMusic, m_backgroundMusic)

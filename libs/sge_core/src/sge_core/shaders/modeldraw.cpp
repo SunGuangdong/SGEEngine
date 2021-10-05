@@ -45,11 +45,14 @@ struct ParamsCbFWDDefaultShading {
 	vec4f lightShadowRange;
 
 	vec4f lightShadowBias;
-	//float lightShadowBias_padding[3];
+	// float lightShadowBias_padding[3];
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
-	int uSkinningFirstBoneOffsetInTex_padding[3];
+	
+	float uCurvatureY;
+	float uCurvatureZ;
+	int uUseCurvature;
 };
 
 //-----------------------------------------------------------------------------
@@ -63,8 +66,9 @@ void BasicModelDraw::drawGeometry(const RenderDestination& rdest,
                                   const ObjectLighting& lighting,
                                   const Geometry* geometry,
                                   const PBRMaterial& material,
-                                  const InstanceDrawMods& mods) {
-	drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, lighting, geometry, material, mods);
+                                  const InstanceDrawMods& mods,
+                                  const BendSettings& bendSets) {
+	drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, lighting, geometry, material, mods, bendSets);
 }
 
 
@@ -77,7 +81,8 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
                                              const ObjectLighting& lighting,
                                              const Geometry* geometry,
                                              const PBRMaterial& material,
-                                             const InstanceDrawMods& mods) {
+                                             const InstanceDrawMods& mods,
+                                             const BendSettings& bendSets) {
 	SGEDevice* const sgedev = rdest.getDevice();
 	if (!paramsBuffer.IsResourceValid()) {
 		BufferDesc bd = BufferDesc::GetDefaultConstantBuffer(1024, ResourceUsage::Dynamic);
@@ -289,6 +294,9 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	paramsCb.uSkinningFirstBoneOffsetInTex = geometry->firstBoneOffset;
 	paramsCb.uPBRMtlFlags = pbrMtlFlags;
 	paramsCb.alphaMultiplier = material.alphaMultiplier;
+	paramsCb.uCurvatureY = bendSets.yCurvature;
+	paramsCb.uCurvatureZ = bendSets.zCurvature;
+	paramsCb.uUseCurvature = bendSets.useCurvature ? 1 : 0;
 
 	if (material.diffuseTexture) {
 		shaderPerm.bind<64>(uniforms, uTexDiffuse, (void*)material.diffuseTexture);
@@ -463,6 +471,7 @@ void BasicModelDraw::draw(const RenderDestination& rdest,
                           const ObjectLighting& lighting,
                           const EvaluatedModel& evalModel,
                           const InstanceDrawMods& mods,
+                          const BendSettings& bendSets,
                           const std::vector<MaterialOverride>* mtlOverrides) {
 	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
@@ -508,7 +517,7 @@ void BasicModelDraw::draw(const RenderDestination& rdest,
 				}
 			}
 
-			drawGeometry(rdest, camPos, camLookDir, projView, finalTrasform, lighting, &evalMesh.geometry, material, mods);
+			drawGeometry(rdest, camPos, camLookDir, projView, finalTrasform, lighting, &evalMesh.geometry, material, mods, bendSets);
 		}
 	}
 }

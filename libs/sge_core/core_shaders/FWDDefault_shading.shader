@@ -42,6 +42,10 @@ cbuffer ParamsCbFWDDefaultShading {
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+	
+	float uCurvatureY;
+	float uCurvatureZ;
+	int uUseCurvature;
 };
 
 // Material.
@@ -132,9 +136,27 @@ VS_OUTPUT vsMain(VS_INPUT vsin) {
 #endif
 
 	// Pass the varyings to the next shader.
-	const float4 worldPos = mul(world, float4(vertexPosOs, 1.0));
+	float4 worldPos = mul(world, float4(vertexPosOs, 1.0));
 	const float4 worldNormal = mul(world, float4(normalOs, 0.0)); // TODO: Proper normal transfrom by inverse transpose.
+	
+#if 1
+	if(uUseCurvature) {
+		float curvatureY = uCurvatureY;
+		float curvatureZ = uCurvatureZ;
 
+		float curveStart = cameraPositionWs.x + 40.f;
+		float curveCenter = cameraPositionWs.x + 70.f;
+
+		if(worldPos.x > curveStart && worldPos.x < curveCenter) {
+			worldPos.y += (worldPos.x - curveStart) * (worldPos.x - curveStart) * curvatureY;
+		} else if (worldPos.x > curveCenter) {
+			worldPos.y += (worldPos.x - curveStart) * (worldPos.x - curveStart) * curvatureY;
+			worldPos.y -= (worldPos.x - curveCenter) * (worldPos.x - curveCenter) * 0.02f;
+			
+			worldPos.z += (worldPos.x - curveCenter) * (worldPos.x - curveCenter) * curvatureZ * 0.5f;
+		}
+	}
+#endif
 
 	res.v_posWS = worldPos.xyz;
 	res.SV_Position = mul(projView, worldPos);

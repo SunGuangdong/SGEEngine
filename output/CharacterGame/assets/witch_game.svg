@@ -25,9 +25,9 @@
      inkscape:document-units="px"
      showgrid="false"
      width="128px"
-     inkscape:zoom="1"
-     inkscape:cx="2000.5"
-     inkscape:cy="724.5"
+     inkscape:zoom="0.1525238"
+     inkscape:cx="-822.82243"
+     inkscape:cy="2357.0093"
      inkscape:window-width="1858"
      inkscape:window-height="1057"
      inkscape:window-x="54"
@@ -309,6 +309,546 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1">
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:17.1241;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:68.4961, 68.4961;stroke-dashoffset:20.5488;stroke-opacity:1"
+       id="rect6055"
+       width="203.20001"
+       height="101.59999"
+       x="-328.23239"
+       y="499.04163"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1103"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1105"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1107"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1109"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1111"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1113"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1115"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36572"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1117"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36572"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1119"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36572"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1121"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36572"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1123"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36572"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1125"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36572"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1127"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49905"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1129"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49905"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1131"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49905"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1133"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49905"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1135"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49905"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1137"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49905"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1139"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1141"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1143"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1145"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1147"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1149"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1151"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1153"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1155"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1157"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1159"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1161"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1163"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1165"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1167"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1169"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1171"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1173"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1198"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1200"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36572"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1202"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49905"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1204"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1206"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1208"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1290"
+       width="33.866669"
+       height="33.866669"
+       x="-328.23239"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1292"
+       width="33.866669"
+       height="33.866669"
+       x="-294.36575"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1294"
+       width="33.866669"
+       height="33.866669"
+       x="-260.49908"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1296"
+       width="33.866669"
+       height="33.866669"
+       x="-226.6324"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#374548;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1298"
+       width="33.866669"
+       height="33.866669"
+       x="-192.76573"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1300"
+       width="33.866669"
+       height="33.866669"
+       x="-158.89905"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:17.1241;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:68.4961, 68.4961;stroke-dashoffset:20.5488;stroke-opacity:1"
+       id="rect1302"
+       width="203.20001"
+       height="101.59999"
+       x="-328.23239"
+       y="397.44162"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:17.1241;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:68.4961, 68.4961;stroke-dashoffset:20.5488;stroke-opacity:1"
+       id="rect1353"
+       width="203.20001"
+       height="101.59999"
+       x="-328.23239"
+       y="295.84164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:17.1241;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:68.4961, 68.4961;stroke-dashoffset:20.5488;stroke-opacity:1"
+       id="rect1357"
+       width="203.20001"
+       height="101.59999"
+       x="-328.23239"
+       y="973.17493"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:17.1241;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:68.4961, 68.4961;stroke-dashoffset:20.5488;stroke-opacity:1"
+       id="rect1359"
+       width="203.20001"
+       height="101.59999"
+       x="-328.23239"
+       y="871.57495"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:17.1241;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:68.4961, 68.4961;stroke-dashoffset:20.5488;stroke-opacity:1"
+       id="rect1363"
+       width="203.20001"
+       height="101.59999"
+       x="-328.23239"
+       y="1074.7749"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <g
        id="g52919">
       <rect
@@ -568,16 +1108,6 @@
          d="M 40.158409,101.60001 H 243.35843"
          id="path2198" />
     </g>
-    <rect
-       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:17.1241;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:68.4961, 68.4961;stroke-dashoffset:20.5488;stroke-opacity:1"
-       id="rect6055"
-       width="203.20001"
-       height="101.59999"
-       x="40.158409"
-       y="203.20001"
-       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\grass1.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96" />
     <g
        id="g9171"
        transform="matrix(2,0,0,1.9989699,-40.158273,-0.05398579)"
@@ -783,12 +1313,15 @@
          ry="1.6163549" />
     </g>
     <rect
-       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
        id="rect52880"
        width="33.866669"
        height="33.866669"
-       x="-27.242073"
-       y="67.733337" />
+       x="-125.03238"
+       y="363.57492"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
     <path
        id="rect52923"
        style="fill:#1c241f;stroke:none;stroke-width:7.50043;stroke-linejoin:round"
@@ -1056,6 +1589,784 @@
          d="m 1239.0117,1265.9297 c -41.7908,-0.4631 -79.8196,9.8241 -82.5137,21.5391 -0.086,0.3756 -0.1574,0.7535 -0.2343,1.1308 30.5094,-10.5495 88.6707,-14.7243 133.8535,-0.5195 47.5221,14.9399 102.3051,52.3073 122.7715,82.5508 5.071,-27.158 -61.7817,-79.0072 -117.5235,-96.5313 -17.5847,-5.5284 -37.3577,-7.9594 -56.3535,-8.1699 z"
          transform="scale(0.26458334)" />
     </g>
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1692"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="329.70828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1694"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="295.84164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1079"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="363.57492"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1081"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="329.70828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1083"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="295.84164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1085"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="363.57492"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1087"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="329.70828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1089"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="295.84164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1091"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1093"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1095"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1097"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1099"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1101"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1104"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1106"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1108"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1112"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1114"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1116"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1118"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1120"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1122"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1124"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1126"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="634.5083"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1128"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="668.37494"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1130"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="702.24164"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1132"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="736.10828"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <path
+       style="fill:#ffcc00;stroke:#d4d400;stroke-width:5.18475;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:31.1085, 31.1085;stroke-dashoffset:0;stroke-opacity:1"
+       d="M -328.23239,736.10828 H -23.432373"
+       id="path1175"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#1c241f;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1134"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="769.97498"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1136"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="803.84161"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1138"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="600.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#435458;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1140"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="837.70831"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1142"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="465.17487"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1144"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="431.30823"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1146"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="397.44159"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1148"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="465.17487"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1150"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="431.30823"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1152"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="397.44159"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1154"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="465.17487"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1156"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="431.30823"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect1158"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="397.44159"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2722"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="566.77478"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2724"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="532.9082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2726"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="499.04153"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2728"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="566.77478"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2730"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="532.9082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2732"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="499.04153"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2734"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="566.77478"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2736"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="532.9082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2738"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="499.04153"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2740"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="939.30817"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2742"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="905.44159"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2744"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="871.57495"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2746"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="939.30817"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2748"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="905.44159"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2750"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="871.57495"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2752"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="939.30817"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2754"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="905.44159"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2756"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="871.57495"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2758"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="1040.9082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2760"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="1007.0416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2762"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="973.17493"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2764"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="1040.9082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2766"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="1007.0416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2768"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="973.17493"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2770"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="1040.9082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2772"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="1007.0416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect2774"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="973.17493"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5410"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="1142.5082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5412"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="1108.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5414"
+       width="33.866669"
+       height="33.866669"
+       x="-125.03238"
+       y="1074.7749"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5416"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="1142.5082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5418"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="1108.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5420"
+       width="33.866669"
+       height="33.866669"
+       x="-91.16571"
+       y="1074.7749"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5422"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="1142.5082"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5424"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="1108.6416"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <rect
+       style="fill:#7a8f27;fill-opacity:1;stroke:none;stroke-width:1.98449;stroke-linejoin:round"
+       id="rect5426"
+       width="33.866669"
+       height="33.866669"
+       x="-57.299042"
+       y="1074.7749"
+       inkscape:export-filename="D:\work\sge_source\output\CharacterGame\assets\rodeSegmentTex.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
   </g>
   <script
      id="mesh_polyfill"

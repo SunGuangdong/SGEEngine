@@ -91,7 +91,7 @@ void AssetProperty::setTargetAsset(const char* const assetPath) {
 	m_targetAsset = assetPath ? assetPath : "";
 }
 
-DefineTypeId(AssetProperty, 20'03'01'0001);
+RelfAddTypeId(AssetProperty, 20'03'01'0001);
 ReflBlock() {
 	ReflAddType(AssetProperty) ReflMember(AssetProperty, m_targetAsset);
 }

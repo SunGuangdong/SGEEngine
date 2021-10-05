@@ -5,9 +5,9 @@
 namespace sge {
 
 // clang-format off
-DefineTypeId(CollsionShapeDesc::Type,        21'02'28'0003);
-DefineTypeId(CollsionShapeDesc,              21'02'28'0004);
-DefineTypeId(std::vector<CollsionShapeDesc>, 21'02'28'0005);
+RelfAddTypeId(CollsionShapeDesc::Type,        21'02'28'0003);
+RelfAddTypeId(CollsionShapeDesc,              21'02'28'0004);
+RelfAddTypeId(std::vector<CollsionShapeDesc>, 21'02'28'0005);
 ReflBlock()
 {
 	ReflAddType(CollsionShapeDesc::Type)

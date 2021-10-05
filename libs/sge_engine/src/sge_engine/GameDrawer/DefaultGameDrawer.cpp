@@ -608,11 +608,11 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 			                                *drawSets.shadowMapBuildInfo, geom, ri.mtl.diffuseTexture, false);
 		} else {
 			m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), finalTrasform, lighting, &geom,
-			                         ri.mtl, ri.traitModel->m_models[ri.iModel].instanceDrawMods);
+			                         ri.mtl, ri.traitModel->m_models[ri.iModel].instanceDrawMods, BendSettings{getWorld()->worldCurvatureY, getWorld()->worldCurvatureZ, drawReason != drawReason_editing});
 		}
 	} else {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), finalTrasform, geom,
-		                                   getSelectionTintColor(drawReason));
+		                                   getSelectionTintColor(drawReason), false);
 	}
 }
 
@@ -631,7 +631,7 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), ri.obj2world, texPlaneGeom,
-		                                   getSelectionTintColor(drawReason));
+		                                   getSelectionTintColor(drawReason), true);
 	} else if (drawReason == drawReason_gameplayShadow) {
 		// Shadow maps.
 		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), ri.obj2world,
@@ -645,9 +645,10 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 		mods.gameTime = getWorld()->timeSpendPlaying;
 		mods.forceNoLighting = ri.forceNoLighting;
 		mods.forceNoCulling = ri.forceNoCulling;
+		mods.forceAdditiveBlending = ri.forceAlphaBlending;
 
 		m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), ri.obj2world, lighting,
-		                         &texPlaneGeom, texPlaneMtl, mods);
+		                         &texPlaneGeom, texPlaneMtl, mods, BendSettings{getWorld()->worldCurvatureY, getWorld()->worldCurvatureZ, !ri.forceNoWitchGameBending && drawReason != drawReason_editing});
 	}
 }
 
@@ -688,7 +689,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 						mat4f particleTForm = n2w * mat4f::getTranslation(particle.pos) * mat4f::getScaling(particle.scale);
 
 						m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, lighting,
-						                 model->staticEval, InstanceDrawMods());
+						                 model->staticEval, InstanceDrawMods(), BendSettings());
 					}
 				}
 			}
@@ -706,7 +707,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 					mods.forceAdditiveBlending = true;
 
 					m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
-					                         &srd->geometry, srd->material, mods);
+					                         &srd->geometry, srd->material, mods, BendSettings());
 				}
 			}
 		}
@@ -733,7 +734,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 				    mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) * mat4f::getScaling(particle.scale);
 
 				m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, lighting,
-				                 pgrp->spriteTexture->asModel()->staticEval, InstanceDrawMods());
+				                 pgrp->spriteTexture->asModel()->staticEval, InstanceDrawMods(), BendSettings{});
 			}
 		} else {
 			if (m_partRendDataGen.generate(*pgrp, *drawSets.rdest.sgecon, *drawSets.drawCamera, n2w)) {
@@ -743,7 +744,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 
 				const mat4f identity = mat4f::getIdentity();
 				m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), identity, lighting,
-				                         &m_partRendDataGen.geometry, m_partRendDataGen.material, mods);
+				                         &m_partRendDataGen.geometry, m_partRendDataGen.material, mods, BendSettings());
 			}
 		}
 	}
@@ -929,11 +930,11 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 		if (simpleObstacle->geometry.hasData()) {
 			if (drawReason_IsVisualizeSelection(drawReason)) {
 				m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), simpleObstacle->getTransformMtx(),
-				                                   simpleObstacle->geometry, selectionTint);
+				                                   simpleObstacle->geometry, selectionTint, false);
 			} else {
 				m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(),
 				                         simpleObstacle->getTransformMtx(), lighting, &simpleObstacle->geometry, simpleObstacle->material,
-				                         InstanceDrawMods());
+				                         InstanceDrawMods(), BendSettings());
 			}
 		}
 	} else if (actorType == sgeTypeId(ACamera) && drawReason_IsVisualizeSelection(drawReason)) {

@@ -4,7 +4,7 @@
 
 namespace sge {
 
-DefineTypeId(APumpkinProjectile, 21'09'17'0001);
+RelfAddTypeId(APumpkinProjectile, 21'09'17'0001);
 
 ReflBlock() {
 	ReflAddActor(APumpkinProjectile);

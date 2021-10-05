@@ -73,7 +73,7 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	imods.forceNoLighting = true;
 
 	getCore()->getModelDraw().draw(rdest, camera.eyePosition(), -camera.orbitPoint.normalized0(), proj * lookAt, mat4f::getIdentity(),
-	                               ObjectLighting(), m_eval, imods);
+	                               ObjectLighting(), m_eval, imods, BendSettings());
 
 	if (kIsTexcoordStyleD3D) {
 		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y));
@@ -224,7 +224,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
 			getCore()->getModelDraw().draw(rdest, camera.eyePosition(), -camera.orbitPoint.normalized0(), proj * lookAt,
-			                               mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods());
+			                               mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods(), BendSettings());
 
 			ImGui::InvisibleButton("TextureCanvasIB", canvas_size);
 

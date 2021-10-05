@@ -6,7 +6,7 @@
 namespace sge {
 struct GameInspector;
 
-DefineTypeIdExists(TraitScriptSlot);
+RelfAddTypeIdExists(TraitScriptSlot);
 struct SGE_ENGINE_API TraitScriptSlot : public Trait {
 	SGE_TraitDecl_Full(TraitScriptSlot);
 

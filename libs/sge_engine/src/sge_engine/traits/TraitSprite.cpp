@@ -8,8 +8,8 @@
 
 namespace sge {
 // clang-format off
-DefineTypeId(TraitSprite, 20'07'11'0001);
-DefineTypeId(TraitSprite::ImageSettings, 21'04'04'0001);
+RelfAddTypeId(TraitSprite, 20'07'11'0001);
+RelfAddTypeId(TraitSprite::ImageSettings, 21'04'04'0001);
 
 ReflBlock() {
 	ReflAddType(TraitSprite::ImageSettings)
@@ -23,6 +23,8 @@ ReflBlock() {
 		ReflMember(TraitSprite::ImageSettings, forceNoCulling)
 		ReflMember(TraitSprite::ImageSettings, flipHorizontally)
 		ReflMember(TraitSprite::ImageSettings, spriteFrameTime).uiRange(0.f, 100000.f, 0.01f)
+		ReflMember(TraitSprite::ImageSettings, forceAlphaBlending)
+		ReflMember(TraitSprite::ImageSettings, forceNoWitchGameBending)
 	;
 
 	ReflAddType(TraitSprite)
@@ -160,6 +162,8 @@ void TraitSprite::getRenderItems(const GameDrawSets& drawSets, std::vector<Trait
 	renderItem.actor = getActor();
 	renderItem.forceNoCulling = imageSettings.forceNoCulling;
 	renderItem.forceNoLighting = imageSettings.forceNoLighting;
+	renderItem.forceAlphaBlending = imageSettings.forceAlphaBlending;
+	renderItem.forceNoWitchGameBending = imageSettings.forceNoWitchGameBending;
 	renderItem.colorTint = imageSettings.colorTint;
 
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();

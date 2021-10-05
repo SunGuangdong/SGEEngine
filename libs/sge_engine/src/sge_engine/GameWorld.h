@@ -345,6 +345,10 @@ struct SGE_ENGINE_API GameWorld {
 
 	// Audio stuff
 	float m_masterVolume = 1.0f;
+
+	//
+	float worldCurvatureY = 0.005f;
+	float worldCurvatureZ = 0.04f;
 };
 
 } // namespace sge

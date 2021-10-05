@@ -10,7 +10,7 @@ namespace sge {
 /// The trait is mainly designed to be able to distiquish between character
 /// and non-character actors. Usually used when you want to add some forces
 /// to the rigid body of the character, ignore collitions or other logic.
-DefineTypeIdExists(TraitCharacterController);
+RelfAddTypeIdExists(TraitCharacterController);
 struct SGE_ENGINE_API TraitCharacterController final : public Trait {
 	SGE_TraitDecl_Full(TraitCharacterController);
 

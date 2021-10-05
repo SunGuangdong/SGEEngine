@@ -19,11 +19,11 @@ namespace sge {
 struct MDiffuseMaterial; // User for creating material overrides.
 
 // clang-format off
-DefineTypeId(TraitModel, 20'03'01'0004);
-DefineTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
-DefineTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
-DefineTypeId(TraitModel::MaterialOverride, 20'10'15'0001);
-DefineTypeId(std::vector<TraitModel::MaterialOverride>, 20'10'15'0002);
+RelfAddTypeId(TraitModel, 20'03'01'0004);
+RelfAddTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
+RelfAddTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
+RelfAddTypeId(TraitModel::MaterialOverride, 20'10'15'0001);
+RelfAddTypeId(std::vector<TraitModel::MaterialOverride>, 20'10'15'0002);
 
 ReflBlock() {
 	ReflAddType(TraitModel::MaterialOverride)
@@ -45,6 +45,7 @@ ReflBlock() {
 	ReflAddType(TraitModel)
 		ReflMember(TraitModel, isRenderable)
 		ReflMember(TraitModel, m_models)
+		ReflMember(TraitModel, forceNoWitchGameBending)
 	;
 }
 // clang-format on
@@ -294,6 +295,14 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 	if (ImGui::CollapsingHeader(ICON_FK_CUBE " Model Trait", ImGuiTreeNodeFlags_DefaultOpen)) {
 		int deleteModelIndex = -1;
 
+		chain.add(sgeFindMember(TraitModel, isRenderable));
+		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
+		chain.pop();
+
+		chain.add(sgeFindMember(TraitModel, forceNoWitchGameBending));
+		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
+		chain.pop();
+		
 		// Per model User Interface.
 		for (int iModel = 0; iModel < traitModel.m_models.size(); ++iModel) {
 			std::string label = string_format("Model %d", iModel);

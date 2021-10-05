@@ -20,16 +20,18 @@ struct SGE_CORE_API ConstantColorWireShader {
 	          const mat4f& projView,
 	          const mat4f& preRoot,
 	          const EvaluatedModel& model,
-	          const vec4f& shadingColor);
+	          const vec4f& shadingColor,
+	          bool forceNoCulling);
 
 	void drawGeometry(
-	    const RenderDestination& rdest, const mat4f& projView, const mat4f& world, const Geometry& geometry, const vec4f& shadingColor);
+	    const RenderDestination& rdest, const mat4f& projView, const mat4f& world, const Geometry& geometry, const vec4f& shadingColor, bool forceNoCulling);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermut;
 	StateGroup stateGroup;
 	GpuHandle<RasterizerState> m_rasterWireframeDepthBias;
 	GpuHandle<RasterizerState> m_rasterWireframeDepthBiasCCW;
+	GpuHandle<RasterizerState> m_rasterWireframeDepthBiasNoCulling;
 };
 
 } // namespace sge

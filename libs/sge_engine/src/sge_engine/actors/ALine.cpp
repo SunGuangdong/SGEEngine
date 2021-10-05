@@ -6,7 +6,7 @@ namespace sge {
 
 
 // clang-format off
-DefineTypeId(ALine, 20'03'02'0022);
+RelfAddTypeId(ALine, 20'03'02'0022);
 
 ReflBlock() {
 	ReflAddActor(ALine)

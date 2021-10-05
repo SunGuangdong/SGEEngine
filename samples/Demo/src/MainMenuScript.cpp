@@ -52,7 +52,7 @@ struct MainMenuScript final : public IWorldScript {
 	}
 };
 
-DefineTypeId(MainMenuScript, 21'03'13'0001);
+RelfAddTypeId(MainMenuScript, 21'03'13'0001);
 ReflBlock() {
 	ReflAddScript(MainMenuScript);
 }

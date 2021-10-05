@@ -12,7 +12,7 @@ struct ICamera;
 struct TraitModel;
 struct TraitSpriteRenderItem;
 
-DefineTypeIdExists(TraitSprite);
+RelfAddTypeIdExists(TraitSprite);
 struct SGE_ENGINE_API TraitSprite : public Trait {
 	SGE_TraitDecl_Full(TraitSprite);
 
@@ -134,6 +134,13 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 
 		/// Sprite (if any) evaluation time in seconds.
 		float spriteFrameTime = 0.f;
+
+		/// @brief True if the sprite needs to be drawn always with alpha blending.
+		/// Usually this is needed when there are some edges that appear rough or sharp
+		/// or when the image is semi-transparent.
+		bool forceAlphaBlending = false;
+
+		bool forceNoWitchGameBending = false;
 	};
 
 	ImageSettings imageSettings;

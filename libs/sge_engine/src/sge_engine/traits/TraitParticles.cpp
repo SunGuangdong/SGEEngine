@@ -6,7 +6,7 @@
 namespace sge {
 
 // clang-format off
-DefineTypeId(TraitParticlesSimple, 20'03'02'0051);
+RelfAddTypeId(TraitParticlesSimple, 20'03'02'0051);
 ReflBlock() {
 	ReflAddType(TraitParticlesSimple)
 		ReflMember(TraitParticlesSimple, m_isEnabled)
@@ -15,7 +15,7 @@ ReflBlock() {
 	;
 }
 
-DefineTypeId(ParticleGroupDesc::SpawnShape, 20'03'02'0046);
+RelfAddTypeId(ParticleGroupDesc::SpawnShape, 20'03'02'0046);
 ReflBlock() {
 	ReflAddType(ParticleGroupDesc::SpawnShape)
 		ReflEnumVal(ParticleGroupDesc::spawnShape_sphere, "sphere")
@@ -25,7 +25,7 @@ ReflBlock() {
 	;
 }
 
-DefineTypeId(ParticleGroupDesc::BirthType, 20'03'02'0047);
+RelfAddTypeId(ParticleGroupDesc::BirthType, 20'03'02'0047);
 ReflBlock() {
 	ReflAddType(ParticleGroupDesc::BirthType)
 		ReflEnumVal(ParticleGroupDesc::birthType_constant, "Constant")
@@ -33,7 +33,7 @@ ReflBlock() {
 	;
 }
 
-DefineTypeId(ParticleGroupDesc::Visualization, 20'03'02'0048);
+RelfAddTypeId(ParticleGroupDesc::Visualization, 20'03'02'0048);
 ReflBlock() {
 	ReflAddType(ParticleGroupDesc::Visualization)
 		ReflEnumVal(ParticleGroupDesc::vis_model3D, "Model")
@@ -41,15 +41,15 @@ ReflBlock() {
 	;
 }
 
-DefineTypeId(ParticleGroupDesc::VelocityType, 20'03'06'0007);
+RelfAddTypeId(ParticleGroupDesc::VelocityType, 20'03'06'0007);
 ReflBlock() {
 	ReflAddType(ParticleGroupDesc::VelocityType) ReflEnumVal(ParticleGroupDesc::velocityType_directional, "directional")
 	    ReflEnumVal(ParticleGroupDesc::velocityType_radial, "radial") ReflEnumVal(ParticleGroupDesc::velocityType_cone, "cone");
 }
 
 
-DefineTypeId(ParticleGroupDesc, 20'03'02'0049);
-DefineTypeId(std::vector<ParticleGroupDesc>, 20'03'02'0050);
+RelfAddTypeId(ParticleGroupDesc, 20'03'02'0049);
+RelfAddTypeId(std::vector<ParticleGroupDesc>, 20'03'02'0050);
 
 ReflBlock() {
 	ReflAddType(ParticleGroupDesc)
@@ -504,7 +504,7 @@ void TraitParticlesProgrammable::getRenderItems(std::vector<TraitParticlesProgra
 //--------------------------------------------------------------
 // ParticleRenderDataGen
 //--------------------------------------------------------------
-DefineTypeId(TraitParticlesProgrammable, 20'11'23'0001);
+RelfAddTypeId(TraitParticlesProgrammable, 20'11'23'0001);
 bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleGroup& particles,
                                      SGEContext& sgecon,
                                      const ICamera& camera,

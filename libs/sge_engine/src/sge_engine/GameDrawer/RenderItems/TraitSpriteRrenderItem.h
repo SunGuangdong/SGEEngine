@@ -15,6 +15,8 @@ struct TraitSpriteRenderItem : public IRenderItem {
 	vec4f colorTint = vec4f(1.f);
 	bool forceNoLighting = false;
 	bool forceNoCulling = false;
+	bool forceAlphaBlending = false;
+	bool forceNoWitchGameBending = false;
 };
 
 } // namespace sge

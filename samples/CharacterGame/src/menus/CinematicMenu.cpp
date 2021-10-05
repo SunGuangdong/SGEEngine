@@ -112,7 +112,7 @@ struct CinematicMenuScript : public IWorldScript {
 
 	float totalProgress = 0.f;
 };
-DefineTypeId(CinematicMenuScript, 21'08'30'0001);
+RelfAddTypeId(CinematicMenuScript, 21'08'30'0001);
 ReflBlock() {
 	ReflAddScript(CinematicMenuScript) ReflMember(CinematicMenuScript, totalProgress);
 }

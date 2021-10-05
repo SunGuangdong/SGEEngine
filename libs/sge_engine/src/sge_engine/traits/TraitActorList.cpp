@@ -2,5 +2,5 @@
 
 namespace sge {
 
-DefineTypeId(TraitActorList, 20'11'09'0001);
+RelfAddTypeId(TraitActorList, 20'11'09'0001);
 }

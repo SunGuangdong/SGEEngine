@@ -9,7 +9,7 @@ namespace sge {
 // struct Actor
 //--------------------------------------------------------------------
 // clang-format off
-DefineTypeId(Actor, 20'03'01'0022);
+RelfAddTypeId(Actor, 20'03'01'0022);
 
 ReflBlock()
 {

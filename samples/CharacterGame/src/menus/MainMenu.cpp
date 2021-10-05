@@ -63,7 +63,7 @@ struct MainMenuScript : public IWorldScript {
 		context.draw(drawSetsUI);
 	}
 };
-DefineTypeId(MainMenuScript, 21'08'26'0001);
+RelfAddTypeId(MainMenuScript, 21'08'26'0001);
 ReflBlock() {
 	ReflAddScript(MainMenuScript);
 }

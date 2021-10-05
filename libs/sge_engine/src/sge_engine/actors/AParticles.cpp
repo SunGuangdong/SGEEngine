@@ -8,7 +8,7 @@ namespace sge {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-DefineTypeId(AParticlesSimple, 20'03'02'0052);
+RelfAddTypeId(AParticlesSimple, 20'03'02'0052);
 // clang-format off
 
 ReflBlock() {

@@ -57,11 +57,18 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 		cbParms->create(bd, nullptr);
 	}
 
-	if (m_skySphereVB.IsResourceValid() == false) {
+	if (!m_skySphereVB.IsResourceValid()) {
 		m_skySphereVB = getCore()->getDevice()->requestResource<Buffer>();
 		m_skySphereNumVerts = GeomGen::sphere(m_skySphereVB.GetPtr(), 32, 32);
 		VertexDecl vdecl[] = {VertexDecl(0, "a_position", UniformType::Float3, 0)};
 		m_skySphereVBVertexDeclIdx = getCore()->getDevice()->getVertexDeclIndex(vdecl, SGE_ARRSZ(vdecl));
+	}
+
+	if (!m_fullScreenQuadVB.IsResourceValid()) {
+		m_fullScreenQuadVB = getCore()->getDevice()->requestResource<Buffer>();
+		m_fullScreenQuadNumVerts = GeomGen::ndcQuad3DUV(m_fullScreenQuadVB);
+		VertexDecl vdecl[] = {VertexDecl(0, "a_position", UniformType::Float3, 0), VertexDecl(0, "a_uv", UniformType::Float3, 0)};
+		m_fullScreenQuadDeclIdx = getCore()->getDevice()->getVertexDeclIndex(vdecl, SGE_ARRSZ(vdecl));
 	}
 
 	const int iShaderPerm = shadingPermut->getCompileTimeOptionsPerm().computePermutationIndex(nullptr, 0);

@@ -4,7 +4,7 @@
 #include "sge_engine/enums2d.h"
 
 namespace sge {
-DefineTypeId(TraitViewportIcon, 20'05'22'0001);
+RelfAddTypeId(TraitViewportIcon, 20'05'22'0001);
 
 ReflBlock() {
 	ReflAddType(TraitViewportIcon);

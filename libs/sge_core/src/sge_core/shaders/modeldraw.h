@@ -17,6 +17,12 @@ struct MaterialOverride {
 	PBRMaterial mtl;
 };
 
+struct BendSettings {
+	float yCurvature = 0.f;
+	float zCurvature = 0.f;
+	bool useCurvature = false;
+};
+
 //------------------------------------------------------------
 // ShadingLightData
 // Describes the light data in a converted form, suitable for
@@ -80,6 +86,7 @@ struct SGE_CORE_API BasicModelDraw {
 	          const ObjectLighting& lighting,
 	          const EvaluatedModel& model,
 	          const InstanceDrawMods& mods,
+	          const BendSettings& bendSets,
 	          const std::vector<MaterialOverride>* mtlOverrides = nullptr);
 
 	void drawGeometry(const RenderDestination& rdest,
@@ -90,7 +97,8 @@ struct SGE_CORE_API BasicModelDraw {
 	                  const ObjectLighting& lighting,
 	                  const Geometry* geometry,
 	                  const PBRMaterial& material,
-	                  const InstanceDrawMods& mods);
+	                  const InstanceDrawMods& mods,
+	                  const BendSettings& bendSets);
 
   private:
 	void drawGeometry_FWDShading(const RenderDestination& rdest,
@@ -101,7 +109,8 @@ struct SGE_CORE_API BasicModelDraw {
 	                             const ObjectLighting& lighting,
 	                             const Geometry* geometry,
 	                             const PBRMaterial& material,
-	                             const InstanceDrawMods& mods);
+	                             const InstanceDrawMods& mods,
+	                             const BendSettings& bendSets);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermutFWDShading;
