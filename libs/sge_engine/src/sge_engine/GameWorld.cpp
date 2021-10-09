@@ -731,6 +731,20 @@ void GameWorld::createPrefab(GameWorld& prefabWorld,
 	prefabWorld.instantiatePrefab(*this, false, !shouldKeepOriginalObjectIds, pOblectsToInstantiate);
 }
 
+span<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(const RigidBody* rb) const {
+	if (rb == nullptr) {
+		return {};
+	}
+
+	auto itrFind = m_physicsManifoldList.find(rb);
+	if (itrFind == m_physicsManifoldList.end()) {
+		return {};
+	}
+
+	return span<const btPersistentManifold* const>::span(itrFind->second.data(), itrFind->second.size());
+}
+
+
 void GameWorld::removeRigidBodyManifold(RigidBody* const rb) {
 	auto itrFind = m_physicsManifoldList.find(rb);
 	if (itrFind == m_physicsManifoldList.end()) {
@@ -776,6 +790,7 @@ void GameWorld::addPostSceneTaskLoadWorldFormFile(const char* filename) {
 	PostSceneUpdateTaskLoadWorldFormFile* task = new PostSceneUpdateTaskLoadWorldFormFile(filename, true);
 	addPostSceneTask(task);
 }
+
 
 void GameWorld::setDefaultGravity(const vec3f& gravity) {
 	physicsWorld.dynamicsWorld->setGravity(toBullet(gravity));

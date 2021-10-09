@@ -139,26 +139,37 @@ VS_OUTPUT vsMain(VS_INPUT vsin) {
 	float4 worldPos = mul(world, float4(vertexPosOs, 1.0));
 	const float4 worldNormal = mul(world, float4(normalOs, 0.0)); // TODO: Proper normal transfrom by inverse transpose.
 	
+	float4 worldPosNonDistorted = worldPos;
 #if 1
 	if(uUseCurvature) {
 		float curvatureY = uCurvatureY;
 		float curvatureZ = uCurvatureZ;
 
-		float curveStart = cameraPositionWs.x + 40.f;
-		float curveCenter = cameraPositionWs.x + 70.f;
+		float curveStart = cameraPositionWs.x + 00.f;
+		float curveCenter = cameraPositionWs.x + 100.f;
+		float curveEnd = curveCenter + 30.f;
+
+		float kz = (worldPos.x - curveStart) / (curveCenter - curveStart);
+		kz = kz * kz * kz * kz;
 
 		if(worldPos.x > curveStart && worldPos.x < curveCenter) {
-			worldPos.y += (worldPos.x - curveStart) * (worldPos.x - curveStart) * curvatureY;
-		} else if (worldPos.x > curveCenter) {
-			worldPos.y += (worldPos.x - curveStart) * (worldPos.x - curveStart) * curvatureY;
-			worldPos.y -= (worldPos.x - curveCenter) * (worldPos.x - curveCenter) * 0.02f;
+			float k = (worldPos.x - curveStart) / (curveCenter - curveStart);
+			k = 3.f * k * k - 2.f * k * k * k;
 			
-			worldPos.z += (worldPos.x - curveCenter) * (worldPos.x - curveCenter) * curvatureZ * 0.5f;
+			worldPos.y += k * curvatureY;
+			worldPos.z += kz * curvatureZ;
+		} else if (worldPos.x > curveCenter) {
+			float k = (worldPos.x - curveCenter) / (curveEnd - curveCenter);
+			k = k * k * k * k;
+			worldPos.y += curvatureY;			
+			worldPos.y += -k * curvatureY;			
+				
+			worldPos.z += kz * curvatureZ;			
 		}
 	}
 #endif
 
-	res.v_posWS = worldPos.xyz;
+	res.v_posWS = worldPosNonDistorted.xyz;
 	res.SV_Position = mul(projView, worldPos);
 
 	res.v_normal = worldNormal.xyz;
@@ -184,14 +195,14 @@ VS_OUTPUT vsMain(VS_INPUT vsin) {
 #ifdef SGE_PIXEL_SHADER
 float4 psMain(VS_OUTPUT IN)
     : SV_Target0 {
-	float4 diffuseColor = pow(uDiffuseColorTint, 2.2f);
+	float4 diffuseColor = uDiffuseColorTint; //pow(uDiffuseColorTint, 2.2f);
 
 	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromConstantColor) {
 		// We already use uDiffuseColorTint. So nothing to do here.
 	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
 	#if (OPT_HasUV == kHasUV_Yes)
 		diffuseColor *= tex2D(texDiffuse, IN.v_uv);
-		diffuseColor.xyz = pow(diffuseColor.xyz, 2.2f);
+		//diffuseColor.xyz = pow(diffuseColor.xyz, 2.2f);
 	#else // Should never happen.
 		return float4(1.f, 0.f, 1.f, 1.f);
 	#endif
@@ -248,11 +259,11 @@ float4 psMain(VS_OUTPUT IN)
 
 #if OPT_HasUV == kHasUV_Yes
 			if (uPBRMtlFlags & kPBRMtl_Flags_HasMetalnessMap) {
-				metallic *= pow(tex2D(uTexMetalness, IN.v_uv).r, 2.2f);
+				metallic *= tex2D(uTexMetalness, IN.v_uv).r;
 			}
 
 			if ((uPBRMtlFlags & kPBRMtl_Flags_HasRoughnessMap) != 0) {
-				roughness *= pow(tex2D(uTexRoughness, IN.v_uv).r, 2.2f);
+				roughness *= tex2D(uTexRoughness, IN.v_uv).r;
 			}
 #endif
 
@@ -416,6 +427,15 @@ float4 psMain(VS_OUTPUT IN)
 
 		finalColor = float4(lighting, diffuseColor.w) + float4(fakeAmbientDetail + rimLighting, 0.f);
 	}
+	
+	// Fog
+	// if( uUseCurvature ) {
+		// float fogDist = max(0.f, IN.v_posWS.x - cameraPositionWs.x);
+		// float fogDensity = exp(-fogDist / 100.f);
+		// fogDensity = fogDensity * fogDensity;
+		
+		// finalColor.xyz = finalColor.xyz * fogDensity + (1 - fogDensity) * float3(0.12, 0.13, 0.12);
+	// }
 
 	//// Saturate the color, to make the selection highlight visiable for really brightly lit objects.
 	// finalColor.x = saturate(finalColor.x);
@@ -426,7 +446,7 @@ float4 psMain(VS_OUTPUT IN)
 	// finalColor.xyz = finalColor / (finalColor + float3(1.f, 1.f, 1.f));
 
 	// Back to linear color space.
-	finalColor.xyz = pow(finalColor, 1.0f / 2.2f);
+	//finalColor.xyz = pow(finalColor, 1.0f / 2.2f);
 
 #if OPT_HasVertexColor == kHasVertexColor_Yes
 	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseTintByVertexColor) {

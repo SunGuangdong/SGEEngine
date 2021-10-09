@@ -13,6 +13,10 @@ struct ARoadSegment : public Actor {
 
 		ttModel.addModel("assets/roadSegment.mdl", true);
 	}
+	
+	void update() {
+
+	}
 
 	virtual AABox3f getBBoxOS() const { return ttModel.getBBoxOS(); }
 

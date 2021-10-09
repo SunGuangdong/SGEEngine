@@ -42,7 +42,7 @@ const mat4f& Actor::getTransformMtx() const {
 //}
 
 void Actor::setTransform(const transf3d& transform, bool killVelocity) {
-	setTransformEx(transform, killVelocity, false, true);
+	setTransformEx(transform, killVelocity, true, true);
 }
 
 void Actor::setLocalTransform(const transf3d& localTransform, bool killVelocity) {

@@ -18,7 +18,7 @@ void APumpkinProjectile::create() {
 	ttRigidbody.getRigidBody()->setNoCollisionResponse(true);
 	auto imageAsset = getCore()->getAssetLib()->getAsset("assets/pumpkin1.png", true);
 	ttSprite.m_assetProperty.setAsset(imageAsset);
-	ttSprite.imageSettings.m_anchor = Anchor::anchor_mid;
+	ttSprite.imageSettings.m_anchor = anchor_mid;
 	ttSprite.imageSettings.defaultFacingAxisZ = false;
 }
 

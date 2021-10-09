@@ -10,7 +10,9 @@
 #include "sge_engine/traits/TraitSprite.h"
 #include "sge_engine/typelibHelper.h"
 #include "sge_utils/math/Random.h"
+#include "sge_utils/math/Rangef.h"
 
+#include "ADecores.h"
 #include "APumpkinProjectile.h"
 
 namespace sge {
@@ -51,73 +53,12 @@ RelfAddTypeIdInline(WitchCameraTrait, 21'08'23'0001);
 
 Random g_rnd;
 
-void populateRoad(Actor* road) {
-	GameWorld* world = road->getWorld();
-
-	vector_set<ObjectId> children;
-	world->getAllChildren(children, road->getId());
-	for (ObjectId child : children) {
-		world->objectDelete(child);
-	}
-
-	const vec3f minRoadPositionWs = road->getPosition();
-	const vec3f maxRoadPositionWs = road->getPosition() + vec3f(100.f, 0.f, 0.f);
-
-	const float rangeZMin = 8.f;
-	const float rangeZMax = 32.f;
-
-	for (int t = 0; t < 100; t += 10) {
-		const int assetIndexPick = g_rnd.nextInt() % SGE_ARRSZ(g_decoreAssetNames);
-		std::shared_ptr<Asset> decoreTexAsset =
-		    getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_decoreAssetNames[assetIndexPick], true);
-		const float decoreTexWidth = float(decoreTexAsset->asTextureView()->tex->getDesc().texture2D.width);
-		const float decoreTexWidthWs = float(decoreTexWidth) / 64.f;
-
-		const float rangeZMinThis = rangeZMin + decoreTexWidthWs * 0.5f;
-		const float rangeZMaxThis = rangeZMax - decoreTexWidthWs * 0.5f;
-
-		if (assetIndexPick == 0) {
-			const float zSpawnRange = rangeZMaxThis - rangeZMinThis;
-			int numFencesToSpawn = int(zSpawnRange / decoreTexWidthWs);
-
-			for (int iFence = 0; iFence < numFencesToSpawn; ++iFence) {
-				AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-
-				float zPosWs = rangeZMinThis + iFence * decoreTexWidthWs;
-
-				decore->m_traitModel.m_models.clear();
-				decore->m_traitSprite.m_assetProperty.setAsset(decoreTexAsset);
-				decore->m_traitSprite.imageSettings.defaultFacingAxisZ = false;
-
-				decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-				world->setParentOf(decore->getId(), road->getId());
-			}
-
-			float zPosWs = g_rnd.nextInRange(rangeZMinThis, rangeZMaxThis);
-
-			zPosWs *= g_rnd.next01() > 0.5f ? 1.f : -1.f;
-
-			
-		} else {
-			float zPosWs = g_rnd.nextInRange(rangeZMinThis, rangeZMaxThis);
-
-			zPosWs *= g_rnd.next01() > 0.5f ? 1.f : -1.f;
-
-			AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-			decore->m_traitModel.m_models.clear();
-			decore->m_traitSprite.m_assetProperty.setAsset(decoreTexAsset);
-			decore->m_traitSprite.imageSettings.defaultFacingAxisZ = false;
-			decore->m_traitSprite.imageSettings.flipHorizontally = g_rnd.next01() > 0.5f;;
-
-			decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-			world->setParentOf(decore->getId(), road->getId());
-		}
-	}
-}
-
 struct LevelInfo {
 	bool isInfoGained = false;
 	ObjectId roads[3];
+	Random rnd;
+
+	LevelInfo() { rnd.setSeed(int(size_t(this))); }
 
 	void gainInfo(GameWorld& world) {
 		if (isInfoGained == false) {
@@ -130,9 +71,96 @@ struct LevelInfo {
 			populateRoad(world.getActorById(roads[2]));
 		}
 	}
+
+	void moveLevel(GameWorld* world, float xDiff) {
+		for (const ObjectId roadId : roads) {
+			if (Actor* const road = world->getActorById(roadId)) {
+				vec3f newPos = road->getPosition();
+				newPos.x += xDiff;
+
+				// If the road is behind view, move it to the back and regenerate it.
+				if (newPos.x < -110.f) {
+					newPos.x += 300.f;
+					populateRoad(road);
+				}
+
+				road->setPosition(newPos, false);
+			}
+		}
+	}
+
+	void populateRoad(Actor* road) {
+		GameWorld* world = road->getWorld();
+
+		vector_set<ObjectId> children;
+		world->getAllChildren(children, road->getId());
+		for (ObjectId child : children) {
+			world->objectDelete(child);
+		}
+
+		const vec3f minRoadPositionWs = road->getPosition();
+		const vec3f maxRoadPositionWs = road->getPosition() + vec3f(100.f, 0.f, 0.f);
+
+		const float rangeZMin = 8.f;
+		const float rangeZMax = 32.f;
+
+		Rangef onRoadRange = Rangef(-8.f, 8.f);
+
+		for (int t = 0; t < 100; t += 10) {
+			const int assetIndexPick = rnd.nextInt() % SGE_ARRSZ(g_decoreAssetNames);
+			std::shared_ptr<Asset> decoreTexAsset =
+			    getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_decoreAssetNames[assetIndexPick], true);
+			const float decoreTexWidth = float(decoreTexAsset->asTextureView()->tex->getDesc().texture2D.width);
+			const float decoreTexWidthWs = float(decoreTexWidth) / 64.f;
+
+			const float rangeZMinThis = rangeZMin + decoreTexWidthWs * 0.5f;
+			const float rangeZMaxThis = rangeZMax - decoreTexWidthWs * 0.5f;
+
+			if (rnd.nextInt() % 100 <= 20) {
+				float zPosWs = rnd.nextInRange(-rangeZMax, rangeZMax) * rnd.nextFlipFLoat();
+				ADecoreGhost* const decoreGhost = world->allocObjectT<ADecoreGhost>();
+
+				decoreGhost->setPosition(minRoadPositionWs + vec3f(float(t), -2.f, zPosWs));
+				world->setParentOf(decoreGhost->getId(), road->getId());
+			}
+
+			if (assetIndexPick == 0) {
+				const float zSpawnRange = rangeZMaxThis - rangeZMinThis;
+				int numFencesToSpawn = int(zSpawnRange / decoreTexWidthWs);
+
+				for (int iFence = 0; iFence < numFencesToSpawn; ++iFence) {
+					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
+
+					float zPosWs = rangeZMinThis + iFence * decoreTexWidthWs;
+
+					decore->m_traitModel.m_models.clear();
+					decore->m_traitSprite.m_assetProperty.setAsset(decoreTexAsset);
+					decore->m_traitSprite.imageSettings.defaultFacingAxisZ = false;
+
+					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
+					world->setParentOf(decore->getId(), road->getId());
+				}
+
+				float zPosWs = rnd.nextInRange(rangeZMinThis, rangeZMaxThis);
+
+				zPosWs *= rnd.next01() > 0.5f ? 1.f : -1.f;
+			} else {
+				float zPosWs = rnd.nextInRange(rangeZMinThis, rangeZMaxThis);
+
+				zPosWs *= rnd.next01() > 0.5f ? 1.f : -1.f;
+
+				AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
+				decore->m_traitModel.m_models.clear();
+				decore->m_traitSprite.m_assetProperty.setAsset(decoreTexAsset);
+				decore->m_traitSprite.imageSettings.defaultFacingAxisZ = false;
+				decore->m_traitSprite.imageSettings.flipHorizontally = rnd.next01() > 0.5f;
+
+				decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
+				world->setParentOf(decore->getId(), road->getId());
+			}
+		}
+	}
 };
-
-
 
 struct AWitch : public Actor {
 	TraitRigidBody ttRigidbody;
@@ -146,15 +174,15 @@ struct AWitch : public Actor {
 
 	float visualXTilt = 0.f;
 
-	float targetWorldCurvatureY = 0.005f;
-	float targetWorldCurvatureZ = 0.04f;
-	float timeUntilNextCurvatureTarget = 1.f;
+	float targetWorldCurvatureY = 15.f;
+	float targetWorldCurvatureZ = -10.f;
+	float nextWorldCurvatureY = 15.f;
+	float nextWorldCurvatureZ = 10.f;
+	float currentCurvatureRemainingDistance = 100.f;
 
 	LevelInfo levelInfo;
 
 	virtual AABox3f getBBoxOS() const { return AABox3f(); }
-
-
 
 	void create() {
 		registerTrait(ttRigidbody);
@@ -176,23 +204,7 @@ struct AWitch : public Actor {
 		getWorld()->worldCurvatureZ = targetWorldCurvatureZ;
 	}
 
-	void moveLevel(float xDiff) {
-		for (ObjectId roadId : levelInfo.roads) {
-			if (Actor* a = getWorld()->getActorById(roadId)) {
-				vec3f newPos = a->getPosition();
-				newPos.x += xDiff;
 
-				if (newPos.x < -100.f) {
-					// Regenerate road with new random elements.
-					newPos.x += 300.f;
-
-					populateRoad(a);
-				}
-
-				a->setPosition(newPos, false);
-			}
-		}
-	}
 
 	void update(const GameUpdateSets& u) {
 		ttCamera.update();
@@ -203,15 +215,18 @@ struct AWitch : public Actor {
 
 		levelInfo.gainInfo(*getWorld());
 
-		if (timeUntilNextCurvatureTarget <= 0.f) {
-			targetWorldCurvatureY = m_rnd.nextInRange(0.001f, 0.003f);
-			targetWorldCurvatureZ = m_rnd.nextInRange(-0.08f, 0.08f);
-			timeUntilNextCurvatureTarget = 3.f;
-		}
-		timeUntilNextCurvatureTarget -= u.dt;
+		float curvatureZ = targetWorldCurvatureZ;
+		float curvatureY = targetWorldCurvatureY;
 
-		// getWorld()->worldCurvatureY = speedLerp(getWorld()->worldCurvatureY, targetWorldCurvatureY, 0.01f * u.dt);
-		getWorld()->worldCurvatureZ = speedLerp(getWorld()->worldCurvatureZ, targetWorldCurvatureZ, 0.1f * u.dt);
+		if (currentCurvatureRemainingDistance < 120.f) {
+			float k = 1.f - currentCurvatureRemainingDistance / 120.f;
+			k = k < 0.5 ? 2 * k * k : 1 - powf(-2 * k + 2, 2) / 2;
+			curvatureZ = lerp(targetWorldCurvatureZ, nextWorldCurvatureZ, k);
+			curvatureY = lerp(targetWorldCurvatureY, nextWorldCurvatureY, k);
+		}
+
+		getWorld()->worldCurvatureZ = curvatureZ;
+		getWorld()->worldCurvatureY = curvatureY;
 
 		ttRigidbody.getRigidBody()->setGravity(vec3f(0.f));
 
@@ -239,7 +254,7 @@ struct AWitch : public Actor {
 
 			// Keyboard input dir.
 			if (u.is.wasActiveWhilePolling() && u.is.AnyArrowKeyDown(true)) {
-				inputDir = vec3f(u.is.GetArrowKeysDir(true, true), 0);
+				inputDir = vec3f(u.is.GetArrowKeysDir(false, true), 0);
 				inputDir.z = inputDir.x;
 				inputDir.x = inputDir.y;
 				inputDir.y = 0.f;
@@ -268,16 +283,27 @@ struct AWitch : public Actor {
 		visualXTilt += inputDirWS.z * u.dt * 2.f;
 		visualXTilt = clamp(visualXTilt, -1.f, 1.f);
 
-		vec3f totalPlayerSpeed = inputDirWS * vec3f(20.f, 0.f, 10.f);
-		vec3f totalPlayerMovement = inputDirWS * vec3f(20.f, 0.f, 10.f) * u.dt;
+		vec3f totalPlayerSpeed = inputDirWS * vec3f(30.f, 0.f, 10.f);
+		vec3f totalPlayerMovement = totalPlayerSpeed * u.dt;
+
+		currentCurvatureRemainingDistance -= totalPlayerSpeed.x * u.dt;
+
+		if (currentCurvatureRemainingDistance < 0.f) {
+			currentCurvatureRemainingDistance = m_rnd.nextInRange(190.f, 200.f) + currentCurvatureRemainingDistance;
+
+			targetWorldCurvatureZ = nextWorldCurvatureZ;
+			targetWorldCurvatureY = nextWorldCurvatureY;
+
+			nextWorldCurvatureY = m_rnd.nextInRange(8.f, 15.f);
+			nextWorldCurvatureZ = m_rnd.nextInRange(-22.f, 22.f);
+		}
 
 		// Move the player in ZY plane
 		ttRigidbody.getRigidBody()->setLinearVelocity(totalPlayerSpeed._0yz());
 
-		moveLevel(-totalPlayerMovement.x);
+		levelInfo.moveLevel(getWorld(), -totalPlayerMovement.x);
 
-
-		float tiltAmountSmoothed = smoothstep(fabsf(visualXTilt)) * sign(visualXTilt);
+		float tiltAmountSmoothed = fabsf(visualXTilt) * sign(visualXTilt);
 
 		ttSprite.m_additionalTransform =
 		    mat4f::getTranslation(vec3f(0.f, 1.f, 0.f) * sinf(getWorld()->timeSpendPlaying * 3.14f * 0.5f) * 0.2f) *
