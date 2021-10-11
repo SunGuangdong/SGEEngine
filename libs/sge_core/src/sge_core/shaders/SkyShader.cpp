@@ -110,9 +110,9 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 
 	StaticArray<BoundUniform, 12> uniforms;
 
-	shaderPerm.bind(uniforms, uParamsCb_vertex, cbParms.GetPtr());
-	shaderPerm.bind(uniforms, uParamsCb_pixel, cbParms.GetPtr());
-	shaderPerm.bind(uniforms, uSkyTexture, sets.texture);
+	shaderPerm.bind<12>(uniforms, uParamsCb_vertex, cbParms.GetPtr());
+	shaderPerm.bind<12>(uniforms, uParamsCb_pixel, cbParms.GetPtr());
+	shaderPerm.bind<12>(uniforms, uSkyTexture, sets.texture);
 
 	stateGroup.setProgram(shaderPerm.shadingProgram.GetPtr());
 	stateGroup.setPrimitiveTopology(PrimitiveTopology::TriangleList);

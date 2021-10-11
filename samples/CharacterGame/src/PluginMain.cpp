@@ -18,6 +18,7 @@ struct PluginGame final : public IPlugin {
 };
 } // namespace sge
 
+#if !defined(__EMSCRIPTEN__)
 extern "C" {
 #ifdef WIN32
 __declspec(dllexport) sge::IPlugin* getInterop() {
@@ -29,3 +30,8 @@ __attribute__((visibility("default"))) sge::IPlugin* getInterop() {
 }
 #endif
 }
+#else
+sge::IPlugin* getInterop() {
+	return new sge::PluginGame();
+}
+#endif

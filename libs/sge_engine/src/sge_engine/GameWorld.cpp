@@ -741,7 +741,7 @@ span<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(co
 		return {};
 	}
 
-	return span<const btPersistentManifold* const>::span(itrFind->second.data(), itrFind->second.size());
+	return span<const btPersistentManifold* const>(itrFind->second.data(), itrFind->second.size());
 }
 
 

@@ -262,7 +262,7 @@ void createDirectory(const char* const path) {
 void copyFile(const char* srcFile, const char* destFile) {
 #ifdef WIN32
 	[[maybe_unused]] BOOL succeeded = CopyFileA(srcFile, destFile, FALSE);
-	sgeAssert(succeeded != 0);
+	//sgeAssert(succeeded != 0);
 #else
 	// const std::string cmd = string_format("cp \"%s\" \"%s\"", srcFile, destFile);
 	// system(cmd.c_str());

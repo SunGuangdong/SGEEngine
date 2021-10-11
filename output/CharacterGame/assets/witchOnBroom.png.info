@@ -6,5 +6,5 @@
 		"addressModeZ":"edge",
 		"filter":"linear"
 	},
-	"isSemiTransparent":false
+	"isSemiTransparent":true
 }

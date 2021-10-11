@@ -13,6 +13,7 @@
 #include "sge_utils/math/Rangef.h"
 
 #include "ADecores.h"
+#include "ABat.h"
 #include "APumpkinProjectile.h"
 
 namespace sge {
@@ -103,6 +104,7 @@ struct LevelInfo {
 
 		const float rangeZMin = 8.f;
 		const float rangeZMax = 32.f;
+		const float rangeZMid = 16.f;
 
 		Rangef onRoadRange = Rangef(-8.f, 8.f);
 
@@ -116,14 +118,20 @@ struct LevelInfo {
 			const float rangeZMinThis = rangeZMin + decoreTexWidthWs * 0.5f;
 			const float rangeZMaxThis = rangeZMax - decoreTexWidthWs * 0.5f;
 
-			if (rnd.nextInt() % 100 <= 20) {
-				float zPosWs = rnd.nextInRange(-rangeZMax, rangeZMax) * rnd.nextFlipFLoat();
+			if (rnd.nextInt() % 100 <= 50) {
+				float zPosWs = rnd.nextInRange(-rangeZMid, rangeZMid) * rnd.nextFlipFLoat();
 				ADecoreGhost* const decoreGhost = world->allocObjectT<ADecoreGhost>();
 
 				decoreGhost->setPosition(minRoadPositionWs + vec3f(float(t), -2.f, zPosWs));
 				world->setParentOf(decoreGhost->getId(), road->getId());
-			}
+			} else if (rnd.nextInt() % 100 <= 20) {
+				float zPosWs = rnd.nextInRange(-rangeZMin, rangeZMin) * rnd.nextFlipFLoat();
+				ABat* const bat = world->allocObjectT<ABat>();
 
+				bat->setPosition(minRoadPositionWs + vec3f(float(t), 3.f, zPosWs));
+				world->setParentOf(bat->getId(), road->getId());
+			}
+			
 			if (assetIndexPick == 0) {
 				const float zSpawnRange = rangeZMaxThis - rangeZMinThis;
 				int numFencesToSpawn = int(zSpawnRange / decoreTexWidthWs);
@@ -283,7 +291,7 @@ struct AWitch : public Actor {
 		visualXTilt += inputDirWS.z * u.dt * 2.f;
 		visualXTilt = clamp(visualXTilt, -1.f, 1.f);
 
-		vec3f totalPlayerSpeed = inputDirWS * vec3f(30.f, 0.f, 10.f);
+		vec3f totalPlayerSpeed = inputDirWS * vec3f(40.f, 0.f, 10.f);
 		vec3f totalPlayerMovement = totalPlayerSpeed * u.dt;
 
 		currentCurvatureRemainingDistance -= totalPlayerSpeed.x * u.dt;

@@ -8,7 +8,21 @@ void ADecoreGhost::create() {
 	rnd.setSeed(int(size_t(this)));
 	registerTrait(ttSprite);
 
-	auto assetMoon = getCore()->getAssetLib()->getAsset("assets/decores/G9.png", true);
+	const char* ghostTexs[] = {
+		"assets/ghosts/G1.png",
+		"assets/ghosts/G2.png",
+		"assets/ghosts/G3.png",
+		"assets/ghosts/G4.png",
+		"assets/ghosts/G5.png",
+		"assets/ghosts/G6.png",
+		"assets/ghosts/G7.png",
+		"assets/ghosts/G8.png",
+		"assets/ghosts/G9.png",
+		"assets/ghosts/G10.png",
+		"assets/ghosts/G11.png",
+	};
+
+	auto assetMoon = getCore()->getAssetLib()->getAsset(ghostTexs[rnd.nextInt() % SGE_ARRSZ(ghostTexs)] , true);
 	ttSprite.m_assetProperty.setAsset(assetMoon);
 	ttSprite.imageSettings.defaultFacingAxisZ = false;
 	ttSprite.imageSettings.m_anchor = anchor_mid;
