@@ -308,6 +308,9 @@ void ApplicationHandler::PollEvents() {
 					} else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 						WE_Resize_Data data(event.window.data1, event.window.data2);
 						wnd->HandleEvent(WE_Resize, &data);
+
+						// Caution the code above works for desktop but not for webgl builds with emscpriten.
+						// For the workaround see tag [SGE_EMSCRIPTEN_NO_SDL_RESIZE].
 					} else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 						// From https://wiki.libsdl.org/SDL_WindowEventID
 						// window size has changed, either as a result of an API call or through the system or user changing the window

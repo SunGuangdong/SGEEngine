@@ -276,8 +276,18 @@ struct AWitch : public Actor {
 				inputDir.y = 0.f;
 			}
 
+			if (u.is.hasTouchPressedUV(vec2f(0.f, 0.f), vec2f(0.5f, 1.f))) {
+				inputDir.z = -1.f;
+			}
+
+			if (u.is.hasTouchPressedUV(vec2f(0.5f, 0.f), vec2f(1.f, 1.f))) {
+				inputDir.z = 1.f;
+			}
+
 			// Correct the input so it is aligned with the camera.
 			inputDirWS = inputDir;
+
+			inputDirWS.x = 1.f;
 		}
 
 		if (fabsf(inputDirWS.x) > 1e-3f) {
@@ -303,7 +313,7 @@ struct AWitch : public Actor {
 			targetWorldCurvatureY = nextWorldCurvatureY;
 
 			nextWorldCurvatureY = m_rnd.nextInRange(8.f, 15.f);
-			nextWorldCurvatureZ = m_rnd.nextInRange(-22.f, 22.f);
+			nextWorldCurvatureZ = m_rnd.nextInRange(-22.f, 22.f); 
 		}
 
 		// Move the player in ZY plane

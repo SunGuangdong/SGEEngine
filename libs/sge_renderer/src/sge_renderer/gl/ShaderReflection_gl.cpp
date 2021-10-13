@@ -61,10 +61,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 
 	GLint numUniforms = 0;
 	glGetProgramiv(program, GL_ACTIVE_UNIFORMS, &numUniforms);
-#if !defined(__EMSCRIPTEN__)
 	GLint numUniformBlocks = 0;
 	glGetProgramiv(program, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlocks);
-#endif
 
 	int texBindUnit = 1;
 
@@ -141,7 +139,6 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 	}
 
 	// Load the uniform buffers(cbuffers).
-#if !defined(__EMSCRIPTEN__)
 	for (GLint t = 0; t < numUniformBlocks; ++t) {
 		// Uniform buffer name.
 		char name[MAX_NAME_LEN];
@@ -181,7 +178,13 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 		// Read the variables in the uniform block.
 		for (GLint v = 0; v < numVariableInBlock; ++v) {
 			char varName[MAX_NAME_LEN];
+#if !defined(__EMSCRIPTEN__)
+			// TODO try emscripten_glGetActiveUniformName
 			glGetActiveUniformName(program, varIndices[v], MAX_NAME_LEN, NULL, varName);
+#else
+			sprintf(varName, "emsc_var%d", v);
+#endif
+
 
 			CBufferVariableRefl var;
 			var.name = varName;
@@ -195,7 +198,7 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 
 		cbuffers.add(cbuffer);
 	}
-#endif
+
 	// Read vertex shader attributes.
 	GLint numVSAttribs = 0;
 	glGetProgramiv(program, GL_ACTIVE_ATTRIBUTES, &numVSAttribs);

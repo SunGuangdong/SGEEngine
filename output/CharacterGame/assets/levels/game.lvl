@@ -1,11 +1,11 @@
 {
 	"version":0,
-	"nextNameIndex":9173,
+	"nextNameIndex":9473,
 	"nextActorId":8023,
 	"actors":[
 		{
-			"type":"ARoadSegment",
-			"id":1,
+			"type":"ALight",
+			"id":5,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -14,59 +14,36 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":37.213375,
-						"y":0.000000,
-						"z":0.000000
+						"x":167.000000,
+						"y":50.500000,
+						"z":14.000000
+					},
+					"r":{
+						"x":-0.198882,
+						"y":0.977538,
+						"z":-0.013907,
+						"w":0.068356
 					}
 				},
 				"m_id":{
-					"id":1
+					"id":5
 				},
-				"m_displayName":"Road_0"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":2,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":137.212494,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":2
-				},
-				"m_displayName":"Road_1"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":3,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-62.786121,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":3
-				},
-				"m_displayName":"Road_2"
+				"m_displayName":"ALight_4",
+				"m_lightDesc":{
+					"isOn":true,
+					"type":2,
+					"intensity":19.110001,
+					"range":339.000000,
+					"color":{
+						"x":1.000000,
+						"y":0.969791,
+						"z":0.898496
+					},
+					"spotLightAngle":0.349066,
+					"hasShadows":true,
+					"shadowMapRes":4000,
+					"shadowMapBias":0.000001
+				}
 			}
 		},
 		{
@@ -730,8 +707,8 @@
 			}
 		},
 		{
-			"type":"ALight",
-			"id":5,
+			"type":"ARoadSegment",
+			"id":1,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -740,36 +717,59 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":167.000000,
-						"y":50.500000,
-						"z":14.000000
-					},
-					"r":{
-						"x":-0.198882,
-						"y":0.977538,
-						"z":-0.013907,
-						"w":0.068356
+						"x":37.213375,
+						"y":0.000000,
+						"z":0.000000
 					}
 				},
 				"m_id":{
-					"id":5
+					"id":1
 				},
-				"m_displayName":"ALight_4",
-				"m_lightDesc":{
-					"isOn":true,
-					"type":2,
-					"intensity":19.110001,
-					"range":339.000000,
-					"color":{
-						"x":1.000000,
-						"y":0.969791,
-						"z":0.898496
-					},
-					"spotLightAngle":0.349066,
-					"hasShadows":true,
-					"shadowMapRes":4000,
-					"shadowMapBias":0.000001
-				}
+				"m_displayName":"Road_0"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":2,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":137.212494,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":2
+				},
+				"m_displayName":"Road_1"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":3,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":-62.786121,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":3
+				},
+				"m_displayName":"Road_2"
 			}
 		},
 		{
@@ -873,9 +873,9 @@
 						"w":0.707107
 					},
 					"s":{
-						"x":26.000000,
-						"y":26.000000,
-						"z":26.000000
+						"x":34.020000,
+						"y":34.020000,
+						"z":34.020000
 					}
 				},
 				"m_id":{

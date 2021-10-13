@@ -575,7 +575,7 @@ void RigidBody::applyLinearVelocity(const vec3f& v) {
 	}
 }
 
-inline void RigidBody::setLinearVelocity(const vec3f& v) {
+void RigidBody::setLinearVelocity(const vec3f& v) {
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setLinearVelocity(toBullet(v));
