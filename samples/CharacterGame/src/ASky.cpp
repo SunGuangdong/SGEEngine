@@ -15,12 +15,13 @@ struct AMoon : public Actor {
 		registerTrait(ttSprite);
 
 		auto assetMoon = getCore()->getAssetLib()->getAsset("assets/sky/Moon.png", true);
-		ttSprite.m_assetProperty.setAsset(assetMoon);
-		ttSprite.imageSettings.defaultFacingAxisZ = false;
-		ttSprite.imageSettings.m_anchor = anchor_mid;
-		ttSprite.imageSettings.forceAlphaBlending = true;
-		ttSprite.imageSettings.forceNoWitchGameBending = true;
-		ttSprite.imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
+		ttSprite.images.resize(1);
+		ttSprite.images[0].m_assetProperty.setAsset(assetMoon);
+		ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+		ttSprite.images[0].imageSettings.m_anchor = anchor_mid;
+		ttSprite.images[0].imageSettings.forceAlphaBlending = true;
+		ttSprite.images[0].imageSettings.forceNoWitchGameBending = true;
+		ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
 	}
 
 	void update(const GameUpdateSets& u) {
@@ -62,11 +63,12 @@ struct ACloud : public Actor {
 	void create() {
 		registerTrait(ttSprite);
 
-		ttSprite.imageSettings.defaultFacingAxisZ = false;
-		ttSprite.imageSettings.m_anchor = anchor_mid;
-		ttSprite.imageSettings.forceAlphaBlending = true;
-		ttSprite.imageSettings.forceNoWitchGameBending = true;
-		ttSprite.imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
+		ttSprite.images.resize(1);
+		ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+		ttSprite.images[0].imageSettings.m_anchor = anchor_mid;
+		ttSprite.images[0].imageSettings.forceAlphaBlending = true;
+		ttSprite.images[0].imageSettings.forceNoWitchGameBending = true;
+		ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
 
 		rnd.setSeed(int(size_t(this)));
 		randomizeCloud();
@@ -74,7 +76,7 @@ struct ACloud : public Actor {
 
 	void randomizeCloud() {
 		auto assetCloudTex = getCore()->getAssetLib()->getAsset(cloudTexPaths[rnd.nextInt() % SGE_ARRSZ(cloudTexPaths)], true);
-		ttSprite.m_assetProperty.setAsset(assetCloudTex);
+		ttSprite.images[0].m_assetProperty.setAsset(assetCloudTex);
 
 		cloudSpeed = rnd.nextInRange(5.f, 11.f);
 		cloudSpeed = rnd.nextInt() % 2 ? 1.f : -1.f;
@@ -105,7 +107,7 @@ struct ACloud : public Actor {
 			alpha = 1.f - (travelDistanceAccum - 0.9f * travelDistanceBeforeReappear) / (0.1f * travelDistanceBeforeReappear);
 		}
 
-		ttSprite.imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, alpha * baseCloudAlpha);
+		ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, alpha * baseCloudAlpha);
 
 		// Move the cloud.
 		vec3f newPos = getPosition();

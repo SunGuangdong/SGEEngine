@@ -1,0 +1,22 @@
+After emsdk has been installed and activated (see emscripten docs for more info) to configure CMake run this.
+
+mkdir game_embin
+cd game_embin
+cmake D:\sge_source -G Ninja -DCMAKE_TOOLCHAIN_FILE=D:\work\emsdk\upstream\emscripten\cmake\Modules\Platform\Emscripten.cmake
+
+make did not worked on windows, this is why Ninja is used for build system. Visual Studio just compiles with the regular compiler.
+
+Note that the location of that Emscripten.cmake file might change with the different version of emsdk.
+This file is needed to tell cmake where the emcc (the compiler) and liker are and tell cmake that we're build for emscripten.
+
+and then to build with ninja
+
+ninja <GameProjectName>
+
+Starting an http server locally from the cmd with python3. It is needed so the game data files could be loaded:
+Do this where the html files is (its just easier you could pick another dir it should not matter0>
+
+python -m http.server 8000 --bind 127.0.0.1
+
+Emscripten generates a default HTML files. For a version with most of its things stripped use the index.html here.
+To use it just replace the referenced js file here <script async src=CharacterGame.js></script> to the one you need.

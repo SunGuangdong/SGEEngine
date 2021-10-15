@@ -1,7 +1,7 @@
 {
 	"version":0,
-	"nextNameIndex":9473,
-	"nextActorId":8023,
+	"nextNameIndex":9946,
+	"nextActorId":8113,
 	"actors":[
 		{
 			"type":"ALight",
@@ -40,7 +40,7 @@
 						"z":0.898496
 					},
 					"spotLightAngle":0.349066,
-					"hasShadows":true,
+					"hasShadows":false,
 					"shadowMapRes":4000,
 					"shadowMapBias":0.000001
 				}
@@ -48,249 +48,135 @@
 		},
 		{
 			"type":"ADecoreGhost",
-			"id":7911,
+			"id":8025,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":0.000000,
-						"y":54.226952,
-						"z":-24.001883
+						"x":19.999992,
+						"y":0.183169,
+						"z":10.744504
 					},
 					"r":{
-						"x":0.690708,
+						"x":-0.026031,
 						"y":0.000000,
 						"z":0.000000,
-						"w":-0.723118
+						"w":0.999661
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":37.213375,
-						"y":54.226952,
-						"z":-24.001883
+						"x":88.702728,
+						"y":0.183169,
+						"z":10.744504
 					},
 					"r":{
-						"x":0.690708,
+						"x":-0.026031,
 						"y":0.000000,
 						"z":0.000000,
-						"w":-0.723118
+						"w":0.999661
 					}
 				},
 				"m_id":{
-					"id":7911
+					"id":8025
 				},
-				"m_displayName":"ADecoreGhost_8968"
+				"m_displayName":"ADecoreGhost_9662"
 			}
 		},
 		{
 			"type":"ADecoreGhost",
-			"id":7913,
+			"id":8027,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":9.999992,
-						"y":-75.199867,
-						"z":30.088905
+						"x":30.000008,
+						"y":-1.928459,
+						"z":9.611189
 					},
 					"r":{
-						"x":-0.724697,
+						"x":0.001583,
 						"y":0.000000,
 						"z":0.000000,
-						"w":0.689056
+						"w":0.999999
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":47.213367,
-						"y":-75.199867,
-						"z":30.088905
+						"x":98.702744,
+						"y":-1.928459,
+						"z":9.611189
 					},
 					"r":{
-						"x":-0.724697,
+						"x":0.001583,
 						"y":0.000000,
 						"z":0.000000,
-						"w":0.689056
+						"w":0.999999
 					}
 				},
 				"m_id":{
-					"id":7913
+					"id":8027
 				},
-				"m_displayName":"ADecoreGhost_8970"
+				"m_displayName":"ADecoreGhost_9664"
 			}
 		},
 		{
 			"type":"ADecoreGhost",
-			"id":7920,
+			"id":8032,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":29.999950,
-						"y":-25.629854,
-						"z":-192.974899
-					},
-					"r":{
-						"x":0.661736,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.749725
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":67.213326,
-						"y":-25.629854,
-						"z":-192.974899
-					},
-					"r":{
-						"x":0.661736,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.749725
-					}
-				},
-				"m_id":{
-					"id":7920
-				},
-				"m_displayName":"ADecoreGhost_8977"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":7924,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":49.999950,
-						"y":54.615479,
-						"z":110.657204
-					},
-					"r":{
-						"x":-0.220423,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.975399
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":87.213326,
-						"y":54.615479,
-						"z":110.657204
-					},
-					"r":{
-						"x":-0.220423,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.975399
-					}
-				},
-				"m_id":{
-					"id":7924
-				},
-				"m_displayName":"ADecoreGhost_8981"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":7926,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":59.999950,
-						"y":109.557610,
-						"z":6.566021
-					},
-					"r":{
-						"x":0.970565,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.240806
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":97.213326,
-						"y":109.557610,
-						"z":6.566021
-					},
-					"r":{
-						"x":0.970565,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.240806
-					}
-				},
-				"m_id":{
-					"id":7926
-				},
-				"m_displayName":"ADecoreGhost_8983"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":7934,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":80.000000,
+						"x":60.000008,
 						"y":-2.000000,
-						"z":-9.297422
+						"z":-11.834627
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":117.213379,
+						"x":128.702744,
 						"y":-2.000000,
-						"z":-9.297422
+						"z":-11.834627
 					}
 				},
 				"m_id":{
-					"id":7934
+					"id":8032
 				},
-				"m_displayName":"ADecoreGhost_8991"
+				"m_displayName":"ADecoreGhost_9669"
 			}
 		},
 		{
 			"type":"ADecoreGhost",
-			"id":7936,
+			"id":8040,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":89.999908,
+						"x":90.000008,
 						"y":-2.000000,
-						"z":9.757801
+						"z":-2.374981
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":127.213287,
+						"x":158.702744,
 						"y":-2.000000,
-						"z":9.757801
+						"z":-2.374981
 					}
 				},
 				"m_id":{
-					"id":7936
+					"id":8040
 				},
-				"m_displayName":"ADecoreGhost_8993"
+				"m_displayName":"ADecoreGhost_9677"
 			}
 		},
 		{
 			"type":"ADecoreGhost",
-			"id":7966,
+			"id":8085,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -298,25 +184,25 @@
 					"p":{
 						"x":0.000000,
 						"y":-2.000000,
-						"z":14.018965
+						"z":-7.405090
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":137.212494,
+						"x":168.704132,
 						"y":-2.000000,
-						"z":14.018965
+						"z":-7.405090
 					}
 				},
 				"m_id":{
-					"id":7966
+					"id":8085
 				},
-				"m_displayName":"ADecoreGhost_9116"
+				"m_displayName":"ADecoreGhost_9722"
 			}
 		},
 		{
 			"type":"ADecoreGhost",
-			"id":7972,
+			"id":8091,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -324,364 +210,46 @@
 					"p":{
 						"x":10.000000,
 						"y":-2.000000,
-						"z":0.042852
+						"z":10.302544
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":147.212494,
+						"x":178.704132,
 						"y":-2.000000,
-						"z":0.042852
+						"z":10.302544
 					}
 				},
 				"m_id":{
-					"id":7972
+					"id":8091
 				},
-				"m_displayName":"ADecoreGhost_9122"
+				"m_displayName":"ADecoreGhost_9728"
 			}
 		},
 		{
 			"type":"ADecoreGhost",
-			"id":7982,
+			"id":8109,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":50.000000,
+						"x":89.999969,
 						"y":-2.000000,
-						"z":-14.679084
+						"z":2.866389
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":187.212494,
+						"x":258.704102,
 						"y":-2.000000,
-						"z":-14.679084
+						"z":2.866389
 					}
 				},
 				"m_id":{
-					"id":7982
+					"id":8109
 				},
-				"m_displayName":"ADecoreGhost_9132"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":7988,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":60.000000,
-						"y":-2.000000,
-						"z":-9.973662
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":197.212494,
-						"y":-2.000000,
-						"z":-9.973662
-					}
-				},
-				"m_id":{
-					"id":7988
-				},
-				"m_displayName":"ADecoreGhost_9138"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":7990,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":70.000000,
-						"y":-2.000000,
-						"z":-4.880373
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":207.212494,
-						"y":-2.000000,
-						"z":-4.880373
-					}
-				},
-				"m_id":{
-					"id":7990
-				},
-				"m_displayName":"ADecoreGhost_9140"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":7998,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":0.000000,
-						"y":7.444315,
-						"z":92.279907
-					},
-					"r":{
-						"x":-0.996201,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.087037
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-62.786121,
-						"y":7.444315,
-						"z":92.279907
-					},
-					"r":{
-						"x":-0.996201,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.087037
-					}
-				},
-				"m_id":{
-					"id":7998
-				},
-				"m_displayName":"ADecoreGhost_9148"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":8005,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":20.000000,
-						"y":-30.821615,
-						"z":104.184860
-					},
-					"r":{
-						"x":-0.969652,
-						"y":0.000000,
-						"z":0.000000,
-						"w":0.244463
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-42.786121,
-						"y":-30.821615,
-						"z":104.184860
-					},
-					"r":{
-						"x":-0.969652,
-						"y":0.000000,
-						"z":0.000000,
-						"w":0.244463
-					}
-				},
-				"m_id":{
-					"id":8005
-				},
-				"m_displayName":"ADecoreGhost_9155"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":8011,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":30.000000,
-						"y":-40.065186,
-						"z":-69.917854
-					},
-					"r":{
-						"x":0.842308,
-						"y":0.000000,
-						"z":0.000000,
-						"w":0.538991
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-32.786121,
-						"y":-40.065186,
-						"z":-69.917854
-					},
-					"r":{
-						"x":0.842308,
-						"y":0.000000,
-						"z":0.000000,
-						"w":0.538991
-					}
-				},
-				"m_id":{
-					"id":8011
-				},
-				"m_displayName":"ADecoreGhost_9161"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":8015,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":60.000000,
-						"y":-34.396435,
-						"z":-3.321247
-					},
-					"r":{
-						"x":-0.446339,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.894855
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-2.786121,
-						"y":-34.396435,
-						"z":-3.321247
-					},
-					"r":{
-						"x":-0.446339,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.894855
-					}
-				},
-				"m_id":{
-					"id":8015
-				},
-				"m_displayName":"ADecoreGhost_9165"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":8017,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":70.000000,
-						"y":-122.334084,
-						"z":-271.170654
-					},
-					"r":{
-						"x":-0.921165,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.389181
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":7.213879,
-						"y":-122.334084,
-						"z":-271.170654
-					},
-					"r":{
-						"x":-0.921165,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.389181
-					}
-				},
-				"m_id":{
-					"id":8017
-				},
-				"m_displayName":"ADecoreGhost_9167"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":8019,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":80.000000,
-						"y":32.959908,
-						"z":-61.092007
-					},
-					"r":{
-						"x":0.888258,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.459334
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":17.213879,
-						"y":32.959908,
-						"z":-61.092007
-					},
-					"r":{
-						"x":0.888258,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.459334
-					}
-				},
-				"m_id":{
-					"id":8019
-				},
-				"m_displayName":"ADecoreGhost_9169"
-			}
-		},
-		{
-			"type":"ADecoreGhost",
-			"id":8021,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":90.000000,
-						"y":17.712469,
-						"z":-11.227580
-					},
-					"r":{
-						"x":0.152341,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.988318
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":27.213879,
-						"y":17.712469,
-						"z":-11.227580
-					},
-					"r":{
-						"x":0.152341,
-						"y":0.000000,
-						"z":0.000000,
-						"w":-0.988318
-					}
-				},
-				"m_id":{
-					"id":8021
-				},
-				"m_displayName":"ADecoreGhost_9171"
+				"m_displayName":"ADecoreGhost_9746"
 			}
 		},
 		{
@@ -696,7 +264,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":10.000000,
-						"y":3.975216,
+						"y":0.000000,
 						"z":-0.456607
 					}
 				},
@@ -704,50 +272,6 @@
 					"id":4
 				},
 				"m_displayName":"AWitch_3"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":1,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":37.213375,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":1
-				},
-				"m_displayName":"Road_0"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":2,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":137.212494,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":2
-				},
-				"m_displayName":"Road_1"
 			}
 		},
 		{
@@ -761,7 +285,7 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":-62.786121,
+						"x":168.704132,
 						"y":0.000000,
 						"z":0.000000
 					}
@@ -770,6 +294,160 @@
 					"id":3
 				},
 				"m_displayName":"Road_2"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":2,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":68.702736,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":2
+				},
+				"m_displayName":"Road_1"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":1,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":-31.296394,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":1
+				},
+				"m_displayName":"Road_0"
+			}
+		},
+		{
+			"type":"AInfinitePlaneObstacle",
+			"id":8111,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":-35.500000,
+						"y":0.000000,
+						"z":-8.000000
+					},
+					"r":{
+						"x":0.707107,
+						"y":0.000000,
+						"z":0.000000,
+						"w":0.707107
+					},
+					"s":{
+						"x":5.000000,
+						"y":5.000000,
+						"z":5.000000
+					}
+				},
+				"m_id":{
+					"id":8111
+				},
+				"m_displayName":"AInfinitePlaneObstacle_9812",
+				"displayScale":1.000000,
+				"rbPropConfig":{
+					"mass":0.000000,
+					"friction":1.000000,
+					"rollingFriction":0.000000,
+					"spinningFriction":0.000000,
+					"bounciness":0.000000,
+					"noMoveX":false,
+					"noMoveY":false,
+					"noMoveZ":false,
+					"noRotationX":false,
+					"noRotationY":false,
+					"noRotationZ":false,
+					"movementDamping":0.000000,
+					"rotationDamping":0.000000,
+					"specifyGravity":false,
+					"gravity":{
+						"x":0.000000,
+						"y":0.000000,
+						"z":0.000000
+					}
+				}
+			}
+		},
+		{
+			"type":"AInfinitePlaneObstacle",
+			"id":8112,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":-35.500000,
+						"y":0.000000,
+						"z":8.000000
+					},
+					"r":{
+						"x":-0.707107,
+						"y":0.000000,
+						"z":0.000000,
+						"w":0.707107
+					},
+					"s":{
+						"x":5.000000,
+						"y":5.000000,
+						"z":5.000000
+					}
+				},
+				"m_id":{
+					"id":8112
+				},
+				"m_displayName":"AInfinitePlaneObstacle_9813",
+				"displayScale":1.000000,
+				"rbPropConfig":{
+					"mass":0.000000,
+					"friction":1.000000,
+					"rollingFriction":0.000000,
+					"spinningFriction":0.000000,
+					"bounciness":0.000000,
+					"noMoveX":false,
+					"noMoveY":false,
+					"noMoveZ":false,
+					"noRotationX":false,
+					"noRotationY":false,
+					"noRotationZ":false,
+					"movementDamping":0.000000,
+					"rotationDamping":0.000000,
+					"specifyGravity":false,
+					"gravity":{
+						"x":0.000000,
+						"y":0.000000,
+						"z":0.000000
+					}
+				}
 			}
 		},
 		{
@@ -799,7 +477,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":10.000000,
-						"y":0.778685,
+						"y":-3.196531,
 						"z":-0.465135
 					},
 					"r":{
@@ -826,176 +504,974 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/sky/Moon.png"
-					},
-					"imageSettings":{
-						"m_anchor":1,
-						"colorTint":{
-							"x":0.000001,
-							"y":0.000001,
-							"z":0.000001,
-							"w":0.660099
-						},
-						"defaultFacingAxisZ":true,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":true,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":5547,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":421.000000,
-						"y":77.500000,
-						"z":-4.000000
-					},
-					"r":{
-						"x":0.000000,
-						"y":-0.707107,
-						"z":0.000000,
-						"w":0.707107
-					},
-					"s":{
-						"x":34.020000,
-						"y":34.020000,
-						"z":34.020000
-					}
-				},
-				"m_id":{
-					"id":5547
-				},
-				"m_displayName":"AStaticObstacle_6198",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
+					"images":[
 						
 					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/sky/sky.png"
-					},
-					"imageSettings":{
-						"m_anchor":1,
-						"colorTint":{
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":0.999999,
-							"z":0.999990,
-							"w":0.989170
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":true,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":true,
-						"forceNoWitchGameBending":true
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7912,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":0.000000,
-						"y":0.000000,
-						"z":24.110714
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":37.213375,
-						"y":0.000000,
-						"z":24.110714
-					}
-				},
-				"m_id":{
-					"id":7912
-				},
-				"m_displayName":"AStaticObstacle_8969",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/tree1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
+						"c1":{
+							"x":0.000000,
 							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7914,
+			"id":8023,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":9.999992,
+						"x":0.000000,
+						"y":0.000000,
+						"z":-10.136433
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":68.702736,
+						"y":0.000000,
+						"z":-10.136433
+					}
+				},
+				"m_id":{
+					"id":8023
+				},
+				"m_displayName":"AStaticObstacle_9660",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/grassSmall0.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8024,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":9.999985,
+						"y":0.000000,
+						"z":-19.277977
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":78.702721,
+						"y":0.000000,
+						"z":-19.277977
+					}
+				},
+				"m_id":{
+					"id":8024
+				},
+				"m_displayName":"AStaticObstacle_9661",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/tree1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8026,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":19.999992,
+						"y":0.000000,
+						"z":15.893864
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":88.702728,
+						"y":0.000000,
+						"z":15.893864
+					}
+				},
+				"m_id":{
+					"id":8026
+				},
+				"m_displayName":"AStaticObstacle_9663",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/grassSmall0.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8028,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":30.000008,
+						"y":0.000000,
+						"z":-22.635143
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":98.702744,
+						"y":0.000000,
+						"z":-22.635143
+					}
+				},
+				"m_id":{
+					"id":8028
+				},
+				"m_displayName":"AStaticObstacle_9665",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/tree1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8030,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":40.000023,
+						"y":0.000000,
+						"z":-16.984507
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":108.702759,
+						"y":0.000000,
+						"z":-16.984507
+					}
+				},
+				"m_id":{
+					"id":8030
+				},
+				"m_displayName":"AStaticObstacle_9667",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/house1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8031,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":50.000061,
+						"y":0.000000,
+						"z":24.414082
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":118.702797,
+						"y":0.000000,
+						"z":24.414082
+					}
+				},
+				"m_id":{
+					"id":8031
+				},
+				"m_displayName":"AStaticObstacle_9668",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/grassSmall0.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8033,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":60.000008,
+						"y":0.000000,
+						"z":-12.704457
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":128.702744,
+						"y":0.000000,
+						"z":-12.704457
+					}
+				},
+				"m_id":{
+					"id":8033
+				},
+				"m_displayName":"AStaticObstacle_9670",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/grassSmall0.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8034,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":70.000008,
+						"y":0.000000,
+						"z":14.525913
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":138.702744,
+						"y":0.000000,
+						"z":14.525913
+					}
+				},
+				"m_id":{
+					"id":8034
+				},
+				"m_displayName":"AStaticObstacle_9671",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/grassSmall0.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8035,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":80.000008,
 						"y":0.000000,
 						"z":10.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":47.213367,
+						"x":148.702744,
 						"y":0.000000,
 						"z":10.000000
 					}
 				},
 				"m_id":{
-					"id":7914
+					"id":8035
 				},
-				"m_displayName":"AStaticObstacle_8971",
+				"m_displayName":"AStaticObstacle_9672",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1004,55 +1480,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7915,
+			"id":8036,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":9.999992,
+						"x":80.000008,
 						"y":0.000000,
 						"z":14.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":47.213367,
+						"x":148.702744,
 						"y":0.000000,
 						"z":14.000000
 					}
 				},
 				"m_id":{
-					"id":7915
+					"id":8036
 				},
-				"m_displayName":"AStaticObstacle_8972",
+				"m_displayName":"AStaticObstacle_9673",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1061,55 +1594,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7916,
+			"id":8037,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":9.999992,
+						"x":80.000008,
 						"y":0.000000,
 						"z":18.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":47.213367,
+						"x":148.702744,
 						"y":0.000000,
 						"z":18.000000
 					}
 				},
 				"m_id":{
-					"id":7916
+					"id":8037
 				},
-				"m_displayName":"AStaticObstacle_8973",
+				"m_displayName":"AStaticObstacle_9674",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1118,55 +1708,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7917,
+			"id":8038,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":9.999992,
+						"x":80.000008,
 						"y":0.000000,
 						"z":22.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":47.213367,
+						"x":148.702744,
 						"y":0.000000,
 						"z":22.000000
 					}
 				},
 				"m_id":{
-					"id":7917
+					"id":8038
 				},
-				"m_displayName":"AStaticObstacle_8974",
+				"m_displayName":"AStaticObstacle_9675",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1175,55 +1822,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7918,
+			"id":8039,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":9.999992,
+						"x":80.000008,
 						"y":0.000000,
 						"z":26.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":47.213367,
+						"x":148.702744,
 						"y":0.000000,
 						"z":26.000000
 					}
 				},
 				"m_id":{
-					"id":7918
+					"id":8039
 				},
-				"m_displayName":"AStaticObstacle_8975",
+				"m_displayName":"AStaticObstacle_9676",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1232,340 +1936,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7919,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":19.999950,
-						"y":0.000000,
-						"z":25.243477
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":57.213326,
-						"y":0.000000,
-						"z":25.243477
-					}
-				},
-				"m_id":{
-					"id":7919
-				},
-				"m_displayName":"AStaticObstacle_8976",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
 					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/tree1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7921,
+			"id":8041,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":29.999950,
-						"y":0.000000,
-						"z":-22.747450
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":67.213326,
-						"y":0.000000,
-						"z":-22.747450
-					}
-				},
-				"m_id":{
-					"id":7921
-				},
-				"m_displayName":"AStaticObstacle_8978",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7923,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":39.999966,
-						"y":0.000000,
-						"z":17.448715
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":77.213341,
-						"y":0.000000,
-						"z":17.448715
-					}
-				},
-				"m_id":{
-					"id":7923
-				},
-				"m_displayName":"AStaticObstacle_8980",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7925,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":49.999950,
-						"y":0.000000,
-						"z":-18.877384
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":87.213326,
-						"y":0.000000,
-						"z":-18.877384
-					}
-				},
-				"m_id":{
-					"id":7925
-				},
-				"m_displayName":"AStaticObstacle_8982",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/grassSmall0.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7927,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":59.999950,
-						"y":0.000000,
-						"z":19.903643
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":97.213326,
-						"y":0.000000,
-						"z":19.903643
-					}
-				},
-				"m_id":{
-					"id":7927
-				},
-				"m_displayName":"AStaticObstacle_8984",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/tree1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7929,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":69.999985,
+						"x":90.000008,
 						"y":0.000000,
 						"z":10.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":107.213364,
+						"x":158.702744,
 						"y":0.000000,
 						"z":10.000000
 					}
 				},
 				"m_id":{
-					"id":7929
+					"id":8041
 				},
-				"m_displayName":"AStaticObstacle_8986",
+				"m_displayName":"AStaticObstacle_9678",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1574,55 +2050,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7930,
+			"id":8042,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":69.999985,
+						"x":90.000008,
 						"y":0.000000,
 						"z":14.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":107.213364,
+						"x":158.702744,
 						"y":0.000000,
 						"z":14.000000
 					}
 				},
 				"m_id":{
-					"id":7930
+					"id":8042
 				},
-				"m_displayName":"AStaticObstacle_8987",
+				"m_displayName":"AStaticObstacle_9679",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1631,55 +2164,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7931,
+			"id":8043,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":69.999985,
+						"x":90.000008,
 						"y":0.000000,
 						"z":18.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":107.213364,
+						"x":158.702744,
 						"y":0.000000,
 						"z":18.000000
 					}
 				},
 				"m_id":{
-					"id":7931
+					"id":8043
 				},
-				"m_displayName":"AStaticObstacle_8988",
+				"m_displayName":"AStaticObstacle_9680",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1688,55 +2278,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7932,
+			"id":8044,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":69.999985,
+						"x":90.000008,
 						"y":0.000000,
 						"z":22.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":107.213364,
+						"x":158.702744,
 						"y":0.000000,
 						"z":22.000000
 					}
 				},
 				"m_id":{
-					"id":7932
+					"id":8044
 				},
-				"m_displayName":"AStaticObstacle_8989",
+				"m_displayName":"AStaticObstacle_9681",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1745,55 +2392,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7933,
+			"id":8045,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":69.999985,
+						"x":90.000008,
 						"y":0.000000,
 						"z":26.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":107.213364,
+						"x":158.702744,
 						"y":0.000000,
 						"z":26.000000
 					}
 				},
 				"m_id":{
-					"id":7933
+					"id":8045
 				},
-				"m_displayName":"AStaticObstacle_8990",
+				"m_displayName":"AStaticObstacle_9682",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1802,148 +2506,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7935,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":80.000000,
-						"y":0.000000,
-						"z":-14.392923
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":117.213379,
-						"y":0.000000,
-						"z":-14.392923
-					}
-				},
-				"m_id":{
-					"id":7935
-				},
-				"m_displayName":"AStaticObstacle_8992",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
 					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/grassSmall0.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7937,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":89.999908,
-						"y":0.000000,
-						"z":11.987511
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":127.213287,
-						"y":0.000000,
-						"z":11.987511
-					}
-				},
-				"m_id":{
-					"id":7937
-				},
-				"m_displayName":"AStaticObstacle_8994",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/grassSmall0.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7967,
+			"id":8086,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -1956,15 +2603,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":137.212494,
+						"x":168.704132,
 						"y":0.000000,
 						"z":10.000000
 					}
 				},
 				"m_id":{
-					"id":7967
+					"id":8086
 				},
-				"m_displayName":"AStaticObstacle_9117",
+				"m_displayName":"AStaticObstacle_9723",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -1973,34 +2620,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7968,
+			"id":8087,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2013,15 +2717,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":137.212494,
+						"x":168.704132,
 						"y":0.000000,
 						"z":14.000000
 					}
 				},
 				"m_id":{
-					"id":7968
+					"id":8087
 				},
-				"m_displayName":"AStaticObstacle_9118",
+				"m_displayName":"AStaticObstacle_9724",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2030,34 +2734,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7969,
+			"id":8088,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2070,15 +2831,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":137.212494,
+						"x":168.704132,
 						"y":0.000000,
 						"z":18.000000
 					}
 				},
 				"m_id":{
-					"id":7969
+					"id":8088
 				},
-				"m_displayName":"AStaticObstacle_9119",
+				"m_displayName":"AStaticObstacle_9725",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2087,34 +2848,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7970,
+			"id":8089,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2127,15 +2945,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":137.212494,
+						"x":168.704132,
 						"y":0.000000,
 						"z":22.000000
 					}
 				},
 				"m_id":{
-					"id":7970
+					"id":8089
 				},
-				"m_displayName":"AStaticObstacle_9120",
+				"m_displayName":"AStaticObstacle_9726",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2144,34 +2962,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7971,
+			"id":8090,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2184,15 +3059,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":137.212494,
+						"x":168.704132,
 						"y":0.000000,
 						"z":26.000000
 					}
 				},
 				"m_id":{
-					"id":7971
+					"id":8090
 				},
-				"m_displayName":"AStaticObstacle_9121",
+				"m_displayName":"AStaticObstacle_9727",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2201,34 +3076,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7973,
+			"id":8092,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2236,20 +3168,20 @@
 					"p":{
 						"x":10.000000,
 						"y":0.000000,
-						"z":-17.507710
+						"z":10.000000
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":147.212494,
+						"x":178.704132,
 						"y":0.000000,
-						"z":-17.507710
+						"z":10.000000
 					}
 				},
 				"m_id":{
-					"id":7973
+					"id":8092
 				},
-				"m_displayName":"AStaticObstacle_9123",
+				"m_displayName":"AStaticObstacle_9729",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2258,34 +3190,547 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7974,
+			"id":8093,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":10.000000,
+						"y":0.000000,
+						"z":14.000000
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":178.704132,
+						"y":0.000000,
+						"z":14.000000
+					}
+				},
+				"m_id":{
+					"id":8093
+				},
+				"m_displayName":"AStaticObstacle_9730",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8094,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":10.000000,
+						"y":0.000000,
+						"z":18.000000
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":178.704132,
+						"y":0.000000,
+						"z":18.000000
+					}
+				},
+				"m_id":{
+					"id":8094
+				},
+				"m_displayName":"AStaticObstacle_9731",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8095,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":10.000000,
+						"y":0.000000,
+						"z":22.000000
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":178.704132,
+						"y":0.000000,
+						"z":22.000000
+					}
+				},
+				"m_id":{
+					"id":8095
+				},
+				"m_displayName":"AStaticObstacle_9732",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8096,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":10.000000,
+						"y":0.000000,
+						"z":26.000000
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":178.704132,
+						"y":0.000000,
+						"z":26.000000
+					}
+				},
+				"m_id":{
+					"id":8096
+				},
+				"m_displayName":"AStaticObstacle_9733",
+				"m_traitModel":{
+					"isRenderable":true,
+					"m_models":[
+						
+					],
+					"forceNoWitchGameBending":false
+				},
+				"m_traitSprite":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
+							"x":1.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
+					}
+				}
+			}
+		},
+		{
+			"type":"AStaticObstacle",
+			"id":8097,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2293,20 +3738,20 @@
 					"p":{
 						"x":20.000000,
 						"y":0.000000,
-						"z":28.302582
+						"z":24.891258
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":157.212494,
+						"x":188.704132,
 						"y":0.000000,
-						"z":28.302582
+						"z":24.891258
 					}
 				},
 				"m_id":{
-					"id":7974
+					"id":8097
 				},
-				"m_displayName":"AStaticObstacle_9124",
+				"m_displayName":"AStaticObstacle_9734",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2315,34 +3760,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/grassSmall0.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/tree1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7975,
+			"id":8098,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2350,20 +3852,20 @@
 					"p":{
 						"x":30.000000,
 						"y":0.000000,
-						"z":-21.865038
+						"z":-19.784672
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":167.212494,
+						"x":198.704132,
 						"y":0.000000,
-						"z":-21.865038
+						"z":-19.784672
 					}
 				},
 				"m_id":{
-					"id":7975
+					"id":8098
 				},
-				"m_displayName":"AStaticObstacle_9125",
+				"m_displayName":"AStaticObstacle_9735",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2372,34 +3874,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/tree1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7977,
+			"id":8099,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2412,15 +3971,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":177.212494,
+						"x":208.704132,
 						"y":0.000000,
 						"z":10.000000
 					}
 				},
 				"m_id":{
-					"id":7977
+					"id":8099
 				},
-				"m_displayName":"AStaticObstacle_9127",
+				"m_displayName":"AStaticObstacle_9736",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2429,34 +3988,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7978,
+			"id":8100,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2469,15 +4085,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":177.212494,
+						"x":208.704132,
 						"y":0.000000,
 						"z":14.000000
 					}
 				},
 				"m_id":{
-					"id":7978
+					"id":8100
 				},
-				"m_displayName":"AStaticObstacle_9128",
+				"m_displayName":"AStaticObstacle_9737",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2486,34 +4102,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7979,
+			"id":8101,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2526,15 +4199,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":177.212494,
+						"x":208.704132,
 						"y":0.000000,
 						"z":18.000000
 					}
 				},
 				"m_id":{
-					"id":7979
+					"id":8101
 				},
-				"m_displayName":"AStaticObstacle_9129",
+				"m_displayName":"AStaticObstacle_9738",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2543,34 +4216,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7980,
+			"id":8102,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2583,15 +4313,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":177.212494,
+						"x":208.704132,
 						"y":0.000000,
 						"z":22.000000
 					}
 				},
 				"m_id":{
-					"id":7980
+					"id":8102
 				},
-				"m_displayName":"AStaticObstacle_9130",
+				"m_displayName":"AStaticObstacle_9739",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2600,34 +4330,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7981,
+			"id":8103,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2640,15 +4427,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":177.212494,
+						"x":208.704132,
 						"y":0.000000,
 						"z":26.000000
 					}
 				},
 				"m_id":{
-					"id":7981
+					"id":8103
 				},
-				"m_displayName":"AStaticObstacle_9131",
+				"m_displayName":"AStaticObstacle_9740",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2657,34 +4444,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/fence.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7983,
+			"id":8104,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2692,20 +4536,20 @@
 					"p":{
 						"x":50.000000,
 						"y":0.000000,
-						"z":10.000000
+						"z":14.076442
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":187.212494,
+						"x":218.704132,
 						"y":0.000000,
-						"z":10.000000
+						"z":14.076442
 					}
 				},
 				"m_id":{
-					"id":7983
+					"id":8104
 				},
-				"m_displayName":"AStaticObstacle_9133",
+				"m_displayName":"AStaticObstacle_9741",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2714,262 +4558,91 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7984,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":50.000000,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":187.212494,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_id":{
-					"id":7984
-				},
-				"m_displayName":"AStaticObstacle_9134",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/tree1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
 					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7985,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":50.000000,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":187.212494,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_id":{
-					"id":7985
-				},
-				"m_displayName":"AStaticObstacle_9135",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7986,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":50.000000,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":187.212494,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_id":{
-					"id":7986
-				},
-				"m_displayName":"AStaticObstacle_9136",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7987,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":50.000000,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":187.212494,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_id":{
-					"id":7987
-				},
-				"m_displayName":"AStaticObstacle_9137",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7989,
+			"id":8105,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
@@ -2977,20 +4650,20 @@
 					"p":{
 						"x":60.000000,
 						"y":0.000000,
-						"z":-17.783833
+						"z":22.243525
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":197.212494,
+						"x":228.704132,
 						"y":0.000000,
-						"z":-17.783833
+						"z":22.243525
 					}
 				},
 				"m_id":{
-					"id":7989
+					"id":8105
 				},
-				"m_displayName":"AStaticObstacle_9139",
+				"m_displayName":"AStaticObstacle_9742",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -2999,55 +4672,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/tree1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7991,
+			"id":8106,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":70.000000,
+						"x":70.000015,
 						"y":0.000000,
-						"z":-22.322418
+						"z":-12.962491
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":207.212494,
+						"x":238.704147,
 						"y":0.000000,
-						"z":-22.322418
+						"z":-12.962491
 					}
 				},
 				"m_id":{
-					"id":7991
+					"id":8106
 				},
-				"m_displayName":"AStaticObstacle_9141",
+				"m_displayName":"AStaticObstacle_9743",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -3056,55 +4786,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/grassSmall0.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7992,
+			"id":8108,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":80.000000,
+						"x":79.999924,
 						"y":0.000000,
-						"z":-16.257586
+						"z":16.702412
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":217.212494,
+						"x":248.704056,
 						"y":0.000000,
-						"z":-16.257586
+						"z":16.702412
 					}
 				},
 				"m_id":{
-					"id":7992
+					"id":8108
 				},
-				"m_displayName":"AStaticObstacle_9142",
+				"m_displayName":"AStaticObstacle_9745",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -3113,55 +4900,112 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/tree1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/tree1.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":true,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
+					],
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						"c1":{
+							"x":0.000000,
+							"y":1.000000,
+							"z":0.000000,
+							"w":0.000000
+						},
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":1.000000,
+							"w":0.000000
+						},
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
+							"w":1.000000
+						}
 					}
 				}
 			}
 		},
 		{
 			"type":"AStaticObstacle",
-			"id":7993,
+			"id":8110,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
 					"p":{
-						"x":90.000000,
+						"x":89.999969,
 						"y":0.000000,
-						"z":10.000000
+						"z":14.410336
 					}
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":227.212494,
+						"x":258.704102,
 						"y":0.000000,
-						"z":10.000000
+						"z":14.410336
 					}
 				},
 				"m_id":{
-					"id":7993
+					"id":8110
 				},
-				"m_displayName":"AStaticObstacle_9143",
+				"m_displayName":"AStaticObstacle_9747",
 				"m_traitModel":{
 					"isRenderable":true,
 					"m_models":[
@@ -3170,1281 +5014,84 @@
 					"forceNoWitchGameBending":false
 				},
 				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7994,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":90.000000,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":227.212494,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_id":{
-					"id":7994
-				},
-				"m_displayName":"AStaticObstacle_9144",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
+					"images":[
+						{
+							"isRenderable":true,
+							"m_assetProperty":{
+								"m_targetAsset":"assets/decores/grassSmall0.png"
+							},
+							"m_additionalTransform":{
+								"c0":{
+									"x":1.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c1":{
+									"x":0.000000,
+									"y":1.000000,
+									"z":0.000000,
+									"w":0.000000
+								},
+								"c2":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":1.000000,
+									"w":0.000000
+								},
+								"c3":{
+									"x":0.000000,
+									"y":0.000000,
+									"z":0.000000,
+									"w":1.000000
+								}
+							},
+							"imageSettings":{
+								"m_anchor":0,
+								"colorTint":{
+									"x":1.000000,
+									"y":1.000000,
+									"z":1.000000,
+									"w":1.000000
+								},
+								"defaultFacingAxisZ":false,
+								"m_localXOffset":0.010000,
+								"m_pixelsPerUnit":64.000000,
+								"m_billboarding":0,
+								"forceNoLighting":true,
+								"forceNoCulling":true,
+								"flipHorizontally":false,
+								"spriteFrameTime":0.000000,
+								"forceAlphaBlending":false,
+								"forceNoWitchGameBending":false
+							}
+						}
 					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
+					"additionalTransform":{
+						"c0":{
 							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"y":0.000000,
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7995,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":90.000000,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":227.212494,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_id":{
-					"id":7995
-				},
-				"m_displayName":"AStaticObstacle_9145",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
+						"c1":{
+							"x":0.000000,
 							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
+							"z":0.000000,
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7996,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":90.000000,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":227.212494,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_id":{
-					"id":7996
-				},
-				"m_displayName":"AStaticObstacle_9146",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
+						"c2":{
+							"x":0.000000,
+							"y":0.000000,
 							"z":1.000000,
-							"w":1.000000
+							"w":0.000000
 						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7997,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":90.000000,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":227.212494,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_id":{
-					"id":7997
-				},
-				"m_displayName":"AStaticObstacle_9147",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
+						"c3":{
+							"x":0.000000,
+							"y":0.000000,
+							"z":0.000000,
 							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":7999,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":0.000000,
-						"y":0.000000,
-						"z":-19.930340
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-62.786121,
-						"y":0.000000,
-						"z":-19.930340
-					}
-				},
-				"m_id":{
-					"id":7999
-				},
-				"m_displayName":"AStaticObstacle_9149",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8000,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":10.000000,
-						"y":0.000000,
-						"z":10.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-52.786121,
-						"y":0.000000,
-						"z":10.000000
-					}
-				},
-				"m_id":{
-					"id":8000
-				},
-				"m_displayName":"AStaticObstacle_9150",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8001,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":10.000000,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-52.786121,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_id":{
-					"id":8001
-				},
-				"m_displayName":"AStaticObstacle_9151",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8002,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":10.000000,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-52.786121,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_id":{
-					"id":8002
-				},
-				"m_displayName":"AStaticObstacle_9152",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8003,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":10.000000,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-52.786121,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_id":{
-					"id":8003
-				},
-				"m_displayName":"AStaticObstacle_9153",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8004,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":10.000000,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-52.786121,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_id":{
-					"id":8004
-				},
-				"m_displayName":"AStaticObstacle_9154",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8006,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":20.000000,
-						"y":0.000000,
-						"z":10.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-42.786121,
-						"y":0.000000,
-						"z":10.000000
-					}
-				},
-				"m_id":{
-					"id":8006
-				},
-				"m_displayName":"AStaticObstacle_9156",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8007,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":20.000000,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-42.786121,
-						"y":0.000000,
-						"z":14.000000
-					}
-				},
-				"m_id":{
-					"id":8007
-				},
-				"m_displayName":"AStaticObstacle_9157",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8008,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":20.000000,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-42.786121,
-						"y":0.000000,
-						"z":18.000000
-					}
-				},
-				"m_id":{
-					"id":8008
-				},
-				"m_displayName":"AStaticObstacle_9158",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8009,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":20.000000,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-42.786121,
-						"y":0.000000,
-						"z":22.000000
-					}
-				},
-				"m_id":{
-					"id":8009
-				},
-				"m_displayName":"AStaticObstacle_9159",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8010,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":20.000000,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-42.786121,
-						"y":0.000000,
-						"z":26.000000
-					}
-				},
-				"m_id":{
-					"id":8010
-				},
-				"m_displayName":"AStaticObstacle_9160",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/fence.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8012,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":30.000000,
-						"y":0.000000,
-						"z":-24.736000
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-32.786121,
-						"y":0.000000,
-						"z":-24.736000
-					}
-				},
-				"m_id":{
-					"id":8012
-				},
-				"m_displayName":"AStaticObstacle_9162",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/tree1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8013,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":40.000000,
-						"y":0.000000,
-						"z":-18.854858
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-22.786121,
-						"y":0.000000,
-						"z":-18.854858
-					}
-				},
-				"m_id":{
-					"id":8013
-				},
-				"m_displayName":"AStaticObstacle_9163",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/tree1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8014,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":50.000000,
-						"y":0.000000,
-						"z":18.604134
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-12.786121,
-						"y":0.000000,
-						"z":18.604134
-					}
-				},
-				"m_id":{
-					"id":8014
-				},
-				"m_displayName":"AStaticObstacle_9164",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8016,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":60.000000,
-						"y":0.000000,
-						"z":-18.024797
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-2.786121,
-						"y":0.000000,
-						"z":-18.024797
-					}
-				},
-				"m_id":{
-					"id":8016
-				},
-				"m_displayName":"AStaticObstacle_9166",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8018,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":70.000000,
-						"y":0.000000,
-						"z":-22.422247
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":7.213879,
-						"y":0.000000,
-						"z":-22.422247
-					}
-				},
-				"m_id":{
-					"id":8018
-				},
-				"m_displayName":"AStaticObstacle_9168",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/house1.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8020,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":80.000000,
-						"y":0.000000,
-						"z":-28.068577
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":17.213879,
-						"y":0.000000,
-						"z":-28.068577
-					}
-				},
-				"m_id":{
-					"id":8020
-				},
-				"m_displayName":"AStaticObstacle_9170",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/grassSmall0.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":false,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
-					}
-				}
-			}
-		},
-		{
-			"type":"AStaticObstacle",
-			"id":8022,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":90.000000,
-						"y":0.000000,
-						"z":-15.888689
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":27.213879,
-						"y":0.000000,
-						"z":-15.888689
-					}
-				},
-				"m_id":{
-					"id":8022
-				},
-				"m_displayName":"AStaticObstacle_9172",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
-				},
-				"m_traitSprite":{
-					"m_assetProperty":{
-						"m_targetAsset":"assets/decores/grassSmall0.png"
-					},
-					"imageSettings":{
-						"m_anchor":0,
-						"colorTint":{
-							"x":1.000000,
-							"y":1.000000,
-							"z":1.000000,
-							"w":1.000000
-						},
-						"defaultFacingAxisZ":false,
-						"m_localXOffset":0.010000,
-						"m_pixelsPerUnit":64.000000,
-						"m_billboarding":0,
-						"forceNoLighting":true,
-						"forceNoCulling":true,
-						"flipHorizontally":true,
-						"spriteFrameTime":0.000000,
-						"forceAlphaBlending":false,
-						"forceNoWitchGameBending":false
+						}
 					}
 				}
 			}
@@ -4460,7 +5107,7 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":-7.500000,
+						"x":-9.500000,
 						"y":9.000000,
 						"z":0.000000
 					}
@@ -4484,106 +5131,6 @@
 			}
 		},
 		{
-			"type":"ABat",
-			"id":5386,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-6887.888184,
-						"y":-0.000000,
-						"z":-7.500000
-					}
-				},
-				"m_id":{
-					"id":5386
-				},
-				"m_displayName":"ABat_6037"
-			}
-		},
-		{
-			"type":"ABat",
-			"id":7922,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":-652.768677,
-						"y":3.000000,
-						"z":-0.137620
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-615.555298,
-						"y":3.000000,
-						"z":-0.137620
-					}
-				},
-				"m_id":{
-					"id":7922
-				},
-				"m_displayName":"ABat_8979"
-			}
-		},
-		{
-			"type":"ABat",
-			"id":7928,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":69.999985,
-						"y":3.000000,
-						"z":3.921001
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":107.213364,
-						"y":3.000000,
-						"z":3.921001
-					}
-				},
-				"m_id":{
-					"id":7928
-				},
-				"m_displayName":"ABat_8985"
-			}
-		},
-		{
-			"type":"ABat",
-			"id":7976,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					"p":{
-						"x":40.000000,
-						"y":3.000000,
-						"z":6.572643
-					}
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":177.212494,
-						"y":3.000000,
-						"z":6.572643
-					}
-				},
-				"m_id":{
-					"id":7976
-				},
-				"m_displayName":"ABat_9126"
-			}
-		},
-		{
 			"type":"ASky",
 			"id":3915,
 			"members":{
@@ -4599,7 +5146,7 @@
 					"id":3915
 				},
 				"m_displayName":"ASky_4383",
-				"m_mode":0,
+				"m_mode":1,
 				"m_topColor":{
 					"x":0.341702,
 					"y":0.430204,
@@ -4611,8 +5158,82 @@
 					"z":0.124088
 				},
 				"m_textureAssetProp":{
-					"m_targetAsset":""
+					"m_targetAsset":"assets/sky/sky.png"
 				}
+			}
+		},
+		{
+			"type":"ABat",
+			"id":5386,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":-6905.017578,
+						"y":-0.000000,
+						"z":-7.500000
+					}
+				},
+				"m_id":{
+					"id":5386
+				},
+				"m_displayName":"ABat_6037"
+			}
+		},
+		{
+			"type":"ABat",
+			"id":8029,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":40.000023,
+						"y":3.000000,
+						"z":-3.803876
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":108.702759,
+						"y":3.000000,
+						"z":-3.803876
+					}
+				},
+				"m_id":{
+					"id":8029
+				},
+				"m_displayName":"ABat_9666"
+			}
+		},
+		{
+			"type":"ABat",
+			"id":8107,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					"p":{
+						"x":79.999924,
+						"y":3.000000,
+						"z":6.886983
+					}
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":248.704056,
+						"y":3.000000,
+						"z":6.886983
+					}
+				},
+				"m_id":{
+					"id":8107
+				},
+				"m_displayName":"ABat_9744"
 			}
 		},
 		{
@@ -4627,8 +5248,8 @@
 				"m_logicTransform":{
 					"p":{
 						"x":240.000000,
-						"y":95.216766,
-						"z":17.777779
+						"y":109.216766,
+						"z":-14.252014
 					},
 					"s":{
 						"x":5.320000,
@@ -4655,7 +5276,7 @@
 					"p":{
 						"x":196.500000,
 						"y":30.500000,
-						"z":67.062836
+						"z":65.350075
 					},
 					"s":{
 						"x":2.000000,
@@ -4682,7 +5303,7 @@
 					"p":{
 						"x":217.000000,
 						"y":43.000000,
-						"z":49.393051
+						"z":51.105785
 					},
 					"s":{
 						"x":2.000000,
@@ -4709,7 +5330,7 @@
 					"p":{
 						"x":230.000000,
 						"y":36.500000,
-						"z":-28.403406
+						"z":-30.116148
 					},
 					"s":{
 						"x":2.000000,
@@ -4736,7 +5357,7 @@
 					"p":{
 						"x":209.000000,
 						"y":51.500000,
-						"z":106.766167
+						"z":105.053398
 					},
 					"s":{
 						"x":2.000000,
@@ -4763,7 +5384,7 @@
 					"p":{
 						"x":184.500000,
 						"y":44.000000,
-						"z":-62.786758
+						"z":-64.499504
 					},
 					"s":{
 						"x":2.000000,
@@ -4806,102 +5427,64 @@
 		
 	],
 	"hierarchy":[
-		2,
-		[
-			7966,
-			7967,
-			7968,
-			7969,
-			7970,
-			7971,
-			7972,
-			7973,
-			7974,
-			7975,
-			7976,
-			7977,
-			7978,
-			7979,
-			7980,
-			7981,
-			7982,
-			7983,
-			7984,
-			7985,
-			7986,
-			7987,
-			7988,
-			7989,
-			7990,
-			7991,
-			7992,
-			7993,
-			7994,
-			7995,
-			7996,
-			7997
-		],
-		3,
-		[
-			7998,
-			7999,
-			8000,
-			8001,
-			8002,
-			8003,
-			8004,
-			8005,
-			8006,
-			8007,
-			8008,
-			8009,
-			8010,
-			8011,
-			8012,
-			8013,
-			8014,
-			8015,
-			8016,
-			8017,
-			8018,
-			8019,
-			8020,
-			8021,
-			8022
-		],
-		1,
-		[
-			7911,
-			7912,
-			7913,
-			7914,
-			7915,
-			7916,
-			7917,
-			7918,
-			7919,
-			7920,
-			7921,
-			7922,
-			7923,
-			7924,
-			7925,
-			7926,
-			7927,
-			7928,
-			7929,
-			7930,
-			7931,
-			7932,
-			7933,
-			7934,
-			7935,
-			7936,
-			7937
-		],
 		4,
 		[
 			3547
+		],
+		2,
+		[
+			8023,
+			8024,
+			8025,
+			8026,
+			8027,
+			8028,
+			8029,
+			8030,
+			8031,
+			8032,
+			8033,
+			8034,
+			8035,
+			8036,
+			8037,
+			8038,
+			8039,
+			8040,
+			8041,
+			8042,
+			8043,
+			8044,
+			8045
+		],
+		3,
+		[
+			8085,
+			8086,
+			8087,
+			8088,
+			8089,
+			8090,
+			8091,
+			8092,
+			8093,
+			8094,
+			8095,
+			8096,
+			8097,
+			8098,
+			8099,
+			8100,
+			8101,
+			8102,
+			8103,
+			8104,
+			8105,
+			8106,
+			8107,
+			8108,
+			8109,
+			8110
 		]
 	]
 }

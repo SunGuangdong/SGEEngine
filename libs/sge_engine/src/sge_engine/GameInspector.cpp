@@ -217,6 +217,9 @@ void GameInspector::deleteSelection(bool const deleteHierarchyUnderSelectedObjec
 	if (editMode == editMode_actors) {
 		vector_set<ObjectId> actorsToDelete;
 		for (auto& pair : perObjectSelection) {
+			if(deleteHierarchyUnderSelectedObjects) {
+				getWorld()->getAllChildren(actorsToDelete, pair.first->getId());
+			}
 			actorsToDelete.insert(pair.first->getId());
 		}
 

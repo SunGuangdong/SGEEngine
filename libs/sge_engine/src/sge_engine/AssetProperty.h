@@ -40,7 +40,13 @@ struct SGE_ENGINE_API AssetProperty {
 		m_asset = nullptr;
 	}
 
+	/// @brief Changes directly the current asset.
+	/// @param asset 
 	void setAsset(std::shared_ptr<Asset>& asset);
+
+	/// @brief Sets the asset that will generate a change when calling @update.
+	/// Useful when others depend on knowing what this asset is.
+	/// @param assetPath 
 	void setTargetAsset(const char* const assetPath);
 
 	std::shared_ptr<Asset>& getAsset() { return m_asset; }

@@ -171,6 +171,16 @@ CollsionShapeDesc CollsionShapeDesc::createCylinder(const vec3f& halfDiagonal, c
 	return r;
 }
 
+CollsionShapeDesc CollsionShapeDesc::createCylinder(float height, float radius, const transf3d& offset) {
+	vec3f halfDiagonal = vec3f(radius, height * 0.5f, radius);
+	return createCylinder(halfDiagonal, offset);
+}
+
+CollsionShapeDesc CollsionShapeDesc::createCylinderBottomAligned(float height, float radius, transf3d offset) {
+	offset.p.y += height * 0.5f;
+	return createCylinder(height, radius, offset);
+}
+
 CollsionShapeDesc CollsionShapeDesc::createCone(const float height, const float radius, const transf3d& offset) {
 	CollsionShapeDesc r;
 	r.type = type_cone;

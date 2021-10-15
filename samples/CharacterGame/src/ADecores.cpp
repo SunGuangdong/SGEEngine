@@ -23,12 +23,13 @@ void ADecoreGhost::create() {
 	};
 
 	auto assetMoon = getCore()->getAssetLib()->getAsset(ghostTexs[rnd.nextInt() % SGE_ARRSZ(ghostTexs)] , true);
-	ttSprite.m_assetProperty.setAsset(assetMoon);
-	ttSprite.imageSettings.defaultFacingAxisZ = false;
-	ttSprite.imageSettings.m_anchor = anchor_mid;
-	ttSprite.imageSettings.forceAlphaBlending = true;
-	ttSprite.imageSettings.forceNoWitchGameBending = true;
-	ttSprite.imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
+	ttSprite.images.resize(1);
+	ttSprite.images[0].m_assetProperty.setAsset(assetMoon);
+	ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+	ttSprite.images[0].imageSettings.m_anchor = anchor_mid;
+	ttSprite.images[0].imageSettings.forceAlphaBlending = true;
+	ttSprite.images[0].imageSettings.forceNoWitchGameBending = true;
+	ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
 
 	curvingAngle = rnd.nextInRange(0.2f, deg2rad(4.f)) * (rnd.nextBool() ? 1.f : -1.f);
 	speed = rnd.nextInRange(4.f, 13.f);
@@ -47,7 +48,7 @@ void ADecoreGhost::update(const GameUpdateSets& u) {
 
 		float fadeStart = lifeSpan - 0.5f;
 		if (lifeAccum >= fadeStart) {
-			ttSprite.imageSettings.colorTint.w = 1.f - clamp01((lifeAccum - fadeStart) / 0.5f);
+			ttSprite.images[0].imageSettings.colorTint.w = 1.f - clamp01((lifeAccum - fadeStart) / 0.5f);
 		}
 
 

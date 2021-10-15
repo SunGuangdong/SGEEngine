@@ -673,11 +673,9 @@ struct MemberFieldChainKnot {
 	int arrayIdx = -1;
 };
 
-//---------------------------------------------------------------------------
-// MemberChain
-// Is a way to refer to a remote member (member of a member of a member ...)
-// in some memory.
-//---------------------------------------------------------------------------
+/// MemberChain
+/// Is a way to refer to a remote member (member of a member of a member ...)
+/// in some memory. The structure belives you that the chain start from the correct type.
 struct SGE_ENGINE_API MemberChain {
 	MemberChain() = default;
 

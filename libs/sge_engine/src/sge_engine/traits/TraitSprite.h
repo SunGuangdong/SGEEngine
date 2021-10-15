@@ -14,64 +14,6 @@ struct TraitSpriteRenderItem;
 
 RelfAddTypeIdExists(TraitSprite);
 struct SGE_ENGINE_API TraitSprite : public Trait {
-	SGE_TraitDecl_Full(TraitSprite);
-
-	TraitSprite()
-	    : m_assetProperty(AssetType::Texture2D, AssetType::Sprite) {}
-
-	void setModel(const char* assetPath, bool updateNow) {
-		m_assetProperty.setTargetAsset(assetPath);
-		if (updateNow) {
-			postUpdate();
-		}
-	}
-
-	void setModel(std::shared_ptr<Asset>& asset, bool updateNow) {
-		m_assetProperty.setAsset(asset);
-		if (updateNow) {
-			updateAssetProperty();
-		}
-	}
-
-	/// Not called automatically see the class comment above.
-	/// Updates the working model.
-	/// Returns true if the model has been changed (no matter if it is valid or not).
-	bool postUpdate() { return updateAssetProperty(); }
-
-	/// Invalidates the asset property focing an update.
-	void clear() { m_assetProperty.clear(); }
-
-	AssetProperty& getAssetProperty() { return m_assetProperty; }
-	const AssetProperty& getAssetProperty() const { return m_assetProperty; }
-
-	mat4f getAdditionalTransform() const { return m_additionalTransform; }
-	void setAdditionalTransform(const mat4f& tr) { m_additionalTransform = tr; }
-
-	AABox3f getBBoxOS() const;
-
-	void setRenderable(bool v) { isRenderable = v; }
-	bool getRenderable() const { return isRenderable; }
-	void setNoLighting(bool v) { instanceDrawMods.forceNoLighting = v; }
-	bool getNoLighting() const { return instanceDrawMods.forceNoLighting; }
-
-	void getRenderItems(const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
-
-  private:
-	bool updateAssetProperty() {
-		if (m_assetProperty.update()) {
-			return true;
-		}
-		return false;
-	}
-
-  public:
-
-	bool isRenderable = true;
-	AssetProperty m_assetProperty;
-	mat4f m_additionalTransform = mat4f::getIdentity();
-	
-	InstanceDrawMods instanceDrawMods;
-
 	/// @brief A struct holding the rendering options of a sprite or a texture in 3D.
 	struct ImageSettings {
 		/// @brief Computes the object-to-node transformation of the sprite so i has its origin in the deisiered location.
@@ -143,7 +85,45 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 		bool forceNoWitchGameBending = false;
 	};
 
-	ImageSettings imageSettings;
+	struct Element {
+		Element() : m_assetProperty(AssetType::Texture2D, AssetType::Sprite) {}
+
+		bool isRenderable = true;
+		AssetProperty m_assetProperty;
+		mat4f m_additionalTransform = mat4f::getIdentity();
+		ImageSettings imageSettings;
+	};
+
+  public:
+	SGE_TraitDecl_Full(TraitSprite);
+
+	TraitSprite() = default;
+
+	/// Not called automatically see the class comment above.
+	/// Updates the working model.
+	/// Returns true if the model has been changed (no matter if it is valid or not).
+	bool postUpdate() { return updateAssetProperty(); }
+
+	AABox3f getBBoxOS() const;
+
+	void setRenderable(bool v) { isRenderable = v; }
+	bool getRenderable() const { return isRenderable; }
+
+	void getRenderItems(const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
+
+  private:
+	bool updateAssetProperty() {
+		bool hadChange = false;
+		for (Element& image : images) {
+			hadChange = image.m_assetProperty.update() || hadChange;
+		}
+		return hadChange;
+	}
+
+  public:
+	bool isRenderable = true;
+	std::vector<Element> images;
+	mat4f additionalTransform = mat4f::getIdentity();
 };
 
 } // namespace sge
