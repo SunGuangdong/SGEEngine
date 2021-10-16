@@ -34,6 +34,11 @@ struct Random {
 		return rnd;
 	}
 
+	/// Returns an integer between [0; maxIntPlusOne).
+	/// Notice it is an open interval maxIntPlusOne-1 is the max value.
+	/// Useful for indexing an array.
+	int nextIntBefore(int maxIntPlusOne) const { return nextInt() % maxIntPlusOne; }
+
 	bool nextBool() const { return nextInt() % 2; }
 	float nextFlipFLoat() const { return nextInt() % 2 ? 1.f : -1.f; }
 

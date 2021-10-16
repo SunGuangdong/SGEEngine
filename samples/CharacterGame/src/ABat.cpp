@@ -4,7 +4,7 @@
 #include "sge_core/ICore.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_utils/math/Random.h"
-
+#include "GlobalRandom.h"
 
 namespace sge {
 
@@ -12,8 +12,6 @@ RelfAddTypeId(ABat, 21'10'03'0002);
 ReflBlock() {
 	ReflAddActor(ABat);
 }
-
-Random g_batRandom;
 
 void ABat::create() {
 	registerTrait(ttSprite);
@@ -24,7 +22,7 @@ void ABat::create() {
 	    "assets/bats/B3.png", "assets/bats/B3-2.png", "assets/bats/B4.png", "assets/bats/B4-2.png",
 	};
 
-	int frame0 = (g_batRandom.nextInt() % (SGE_ARRSZ(batFrames) / 2)) * 2;
+	int frame0 = (g_rnd.nextInt() % (SGE_ARRSZ(batFrames) / 2)) * 2;
 
 	frames[0] = getCore()->getAssetLib()->getAsset(batFrames[frame0], true);
 	frames[1] = getCore()->getAssetLib()->getAsset(batFrames[frame0 + 1], true);
@@ -53,12 +51,6 @@ void ABat::update(const GameUpdateSets& u) {
 				break;
 			}
 		}
-	}
-
-	if (getPosition().x < 100.f) {
-		vec3f newPos = getPosition();
-		newPos.x -= 10.f * u.dt;
-		setPosition(newPos);
 	}
 
 	ttSprite.images[0].m_additionalTransform =

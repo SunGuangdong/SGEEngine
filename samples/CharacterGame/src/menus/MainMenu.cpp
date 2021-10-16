@@ -9,7 +9,6 @@
 
 namespace sge {
 
-
 using namespace gamegui;
 using namespace gamegui::literals;
 
@@ -24,7 +23,7 @@ struct MainMenuScript : public IWorldScript {
 	void create() override {
 		context.create(getWorld()->userProjectionSettings.canvasSize);
 
-		font.Create(getCore()->getDevice(), "assets/editor/fonts/UbuntuMono-Regular.ttf", 96);
+		font.Create(getCore()->getDevice(), "assets/editor/fonts/AutourOne-Regular.ttf", 128);
 
 		context.setDefaultFont(&font);
 
@@ -32,9 +31,9 @@ struct MainMenuScript : public IWorldScript {
 
 		auto mainMenuWidget = std::make_shared<gamegui::InvisibleWidget>(context, Pos(0.5_f, 0.5_f, vec2f(0.5f)), Size(0.85_hf, 0.35_hf));
 
-		std::shared_ptr<gamegui::ButtonWidget> newGameBtn = ButtonWidget::create(context, Pos(0_f, 0_f), Size(1_wf, 0.5_hf), "New Game");
+		std::shared_ptr<gamegui::ButtonWidget> newGameBtn = ButtonWidget::create(context, Pos(0_f, 0_f), Size(1_wf, 0.5_hf), "Play");
 		eventSubs.push_back(newGameBtn
-		    ->subscribe_onRelease([&] { getWorld()->addPostSceneTask(new PostSceneUpdateTaskLoadWorldFormFile("assets/levels/debug.lvl", true)); }));
+		    ->subscribe_onRelease([&] { getWorld()->addPostSceneTask(new PostSceneUpdateTaskLoadWorldFormFile("assets/levels/game.lvl", true)); }));
 		mainMenuWidget->addChild(newGameBtn);
 
 		std::shared_ptr<gamegui::ButtonWidget> quitBtn = ButtonWidget::create(context, Pos(0_f, 0.5_hf), Size(1_wf, 0.5_hf), "Quit");

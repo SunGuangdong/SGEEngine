@@ -23,9 +23,11 @@ AABox3f AWitch::getBBoxOS() const {
 }
 
 void AWitch::applyDamage() {
-	timeImmune = 1.f;
-	health -= 1;
-	health = maxOf(health, 0);
+	if (timeImmune == 0.f) {
+		timeImmune = 1.f;
+		health -= 1;
+		health = maxOf(health, 0);
+	}
 }
 
 void AWitch::create() {
@@ -62,8 +64,8 @@ void AWitch::update(const GameUpdateSets& u) {
 	float curvatureZ = targetWorldCurvatureZ;
 	float curvatureY = targetWorldCurvatureY;
 
-	if (currentCurvatureRemainingDistance < 120.f) {
-		float k = 1.f - currentCurvatureRemainingDistance / 120.f;
+	if (currentCurvatureRemainingDistance < 300.f) {
+		float k = 1.f - currentCurvatureRemainingDistance / 300.f;
 		k = k < 0.5 ? 2 * k * k : 1 - powf(-2 * k + 2, 2) / 2;
 		curvatureZ = lerp(targetWorldCurvatureZ, nextWorldCurvatureZ, k);
 		curvatureY = lerp(targetWorldCurvatureY, nextWorldCurvatureY, k);
@@ -116,13 +118,13 @@ void AWitch::update(const GameUpdateSets& u) {
 	currentCurvatureRemainingDistance -= totalPlayerSpeed.x * u.dt;
 
 	if (currentCurvatureRemainingDistance < 0.f) {
-		currentCurvatureRemainingDistance = g_rnd.nextInRange(190.f, 200.f) + currentCurvatureRemainingDistance;
+		currentCurvatureRemainingDistance = g_rnd.nextInRange(350.f, 500.f) + currentCurvatureRemainingDistance;
 
 		targetWorldCurvatureZ = nextWorldCurvatureZ;
 		targetWorldCurvatureY = nextWorldCurvatureY;
 
-		nextWorldCurvatureY = g_rnd.nextInRange(8.f, 15.f);
-		nextWorldCurvatureZ = g_rnd.nextInRange(-22.f, 22.f);
+		nextWorldCurvatureY = g_rnd.nextInRange(12.f, 18.f);
+		nextWorldCurvatureZ = g_rnd.nextInRange(-18.f, 18.f);
 	}
 
 	// Move the witch in ZY plane and the rest of the level with her.

@@ -1,7 +1,7 @@
 {
 	"version":0,
-	"nextNameIndex":9946,
-	"nextActorId":8113,
+	"nextNameIndex":10013,
+	"nextActorId":8114,
 	"actors":[
 		{
 			"type":"ALight",
@@ -44,6 +44,28 @@
 					"shadowMapRes":4000,
 					"shadowMapBias":0.000001
 				}
+			}
+		},
+		{
+			"type":"AWitch",
+			"id":4,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":10.000000,
+						"y":0.000000,
+						"z":-0.456607
+					}
+				},
+				"m_id":{
+					"id":4
+				},
+				"m_displayName":"AWitch_3"
 			}
 		},
 		{
@@ -253,94 +275,6 @@
 			}
 		},
 		{
-			"type":"AWitch",
-			"id":4,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":10.000000,
-						"y":0.000000,
-						"z":-0.456607
-					}
-				},
-				"m_id":{
-					"id":4
-				},
-				"m_displayName":"AWitch_3"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":3,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":168.704132,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":3
-				},
-				"m_displayName":"Road_2"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":2,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":68.702736,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":2
-				},
-				"m_displayName":"Road_1"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":1,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-31.296394,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":1
-				},
-				"m_displayName":"Road_0"
-			}
-		},
-		{
 			"type":"AInfinitePlaneObstacle",
 			"id":8111,
 			"members":{
@@ -448,6 +382,72 @@
 						"z":0.000000
 					}
 				}
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":3,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":168.704132,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":3
+				},
+				"m_displayName":"Road_2"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":2,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":68.702736,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":2
+				},
+				"m_displayName":"Road_1"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":1,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":-31.296394,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":1
+				},
+				"m_displayName":"Road_0"
 			}
 		},
 		{
@@ -5131,38 +5131,6 @@
 			}
 		},
 		{
-			"type":"ASky",
-			"id":3915,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					
-				},
-				"m_id":{
-					"id":3915
-				},
-				"m_displayName":"ASky_4383",
-				"m_mode":1,
-				"m_topColor":{
-					"x":0.341702,
-					"y":0.430204,
-					"z":0.459854
-				},
-				"m_bottomColor":{
-					"x":0.088582,
-					"y":0.120202,
-					"z":0.124088
-				},
-				"m_textureAssetProp":{
-					"m_targetAsset":"assets/sky/sky.png"
-				}
-			}
-		},
-		{
 			"type":"ABat",
 			"id":5386,
 			"members":{
@@ -5234,6 +5202,38 @@
 					"id":8107
 				},
 				"m_displayName":"ABat_9744"
+			}
+		},
+		{
+			"type":"ASky",
+			"id":3915,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					
+				},
+				"m_id":{
+					"id":3915
+				},
+				"m_displayName":"ASky_4383",
+				"m_mode":1,
+				"m_topColor":{
+					"x":0.341702,
+					"y":0.430204,
+					"z":0.459854
+				},
+				"m_bottomColor":{
+					"x":0.088582,
+					"y":0.120202,
+					"z":0.124088
+				},
+				"m_textureAssetProp":{
+					"m_targetAsset":"assets/sky/sky.png"
+				}
 			}
 		},
 		{
@@ -5397,6 +5397,16 @@
 				},
 				"m_displayName":"ACloud_7318"
 			}
+		},
+		{
+			"type":"InGameMenuScript",
+			"id":8113,
+			"members":{
+				"m_id":{
+					"id":8113
+				},
+				"m_displayName":"InGameMenuScript_10012"
+			}
 		}
 	],
 	"cameraProvider":2254,
@@ -5424,7 +5434,9 @@
 	},
 	"physicsSimNumSubSteps":3,
 	"worldScripts":[
-		
+		{
+			"id":8113
+		}
 	],
 	"hierarchy":[
 		4,

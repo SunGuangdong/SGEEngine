@@ -9,10 +9,10 @@
 #include "EditorCamera.h"
 #include "PhysicsDebugDraw.h"
 #include "sge_core/application/input.h"
-#include "sge_utils/utils/span.h"
 #include "sge_engine/Physics.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/utils/Event.h"
+#include "sge_utils/utils/span.h"
 #include "sge_utils/utils/vector_set.h"
 
 namespace sge {
@@ -145,6 +145,17 @@ struct SGE_ENGINE_API GameWorld {
 		}
 
 		return &itr->second;
+	}
+
+	template <typename T>
+	T* getFistObject() {
+		const std::vector<GameObject*>* objs = getObjects(sgeTypeId(T));
+
+		if (objs && !objs->empty()) {
+			return static_cast<T*>(objs->at(0));
+		}
+
+		return nullptr;
 	}
 
 	/// @brief Retrieves an object with the specified id.

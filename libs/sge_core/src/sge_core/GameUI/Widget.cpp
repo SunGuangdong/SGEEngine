@@ -111,8 +111,20 @@ void TextWidget::draw(const UIDrawSets& drawSets) {
 
 	this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
-	const float textPosX = bboxSS.center().x - textDim.x * 0.5f;
-	const float textPosY = bboxSS.center().y + textHeight * 0.5f - textDim.y * 0.5f;
+	float textPosX;
+	float textPosY;
+
+	if (m_algnTextHCenter) {
+		textPosX = bboxSS.center().x - textDim.x * 0.5f;
+	} else {
+		textPosX = bboxSS.min.x;
+	}
+
+	if (m_algnTextVCenter) {
+		textPosY = bboxSS.center().y + textHeight * 0.5f - textDim.y * 0.5f;
+	} else {
+		textPosY = bboxSS.max.y;
+	}
 
 	// drawSets.quickDraw->drawRect(bboxSS.min.x, bboxSS.min.y, bboxSS.size().x, bboxSS.size().y, vec4f(0.33f),
 	//                             getCore()->getGraphicsResources().BS_backToFrontAlpha);

@@ -145,9 +145,9 @@ VS_OUTPUT vsMain(VS_INPUT vsin) {
 		float curvatureY = uCurvatureY;
 		float curvatureZ = uCurvatureZ;
 
-		float curveStart = cameraPositionWs.x + 5.f;
-		float curveCenter = cameraPositionWs.x + 150.f;
-		float curveEnd = curveCenter + 70.f;
+		float curveStart = cameraPositionWs.x;
+		float curveCenter = cameraPositionWs.x + 140.f;
+		float curveEnd = curveCenter + 50.f;
 
 		float kz = (worldPos.x - curveStart) / (curveCenter - curveStart);
 		kz = kz * kz * kz * kz;

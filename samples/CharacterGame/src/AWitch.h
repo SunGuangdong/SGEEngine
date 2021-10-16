@@ -11,13 +11,14 @@ namespace sge {
 
 struct AWitch : public Actor {
 	AWitch() = default;
-	AABox3f AWitch::getBBoxOS() const;
+	AABox3f getBBoxOS() const;
 	void create();
 
 	void update(const GameUpdateSets& u);
 
 	void applyDamage();
 	bool isDamaged() const { return timeImmune > 0.f; }
+	int getHealth() const { return health; }
 
   public:
 	float timeImmune = 0.f;

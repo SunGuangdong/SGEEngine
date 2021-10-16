@@ -12,6 +12,8 @@
 
 namespace sge {
 
+struct ACandy;
+
 const char* g_decoreAssetNames[] = {
     "assets/decores/fence.png",
     "assets/decores/grassSmall0.png",
@@ -87,8 +89,9 @@ inline void LevelInfo::populateRoad(Actor* road) {
 
 				enemiesFilledDistance += 40.f;
 			} else if (rndChoice < 0.30f) {
+				// Bat chain.
 				float zPosWs = rnd.nextInRange(-rangeZMin, rangeZMin) * rnd.nextFlipFLoat();
-				for (int t = 0; t < 5; ++t) {
+				for (int t = 0; t < 4; ++t) {
 					ABat* const bat = world->allocObjectT<ABat>();
 
 					bat->setPosition(minRoadPositionWs + vec3f(enemiesFilledDistance, 0.f, zPosWs + rnd.nextInRange(-0.1f, 0.1f)));
@@ -97,9 +100,32 @@ inline void LevelInfo::populateRoad(Actor* road) {
 					enemiesFilledDistance += 6.f;
 				}
 
-				enemiesFilledDistance += 20.f;
+				enemiesFilledDistance += 6.f;
+				int numPostCandies = 3 + g_rnd.nextIntBefore(5);
+				for (int t = 0; t < numPostCandies; ++t) {
+					Actor* const candy = world->allocActor(sgeTypeId(ACandy));
+					candy->setPosition(minRoadPositionWs + vec3f(enemiesFilledDistance, 0.f, zPosWs + rnd.nextInRange(-0.1f, 0.1f)));
+					world->setParentOf(candy->getId(), road->getId());
+
+					enemiesFilledDistance += 4.f;
+				}
 			} else if (rndChoice < 0.50f) {
-				enemiesFilledDistance += 10.f; // Nothing, just an empty space.
+				float emptyStripLen = 10 + g_rnd.next01() * 30.f;
+
+				if (rnd.next01() < 0.3f) {
+					int numCandiesToSpawn = int(emptyStripLen / 4.f);
+					for (int t = 0; t < numCandiesToSpawn; ++t) {
+						float zPosWs = sin(((t * 4.f) / emptyStripLen) * two_pi() ) * 4.f;
+
+						Actor* const candy = world->allocActor(sgeTypeId(ACandy));
+						candy->setPosition(minRoadPositionWs + vec3f(enemiesFilledDistance, 0.f, zPosWs));
+						world->setParentOf(candy->getId(), road->getId());
+
+						enemiesFilledDistance += 4.f;
+					}
+				} else {
+					enemiesFilledDistance += emptyStripLen;
+				}
 			}
 		}
 	}

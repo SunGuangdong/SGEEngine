@@ -74,6 +74,12 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 
 	void addChild(std::shared_ptr<IWidget> widget);
 
+	template<typename TWidget>
+	std::shared_ptr<TWidget> addChildT(std::shared_ptr<TWidget> widget) {
+		addChild(widget);
+		return widget;
+	}
+
 	const std::vector<std::shared_ptr<IWidget>>& getChildren() const { return m_children; }
 
 	void setLayout(ILayout* layout);
@@ -171,7 +177,7 @@ struct SGE_CORE_API ColoredWidget final : public IWidget {
 		return true;
 	}
 
-  private:
+  public:
 	vec4f m_color = vec4f(1.f);
 };
 
@@ -200,6 +206,7 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 	void setFont(DebugFont* font) { m_font = font; }
 	void setFontSize(Unit fontSize) { m_fontSize = fontSize; }
 
+	bool m_algnTextCenter = true;
   private:
 	DebugFont* m_font = nullptr;
 	vec4f m_color = vec4f(1.f);
