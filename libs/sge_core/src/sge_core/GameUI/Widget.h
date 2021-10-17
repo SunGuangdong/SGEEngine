@@ -206,7 +206,8 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 	void setFont(DebugFont* font) { m_font = font; }
 	void setFontSize(Unit fontSize) { m_fontSize = fontSize; }
 
-	bool m_algnTextCenter = true;
+	bool m_algnTextHCenter = true;
+	bool m_algnTextVCenter = true;
   private:
 	DebugFont* m_font = nullptr;
 	vec4f m_color = vec4f(1.f);

@@ -18,6 +18,9 @@ struct InGameMenuScript : public IWorldScript {
 	DebugFont font;
 
 	std::shared_ptr<gamegui::TextWidget> livesTextWdg;
-	std::shared_ptr<gamegui::ColoredWidget> blackOverlay;
+
+	std::shared_ptr<gamegui::InvisibleWidget> hud;
+	std::shared_ptr<gamegui::ColoredWidget> blackScreen;
+	std::shared_ptr<gamegui::InvisibleWidget> deadScreen;
 };
 } // namespace sge

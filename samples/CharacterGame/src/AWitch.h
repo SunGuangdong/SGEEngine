@@ -19,6 +19,7 @@ struct AWitch : public Actor {
 	void applyDamage();
 	bool isDamaged() const { return timeImmune > 0.f; }
 	int getHealth() const { return health; }
+	bool isDead() const { return health <= 0; }
 
   public:
 	float timeImmune = 0.f;
