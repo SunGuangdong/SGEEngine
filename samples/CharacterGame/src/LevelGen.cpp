@@ -16,8 +16,19 @@ struct ACandy;
 
 const char* g_decoreAssetNames[] = {
     "assets/decores/fence.png",
-    "assets/decores/grassSmall0.png",
-    "assets/decores/house1.png",
+    "assets/pumpkins/P1.png",
+    "assets/pumpkins/P2.png",
+    "assets/pumpkins/P3.png",
+    "assets/pumpkins/P4.png",
+    "assets/pumpkins/P5.png",
+    "assets/pumpkins/P6.png",
+    "assets/pumpkins/P7.png",
+    "assets/pumpkins/P8.png",
+    "assets/pumpkins/P9.png",
+    "assets/pumpkins/P10.png",
+    "assets/pumpkins/P Set1.png",
+    "assets/pumpkins/P Set2.png",
+    "assets/pumpkins/P Set3.png",
     "assets/decores/tree1.png",
 };
 

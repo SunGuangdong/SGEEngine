@@ -31,6 +31,7 @@ void AGhostCircle::create() {
 	for (int t = 0; t < kNumGhosts; ++t) {
 		const float angleDiff = two_pi() / float(kNumGhosts);
 
+		ttSprite.hasShadows = false;
 		TraitSprite::Element& image = ttSprite.images[t];
 
 		vec3f ghostPosOs = vec3f(sin(angleDiff * t), 0.f, cos(angleDiff * t)) * circleRadius;
@@ -40,7 +41,7 @@ void AGhostCircle::create() {
 		image.imageSettings.m_anchor = anchor_bottomMid;
 		image.imageSettings.m_billboarding = billboarding_yOnly;
 		image.imageSettings.forceAlphaBlending = true;
-		image.imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 2.f);
+		image.imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 1.f);
 
 		int frame0 = (g_ghostCircleRandom.nextInt() % (SGE_ARRSZ(ghostTexs)));
 		auto ghostImg = getCore()->getAssetLib()->getAsset(ghostTexs[frame0], true);

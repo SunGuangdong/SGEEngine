@@ -109,7 +109,7 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 	void setRenderable(bool v) { isRenderable = v; }
 	bool getRenderable() const { return isRenderable; }
 
-	void getRenderItems(const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
+	void getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
 
   private:
 	bool updateAssetProperty() {
@@ -122,6 +122,7 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 
   public:
 	bool isRenderable = true;
+	bool hasShadows = true;
 	std::vector<Element> images;
 	mat4f additionalTransform = mat4f::getIdentity();
 };

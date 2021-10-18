@@ -9,20 +9,14 @@ void ADecoreGhost::create() {
 	registerTrait(ttSprite);
 
 	const char* ghostTexs[] = {
-		"assets/ghosts/G1.png",
-		"assets/ghosts/G2.png",
-		"assets/ghosts/G3.png",
-		"assets/ghosts/G4.png",
-		"assets/ghosts/G5.png",
-		"assets/ghosts/G6.png",
-		"assets/ghosts/G7.png",
-		"assets/ghosts/G8.png",
-		"assets/ghosts/G9.png",
-		"assets/ghosts/G10.png",
-		"assets/ghosts/G11.png",
+	    "assets/ghosts/G1.png", "assets/ghosts/G2.png",  "assets/ghosts/G3.png",  "assets/ghosts/G4.png",
+	    "assets/ghosts/G5.png", "assets/ghosts/G6.png",  "assets/ghosts/G7.png",  "assets/ghosts/G8.png",
+	    "assets/ghosts/G9.png", "assets/ghosts/G10.png", "assets/ghosts/G11.png",
 	};
 
-	auto assetMoon = getCore()->getAssetLib()->getAsset(ghostTexs[rnd.nextInt() % SGE_ARRSZ(ghostTexs)] , true);
+	ttSprite.hasShadows = false;
+
+	auto assetMoon = getCore()->getAssetLib()->getAsset(ghostTexs[rnd.nextInt() % SGE_ARRSZ(ghostTexs)], true);
 	ttSprite.images.resize(1);
 	ttSprite.images[0].m_assetProperty.setAsset(assetMoon);
 	ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;

@@ -70,49 +70,47 @@ struct ACloud : public Actor {
 		ttSprite.images[0].imageSettings.forceNoWitchGameBending = true;
 		ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
 
-		rnd.setSeed(int(size_t(this)));
+
 		randomizeCloud();
+		rnd.setSeed(int(size_t(this)));
 	}
 
 	void randomizeCloud() {
 		auto assetCloudTex = getCore()->getAssetLib()->getAsset(cloudTexPaths[rnd.nextInt() % SGE_ARRSZ(cloudTexPaths)], true);
 		ttSprite.images[0].m_assetProperty.setAsset(assetCloudTex);
 
-		cloudSpeed = rnd.nextInRange(5.f, 11.f);
-		cloudSpeed = rnd.nextInt() % 2 ? 1.f : -1.f;
 
-		travelDistanceBeforeReappear = rnd.nextInRange(10.f, 50.f);
-		travelDistanceAccum = 0.f;
 		baseCloudAlpha = rnd.nextInRange(0.8f, 0.98f);
 
-		vec3f newPos = getPosition();
-		newPos.z = rnd.nextInRange(-160.f, 160.f);
-		;
-		setPosition(newPos);
+		if (getPosition().x < 0) {
+			alpha = 0.f;
+			vec3f newPos = getPosition();
+			newPos.x = rnd.nextInRange(230.f, 250.f);
+			setPosition(newPos);
+		}
 	}
 
 	void update(const GameUpdateSets& u) {
+
+		ttSprite.postUpdate();
+
 		if (u.isGamePaused()) {
 			return;
 		}
 
-		if (travelDistanceAccum >= travelDistanceBeforeReappear) {
+		if (getPosition().x < 0) {
 			randomizeCloud();
 		}
 
-		float alpha = 1.f;
-		if (travelDistanceAccum <= 0.1f * travelDistanceBeforeReappear) {
-			alpha = travelDistanceAccum / (0.1f * travelDistanceBeforeReappear);
-		} else if (travelDistanceAccum >= 0.9f * travelDistanceBeforeReappear) {
-			alpha = 1.f - (travelDistanceAccum - 0.9f * travelDistanceBeforeReappear) / (0.1f * travelDistanceBeforeReappear);
-		}
+		alpha += u.dt * 2.f;
+		alpha = clamp01(alpha);
 
 		ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, alpha * baseCloudAlpha);
 
 		// Move the cloud.
+		float speed = (1.f - sqr(minOf(fabsf(getPosition().x), 250.f) / 250.f)) * 10.f + 1.f;
 		vec3f newPos = getPosition();
-		newPos.z = newPos.z + u.dt * cloudSpeed;
-		travelDistanceAccum += u.dt * fabsf(cloudSpeed);
+		newPos.x = newPos.x - u.dt * speed;
 		setPosition(newPos);
 	}
 
@@ -120,9 +118,7 @@ struct ACloud : public Actor {
 
   public:
 	Random rnd;
-	float cloudSpeed = 5.f;
-	float travelDistanceBeforeReappear = 600.f;
-	float travelDistanceAccum = 0.f;
+	float alpha = 0.f;
 	float baseCloudAlpha = 1.f;
 	TraitSprite ttSprite;
 };
@@ -130,7 +126,7 @@ struct ACloud : public Actor {
 
 RelfAddTypeId(ACloud, 21'10'03'0004);
 ReflBlock() {
-	ReflAddActor(ACloud);
+	ReflAddActor(ACloud) ReflMember(ACloud, ttSprite);
 }
 
 } // namespace sge

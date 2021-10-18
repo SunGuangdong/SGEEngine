@@ -39,6 +39,8 @@ ReflBlock() {
 	ReflAddType(std::vector<TraitSprite::Element>);
 
 	ReflAddType(TraitSprite)
+		ReflMember(TraitSprite, isRenderable)
+		ReflMember(TraitSprite, hasShadows)
 		ReflMember(TraitSprite, images)
 		ReflMember(TraitSprite, additionalTransform)
 	;
@@ -63,8 +65,12 @@ AABox3f TraitSprite::getBBoxOS() const {
 	return bbox;
 }
 
-void TraitSprite::getRenderItems(const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems) {
+void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems) {
 	if (isRenderable == false) {
+		return;
+	}
+
+	if (!hasShadows && drawReason == drawReason_gameplayShadow) {
 		return;
 	}
 
