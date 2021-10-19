@@ -41,7 +41,7 @@ void AGhostCircle::create() {
 		image.imageSettings.m_anchor = anchor_bottomMid;
 		image.imageSettings.m_billboarding = billboarding_yOnly;
 		image.imageSettings.forceAlphaBlending = true;
-		image.imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 1.f);
+		image.imageSettings.colorTint = vec4f(94.f / 255.f, 239.f / 255.f, 251.f / 255.f, 1.f);
 
 		int frame0 = (g_ghostCircleRandom.nextInt() % (SGE_ARRSZ(ghostTexs)));
 		auto ghostImg = getCore()->getAssetLib()->getAsset(ghostTexs[frame0], true);
@@ -49,7 +49,7 @@ void AGhostCircle::create() {
 		image.m_assetProperty.setAsset(ghostImg);
 	}
 
-	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 3.f), 0.f, true);
+	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 3.f), 1.f, true);
 	ttRigidBody.getRigidBody()->setCanRotate(false, false, false);
 	ttRigidBody.getRigidBody()->setFriction(0.f);
 }
@@ -57,6 +57,10 @@ void AGhostCircle::create() {
 void AGhostCircle::update(const GameUpdateSets& u) {
 	if (u.isGamePaused()) {
 		return;
+	}
+
+	if (getPosition().x < 0.f) {
+		getWorld()->objectDelete(getId());
 	}
 
 	for (int t = 0; t < kNumGhosts; ++t) {
@@ -69,9 +73,10 @@ void AGhostCircle::update(const GameUpdateSets& u) {
 	}
 
 	if (getPosition().x < 100.f) {
-		vec3f newPos = getPosition();
-		newPos.z += 10.f * u.dt * (isGoingPosZ ? 1.f : -1.f);
-		setPosition(newPos);
+		if (AWitch* witch = getWorld()->getFistObject<AWitch>()) {
+			vec3f speed = vec3f(-witch->currentSpeedX, 0.f, 10.f * (isGoingPosZ ? 1.f : -1.f));
+			ttRigidBody.getRigidBody()->setLinearVelocity(speed);
+		}
 
 		for (const btPersistentManifold* manifold : getWorld()->getRigidBodyManifolds(ttRigidBody.getRigidBody())) {
 			if (manifold) {
@@ -84,6 +89,11 @@ void AGhostCircle::update(const GameUpdateSets& u) {
 		}
 	} else {
 		isGoingPosZ = getPosition().z < 0.f;
+
+		AWitch* witch = getWorld()->getFistObject<AWitch>();
+		if (witch) {
+			ttRigidBody.getRigidBody()->setLinearVelocity(vec3f(-witch->currentSpeedX, 0.f, 0.f));
+		}
 	}
 }
 

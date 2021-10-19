@@ -23,7 +23,7 @@ void ADecoreGhost::create() {
 	ttSprite.images[0].imageSettings.m_anchor = anchor_mid;
 	ttSprite.images[0].imageSettings.forceAlphaBlending = true;
 	ttSprite.images[0].imageSettings.forceNoWitchGameBending = true;
-	ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, 0.98f);
+	ttSprite.images[0].imageSettings.colorTint = vec4f(94.f / 255.f, 239.f / 255.f, 251.f / 255.f, 1.f);
 
 	curvingAngle = rnd.nextInRange(0.2f, deg2rad(4.f)) * (rnd.nextBool() ? 1.f : -1.f);
 	speed = rnd.nextInRange(4.f, 13.f);

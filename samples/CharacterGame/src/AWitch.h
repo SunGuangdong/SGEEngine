@@ -25,6 +25,8 @@ struct AWitch : public Actor {
 	float timeImmune = 0.f;
 	int health = 3;
 
+	float currentSpeedX = 0.f;
+
 	TraitRigidBody ttRigidbody;
 	TraitSprite ttSprite;
 

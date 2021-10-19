@@ -102,7 +102,7 @@ struct ACloud : public Actor {
 			randomizeCloud();
 		}
 
-		alpha += u.dt * 2.f;
+		alpha += u.dt * 0.333f;
 		alpha = clamp01(alpha);
 
 		ttSprite.images[0].imageSettings.colorTint = vec4f(1.f, 1.f, 1.f, alpha * baseCloudAlpha);

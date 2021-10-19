@@ -59,8 +59,6 @@ void AWitch::update(const GameUpdateSets& u) {
 	timeImmune -= u.dt;
 	timeImmune = maxOf(timeImmune, 0.f);
 
-	levelInfo.gainInfo(*getWorld());
-
 	float curvatureZ = targetWorldCurvatureZ;
 	float curvatureY = targetWorldCurvatureY;
 
@@ -112,6 +110,7 @@ void AWitch::update(const GameUpdateSets& u) {
 	visualXTilt = clamp(visualXTilt, -1.f, 1.f);
 
 	const vec3f totalPlayerSpeed = inputDirWS * vec3f(40.f, 0.f, 10.f);
+	currentSpeedX = totalPlayerSpeed.x;
 	const vec3f totalPlayerMovement = totalPlayerSpeed * u.dt;
 
 	// Update the curvature of the level.
@@ -129,15 +128,15 @@ void AWitch::update(const GameUpdateSets& u) {
 
 	// Move the witch in ZY plane and the rest of the level with her.
 	ttRigidbody.getRigidBody()->setLinearVelocity(totalPlayerSpeed._0yz());
-	levelInfo.moveLevel(getWorld(), -totalPlayerMovement.x);
+	// levelInfo.moveLevel(getWorld(), -totalPlayerMovement.x);
+	levelInfo.generateInteractables(getWorld(), currentSpeedX * u.dt);
 
 	// Damage blinking.
 	vec4f witchTint = vec4f(1.f);
 	if (isDamaged()) {
 		int k = int(timeImmune / 0.15f);
-
 		if (k % 2 == 0) {
-			witchTint = vec4f(1.f, 0.7f, 0.7f, 0.8f);
+			witchTint = vec4f(1.f, 0.7f, 0.7f, 0.75f);
 		}
 	}
 

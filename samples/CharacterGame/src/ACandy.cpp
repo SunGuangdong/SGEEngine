@@ -30,7 +30,7 @@ void ACandy::create() {
 	ttSprite.images[0].imageSettings.m_anchor = anchor_bottomMid;
 	ttSprite.images[0].m_additionalTransform = mat4f::getTranslation(0.f, 3.f, 0.f);
 
-	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 1.f), 0.f, true);
+	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 1.f), 1.f, true);
 	ttRigidBody.getRigidBody()->setCanRotate(false, false, false);
 	ttRigidBody.getRigidBody()->setFriction(0.f);
 }
@@ -40,9 +40,13 @@ void ACandy::update(const GameUpdateSets& u) {
 		return;
 	}
 
+	if (getPosition().x < 0.f) {
+		getWorld()->objectDelete(getId());
+	}
+
 	if (isPickedUp == false) {
 		if (AWitch* w = getWorld()->getFistObject<AWitch>()) {
-			if (w->getPosition().distance(getPosition()) < 6.f) {
+			if (w->getPosition().distance(getPosition()) < 3.f) {
 				isPickedUp = true;
 
 				getWorld()->setParentOf(getId(), ObjectId());
@@ -50,7 +54,13 @@ void ACandy::update(const GameUpdateSets& u) {
 		}
 	}
 
-	if (isPickedUp) {
+	if (!isPickedUp) {
+		if (AWitch* witch = getWorld()->getFistObject<AWitch>()) {
+			ttRigidBody.getRigidBody()->setLinearVelocity(vec3f(-witch->currentSpeedX, 0.f, 0.f));
+		}
+	} else {
+		ttRigidBody.getRigidBody()->setLinearVelocity(vec3f(0, 0.f, 0.f));
+
 		const float kChaseDuration = 1.5f;
 
 		if (AWitch* w = getWorld()->getFistObject<AWitch>()) {

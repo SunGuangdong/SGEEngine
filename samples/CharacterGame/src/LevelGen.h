@@ -7,13 +7,11 @@ namespace sge {
 struct LevelInfo {
 	bool isInfoGained = false;
 	ObjectId roads[3];
-	Random rnd;
 
-	LevelInfo() { rnd.setSeed(int(size_t(this))); }
+	float totalGeneratedDistance = 150.f;
 
-	void gainInfo(GameWorld& world);
-	void moveLevel(GameWorld* world, float xDiff);
-	void populateRoad(Actor* road);
+	LevelInfo() = default;
+	void generateInteractables(GameWorld* world, float travelDistnaceThisFrame);
 };
 
 } // namespace sge
