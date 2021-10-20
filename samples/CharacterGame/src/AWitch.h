@@ -13,7 +13,7 @@ namespace sge {
 
 struct AWitch : public Actor {
 
-	AudioDecoderPtr bgMusic;
+	AudioDecoder bgMusic;
 
 	AWitch() = default;
 	AABox3f getBBoxOS() const;

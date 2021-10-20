@@ -51,7 +51,7 @@ void AudioDevice::clear() {
 	ma_mutex_uninit(&mutexDataLock);
 }
 
-void AudioDevice::play(AudioDecoderPtr decoder) {
+void AudioDevice::play(AudioDecoder* decoder) {
 	if (decoder) {
 		if (decoder->playingDevice != nullptr) {
 			sgeAssert(false && "AudioDecoder could be played only on one device!");
@@ -64,6 +64,7 @@ void AudioDevice::play(AudioDecoderPtr decoder) {
 		}
 
 		const ma_mutex_raii lock(mutexDataLock);
+		decoder->playingDevice = this;
 		m_playingDecoders.insert(decoder);
 	}
 }
@@ -81,7 +82,7 @@ void AudioDevice::stop_noMutexLock(AudioDecoder* decoder) {
 		}
 
 		for (auto itr = m_playingDecoders.begin(); itr != m_playingDecoders.end(); itr++) {
-			if (itr->get() == decoder) {
+			if (*itr == decoder) {
 				m_playingDecoders.erase(itr);
 				decoder->playingDevice = nullptr;
 				break;
@@ -146,11 +147,11 @@ void AudioDevice::dataCallback(void* pOutput, const void* UNUSED(pInput), ma_uin
 
 	decodersToStopTemp.clear();
 
-	for (const AudioDecoderPtr& decoder : m_playingDecoders) {
+	for (AudioDecoder* decoder : m_playingDecoders) {
 		if (decoder) {
-			bool isDone = readFramesFromDecoder(*decoder.get(), (float*)pOutput, frameCount);
+			bool isDone = readFramesFromDecoder(*decoder, (float*)pOutput, frameCount);
 			if (isDone) {
-				decodersToStopTemp.push_back(decoder.get());
+				decodersToStopTemp.push_back(decoder);
 			}
 		}
 	}
@@ -183,21 +184,15 @@ void AudioData::createFromFile(const char* filename) {
 //------------------------------------------------------------------
 void AudioDecoder::clear() {
 	if (playingDevice) {
-		ma_mutex_lock(&playingDevice->getDataLockMutex());
+		playingDevice->stop(this);
 	}
 
 	audioData = nullptr;
 	ma_decoder_uninit(&decoder);
 	numFramesInDecoder = 0;
+	playingDevice = nullptr;
 
 	state = State();
-
-	if (playingDevice) {
-		playingDevice->stop(this);
-		ma_mutex_unlock(&playingDevice->getDataLockMutex());
-	}
-
-	playingDevice = nullptr;
 }
 
 void AudioDecoder::createDecoder(AudioDataPtr& audioData) {

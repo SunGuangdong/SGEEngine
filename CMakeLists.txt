@@ -170,6 +170,7 @@ add_subdirectory(./libs_ext/bullet)
 add_subdirectory(./libs_ext/recastnavigation)
 add_subdirectory(./libs_ext/imgui)
 add_subdirectory(./libs_ext/doctest)
+add_subdirectory(./libs_ext/miniaudio)
 
 # Use SDL2 as a dll.
 # The code shouldn't depend on SDL2 being a DLL
@@ -235,6 +236,7 @@ sge_mark_external_target(SDL2-static)
 #sge_mark_external_target(doctest) # doctest doesn't create any targets, so it is not needed.
 sge_mark_external_target(mcpp)
 sge_mark_external_target(HLSLParser)
+sge_mark_external_target(miniaudio)
 
 # Internal projects.
 sge_mark_internal_lib(mdlconvlib)

@@ -9,7 +9,6 @@
 namespace sge {
 
 struct AudioDecoder;
-typedef std::shared_ptr<AudioDecoder> AudioDecoderPtr;
 struct AudioData;
 typedef std::shared_ptr<AudioData> AudioDataPtr;
 
@@ -23,7 +22,7 @@ struct AudioDevice {
 
 	ma_mutex& getDataLockMutex() { return mutexDataLock; }
 
-	void play(AudioDecoderPtr decoder);
+	void play(AudioDecoder* decoder);
 	void stop(AudioDecoder* decoder);
 
   private:
@@ -39,7 +38,7 @@ struct AudioDevice {
 	ma_device device;
 	ma_mutex mutexDataLock;
 
-	std::set<AudioDecoderPtr> m_playingDecoders;
+	std::set<AudioDecoder*> m_playingDecoders;
 	std::vector<float> decodingTemp;
 	std::vector<AudioDecoder*> decodersToStopTemp;
 };
