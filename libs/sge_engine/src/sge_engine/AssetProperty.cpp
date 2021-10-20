@@ -65,7 +65,7 @@ const SpriteAnimationAsset* AssetProperty::getAssetSprite() const {
 	return m_asset->asSprite();
 }
 
-AudioAsset* AssetProperty::getAssetAudio() {
+AudioDataAsset* AssetProperty::getAssetAudio() {
 	if (isAssetLoaded(m_asset) == false || m_asset->getType() != AssetType::Audio) {
 		return nullptr;
 	}
@@ -73,7 +73,7 @@ AudioAsset* AssetProperty::getAssetAudio() {
 	return m_asset->asAudio();
 }
 
-const AudioAsset* AssetProperty::getAssetAudio() const {
+const AudioDataAsset* AssetProperty::getAssetAudio() const {
 	if (isAssetLoaded(m_asset) == false || m_asset->getType() != AssetType::Audio) {
 		return nullptr;
 	}

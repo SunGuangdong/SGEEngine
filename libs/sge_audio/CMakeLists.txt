@@ -14,8 +14,10 @@ add_library(sge_audio STATIC
 
 target_include_directories(sge_audio PUBLIC "./src")
 target_include_directories(sge_audio PUBLIC "../../libs_ext/stb")
+target_include_directories(sge_audio PUBLIC "../../libs_ext/miniaudio")
 
 target_link_libraries(sge_audio PUBLIC sge_utils)
+
 if(NOT EMSCRIPTEN)
 	#Do not link with our SDL2, Emscripten has it's own.
 	target_link_libraries(sge_audio PUBLIC SDL2main SDL2)

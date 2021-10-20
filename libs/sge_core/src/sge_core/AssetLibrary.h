@@ -3,6 +3,7 @@
 #include <map>
 #include <memory>
 
+#include "sge_audio/AudioDevice.h"
 #include "sge_core/Sprite.h"
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/model/Model.h"
@@ -12,8 +13,9 @@
 namespace sge {
 struct AssetLibrary;
 
-struct AudioTrack;
-using AudioAsset = std::shared_ptr<AudioTrack>;
+struct AudioDataAsset {
+	AudioDataPtr audioData;
+};
 
 struct AssetTextureMeta {
 	/// The sampler description defined by the asset file.
@@ -132,16 +134,16 @@ struct SGE_CORE_API Asset {
 		return nullptr;
 	}
 
-	sge::AudioAsset* asAudio() {
+	sge::AudioDataAsset* asAudio() {
 		if (getType() == AssetType::Audio) {
-			return (AudioAsset*)m_pAsset;
+			return (AudioDataAsset*)m_pAsset;
 		}
 		return nullptr;
 	}
 
-	const sge::AudioAsset* asAudio() const {
+	const sge::AudioDataAsset* asAudio() const {
 		if (getType() == AssetType::Audio) {
-			return (AudioAsset*)m_pAsset;
+			return (AudioDataAsset*)m_pAsset;
 		}
 		return nullptr;
 	}

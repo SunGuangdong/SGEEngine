@@ -732,11 +732,11 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 					ImGui::Image(explorePreviewAsset->asSprite()->textureAsset->asTextureView()->tex.GetPtr(), sz);
 				}
 			} else if (explorePreviewAsset->getType() == AssetType::Audio) {
-				auto track = explorePreviewAsset->asAudio();
-				ImGui::Text("Vorbis encoded Audio file");
-				ImGui::Text("Sample Rate: %.1f kHZ", (float)(*track)->info.samplesPerSecond / 1000.0f);
-				ImGui::Text("Number of channels: %d", (*track)->info.numChannels);
-				ImGui::Text("Length: %.2f s", (float)(*track)->info.numSamples / (float)(*track)->info.samplesPerSecond);
+				//auto audioData = explorePreviewAsset->asAudio();
+				//ImGui::Text("Vorbis encoded Audio file");
+				//ImGui::Text("Sample Rate: %.1f kHZ", (float)(*track)->info.samplesPerSecond / 1000.0f);
+				//ImGui::Text("Number of channels: %d", (*track)->info.numChannels);
+				//ImGui::Text("Length: %.2f s", (float)(*track)->info.numSamples / (float)(*track)->info.samplesPerSecond);
 			} else {
 				ImGui::Text("No Preview");
 			}

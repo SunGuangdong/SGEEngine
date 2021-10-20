@@ -61,8 +61,8 @@ struct SGE_ENGINE_API AssetProperty {
 	SpriteAnimationAsset* getAssetSprite();
 	const SpriteAnimationAsset* getAssetSprite() const;
 
-	AudioAsset* getAssetAudio();
-	const AudioAsset* getAssetAudio() const;
+	AudioDataAsset* getAssetAudio();
+	const AudioDataAsset* getAssetAudio() const;
 
 	AssetProperty& operator=(const AssetProperty& ref) {
 		m_targetAsset = ref.m_targetAsset;

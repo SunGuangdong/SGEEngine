@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sge_audio/AudioDevice.h"
+
 #include "sge_engine/Actor.h"
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitRigidBody.h"
@@ -10,6 +12,9 @@
 namespace sge {
 
 struct AWitch : public Actor {
+
+	AudioDecoderPtr bgMusic;
+
 	AWitch() = default;
 	AABox3f getBBoxOS() const;
 	void create();

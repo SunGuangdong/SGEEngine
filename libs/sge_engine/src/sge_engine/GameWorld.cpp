@@ -278,9 +278,6 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(debug.forceSleepMs));
 	}
 
-	// Update the audio device.
-	getCore()->getAudioDevice()->setMasterVolume(m_masterVolume);
-
 	// Add the objects that were created during the last update to the list of playing objects.
 	for (int t = 0; t < objectsAwaitingCreation.size(); ++t) {
 		GameObject* const object = objectsAwaitingCreation[t];
