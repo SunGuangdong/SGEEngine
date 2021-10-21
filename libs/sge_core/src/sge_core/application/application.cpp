@@ -304,7 +304,13 @@ void ApplicationHandler::PollEvents() {
 				WindowBase* const wnd = findWindowBySDLId(event.window.windowID);
 				if (wnd) {
 					if (event.window.event == SDL_WINDOWEVENT_SHOWN) {
-						wnd->HandleEvent(WE_Create, nullptr);
+						// The shown even can be fired multiple times on some platforms.
+						// For example when in emscripten we switch tabs.
+						// However we wrongly use that event as Create event, and this needs to change as a proper fix.
+						if (wnd->isWindowShownEventUsedAsCreate_HACK == false) {
+							wnd->HandleEvent(WE_Create, nullptr);
+							wnd->isWindowShownEventUsedAsCreate_HACK = true;
+						}
 					} else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 						WE_Resize_Data data(event.window.data1, event.window.data2);
 						wnd->HandleEvent(WE_Resize, &data);

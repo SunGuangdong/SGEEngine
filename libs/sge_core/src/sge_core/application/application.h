@@ -108,6 +108,7 @@ struct SGE_CORE_API WindowBase {
   public:
 	InputState m_inputState;
 	WindowImplData* m_implData;
+	bool isWindowShownEventUsedAsCreate_HACK = false;
 };
 
 /// @brief Enables/Disables the mouse being captured.
