@@ -34,9 +34,6 @@ void AWitch::create() {
 	registerTrait(ttRigidbody);
 	registerTrait(ttSprite);
 
-	bgMusic.createDecoder(getCore()->getAssetLib()->getAsset("assets/snd/wtf_ghost.mp3", true)->asAudio()->audioData);
-	getCore()->getAudioDevice()->play(&bgMusic);
-
 	// Re-seed by time to make each run different.
 	g_rnd.setSeed(int(Timer::now_nanoseconds_int()));
 

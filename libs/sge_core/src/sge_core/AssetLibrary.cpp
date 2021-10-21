@@ -188,8 +188,8 @@ AssetTextureMeta AssetTexture::loadTextureSettingInfoFile(const std::string& bas
 			}
 
 			const JsonValue* jIsSemiTransparent = jRoot->getMember("isSemiTransparent");
-			if (jIsSemiTransparent && jIsSemiTransparent->jid == JID_BOOL) {
-				result.isSemiTransparent = jIsSemiTransparent->getAsBool();
+			if (jIsSemiTransparent) {
+				result.isSemiTransparent = jIsSemiTransparent->jid == JID_TRUE;
 			}
 
 			return result;

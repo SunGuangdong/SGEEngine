@@ -684,9 +684,7 @@ void JsonWriter::writeString(const char* str, const bool procStringTokens) {
 void JsonWriter::writeVairable(const JsonValue* const value) {
 	const JID jid = value->jid;
 
-	if (jid == JID_BOOL) {
-		sgeAssert(false); // TODO
-	} else if (jid == JID_INT8) {
+	if (jid == JID_INT8) {
 		sge_snprintf(numconvert.data(), numconvert.size(), "%d", (int)(value->value_int8));
 		writeString(numconvert.data(), false);
 	} else if (jid == JID_INT16) {

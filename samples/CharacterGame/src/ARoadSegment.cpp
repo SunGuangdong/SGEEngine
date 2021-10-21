@@ -18,16 +18,8 @@ const char* g_decoresFences[] = {
 };
 
 const char* g_decoresTrees[] = {
-    "assets/trees/T1.png",
-    "assets/trees/T2.png",
-    "assets/trees/T3.png",
-    "assets/trees/T4.png",
-    "assets/trees/T5.png",
-    "assets/trees/T6.png",
-    "assets/trees/T7.png",
-    "assets/trees/T8.png",
-    "assets/trees/T9.png",
-    "assets/trees/T10.png",
+    "assets/trees/T1.png", "assets/trees/T2.png", "assets/trees/T3.png", "assets/trees/T4.png", "assets/trees/T5.png",
+    "assets/trees/T6.png", "assets/trees/T7.png", "assets/trees/T8.png", "assets/trees/T9.png", "assets/trees/T10.png",
 };
 
 const char* g_decoresPumpkins[] = {"assets/pumpkins/P1.png",    "assets/pumpkins/P2.png",     "assets/pumpkins/P3.png",
@@ -37,6 +29,19 @@ const char* g_decoresPumpkins[] = {"assets/pumpkins/P1.png",    "assets/pumpkins
                                    "assets/pumpkins/P Set3.png"
 
 };
+
+const char* g_gravesL[] = {
+    "assets/graves/GL1.png", "assets/graves/GL2.png", "assets/graves/GL3.png",
+    "assets/graves/GL4.png", "assets/graves/GL5.png", "assets/graves/GL6.png",
+
+};
+
+const char* g_gravesR[] = {
+    "assets/graves/GR1.png", "assets/graves/GR2.png", "assets/graves/GR3.png",
+    "assets/graves/GR4.png", "assets/graves/GR5.png", "assets/graves/GR6.png",
+};
+
+const char* g_lampL = "assets/LampL.png";
 
 struct ARoadSegment : public Actor {
 	ARoadSegment() = default;
@@ -85,7 +90,7 @@ struct ARoadSegment : public Actor {
 
 		for (int t = 0; t < 100; t += 10) {
 			const char** assets = nullptr;
-			int typePick = g_rnd.nextInt() % 5;
+			int typePick = g_rnd.nextInt() % 6;
 			int maxAssetsForType = 0;
 			if (typePick == 0) {
 				assets = g_decoresFences;
@@ -96,9 +101,81 @@ struct ARoadSegment : public Actor {
 			} else if (typePick == 2) {
 				assets = g_decoresPumpkins;
 				maxAssetsForType = SGE_ARRSZ(g_decoresPumpkins);
-			}else if (typePick == 3 || typePick == 4) {
+			} else if (typePick == 3 || typePick == 4) {
 				assets = g_decoresTrees;
 				maxAssetsForType = SGE_ARRSZ(g_decoresTrees);
+			} else if (typePick == 3 || typePick == 4) {
+				assets = g_gravesL;
+				maxAssetsForType = SGE_ARRSZ(g_gravesL);
+			} else if (typePick == 3 || typePick == 5) {
+				assets = g_gravesR;
+				maxAssetsForType = SGE_ARRSZ(g_gravesR);
+			}
+
+			if (t % 50 == 0 && t != 0) {
+				{
+					float zPosWs = -rangeZMin;
+
+					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
+					decore->m_traitModel.m_models.clear();
+					decore->m_traitSprite.images.resize(1);
+					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_lampL, true);
+					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
+					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+					decore->m_traitSprite.images[0].imageSettings.flipHorizontally = true;
+					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(0.75f);
+
+					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
+					world->setParentOf(decore->getId(), getId());
+				}
+				{
+					float zPosWs = rangeZMin;
+
+					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
+					decore->m_traitModel.m_models.clear();
+					decore->m_traitSprite.images.resize(1);
+					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_lampL, true);
+					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
+					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+					decore->m_traitSprite.images[0].imageSettings.flipHorizontally = false;
+					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(0.75f);
+
+					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
+					world->setParentOf(decore->getId(), getId());
+				}
+			}
+
+			if (t % 5 == 0 && t != 0) {
+				{
+					float zPosWs = -rangeZMax;
+
+					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
+					decore->m_traitModel.m_models.clear();
+					decore->m_traitSprite.images.resize(1);
+					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_decoresTrees[g_rnd.nextInt() % SGE_ARRSZ(g_decoresTrees)], true);
+					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
+					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+					decore->m_traitSprite.images[0].imageSettings.flipHorizontally =  g_rnd.nextBool();
+					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(g_rnd.nextInRange(1.f, 1.1f));
+
+					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
+					world->setParentOf(decore->getId(), getId());
+				}
+				{
+					float zPosWs = rangeZMax;
+
+					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
+					decore->m_traitModel.m_models.clear();
+					decore->m_traitSprite.images.resize(1);
+					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_decoresTrees[g_rnd.nextInt() % SGE_ARRSZ(g_decoresTrees)], true);
+					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
+					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+					decore->m_traitSprite.images[0].imageSettings.flipHorizontally = g_rnd.nextBool();
+					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(g_rnd.nextInRange(1.f, 1.1f));
+
+					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
+					world->setParentOf(decore->getId(), getId());
+				}
 			}
 
 			const int assetIndexPick = g_rnd.nextInt() % maxAssetsForType;

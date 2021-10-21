@@ -341,7 +341,7 @@ float4 psMain(VS_OUTPUT IN)
 					float samplesWeights = 0.f;
 					const int pcfWidth = 0;
 					const int pcfTotalSampleCnt = (2 * pcfWidth + 1) * (2 * pcfWidth + 1);
-					int pcfTotalSampleCnt2 = 0;
+					int pcfTotalSampleCnt2 = 2;
 					for (int ix = -pcfWidth; ix <= pcfWidth; ix += 1) {
 						for (int iy = -pcfWidth; iy <= pcfWidth; iy += 1) {
 							const float2 sampleUv =
