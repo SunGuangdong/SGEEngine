@@ -1,73 +1,8 @@
 {
 	"version":0,
-	"nextNameIndex":11085,
+	"nextNameIndex":11107,
 	"nextActorId":8318,
 	"actors":[
-		{
-			"type":"ALight",
-			"id":5,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":167.000000,
-						"y":50.500000,
-						"z":14.000000
-					},
-					"r":{
-						"x":-0.198882,
-						"y":0.977538,
-						"z":-0.013907,
-						"w":0.068356
-					}
-				},
-				"m_id":{
-					"id":5
-				},
-				"m_displayName":"ALight_4",
-				"m_lightDesc":{
-					"isOn":true,
-					"type":2,
-					"intensity":19.110001,
-					"range":339.000000,
-					"color":{
-						"x":1.000000,
-						"y":0.969791,
-						"z":0.898496
-					},
-					"spotLightAngle":0.349066,
-					"hasShadows":false,
-					"shadowMapRes":1024,
-					"shadowMapBias":0.000001
-				}
-			}
-		},
-		{
-			"type":"AWitch",
-			"id":4,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":10.000000,
-						"y":0.601105,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":4
-				},
-				"m_displayName":"AWitch_3"
-			}
-		},
 		{
 			"type":"ARoadSegment",
 			"id":8314,
@@ -241,90 +176,67 @@
 			}
 		},
 		{
-			"type":"AStaticObstacle",
-			"id":3547,
+			"type":"AWitch",
+			"id":4,
 			"members":{
 				"m_forceAlphaZSort":false,
 				"m_bindingIgnoreRotation":false,
 				"m_bindingToParentTransform":{
-					"p":{
-						"x":0.000000,
-						"y":-3.196531,
-						"z":-0.008528
-					},
-					"r":{
-						"x":-0.707107,
-						"y":0.000000,
-						"z":0.000000,
-						"w":0.707107
-					},
-					"s":{
-						"x":0.730000,
-						"y":0.730000,
-						"z":0.730000
-					}
+					
 				},
 				"m_logicTransform":{
 					"p":{
 						"x":10.000000,
-						"y":-2.595426,
-						"z":-0.008528
-					},
-					"r":{
-						"x":-0.707107,
-						"y":0.000000,
-						"z":0.000000,
-						"w":0.707107
-					},
-					"s":{
-						"x":0.730000,
-						"y":0.730000,
-						"z":0.730000
+						"y":0.601105,
+						"z":0.000000
 					}
 				},
 				"m_id":{
-					"id":3547
+					"id":4
 				},
-				"m_displayName":"AStaticObstacle_3941",
-				"m_traitModel":{
-					"isRenderable":true,
-					"m_models":[
-						
-					],
-					"forceNoWitchGameBending":false
+				"m_displayName":"AWitch_3"
+			}
+		},
+		{
+			"type":"ALight",
+			"id":5,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
 				},
-				"m_traitSprite":{
-					"isRenderable":true,
-					"hasShadows":true,
-					"images":[
-						
-					],
-					"additionalTransform":{
-						"c0":{
-							"x":1.000000,
-							"y":0.000000,
-							"z":0.000000,
-							"w":0.000000
-						},
-						"c1":{
-							"x":0.000000,
-							"y":1.000000,
-							"z":0.000000,
-							"w":0.000000
-						},
-						"c2":{
-							"x":0.000000,
-							"y":0.000000,
-							"z":1.000000,
-							"w":0.000000
-						},
-						"c3":{
-							"x":0.000000,
-							"y":0.000000,
-							"z":0.000000,
-							"w":1.000000
-						}
+				"m_logicTransform":{
+					"p":{
+						"x":167.000000,
+						"y":50.500000,
+						"z":14.000000
+					},
+					"r":{
+						"x":-0.198882,
+						"y":0.977538,
+						"z":-0.013907,
+						"w":0.068356
 					}
+				},
+				"m_id":{
+					"id":5
+				},
+				"m_displayName":"ALight_4",
+				"m_lightDesc":{
+					"isOn":true,
+					"type":2,
+					"intensity":19.110001,
+					"range":339.000000,
+					"color":{
+						"x":1.000000,
+						"y":0.969791,
+						"z":0.898496
+					},
+					"spotLightAngle":0.349066,
+					"hasShadows":false,
+					"shadowMapRes":1024,
+					"shadowMapBias":0.000001
 				}
 			}
 		},
@@ -475,7 +387,7 @@
 					"m_models":[
 						
 					],
-					"forceNoWitchGameBending":false
+					"forceNoWitchGameBending":true
 				},
 				"m_traitSprite":{
 					"isRenderable":true,
@@ -691,40 +603,6 @@
 			}
 		},
 		{
-			"type":"ACamera",
-			"id":2254,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":-9.500000,
-						"y":9.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":2254
-				},
-				"m_displayName":"ACamera_2476",
-				"m_traitCamera":{
-					"m_cameraSettings":{
-						"orthoGraphicMode":false,
-						"nearPlane":1.000000,
-						"farPlane":1000.000000,
-						"fov":0.872665,
-						"orthographicWidth":1.000000,
-						"orthographicHeight":19.000000,
-						"heightShift":0.000000,
-						"orthographicMantainRatio":true
-					}
-				}
-			}
-		},
-		{
 			"type":"ACloud",
 			"id":6297,
 			"members":{
@@ -735,9 +613,9 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":160.500000,
+						"x":134.500000,
 						"y":30.500000,
-						"z":68.518120
+						"z":65.500000
 					},
 					"s":{
 						"x":2.000000,
@@ -845,7 +723,7 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":202.459549,
+						"x":234.500000,
 						"y":49.500000,
 						"z":-39.000000
 					},
@@ -955,7 +833,7 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":153.000000,
+						"x":116.500000,
 						"y":44.000000,
 						"z":-55.500000
 					},
@@ -1065,7 +943,7 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":192.261215,
+						"x":201.500000,
 						"y":60.500000,
 						"z":75.500000
 					},
@@ -1385,6 +1263,40 @@
 			}
 		},
 		{
+			"type":"ACamera",
+			"id":2254,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":-9.500000,
+						"y":9.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":2254
+				},
+				"m_displayName":"ACamera_2476",
+				"m_traitCamera":{
+					"m_cameraSettings":{
+						"orthoGraphicMode":false,
+						"nearPlane":1.000000,
+						"farPlane":1000.000000,
+						"fov":0.872665,
+						"orthographicWidth":1.000000,
+						"orthographicHeight":19.000000,
+						"heightShift":0.000000,
+						"orthographicMantainRatio":true
+					}
+				}
+			}
+		},
+		{
 			"type":"ABat",
 			"id":5386,
 			"members":{
@@ -1414,60 +1326,6 @@
 					"id":8113
 				},
 				"m_displayName":"InGameMenuScript_10012"
-			}
-		},
-		{
-			"type":"ACandy",
-			"id":8250,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":10.200000,
-						"y":2.996742,
-						"z":-0.456607
-					},
-					"s":{
-						"x":0.045160,
-						"y":0.045160,
-						"z":0.045160
-					}
-				},
-				"m_id":{
-					"id":8250
-				},
-				"m_displayName":"ACandy_10665"
-			}
-		},
-		{
-			"type":"ACandy",
-			"id":8251,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":10.200000,
-						"y":2.996742,
-						"z":-0.456607
-					},
-					"s":{
-						"x":0.112928,
-						"y":0.112928,
-						"z":0.112928
-					}
-				},
-				"m_id":{
-					"id":8251
-				},
-				"m_displayName":"ACandy_10666"
 			}
 		}
 	],
@@ -1503,7 +1361,6 @@
 	"hierarchy":[
 		4,
 		[
-			3547,
 			8317
 		]
 	]

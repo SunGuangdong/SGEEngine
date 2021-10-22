@@ -12,7 +12,6 @@
 namespace sge {
 
 struct AWitch : public Actor {
-
 	AudioDecoder bgMusic;
 
 	AWitch() = default;

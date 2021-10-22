@@ -43,6 +43,54 @@ const char* g_gravesR[] = {
 
 const char* g_lampL = "assets/LampL.png";
 
+std::shared_ptr<Asset> g_lampAsset;
+
+
+std::shared_ptr<sge::Asset> pickDecoreAsset(const char* assets[], int arrSz) {
+	const int elem = g_rnd.nextIntBefore(arrSz);
+	return getCore()->getAssetLib()->getAsset(assets[elem], true);
+}
+
+enum PickDecoreFlags : int {
+	pdf_trees = 1 << 0,
+	pdf_pumpkins = 1 << 1,
+	pdf_graves = 1 << 2,
+
+	pdf_numFlags = 3,
+
+	pdf_all_mask = 7,
+};
+
+std::shared_ptr<sge::Asset> pickDecore(int pdf, bool useLeft) {
+	int usedCatgoriesNum = 0;
+	int possibleCategories[pdf_numFlags] = {0};
+	for (int t = 0; t < pdf_numFlags; ++t) {
+		if (pdf & (1 << t)) {
+			possibleCategories[usedCatgoriesNum] = t;
+			usedCatgoriesNum++;
+		}
+	}
+
+	const int category = possibleCategories[g_rnd.nextIntBefore(usedCatgoriesNum)];
+
+	if (category == 0) {
+		return pickDecoreAsset(g_decoresTrees, SGE_ARRSZ(g_decoresTrees));
+	}
+	if (category == 1) {
+		return pickDecoreAsset(g_decoresPumpkins, SGE_ARRSZ(g_decoresPumpkins));
+	}
+	if (category == 2) {
+		if (useLeft) {
+			return pickDecoreAsset(g_gravesR, SGE_ARRSZ(g_gravesR));
+		} else {
+			return pickDecoreAsset(g_gravesL, SGE_ARRSZ(g_gravesL));
+		}
+	}
+
+	sgeAssert(false);
+	return std::shared_ptr<sge::Asset>();
+}
+
 struct ARoadSegment : public Actor {
 	ARoadSegment() = default;
 
@@ -50,6 +98,10 @@ struct ARoadSegment : public Actor {
 		registerTrait(ttModel);
 
 		ttModel.addModel("assets/roadSegment.mdl", true);
+
+		if (g_lampAsset == nullptr) {
+			g_lampAsset = getCore()->getAssetLib()->getAsset(g_lampL, true);
+		}
 	}
 
 	void update(const GameUpdateSets& u) {
@@ -73,6 +125,25 @@ struct ARoadSegment : public Actor {
 	}
 
 	void generateDecores() {
+		enum DecoreConfig : int {
+			decoreConfig_nothing,
+			decoreConfig_2,
+			decoreConfig_3,
+		};
+
+		// clang-format off
+		int cumulativeDecoreConfig[] = {
+			decoreConfig_nothing, 100,
+		    decoreConfig_2, 100,
+		    decoreConfig_3, 100,
+		};
+		// clang-format on
+
+		int totalCumulativeChance = 0;
+		for (int t = 0; t < SGE_ARRSZ(cumulativeDecoreConfig) / 2; t += 2) {
+			totalCumulativeChance += cumulativeDecoreConfig[t + 1];
+		}
+
 		GameWorld* world = getWorld();
 
 		// Delete the old decores.
@@ -88,154 +159,101 @@ struct ARoadSegment : public Actor {
 
 		const vec3f minRoadPositionWs = getPosition();
 
-		for (int t = 0; t < 100; t += 10) {
-			const char** assets = nullptr;
-			int typePick = g_rnd.nextInt() % 6;
-			int maxAssetsForType = 0;
-			if (typePick == 0) {
-				assets = g_decoresFences;
-				maxAssetsForType = SGE_ARRSZ(g_decoresFences);
-			} else if (typePick == 1) {
-				assets = g_decoresTrees;
-				maxAssetsForType = SGE_ARRSZ(g_decoresTrees);
-			} else if (typePick == 2) {
-				assets = g_decoresPumpkins;
-				maxAssetsForType = SGE_ARRSZ(g_decoresPumpkins);
-			} else if (typePick == 3 || typePick == 4) {
-				assets = g_decoresTrees;
-				maxAssetsForType = SGE_ARRSZ(g_decoresTrees);
-			} else if (typePick == 3 || typePick == 4) {
-				assets = g_gravesL;
-				maxAssetsForType = SGE_ARRSZ(g_gravesL);
-			} else if (typePick == 3 || typePick == 5) {
-				assets = g_gravesR;
-				maxAssetsForType = SGE_ARRSZ(g_gravesR);
+		const auto createDecoreActor = [this](const vec3f& posRoadSpace, std::shared_ptr<sge::Asset> asset) -> AStaticObstacle* {
+			if (asset) {
+				AStaticObstacle* const decore = getWorld()->allocObjectT<AStaticObstacle>();
+				decore->m_traitModel.m_models.clear();
+				decore->m_traitSprite.images.resize(1);
+				decore->m_traitSprite.images[0].m_assetProperty.setAsset(std::move(asset));
+				decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+				decore->m_traitSprite.images[0].imageSettings.flipHorizontally = false;
+
+				decore->setPosition(getPosition() + posRoadSpace);
+				getWorld()->setParentOf(decore->getId(), getId());
+				return decore;
 			}
+			return nullptr;
+		};
 
-			if (t % 50 == 0 && t != 0) {
-				{
-					float zPosWs = -rangeZMin;
+		const auto decoratePos = [this, &createDecoreActor](const vec3f& posRoadSpace, int pdf, bool useLeft) {
+			std::shared_ptr<sge::Asset> asset = pickDecore(pdf, useLeft);
+			createDecoreActor(posRoadSpace, std::move(asset));
+		};
 
-					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-					decore->m_traitModel.m_models.clear();
-					decore->m_traitSprite.images.resize(1);
-					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_lampL, true);
-					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
-					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-					decore->m_traitSprite.images[0].imageSettings.flipHorizontally = true;
-					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(0.75f);
+		const auto pickDecoreConfig = [&totalCumulativeChance, &cumulativeDecoreConfig]() {
+			DecoreConfig decoreConfig = decoreConfig_nothing;
+			const int decoreConfigChooser = g_rnd.nextIntBefore(totalCumulativeChance);
 
-					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-					world->setParentOf(decore->getId(), getId());
-				}
-				{
-					float zPosWs = rangeZMin;
-
-					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-					decore->m_traitModel.m_models.clear();
-					decore->m_traitSprite.images.resize(1);
-					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_lampL, true);
-					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
-					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-					decore->m_traitSprite.images[0].imageSettings.flipHorizontally = false;
-					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(0.75f);
-
-					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-					world->setParentOf(decore->getId(), getId());
+			for (int t = 0; t < SGE_ARRSZ(cumulativeDecoreConfig) / 2; t += 2) {
+				if (decoreConfigChooser <= cumulativeDecoreConfig[t + 1]) {
+					decoreConfig = DecoreConfig(cumulativeDecoreConfig[t]);
 				}
 			}
 
-			if (t % 5 == 0 && t != 0) {
-				{
-					float zPosWs = -rangeZMax;
+			return decoreConfig;
+		};
 
-					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-					decore->m_traitModel.m_models.clear();
-					decore->m_traitSprite.images.resize(1);
-					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_decoresTrees[g_rnd.nextInt() % SGE_ARRSZ(g_decoresTrees)], true);
-					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
-					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-					decore->m_traitSprite.images[0].imageSettings.flipHorizontally =  g_rnd.nextBool();
-					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(g_rnd.nextInRange(1.f, 1.1f));
+		const auto decorateSide = [&](DecoreConfig decoreConfig, float xPosRoadSpace, bool isLeft) {
+			switch (decoreConfig) {
+				case decoreConfig_nothing: {
+				} break;
+				case decoreConfig_2: {
+					const float zKeyPos[2] = {16.f, 24.f};
+					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[0] * (isLeft ? 1.f : -1.f)), pdf_all_mask,
+					            isLeft);
+					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[1] * (isLeft ? 1.f : -1.f)), pdf_all_mask,
+					            isLeft);
 
-					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-					world->setParentOf(decore->getId(), getId());
-				}
-				{
-					float zPosWs = rangeZMax;
+				} break;
+				case decoreConfig_3: {
+					const float zKeyPos[3] = {12.f, 18.f, 24.f};
 
-					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-					decore->m_traitModel.m_models.clear();
-					decore->m_traitSprite.images.resize(1);
-					std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, g_decoresTrees[g_rnd.nextInt() % SGE_ARRSZ(g_decoresTrees)], true);
-					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
-					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-					decore->m_traitSprite.images[0].imageSettings.flipHorizontally = g_rnd.nextBool();
-					decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(g_rnd.nextInRange(1.f, 1.1f));
+					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[0] * (isLeft ? 1.f : -1.f)), pdf_trees | pdf_graves,
+					            isLeft);
+					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[1] * (isLeft ? 1.f : -1.f)), pdf_trees | pdf_graves,
+					            isLeft);
+					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[2] * (isLeft ? 1.f : -1.f)), pdf_trees | pdf_graves,
+					            isLeft);
 
-					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-					world->setParentOf(decore->getId(), getId());
-				}
+				} break;
+			}
+		};
+
+		for (int t = 0; t < 100; t += 1) {
+			// Pick the configuration of the decores.
+			if (t % 10 == 0) {
+				DecoreConfig decoreConfigLeft = pickDecoreConfig();
+				DecoreConfig decoreConfigRight = pickDecoreConfig();
+
+				decorateSide(decoreConfigLeft, float(t), true);
+				decorateSide(decoreConfigRight, float(t), false);
 			}
 
-			const int assetIndexPick = g_rnd.nextInt() % maxAssetsForType;
-			std::shared_ptr<Asset> decoreTexAsset = getCore()->getAssetLib()->getAsset(AssetType::Texture2D, assets[assetIndexPick], true);
-			const float decoreTexWidth = float(decoreTexAsset->asTextureView()->tex->getDesc().texture2D.width);
-			const float decoreTexWidthWs = float(decoreTexWidth) / 64.f;
+			// Add the light on the side walk.
+			if (t == 25 || t == 75) {
+				createDecoreActor(vec3f(float(t), 0, rangeZMin), g_lampAsset);
+			}
 
-			const float rangeZMinThis = rangeZMin + decoreTexWidthWs * 0.5f;
-			const float rangeZMaxThis = rangeZMax - decoreTexWidthWs * 0.5f;
+			if (t == 0 || t == 50) {
+				createDecoreActor(vec3f(float(t), 0, -rangeZMin), g_lampAsset)->m_traitSprite.images[0].imageSettings.flipHorizontally =
+				    true;
+			}
 
-			if (g_rnd.nextInt() % 100 <= 15) {
+			// Trees.
+			if (t % 5 == 0) {
+				if (g_rnd.nextBool())
+					decoratePos(vec3f(float(t), 0.f, -rangeZMax), pdf_trees, false);
+				if (g_rnd.nextBool())
+					decoratePos(vec3f(float(t), 0.f, rangeZMax), pdf_trees, false);
+			}
+
+			// Flying ghost decores.
+			if ((t % 10 == 0) && g_rnd.nextInt() % 100 < 15) {
 				float zPosWs = g_rnd.nextInRange(-rangeZMid, rangeZMid) * g_rnd.nextFlipFLoat();
 				ADecoreGhost* const decoreGhost = world->allocObjectT<ADecoreGhost>();
 
-				decoreGhost->setPosition(minRoadPositionWs + vec3f(float(t), -2.f, zPosWs));
+				decoreGhost->setPosition(minRoadPositionWs + vec3f(float(t) + 0.03f, -2.f, zPosWs));
 				world->setParentOf(decoreGhost->getId(), getId());
-			}
-
-			if (typePick == 0) {
-				const float zSpawnRange = rangeZMaxThis - rangeZMinThis;
-				int numFencesToSpawn = int(zSpawnRange / decoreTexWidthWs);
-
-				for (int iFence = 0; iFence < numFencesToSpawn; ++iFence) {
-					AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-
-					float zPosWs = rangeZMinThis + iFence * decoreTexWidthWs;
-
-					decore->m_traitModel.m_models.clear();
-					decore->m_traitSprite.images.resize(1);
-					decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
-					decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-
-					decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-					world->setParentOf(decore->getId(), getId());
-				}
-
-				float zPosWs = g_rnd.nextInRange(rangeZMinThis, rangeZMaxThis);
-
-				zPosWs *= g_rnd.next01() > 0.5f ? 1.f : -1.f;
-			} else {
-				float zPosWs = g_rnd.nextInRange(rangeZMinThis, rangeZMaxThis);
-
-				zPosWs *= g_rnd.next01() > 0.5f ? 1.f : -1.f;
-
-				AStaticObstacle* const decore = world->allocObjectT<AStaticObstacle>();
-				decore->m_traitModel.m_models.clear();
-				decore->m_traitSprite.images.resize(1);
-				decore->m_traitSprite.images[0].m_assetProperty.setAsset(decoreTexAsset);
-				decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-				decore->m_traitSprite.images[0].imageSettings.flipHorizontally = g_rnd.next01() > 0.5f;
-
-				decore->setPosition(minRoadPositionWs + vec3f(float(t), 0.f, zPosWs));
-
-				if (typePick == 2) {
-					transf3d trs = decore->getTransform();
-					trs.s = vec3f(0.5f);
-					decore->setTransform(trs);
-				}
-
-				world->setParentOf(decore->getId(), getId());
 			}
 		}
 	}

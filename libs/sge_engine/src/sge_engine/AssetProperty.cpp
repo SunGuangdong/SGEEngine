@@ -81,9 +81,9 @@ const AudioDataAsset* AssetProperty::getAssetAudio() const {
 	return m_asset->asAudio();
 }
 
-void AssetProperty::setAsset(std::shared_ptr<Asset>& asset) {
-	m_asset = asset;
-	m_targetAsset = asset->getPath();
+void AssetProperty::setAsset(std::shared_ptr<Asset> asset) {
+	m_asset = std::move(asset);
+	m_targetAsset = m_asset->getPath();
 	m_currentAsset = m_asset->getPath();
 }
 
