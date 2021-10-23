@@ -192,6 +192,11 @@ AssetTextureMeta AssetTexture::loadTextureSettingInfoFile(const std::string& bas
 				result.isSemiTransparent = jIsSemiTransparent->jid == JID_TRUE;
 			}
 
+			const JsonValue* jShoudGenerateMips = jRoot->getMember("shouldGenerateMips");
+			if (jShoudGenerateMips) {
+				result.shouldGenerateMips = jShoudGenerateMips->jid == JID_TRUE;
+			}
+
 			return result;
 		}
 	} catch (...) {
@@ -407,6 +412,8 @@ struct TextureViewAssetFactory : public IAssetFactory {
 
 		TextureDesc textureDesc;
 
+		texture.meta = getAssetTextureMeta(pPath);
+
 		textureDesc.textureType = UniformType::Texture2D;
 		textureDesc.format = TextureFormat::R8G8B8A8_UNORM;
 		textureDesc.usage = TextureUsage::ImmutableResource;
@@ -416,6 +423,7 @@ struct TextureViewAssetFactory : public IAssetFactory {
 		textureDesc.texture2D.sampleQuality = 0;
 		textureDesc.texture2D.width = width;
 		textureDesc.texture2D.height = height;
+		textureDesc.generateMips = texture.meta.shouldGenerateMips;
 
 		TextureData textureDataDesc;
 		textureDataDesc.data = textureData;
@@ -423,7 +431,6 @@ struct TextureViewAssetFactory : public IAssetFactory {
 
 		texture.tex = pMngr->getDevice()->requestResource<Texture>();
 
-		texture.meta = getAssetTextureMeta(pPath);
 		texture.tex->create(textureDesc, &textureDataDesc, texture.meta.assetSamplerDesc);
 
 		if (textureData != nullptr) {

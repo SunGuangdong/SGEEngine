@@ -167,6 +167,7 @@ struct ARoadSegment : public Actor {
 				decore->m_traitSprite.images[0].m_assetProperty.setAsset(std::move(asset));
 				decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
 				decore->m_traitSprite.images[0].imageSettings.flipHorizontally = false;
+				decore->m_traitSprite.images[0].imageSettings.forceAlphaBlending = true;
 
 				decore->setPosition(getPosition() + posRoadSpace);
 				getWorld()->setParentOf(decore->getId(), getId());

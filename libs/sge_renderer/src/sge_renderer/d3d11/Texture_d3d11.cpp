@@ -103,6 +103,12 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 		D3D11_TEXTURE2D_DESC d3dDesc;
 		const auto& tex2D = desc.texture2D;
 
+		const bool shouldAutoGenMipMaps = desc.generateMips && tex2D.numMips == 1 && initalData != nullptr;
+		if (shouldAutoGenMipMaps && initalData == nullptr) {
+			sgeAssert(false && "Auto generated mip-maps need to have inital data!");
+			return false;
+		}
+
 		d3dDesc.ArraySize = tex2D.arraySize;
 		d3dDesc.MipLevels = tex2D.numMips;
 		d3dDesc.Width = tex2D.width;
@@ -110,23 +116,43 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 		d3dDesc.SampleDesc.Count = tex2D.numSamples;
 		d3dDesc.SampleDesc.Quality = tex2D.sampleQuality;
 		d3dDesc.MiscFlags = 0;
+		if (shouldAutoGenMipMaps) {
+			d3dUsage = D3D11_USAGE_DEFAULT;
+			d3dDesc.MiscFlags |= D3D11_RESOURCE_MISC_GENERATE_MIPS;
+			d3dBindFlags |= D3D11_BIND_RENDER_TARGET;
+			d3dDesc.MipLevels = 0;
+		}
 		d3dDesc.Format = d3dFormat;
 		d3dDesc.CPUAccessFlags = d3dCpuAccess;
 		d3dDesc.Usage = d3dUsage;
 		d3dDesc.BindFlags = d3dBindFlags;
 
-		// a bit of a reasoning
-		sgeAssert(d3dDesc.MipLevels != 0);        // 0 mipmaps should mean generate all mipmaps but this is not supported yet
-		sgeAssert(d3dDesc.SampleDesc.Count != 0); // 0 samples does not make any sense
+		// A bit of a reasoning for early level error finding, sometimes the user fails to correctly specfy these.
+		if (shouldAutoGenMipMaps == false) {
+			sgeAssert(d3dDesc.MipLevels != 0 && "Zero MipLevels means that the mipmap level should be auto generated!");
+		}
+		sgeAssert(d3dDesc.SampleDesc.Count != 0 && "Zero samples for texture sampler is invalid");
 
-		const int expectedTexDataSize = initalData ? tex2D.arraySize * tex2D.numMips : 0;
+		int expectedTexDataSize = initalData ? tex2D.arraySize * tex2D.numMips : 0;
+		if (shouldAutoGenMipMaps) {
+			expectedTexDataSize = 1;
+		}
 
 		std::vector<D3D11_SUBRESOURCE_DATA> d3dSubresData(expectedTexDataSize);
 		for (int iData = 0; iData < expectedTexDataSize; ++iData) {
 			d3dSubresData[iData] = TextureData_D3D11_Native(initalData[iData]);
 		}
 
-		hr = d3ddev->CreateTexture2D(&d3dDesc, d3dSubresData.data(), (ID3D11Texture2D**)&m_dx11Texture);
+		hr = d3ddev->CreateTexture2D(&d3dDesc, shouldAutoGenMipMaps ? nullptr : d3dSubresData.data(), (ID3D11Texture2D**)&m_dx11Texture);
+
+		if (shouldAutoGenMipMaps) {
+			ID3D11DeviceContext* context = nullptr;
+			d3ddev->GetImmediateContext(&context);
+			if (context) {
+				context->UpdateSubresource(m_dx11Texture, 0, NULL, d3dSubresData[0].pSysMem, d3dSubresData[0].SysMemPitch, 0);
+				context->GenerateMips(D3D11_GetSRV());
+			}
+		}
 
 		// Generate RTV,SRV,DSV that PROBABLY will be needed
 		D3D11_GetSRV();

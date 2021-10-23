@@ -465,6 +465,7 @@ struct TextureDesc {
 	TextureUsage::Enum usage;
 	UniformType::Enum textureType;
 	TextureFormat::Enum format;
+	bool generateMips = false;
 
 	union {
 		Texture1DDesc texture1D;
@@ -474,6 +475,11 @@ struct TextureDesc {
 	};
 
 	bool hasMipMaps() const {
+
+		if (generateMips) {
+			return true;
+		}
+
 		if (textureType == UniformType::Texture1D)
 			return texture1D.numMips > 1;
 		if (textureType == UniformType::Texture2D)

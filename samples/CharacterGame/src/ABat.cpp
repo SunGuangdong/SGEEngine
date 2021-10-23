@@ -31,6 +31,7 @@ void ABat::create() {
 	ttSprite.images[0].m_assetProperty.setAsset(frames[0]);
 	ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;
 	ttSprite.images[0].imageSettings.m_anchor = anchor_bottomMid;
+	ttSprite.images[0].imageSettings.forceAlphaBlending = true;
 	ttSprite.images[0].m_additionalTransform = mat4f::getTranslation(0.f, 3.f, 0.f);
 
 	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 1.f), 1.f, true);
@@ -94,7 +95,7 @@ void APumpkinOnRoad::create() {
 	ttSprite.images[0].m_assetProperty.setAsset(asset);
 	ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;
 	ttSprite.images[0].imageSettings.m_anchor = anchor_bottomMid;
-	ttSprite.images[0].m_additionalTransform = mat4f::getScaling(0.5f);
+	ttSprite.images[0].imageSettings.forceAlphaBlending = true;
 
 	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 2.f), 1.f, true);
 	ttRigidBody.getRigidBody()->setCanRotate(false, false, false);

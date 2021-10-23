@@ -24,6 +24,9 @@ struct AssetTextureMeta {
 
 	/// True if the texture is semi-trasparent. That means that there are alpha values != for zero or one.
 	bool isSemiTransparent = false;
+
+	///
+	bool shouldGenerateMips = true;
 };
 
 struct SGE_CORE_API AssetTexture {

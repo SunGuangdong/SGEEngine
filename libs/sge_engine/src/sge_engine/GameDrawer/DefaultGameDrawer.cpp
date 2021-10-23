@@ -553,7 +553,7 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 	// Draw the debug draw commands.
 	getCore()->getDebugDraw().draw(drawSets.rdest, drawSets.drawCamera->getProjView());
 
-	//if (drawReason_IsGameOrEditNoShadowPass(drawReason))
+	// if (drawReason_IsGameOrEditNoShadowPass(drawReason))
 	//	if (m_shadingLights.empty() == false) {
 	//		if (Texture* shadowTex = m_shadingLights[0].shadowMap) {
 	//			drawSets.quickDraw->drawRectTexture(drawSets.rdest, 0, 0, 128, 128, shadowTex);
@@ -666,18 +666,16 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 void DefaultGameDrawer::drawRenderItem_TraitViewportIcon(TraitViewportIconRenderItem& ri,
                                                          const GameDrawSets& drawSets,
                                                          const DrawReason& drawReason) {
-	if (0) {
-		if (Texture* iconTex = ri.traitIcon->getIconTexture()) {
-			vec4f tintColor = vec4f(1.f);
+	if (Texture* iconTex = ri.traitIcon->getIconTexture()) {
+		vec4f tintColor = vec4f(1.f);
 
-			if (drawReason == drawReason_visualizeSelectionPrimary)
-				tintColor = getPrimarySelectionColor();
-			else if (drawReason == drawReason_visualizeSelection)
-				tintColor = kSecondarySelectionColor;
+		if (drawReason == drawReason_visualizeSelectionPrimary)
+			tintColor = getPrimarySelectionColor();
+		else if (drawReason == drawReason_visualizeSelection)
+			tintColor = kSecondarySelectionColor;
 
-			const mat4f node2world = ri.traitIcon->computeNodeToWorldMtx(*drawSets.drawCamera);
-			m_texturedPlaneDraw.draw(drawSets.rdest, drawSets.drawCamera->getProjView() * node2world, iconTex, tintColor);
-		}
+		const mat4f node2world = ri.traitIcon->computeNodeToWorldMtx(*drawSets.drawCamera);
+		m_texturedPlaneDraw.draw(drawSets.rdest, drawSets.drawCamera->getProjView() * node2world, iconTex, tintColor);
 	}
 };
 
@@ -902,7 +900,6 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
                                         int const itemIndex,
                                         const ObjectLighting& lighting,
                                         DrawReason const drawReason) {
-	return;
 	TypeId actorType = actor->getType();
 
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();

@@ -6,5 +6,5 @@
 		"addressModeZ":"repeat",
 		"filter":"linear"
 	},
-	"isSemiTransparent":true
+	"isSemiTransparent":false
 }

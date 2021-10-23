@@ -347,7 +347,6 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 				// Show every file in the current directory with an icon next to it.
 				for (const fs::directory_entry& entry : fs::directory_iterator(pathToAssets)) {
-
 					const std::string localAssetPath = relativePathToCwdCanoize(entry.path().string());
 
 					if (entry.is_regular_file() && m_exploreFilter.PassFilter(entry.path().filename().string().c_str())) {
@@ -699,6 +698,13 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 				ImGuiEx::Label("Semi-Transparent");
 				hadChange |= ImGui::Checkbox("##Semi Transparent", &texAsset->meta.isSemiTransparent);
 
+				ImGuiEx::Label("Auto Generate MipMaps");
+				bool changedMipMapGen = ImGui::Checkbox("##Auto Generate MipMaps", &texAsset->meta.shouldGenerateMips);
+				hadChange |= changedMipMapGen;
+				if (changedMipMapGen) {
+					getCore()->getLog().writeWarning("Auto MipMap generation will take effect after a restart!");
+				}
+
 				hadChange |= doAddressModeUI("Tiling X", texAsset->meta.assetSamplerDesc.addressModes[0]);
 				hadChange |= doAddressModeUI("Tiling Y", texAsset->meta.assetSamplerDesc.addressModes[1]);
 				hadChange |= doAddressModeUI("Tiling Z", texAsset->meta.assetSamplerDesc.addressModes[2]);
@@ -732,11 +738,11 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 					ImGui::Image(explorePreviewAsset->asSprite()->textureAsset->asTextureView()->tex.GetPtr(), sz);
 				}
 			} else if (explorePreviewAsset->getType() == AssetType::Audio) {
-				//auto audioData = explorePreviewAsset->asAudio();
-				//ImGui::Text("Vorbis encoded Audio file");
-				//ImGui::Text("Sample Rate: %.1f kHZ", (float)(*track)->info.samplesPerSecond / 1000.0f);
-				//ImGui::Text("Number of channels: %d", (*track)->info.numChannels);
-				//ImGui::Text("Length: %.2f s", (float)(*track)->info.numSamples / (float)(*track)->info.samplesPerSecond);
+				// auto audioData = explorePreviewAsset->asAudio();
+				// ImGui::Text("Vorbis encoded Audio file");
+				// ImGui::Text("Sample Rate: %.1f kHZ", (float)(*track)->info.samplesPerSecond / 1000.0f);
+				// ImGui::Text("Number of channels: %d", (*track)->info.numChannels);
+				// ImGui::Text("Length: %.2f s", (float)(*track)->info.numSamples / (float)(*track)->info.samplesPerSecond);
 			} else {
 				ImGui::Text("No Preview");
 			}
