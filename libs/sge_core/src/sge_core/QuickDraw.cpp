@@ -343,6 +343,8 @@ void QuickDraw::initalize2DDrawResources(SGEContext* context) {
 	blendDesc.alphaDestBlend = Blend::Alpha_InvSrc;
 	blendDesc.blendOp = BlendOp::Add;
 
+	blendDesc = BlendDesc::GetDefaultBackToFrontAlpha();
+
 	m_textBlendState = sgedev->requestResource<BlendState>();
 	m_textBlendState->create(blendDesc);
 

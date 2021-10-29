@@ -22,7 +22,7 @@ struct AudioDevice {
 
 	ma_mutex& getDataLockMutex() { return mutexDataLock; }
 
-	void play(AudioDecoder* decoder);
+	void play(AudioDecoder* decoder, bool ifAlreadyPlayingSeekToBegining);
 	void stop(AudioDecoder* decoder);
 
   private:
@@ -72,6 +72,7 @@ struct AudioDecoder {
 	void createDecoder(AudioDataPtr& audioData);
 
 	void seekToBegining();
+	void seekToBegining_noLock();
 	bool isPlaying() const { return playingDevice != nullptr; }
 
 

@@ -339,9 +339,9 @@ float4 psMain(VS_OUTPUT IN)
 					const float2 pixelSizeUVShadow = (1.0 / tex2Dsize(lightShadowMap));
 
 					float samplesWeights = 0.f;
-					const int pcfWidth = 0;
+					const int pcfWidth = 2;
 					const int pcfTotalSampleCnt = (2 * pcfWidth + 1) * (2 * pcfWidth + 1);
-					int pcfTotalSampleCnt2 = 2;
+					int pcfTotalSampleCnt2 = 0;
 					for (int ix = -pcfWidth; ix <= pcfWidth; ix += 1) {
 						for (int iy = -pcfWidth; iy <= pcfWidth; iy += 1) {
 							const float2 sampleUv =
@@ -420,8 +420,9 @@ float4 psMain(VS_OUTPUT IN)
 
 	if ((uPBRMtlFlags & kPBRMtl_Flags_NoLighting) == 0) {
 		const float3 ambientLightColorLinear = ambientLightColor; // pow(ambientLightColor, 2.2f);
-		const float3 fakeAmbientDetail =
-		    ((normal.y * 0.5f + 0.5f) * ambientLightColorLinear + ambientLightColorLinear * 0.05f) * diffuseColor.xyz;
+		const float3 fakeAmbientDetail = ambientLightColorLinear * diffuseColor.xyz;
+		//const float3 fakeAmbientDetail =
+		//    ((normal.y * 0.5f + 0.5f) * ambientLightColorLinear + ambientLightColorLinear * 0.05f) * diffuseColor.xyz;
 		const float3 rimLighting =
 		    smoothstep(1.f - uRimLightColorWWidth.w, 1.f, (1.f - dot(uCameraLookDirWs, N))) * diffuseColor.xyz * uRimLightColorWWidth.xyz;
 

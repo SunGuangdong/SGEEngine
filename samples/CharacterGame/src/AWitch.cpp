@@ -10,6 +10,7 @@
 
 #include "AWitch.h"
 #include "GlobalRandom.h"
+#include "sge_engine/actors/ALight.h"
 
 namespace sge {
 
@@ -24,9 +25,14 @@ AABox3f AWitch::getBBoxOS() const {
 
 void AWitch::applyDamage() {
 	if (timeImmune == 0.f) {
-		timeImmune = 1.f;
+		timeImmune = 1.5f;
 		health -= 1;
 		health = maxOf(health, 0);
+
+		if (!isMobileEmscripten) {
+			getCore()->getAudioDevice()->play(&sndHurt, true);
+		}
+		currentSpeedX = 20.f;
 	}
 }
 
@@ -42,6 +48,7 @@ void AWitch::create() {
 	ttSprite.images[0].m_assetProperty.setAsset(imageAsset);
 	ttSprite.images[0].imageSettings.m_anchor = anchor_bottomMid;
 	ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;
+	ttSprite.images[0].imageSettings.flipHorizontally = true;
 
 	ttRigidbody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 1.f), 1.f, false);
 	ttRigidbody.getRigidBody()->setCanRotate(false, false, false);
@@ -52,9 +59,22 @@ void AWitch::create() {
 }
 
 void AWitch::update(const GameUpdateSets& u) {
+	if (!areEmscriptenFixesDone) {
+		if (isMobileEmscripten) {
+			if (Actor* aLight = getWorld()->getActorByName("ALight_4")) {
+				ALight* light = (ALight*)aLight;
+				light->m_lightDesc.hasShadows = false;
+			}
+		}
+
+		areEmscriptenFixesDone = true;
+	}
+
 	if (u.isGamePaused()) {
 		return;
 	}
+
+
 
 	timeImmune -= u.dt;
 	timeImmune = maxOf(timeImmune, 0.f);
@@ -86,16 +106,16 @@ void AWitch::update(const GameUpdateSets& u) {
 		// Use gamepad input dif in no keyboard input was used.
 		const GamepadState* const gamepad = u.is.getHookedGemepad(0);
 		if (inputDirWS == vec3f(0.f) && gamepad) {
-			inputDirWS.z = gamepad->getInputDir(true).y;
+			inputDirWS.z = gamepad->getInputDir(true).x;
 			inputDirWS.y = 0.f;
 		}
 
 		if (u.is.hasTouchPressedUV(vec2f(0.f, 0.f), vec2f(0.5f, 1.f))) {
-			inputDirWS.z = -1.f;
+			inputDirWS.z += -1.f;
 		}
 
 		if (u.is.hasTouchPressedUV(vec2f(0.5f, 0.f), vec2f(1.f, 1.f))) {
-			inputDirWS.z = 1.f;
+			inputDirWS.z += 1.f;
 		}
 
 		// The charater automatically goes forwards.
@@ -109,9 +129,15 @@ void AWitch::update(const GameUpdateSets& u) {
 	visualXTilt += 2.f * inputDirWS.z * u.dt;
 	visualXTilt = clamp(visualXTilt, -1.f, 1.f);
 
-	const vec3f totalPlayerSpeed = inputDirWS * vec3f(40.f, 0.f, 10.f);
-	currentSpeedX = totalPlayerSpeed.x;
-	const vec3f totalPlayerMovement = totalPlayerSpeed * u.dt;
+	if (isDead()) {
+		currentSpeedX = speedLerp(currentSpeedX, 0.f, u.dt * 120.f);
+	} else {
+		currentSpeedX = speedLerp(currentSpeedX, 40.f, u.dt * 80.f);
+	}
+
+	currSpeedZ = speedLerp(currSpeedZ, inputDirWS.z * 10.f, u.dt * 110.f);
+
+	const vec3f totalPlayerSpeed = vec3f(currentSpeedX, 0.f, currSpeedZ);
 
 	// Update the curvature of the level.
 	currentCurvatureRemainingDistance -= totalPlayerSpeed.x * u.dt;
@@ -128,7 +154,6 @@ void AWitch::update(const GameUpdateSets& u) {
 
 	// Move the witch in ZY plane and the rest of the level with her.
 	ttRigidbody.getRigidBody()->setLinearVelocity(totalPlayerSpeed._0yz());
-	// levelInfo.moveLevel(getWorld(), -totalPlayerMovement.x);
 	levelInfo.generateInteractables(getWorld(), currentSpeedX * u.dt);
 
 	// Damage blinking.
@@ -137,13 +162,15 @@ void AWitch::update(const GameUpdateSets& u) {
 		int k = int(timeImmune / 0.15f);
 		if (k % 2 == 0) {
 			witchTint = vec4f(1.f, 0.7f, 0.7f, 0.75f);
+		} else {
+			witchTint = vec4f(1.f, 0.7f, 0.7f, 1.f);
 		}
 	}
 
 	ttSprite.images[0].imageSettings.colorTint = witchTint;
 
 	// Tilt the witch.
-	const mat4f upDownWobble = mat4f::getTranslation(vec3f(0.f, 0.5f + sinf(getWorld()->timeSpendPlaying * 3.14f) * 0.2f, 0.f));
+	const mat4f upDownWobble = mat4f::getTranslation(vec3f(0.f, 0.5f + sinf(getWorld()->timeSpendPlaying * 3.14f) * 0.3f, 0.f));
 	float tiltAmountSmoothed = fabsf(visualXTilt) * sign(visualXTilt);
 	const mat4f tilt = mat4f::getTranslation(0.f, 2.f, 0.f) * mat4f::getRotationX(tiltAmountSmoothed * deg2rad(30.f)) *
 	                   mat4f::getTranslation(0.f, -2.f, 0.f);

@@ -16,11 +16,14 @@ struct InGameMenuScript : public IWorldScript {
 	gamegui::UIContext context;
 	std::vector<EventSubscription> eventSubs;
 	DebugFont font;
+	DebugFont fontMenus;
 
 	std::shared_ptr<gamegui::TextWidget> livesTextWdg;
+	std::shared_ptr<gamegui::TextWidget> cnadiesTextWdg;
 
 	std::shared_ptr<gamegui::InvisibleWidget> hud;
 	std::shared_ptr<gamegui::ColoredWidget> blackScreen;
 	std::shared_ptr<gamegui::InvisibleWidget> deadScreen;
+	std::shared_ptr<gamegui::TextWidget> deadScreenCandiesCount;
 };
 } // namespace sge

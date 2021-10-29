@@ -51,19 +51,25 @@ void AudioDevice::clear() {
 	ma_mutex_uninit(&mutexDataLock);
 }
 
-void AudioDevice::play(AudioDecoder* decoder) {
+void AudioDevice::play(AudioDecoder* decoder, bool ifAlreadyPlayingSeekToBegining) {
 	if (decoder) {
-		if (decoder->playingDevice != nullptr) {
-			sgeAssert(false && "AudioDecoder could be played only on one device!");
-			return;
-		}
+		const ma_mutex_raii lock(mutexDataLock);
+
+		// if (decoder->playingDevice != nullptr) {
+		//	sgeAssert(false && "AudioDecoder could be played only on one device!");
+		//	return;
+		//}
 
 		if (decoder->playingDevice == this) {
 			// The sound is already playing.
 			return;
 		}
 
-		const ma_mutex_raii lock(mutexDataLock);
+		if (ifAlreadyPlayingSeekToBegining) {
+			decoder->seekToBegining_noLock();
+		}
+
+
 		decoder->playingDevice = this;
 		m_playingDecoders.insert(decoder);
 	}
@@ -110,19 +116,20 @@ bool AudioDevice::readFramesFromDecoder(AudioDecoder& decoder, float* output, ui
 
 		ma_uint64 framesReadThisIteration = 0;
 		if (decoder.m_syncState.isLooping) {
-			framesReadThisIteration = ma_decoder_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration);
-		} else {
 			ma_data_source_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration, &framesReadThisIteration,
 			                               ma_bool32(true));
+		} else {
+			framesReadThisIteration = ma_decoder_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration);
 		}
 
 		if (framesReadThisIteration == 0) {
+			isPlaybackDone = true;
 			break;
 		}
 
 		// Mix the frames together.
 		for (ma_uint32 iSample = 0; iSample < framesReadThisIteration * CHANNEL_COUNT; ++iSample) {
-			output[totalFramesRead * CHANNEL_COUNT + iSample] += decodingTemp[iSample];
+			output[totalFramesRead * CHANNEL_COUNT + iSample] += decodingTemp[iSample] * decoder.m_syncState.volume;
 		}
 
 		totalFramesRead += framesReadThisIteration;
@@ -135,7 +142,7 @@ bool AudioDevice::readFramesFromDecoder(AudioDecoder& decoder, float* output, ui
 		}
 	}
 
-	return isPlaybackDone;
+	return isPlaybackDone && !decoder.m_syncState.isLooping;
 }
 
 void AudioDevice::dataCallback(void* pOutput, const void* UNUSED(pInput), ma_uint32 frameCount) {
@@ -216,12 +223,16 @@ void AudioDecoder::seekToBegining() {
 		ma_mutex_lock(&playingDevice->getDataLockMutex());
 	}
 
-	ma_decoder_seek_to_pcm_frame(&decoder, 0);
+	seekToBegining_noLock();
 
 	if (playingDevice) {
 		playingDevice->stop(this);
 		ma_mutex_unlock(&playingDevice->getDataLockMutex());
 	}
+}
+
+void AudioDecoder::seekToBegining_noLock() {
+	ma_decoder_seek_to_pcm_frame(&decoder, 0);
 }
 
 } // namespace sge

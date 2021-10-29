@@ -1,8 +1,8 @@
 #include "TraitModel.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
-#include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_engine/EngineGlobal.h"
+#include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/TypeRegister.h"
@@ -199,7 +199,11 @@ AABox3f TraitModel::getBBoxOS() const {
 	return bbox;
 }
 
-void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) {
+void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems) {
+	if (drawReason == drawReason_gameplayShadow && forceNoShadows) {
+		return;
+	}
+
 	for (int iModel = 0; iModel < int(m_models.size()); iModel++) {
 		PerModelSettings& modelSets = m_models[iModel];
 		if (!modelSets.isRenderable) {
@@ -228,7 +232,7 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
 					const EvaluatedMaterial& mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex);
 					PBRMaterial material;
-					
+
 					material.alphaMultiplier = modelSets.alphaMultiplier * mtl.alphaMultiplier;
 
 					material.diffuseColor = mtl.diffuseColor;
@@ -253,7 +257,7 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 
 					if (material.diffuseTexture != nullptr) {
 						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_diffuseMap;
-					} else if(evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor) {
+					} else if (evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor) {
 						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_vertexColor;
 					}
 
@@ -264,7 +268,8 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 					renderItem.iModel = iModel;
 					renderItem.iEvalNode = iNode;
 					renderItem.iEvalNodeMechAttachmentIndex = iAttach;
-					renderItem.needsAlphaSorting = getActor()->m_forceAlphaZSort || mtl.needsAlphaSorting || material.alphaMultiplier < 0.999f;
+					renderItem.needsAlphaSorting =
+					    getActor()->m_forceAlphaZSort || mtl.needsAlphaSorting || material.alphaMultiplier < 0.999f;
 
 					renderItems.push_back(renderItem);
 				}
@@ -302,7 +307,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 		chain.add(sgeFindMember(TraitModel, forceNoWitchGameBending));
 		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 		chain.pop();
-		
+
 		// Per model User Interface.
 		for (int iModel = 0; iModel < traitModel.m_models.size(); ++iModel) {
 			std::string label = string_format("Model %d", iModel);

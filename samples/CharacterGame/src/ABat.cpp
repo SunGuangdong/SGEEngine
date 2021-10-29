@@ -34,7 +34,7 @@ void ABat::create() {
 	ttSprite.images[0].imageSettings.forceAlphaBlending = true;
 	ttSprite.images[0].m_additionalTransform = mat4f::getTranslation(0.f, 3.f, 0.f);
 
-	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 1.f), 1.f, true);
+	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 0.75f), 1.f, true);
 	ttRigidBody.getRigidBody()->setCanRotate(false, false, false);
 	ttRigidBody.getRigidBody()->setFriction(0.f);
 }
@@ -83,19 +83,40 @@ void APumpkinOnRoad::create() {
 
 
 	const char* g_decoresPumpkins[] = {
-	    "assets/pumpkins/P1.png", "assets/pumpkins/P2.png", "assets/pumpkins/P3.png", "assets/pumpkins/P4.png", "assets/pumpkins/P5.png",
-	    "assets/pumpkins/P6.png", "assets/pumpkins/P7.png", "assets/pumpkins/P8.png", "assets/pumpkins/P9.png", "assets/pumpkins/P10.png",
-
+	    "assets/pumpkins/P3.png",
+	    "assets/pumpkins/P5.png",
+	    "assets/pumpkins/P10.png",
 	};
 
-	int frame0 = (g_rnd.nextInt() % (SGE_ARRSZ(g_decoresPumpkins)));
-	auto asset = getCore()->getAssetLib()->getAsset(g_decoresPumpkins[frame0], true);
 
-	ttSprite.images.resize(1);
-	ttSprite.images[0].m_assetProperty.setAsset(asset);
-	ttSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-	ttSprite.images[0].imageSettings.m_anchor = anchor_bottomMid;
-	ttSprite.images[0].imageSettings.forceAlphaBlending = true;
+
+	ttSprite.images.resize(4);
+
+	float upwardsMovement = 0;
+	for (int t = 0; t < 3; ++t) {
+		int frame0 = (g_rnd.nextInt() % (SGE_ARRSZ(g_decoresPumpkins)));
+		auto asset = getCore()->getAssetLib()->getAsset(g_decoresPumpkins[frame0], true);
+		ttSprite.images[t].m_assetProperty.setAsset(asset);
+		ttSprite.images[t].imageSettings.defaultFacingAxisZ = false;
+		ttSprite.images[t].imageSettings.m_anchor = anchor_bottomMid;
+		ttSprite.images[t].imageSettings.forceAlphaBlending = true;
+		ttSprite.images[t].imageSettings.flipHorizontally = g_rnd.nextBool();
+		ttSprite.images[t].m_additionalTransform = mat4f::getTranslation(-0.02f * float(t), upwardsMovement, 0.f);
+		upwardsMovement +=
+		    (float(asset->asTextureView()->tex->getDesc().texture2D.height) / ttSprite.images[t].imageSettings.m_pixelsPerUnit) * 0.75f;
+	}
+
+	// Shadow
+	{
+		auto asset = getCore()->getAssetLib()->getAsset("assets/shadow.png", true);
+		ttSprite.images[3].m_assetProperty.setAsset(asset);
+		ttSprite.images[3].imageSettings.defaultFacingAxisZ = false;
+		ttSprite.images[3].imageSettings.m_anchor = anchor_mid;
+		ttSprite.images[3].imageSettings.forceAlphaBlending = true;
+		ttSprite.images[3].imageSettings.flipHorizontally = g_rnd.nextBool();
+		ttSprite.images[3].imageSettings.colorTint.w = 0.5f;
+		ttSprite.images[3].m_additionalTransform = mat4f::getScaling(0.5f) * mat4f::getTranslation(0.f, 0.1f, 0.f) * mat4f::getRotationZ(half_pi());
+	}
 
 	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createCylinderBottomAligned(6.f, 2.f), 1.f, true);
 	ttRigidBody.getRigidBody()->setCanRotate(false, false, false);

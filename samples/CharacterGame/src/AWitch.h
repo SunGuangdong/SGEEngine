@@ -12,7 +12,6 @@
 namespace sge {
 
 struct AWitch : public Actor {
-	AudioDecoder bgMusic;
 
 	AWitch() = default;
 	AABox3f getBBoxOS() const;
@@ -28,8 +27,10 @@ struct AWitch : public Actor {
   public:
 	float timeImmune = 0.f;
 	int health = 3;
+	int numCandiesCollected = 0;
 
 	float currentSpeedX = 0.f;
+	float currSpeedZ = 0;
 
 	TraitRigidBody ttRigidbody;
 	TraitSprite ttSprite;
@@ -42,6 +43,9 @@ struct AWitch : public Actor {
 	float nextWorldCurvatureY = 15.f;
 	float nextWorldCurvatureZ = 10.f;
 	float currentCurvatureRemainingDistance = 100.f;
+
+
+	bool areEmscriptenFixesDone = false;
 
 	LevelInfo levelInfo;
 };

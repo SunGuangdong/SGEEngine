@@ -332,7 +332,7 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 	}
 
 	if (TraitModel* const trait = getTrait<TraitModel>(actor); item.editMode == editMode_actors && trait != nullptr) {
-		trait->getRenderItems(m_RIs_traitModel);
+		trait->getRenderItems(drawReason, m_RIs_traitModel);
 	}
 
 	if (TraitSprite* const trait = getTrait<TraitSprite>(actor); item.editMode == editMode_actors && trait != nullptr) {
@@ -950,75 +950,6 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 		}
 	} else if (actorType == sgeTypeId(ACamera) && drawReason_IsVisualizeSelection(drawReason)) {
 		if (editMode == editMode_actors) {
-			float const bodyEnd = -0.3f;
-			float const sizeZ = 0.35f;
-			float height = 0.35f;
-			float eyeScaleStart = 0.5f;
-
-			vec3f vertices[] = {
-			    // Body
-			    vec3f(bodyEnd, -height, -sizeZ),
-			    vec3f(bodyEnd, -height, sizeZ),
-			    vec3f(bodyEnd, height, -sizeZ),
-			    vec3f(bodyEnd, height, sizeZ),
-
-			    vec3f(-1.f, -height, -sizeZ),
-			    vec3f(-1.f, -height, sizeZ),
-			    vec3f(-1.f, height, -sizeZ),
-			    vec3f(-1.f, height, sizeZ),
-
-			    vec3f(bodyEnd, -height, -sizeZ),
-			    vec3f(bodyEnd, height, -sizeZ),
-			    vec3f(bodyEnd, -height, sizeZ),
-			    vec3f(bodyEnd, height, sizeZ),
-
-			    vec3f(-1.f, -height, -sizeZ),
-			    vec3f(-1.f, height, -sizeZ),
-			    vec3f(-1.f, -height, sizeZ),
-			    vec3f(-1.f, height, sizeZ),
-
-			    vec3f(bodyEnd, height, sizeZ),
-			    vec3f(-1.f, height, sizeZ),
-			    vec3f(bodyEnd, -height, sizeZ),
-			    vec3f(-1.f, -height, sizeZ),
-
-			    vec3f(bodyEnd, height, -sizeZ),
-			    vec3f(-1.f, height, -sizeZ),
-			    vec3f(bodyEnd, -height, -sizeZ),
-			    vec3f(-1.f, -height, -sizeZ),
-
-			    // Eye
-			    vec3f(0.f, -height, -sizeZ),
-			    vec3f(0.f, -height, sizeZ),
-			    vec3f(0.f, height, -sizeZ),
-			    vec3f(0.f, height, sizeZ),
-
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * sizeZ),
-
-			    vec3f(0.f, -height, -sizeZ),
-			    vec3f(0.f, height, -sizeZ),
-			    vec3f(0.f, -height, sizeZ),
-			    vec3f(0.f, height, sizeZ),
-
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * sizeZ),
-
-			    vec3f(0.f, height, sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * sizeZ),
-			    vec3f(0.f, -height, sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * sizeZ),
-
-			    vec3f(0.f, height, -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * -sizeZ),
-			    vec3f(0.f, -height, -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * -sizeZ),
-			};
-
 			if (const TraitCamera* const traitCamera = getTrait<TraitCamera>(actor)) {
 				const auto intersectPlanes = [](const Plane& p0, const Plane& p1, const Plane& p2) -> vec3f {
 					// http://www.ambrsoft.com/TrigoCalc/Plan3D/3PlanesIntersection_.htm
@@ -1032,8 +963,8 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 				};
 
 
-				const ICamera* const icam = traitCamera->getCamera();
-				const Frustum* const f = icam->getFrustumWS();
+				const ICamera* const ifaceCamera = traitCamera->getCamera();
+				const Frustum* const f = ifaceCamera->getFrustumWS();
 				if (f) {
 					const vec3f frustumVerts[8] = {
 					    intersectPlanes(f->t, f->r, f->n), intersectPlanes(f->t, f->l, f->n),
@@ -1054,7 +985,7 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 					    frustumVerts[3],
 					    frustumVerts[0],
 
-					    // Lines that connect near and far.
+					    // Lines that connect near and far planes.
 					    frustumVerts[4 + 0],
 					    frustumVerts[4 + 1],
 					    frustumVerts[4 + 1],

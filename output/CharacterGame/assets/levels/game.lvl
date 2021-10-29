@@ -1,6 +1,6 @@
 {
 	"version":0,
-	"nextNameIndex":11126,
+	"nextNameIndex":11297,
 	"nextActorId":8318,
 	"actors":[
 		{
@@ -40,9 +40,9 @@
 						"z":0.898496
 					},
 					"spotLightAngle":0.349066,
-					"hasShadows":false,
+					"hasShadows":true,
 					"shadowMapRes":1024,
-					"shadowMapBias":0.000001
+					"shadowMapBias":0.000000
 				}
 			}
 		},
@@ -66,68 +66,6 @@
 					"id":4
 				},
 				"m_displayName":"AWitch_3"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":8314,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					
-				},
-				"m_id":{
-					"id":8314
-				},
-				"m_displayName":"ARoadSegment_10952"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":8315,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":100.000000,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":8315
-				},
-				"m_displayName":"ARoadSegment_10953"
-			}
-		},
-		{
-			"type":"ARoadSegment",
-			"id":8316,
-			"members":{
-				"m_forceAlphaZSort":false,
-				"m_bindingIgnoreRotation":false,
-				"m_bindingToParentTransform":{
-					
-				},
-				"m_logicTransform":{
-					"p":{
-						"x":200.000000,
-						"y":0.000000,
-						"z":0.000000
-					}
-				},
-				"m_id":{
-					"id":8316
-				},
-				"m_displayName":"ARoadSegment_10954"
 			}
 		},
 		{
@@ -238,6 +176,68 @@
 						"z":0.000000
 					}
 				}
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":8314,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					
+				},
+				"m_id":{
+					"id":8314
+				},
+				"m_displayName":"ARoadSegment_10952"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":8315,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":108.000000,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":8315
+				},
+				"m_displayName":"ARoadSegment_10953"
+			}
+		},
+		{
+			"type":"ARoadSegment",
+			"id":8316,
+			"members":{
+				"m_forceAlphaZSort":false,
+				"m_bindingIgnoreRotation":false,
+				"m_bindingToParentTransform":{
+					
+				},
+				"m_logicTransform":{
+					"p":{
+						"x":216.000000,
+						"y":0.000000,
+						"z":0.000000
+					}
+				},
+				"m_id":{
+					"id":8316
+				},
+				"m_displayName":"ARoadSegment_10954"
 			}
 		},
 		{
@@ -368,14 +368,14 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":236.500000,
-						"y":72.500000,
+						"x":265.513580,
+						"y":68.500000,
 						"z":9.500000
 					},
 					"s":{
-						"x":6.140000,
-						"y":6.140000,
-						"z":6.140000
+						"x":10.500000,
+						"y":10.500000,
+						"z":10.500000
 					}
 				},
 				"m_id":{
@@ -613,9 +613,15 @@
 				},
 				"m_logicTransform":{
 					"p":{
-						"x":-9.500000,
-						"y":9.000000,
+						"x":-7.000000,
+						"y":13.000000,
 						"z":0.000000
+					},
+					"r":{
+						"x":0.000000,
+						"y":0.000000,
+						"z":-0.020196,
+						"w":0.999796
 					}
 				},
 				"m_id":{
@@ -630,7 +636,7 @@
 						"fov":0.872665,
 						"orthographicWidth":1.000000,
 						"orthographicHeight":19.000000,
-						"heightShift":0.000000,
+						"heightShift":-0.210000,
 						"orthographicMantainRatio":true
 					}
 				}
@@ -648,7 +654,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":134.500000,
-						"y":30.500000,
+						"y":60.000000,
 						"z":65.500000
 					},
 					"s":{
@@ -758,7 +764,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":234.500000,
-						"y":49.500000,
+						"y":79.000000,
 						"z":-39.000000
 					},
 					"s":{
@@ -868,7 +874,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":116.500000,
-						"y":44.000000,
+						"y":73.500000,
 						"z":-55.500000
 					},
 					"s":{
@@ -978,7 +984,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":201.500000,
-						"y":60.500000,
+						"y":81.500000,
 						"z":75.500000
 					},
 					"s":{
@@ -1088,7 +1094,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":174.000000,
-						"y":38.000000,
+						"y":67.500000,
 						"z":36.000000
 					},
 					"s":{
@@ -1198,7 +1204,7 @@
 				"m_logicTransform":{
 					"p":{
 						"x":181.000000,
-						"y":55.000000,
+						"y":84.500000,
 						"z":-58.000000
 					},
 					"s":{

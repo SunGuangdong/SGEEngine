@@ -93,9 +93,10 @@ void ColoredWidget::draw(const UIDrawSets& drawSets) {
 	                             bboxScissorsSS.size().y, m_color, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
-//----------------------------------------------------
-// TextWidget
-//----------------------------------------------------
+
+
+inline void TextWidget::onRelease(bool UNUSED(wasReleaseInside)) { isScrollingY = false; }
+
 void TextWidget::draw(const UIDrawSets& drawSets) {
 	if (m_text.empty()) {
 		return;
@@ -109,7 +110,7 @@ void TextWidget::draw(const UIDrawSets& drawSets) {
 
 	const vec2f textDim = font->computeTextDimensions(m_text.c_str(), textHeight);
 
-	this->getSize().minSizeX = Unit::fromPixels(textDim.x);
+	//this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
 	float textPosX;
 	float textPosY;
@@ -123,8 +124,10 @@ void TextWidget::draw(const UIDrawSets& drawSets) {
 	if (m_algnTextVCenter) {
 		textPosY = bboxSS.center().y + textHeight * 0.5f - textDim.y * 0.5f;
 	} else {
-		textPosY = bboxSS.max.y;
+		textPosY = bboxSS.min.y;
 	}
+
+	textPosY += yScrollPixels;
 
 	// drawSets.quickDraw->drawRect(bboxSS.min.x, bboxSS.min.y, bboxSS.size().x, bboxSS.size().y, vec4f(0.33f),
 	//                             getCore()->getGraphicsResources().BS_backToFrontAlpha);

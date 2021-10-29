@@ -20,4 +20,19 @@ struct AGhostCircle : public Actor {
 	bool isGoingPosZ = false;
 };
 
+struct ALeftRightGhost : public Actor {
+	ALeftRightGhost() = default;
+
+	void create();
+	void update(const GameUpdateSets& UNUSED(updateSets));
+	virtual AABox3f getBBoxOS() const { return ttSprite.getBBoxOS(); }
+
+  public:
+	
+	TraitSprite ttSprite;
+	TraitRigidBody ttRigidBody;
+	bool isInitalPickDirDone = false;
+	bool isGoingPosZ = false;
+};
+
 } // namespace sge

@@ -51,7 +51,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	AABox3f getBBoxOS() const;
 
-	void getRenderItems(std::vector<TraitModelRenderItem>& renderItems);
+	void getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems);
 
 	void invalidateCachedAssets();
 
@@ -121,6 +121,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	bool isFixedModelsSize = true;          ///< if true the interface will not offer adding/removing more models to the trait.
 	std::vector<PerModelSettings> m_models; ///< A list of all models in their settings to rendered by the trait.
 	bool forceNoWitchGameBending = false;
+	bool forceNoShadows = false;
 };
 
 } // namespace sge

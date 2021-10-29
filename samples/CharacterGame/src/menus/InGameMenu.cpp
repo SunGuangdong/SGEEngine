@@ -9,6 +9,8 @@
 #include "sge_engine/ScriptObject.h"
 #include "sge_utils/utils/strings.h"
 
+#include "../GlobalRandom.h"
+
 #include "../AWitch.h"
 
 namespace sge {
@@ -20,10 +22,17 @@ ReflBlock() {
 	ReflAddScript(InGameMenuScript);
 }
 
+
+const char* g_deadMessages[] = {
+    "With that much candy you cannot even make a cavity!",
+    "Doing nothing is better than wasting time!",
+};
+
 void InGameMenuScript::create() {
 	context.create(getWorld()->userProjectionSettings.canvasSize);
-	font.Create(getCore()->getDevice(), "assets/editor/fonts/AutourOne-Regular.ttf", 128);
-	context.setDefaultFont(&font);
+	font.Create(getCore()->getDevice(), "assets/editor/fonts/Festive-Regular.ttf", 128);
+	fontMenus.Create(getCore()->getDevice(), "assets/editor/fonts/AutourOne-Regular.ttf", 128);
+	context.setDefaultFont(&fontMenus);
 
 	auto rootMenuWidget = std::make_shared<gamegui::InvisibleWidget>(context, Pos(0_f, 0_f), Size(1_f, 1_f));
 	context.addRootWidget(rootMenuWidget);
@@ -31,42 +40,67 @@ void InGameMenuScript::create() {
 	{
 		hud = rootMenuWidget->addChildT(std::make_shared<gamegui::InvisibleWidget>(context, Pos(0_f, 0_f), Size(1_f, 1_f)));
 
-		auto livesWdg = hud->addChildT(std::make_shared<gamegui::InvisibleWidget>(context, Pos(0_f, 0_f), Size(1_f, 0.15_hf)));
-
 		auto imgWitchProfile = getCore()->getAssetLib()->getAsset("assets/witchProfile.png", true);
-		auto imgWidget =
-		    livesWdg->addChildT(ImageWidget::createByHeight(context, Pos(0_f, 0_f), 1_hf, imgWitchProfile->asTextureView()->tex));
-		livesTextWdg = livesWdg->addChildT(
-		    std::make_shared<gamegui::TextWidget>(context, Pos(imgWidget->getSize().sizeX, 0_f, vec2f(0.f, 0.f)), Size(1_wf, 1_hf)));
+		auto imgCandies = getCore()->getAssetLib()->getAsset("assets/candy icon.png", true);
 
-		livesTextWdg->setText("3");
+		auto imgWidget = hud->addChildT(ImageWidget::create(context, Pos(0_f, 0_f), 0.15_wf, imgWitchProfile->asTextureView()->tex));
+
+		livesTextWdg =
+		    hud->addChildT(std::make_shared<gamegui::TextWidget>(context, Pos(0.15_wf, 0_f, vec2f(0.f, 0.f)), Size(0.5_wf, 0.15_wf)));
+
+		livesTextWdg->setFont(&font);
+		livesTextWdg->setFontSize(1_f);
+		livesTextWdg->setColor(colorFromIntRgba(211, 255, 252));
+
+
+
 		livesTextWdg->m_algnTextHCenter = false;
 		livesTextWdg->m_algnTextVCenter = true;
+
+
+		auto imgCandiesWidget =
+		    hud->addChildT(ImageWidget::create(context, Pos(1_f, 0_hf, vec2f(1.f, 0.f)), 0.15_wf, imgCandies->asTextureView()->tex));
+
+
+		cnadiesTextWdg =
+		    hud->addChildT(std::make_shared<gamegui::TextWidget>(context, Pos(0.85_wf, 0.0_f, vec2f(1.f, 0.f)), Size(0.15_wf, 0.15_wf)));
+		cnadiesTextWdg->setText("0");
+		cnadiesTextWdg->setFont(&font);
+
+		cnadiesTextWdg->setColor(colorFromIntRgba(211, 255, 252));
 	}
 
 	{
 		deadScreen = rootMenuWidget->addChildT(std::make_shared<gamegui::InvisibleWidget>(context, Pos(0_f, 0_f), Size(1_f, 1_f)));
-		
+
 
 		auto deadScreenBlack = deadScreen->addChildT(std::make_shared<gamegui::ColoredWidget>(context, Pos(0_f, 0_f), Size(1_f, 1_f)));
 		deadScreenBlack->setColor(vec4f(0.f, 0.f, 0.f, 1.f));
 
-		auto diedTextMsg = deadScreen->addChildT(std::make_shared<gamegui::TextWidget>(context, Pos(0_f, 0.25_f), Size(1_f, 0.07_f)));
-		diedTextMsg->setText("You've falled off the broom!");
+		auto diedTextMsg =
+		    deadScreen->addChildT(std::make_shared<gamegui::TextWidget>(context, Pos(0.5_f, 0.25_f, vec2f(0.5f)), Size(0.8_wf, 0.07_wf)));
+		diedTextMsg->setText("You fell off the broom!");
+		diedTextMsg->setColor(colorFromIntRgba(255, 158, 80));
 
 		auto btnRestart = deadScreen->addChildT(
-		    std::make_shared<gamegui::ButtonWidget>(context, Pos(0.5_f, 0.40_f, vec2f(0.5f, 0.f)), Size(0.35_wf, 0.10_wf)));
+		    std::make_shared<gamegui::ButtonWidget>(context, Pos(0.5_f, 0.40_f, vec2f(0.5f, 0.f)), Size(0.45_wf, 0.10_wf)));
 		btnRestart->setText("Fly Again!");
+		btnRestart->setBgColor(colorWhite(0.33f), colorBlack(0.44f), colorBlack(0.22f));
+		btnRestart->setColor(colorFromIntRgba(255, 158, 80));
+
+		deadScreenCandiesCount =
+		    deadScreen->addChildT(std::make_shared<gamegui::TextWidget>(context, Pos(0.5_f, 0.75_f, vec2f(0.5f)), Size(0.7_wf, 0.05_wf)));
+		deadScreenCandiesCount->setColor(colorFromIntRgba(255, 158, 80));
 
 		eventSubs.push_back(btnRestart->subscribe_onRelease(
 		    [&] { getWorld()->addPostSceneTask(new PostSceneUpdateTaskLoadWorldFormFile("assets/levels/game.lvl", true)); }));
 
 		deadScreen->suspend();
 	}
-
+	
 	{
 		blackScreen = rootMenuWidget->addChildT(std::make_shared<gamegui::ColoredWidget>(context, Pos(0_f, 0_f), Size(1_f, 1_f)));
-		blackScreen->setColor(vec4f(0.f, 0.f, 0.f, 1.f));
+		blackScreen->setColor(colorFromIntRgba(16, 8, 1));
 	}
 }
 
@@ -84,6 +118,9 @@ void InGameMenuScript::onPostUpdate(const GameUpdateSets& u) {
 			hud->suspend();
 			blackScreen->suspend();
 			deadScreen->unsuspend();
+		} else {
+			cnadiesTextWdg->setText(string_format("%d", int(w->numCandiesCollected)));
+			deadScreenCandiesCount->setText(string_format("You've collected %d candies!", int(w->numCandiesCollected)));
 		}
 	}
 }

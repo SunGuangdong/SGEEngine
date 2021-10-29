@@ -61,7 +61,9 @@ enum PickDecoreFlags : int {
 	pdf_all_mask = 7,
 };
 
-std::shared_ptr<sge::Asset> pickDecore(int pdf, bool useLeft) {
+std::shared_ptr<sge::Asset> pickDecore(int pdf, bool useLeft, float& outScale) {
+	outScale = 1.f;
+
 	int usedCatgoriesNum = 0;
 	int possibleCategories[pdf_numFlags] = {0};
 	for (int t = 0; t < pdf_numFlags; ++t) {
@@ -74,6 +76,7 @@ std::shared_ptr<sge::Asset> pickDecore(int pdf, bool useLeft) {
 	const int category = possibleCategories[g_rnd.nextIntBefore(usedCatgoriesNum)];
 
 	if (category == 0) {
+		outScale = g_rnd.nextInRange(1.4f, 1.8f);
 		return pickDecoreAsset(g_decoresTrees, SGE_ARRSZ(g_decoresTrees));
 	}
 	if (category == 1) {
@@ -94,10 +97,13 @@ std::shared_ptr<sge::Asset> pickDecore(int pdf, bool useLeft) {
 struct ARoadSegment : public Actor {
 	ARoadSegment() = default;
 
+	bool initalDecoresGenerated = false;
+
 	void create() {
 		registerTrait(ttModel);
 
 		ttModel.addModel("assets/roadSegment.mdl", true);
+		ttModel.forceNoShadows = true;
 
 		if (g_lampAsset == nullptr) {
 			g_lampAsset = getCore()->getAssetLib()->getAsset(g_lampL, true);
@@ -109,6 +115,11 @@ struct ARoadSegment : public Actor {
 			return;
 		}
 
+		if (!initalDecoresGenerated) {
+			generateDecores();
+			initalDecoresGenerated = true;
+		}
+
 		if (AWitch* witch = getWorld()->getFistObject<AWitch>()) {
 			vec3f p = getPosition();
 			p.x -= witch->currentSpeedX * u.dt;
@@ -116,9 +127,9 @@ struct ARoadSegment : public Actor {
 			setPosition(p);
 		}
 
-		if (getPosition().x < -110.f) {
+		if (getPosition().x < -116.f) {
 			vec3f p = getPosition();
-			p.x += 300.f;
+			p.x += 108.f * 3.f;
 			setPosition(p);
 			generateDecores();
 		}
@@ -129,13 +140,15 @@ struct ARoadSegment : public Actor {
 			decoreConfig_nothing,
 			decoreConfig_2,
 			decoreConfig_3,
+			decoreConfig_hugeTree,
 		};
 
 		// clang-format off
 		int cumulativeDecoreConfig[] = {
-			decoreConfig_nothing, 100,
-		    decoreConfig_2, 100,
-		    decoreConfig_3, 100,
+			decoreConfig_nothing, 130,
+		    decoreConfig_2, 170,
+		    decoreConfig_3, 170,
+			decoreConfig_hugeTree, 50,
 		};
 		// clang-format on
 
@@ -159,15 +172,17 @@ struct ARoadSegment : public Actor {
 
 		const vec3f minRoadPositionWs = getPosition();
 
-		const auto createDecoreActor = [this](const vec3f& posRoadSpace, std::shared_ptr<sge::Asset> asset) -> AStaticObstacle* {
+		const auto createDecoreActor = [this](const vec3f& posRoadSpace, std::shared_ptr<sge::Asset> asset,
+		                                      float visualScale) -> AStaticObstacle* {
 			if (asset) {
 				AStaticObstacle* const decore = getWorld()->allocObjectT<AStaticObstacle>();
 				decore->m_traitModel.m_models.clear();
 				decore->m_traitSprite.images.resize(1);
 				decore->m_traitSprite.images[0].m_assetProperty.setAsset(std::move(asset));
 				decore->m_traitSprite.images[0].imageSettings.defaultFacingAxisZ = false;
-				decore->m_traitSprite.images[0].imageSettings.flipHorizontally = false;
+				decore->m_traitSprite.images[0].imageSettings.flipHorizontally = true;
 				decore->m_traitSprite.images[0].imageSettings.forceAlphaBlending = true;
+				decore->m_traitSprite.images[0].m_additionalTransform = mat4f::getScaling(visualScale);
 
 				decore->setPosition(getPosition() + posRoadSpace);
 				getWorld()->setParentOf(decore->getId(), getId());
@@ -177,8 +192,9 @@ struct ARoadSegment : public Actor {
 		};
 
 		const auto decoratePos = [this, &createDecoreActor](const vec3f& posRoadSpace, int pdf, bool useLeft) {
-			std::shared_ptr<sge::Asset> asset = pickDecore(pdf, useLeft);
-			createDecoreActor(posRoadSpace, std::move(asset));
+			float scale = 1.f;
+			std::shared_ptr<sge::Asset> asset = pickDecore(pdf, useLeft, scale);
+			return createDecoreActor(posRoadSpace, std::move(asset), scale);
 		};
 
 		const auto pickDecoreConfig = [&totalCumulativeChance, &cumulativeDecoreConfig]() {
@@ -200,27 +216,38 @@ struct ARoadSegment : public Actor {
 				} break;
 				case decoreConfig_2: {
 					const float zKeyPos[2] = {16.f, 24.f};
-					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[0] * (isLeft ? 1.f : -1.f)), pdf_all_mask,
-					            isLeft);
-					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[1] * (isLeft ? 1.f : -1.f)), pdf_all_mask,
-					            isLeft);
+					if (g_rnd.next01() < 0.8f)
+						decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 1.f), 0.f, zKeyPos[0] * (isLeft ? 1.f : -1.f)),
+						            pdf_all_mask, isLeft);
+					if (g_rnd.next01() < 0.8f)
+						decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 1.f), 0.f, zKeyPos[1] * (isLeft ? 1.f : -1.f)),
+						            pdf_all_mask, isLeft);
 
 				} break;
 				case decoreConfig_3: {
 					const float zKeyPos[3] = {12.f, 18.f, 24.f};
 
-					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[0] * (isLeft ? 1.f : -1.f)), pdf_trees | pdf_graves,
-					            isLeft);
-					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[1] * (isLeft ? 1.f : -1.f)), pdf_trees | pdf_graves,
-					            isLeft);
-					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 0.1f), 0.f, zKeyPos[2] * (isLeft ? 1.f : -1.f)), pdf_trees | pdf_graves,
-					            isLeft);
+					if (g_rnd.next01() < 0.8f)
+						decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 1.f), 0.f, zKeyPos[0] * (isLeft ? 1.f : -1.f)), pdf_graves,
+						            isLeft);
+					if (g_rnd.next01() < 0.8f)
+						decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 1.f), 0.f, zKeyPos[1] * (isLeft ? 1.f : -1.f)),
+						            pdf_trees | pdf_graves, isLeft);
+					if (g_rnd.next01() < 0.8f)
+						decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 1.f), 0.f, zKeyPos[2] * (isLeft ? 1.f : -1.f)),
+						            pdf_trees | pdf_graves, isLeft);
 
+				} break;
+				case decoreConfig_hugeTree: {
+					float zKeyPos = 20.f;
+					decoratePos(vec3f(xPosRoadSpace + g_rnd.nextInRange(0.f, 1.f), 0.f, zKeyPos * (isLeft ? 1.f : -1.f)),
+					            pdf_trees | pdf_graves, isLeft)
+					    ->m_traitSprite.additionalTransform = mat4f::getScaling(2.f);
 				} break;
 			}
 		};
 
-		for (int t = 0; t < 100; t += 1) {
+		for (int t = 0; t < 108; t += 1) {
 			// Pick the configuration of the decores.
 			if (t % 10 == 0) {
 				DecoreConfig decoreConfigLeft = pickDecoreConfig();
@@ -231,21 +258,25 @@ struct ARoadSegment : public Actor {
 			}
 
 			// Add the light on the side walk.
-			if (t == 25 || t == 75) {
-				createDecoreActor(vec3f(float(t), 0, rangeZMin), g_lampAsset);
+			if (t == 50) {
+				createDecoreActor(vec3f(float(t), 0, rangeZMin), g_lampAsset, 1.f)->m_traitSprite.images[0].imageSettings.flipHorizontally =
+				    false;
 			}
 
-			if (t == 0 || t == 50) {
-				createDecoreActor(vec3f(float(t), 0, -rangeZMin), g_lampAsset)->m_traitSprite.images[0].imageSettings.flipHorizontally =
-				    true;
+			if (t == 100) {
+				createDecoreActor(vec3f(float(t), 0, -rangeZMin), g_lampAsset, 1.f)
+				    ->m_traitSprite.images[0]
+				    .imageSettings.flipHorizontally = true;
 			}
 
 			// Trees.
-			if (t % 5 == 0) {
+			if (t % 15 == 0) {
 				if (g_rnd.nextBool())
-					decoratePos(vec3f(float(t), 0.f, -rangeZMax), pdf_trees, false);
+					decoratePos(vec3f(float(t), 0.f, -rangeZMax), pdf_trees, false)->m_traitSprite.additionalTransform =
+					    mat4f::getScaling(g_rnd.nextInRange(1.86f, 2.1f));
 				if (g_rnd.nextBool())
-					decoratePos(vec3f(float(t), 0.f, rangeZMax), pdf_trees, false);
+					decoratePos(vec3f(float(t), 0.f, rangeZMax), pdf_trees, false)->m_traitSprite.additionalTransform =
+					    mat4f::getScaling(g_rnd.nextInRange(1.86f, 2.1f));
 			}
 
 			// Flying ghost decores.

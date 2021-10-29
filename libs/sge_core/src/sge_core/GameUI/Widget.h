@@ -74,7 +74,7 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 
 	void addChild(std::shared_ptr<IWidget> widget);
 
-	template<typename TWidget>
+	template <typename TWidget>
 	std::shared_ptr<TWidget> addChildT(std::shared_ptr<TWidget> widget) {
 		addChild(widget);
 		return widget;
@@ -199,6 +199,20 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 		return w;
 	}
 
+	bool onPress() override {
+		isScrollingY = enableYScroll;
+		return true;
+	}
+
+	//----------------------------------------------------
+	// TextWidget
+	//----------------------------------------------------
+	void update() {
+
+	}
+
+	void onRelease(bool wasReleaseInside) override;
+
 	virtual void draw(const UIDrawSets& drawSets) override;
 
 	void setColor(const vec4f& c) { m_color = c; }
@@ -208,6 +222,11 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 
 	bool m_algnTextHCenter = true;
 	bool m_algnTextVCenter = true;
+
+	bool enableYScroll = false;
+	float yScrollPixels = 0.f;
+	bool isScrollingY = false;
+
   private:
 	DebugFont* m_font = nullptr;
 	vec4f m_color = vec4f(1.f);
@@ -243,6 +262,8 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 	}
 
 	static std::shared_ptr<ButtonWidget> create(UIContext& owningContext, Pos position, Size size, const char* const text = nullptr);
+	static std::shared_ptr<ButtonWidget>
+	    createImageWidth(UIContext& owningContext, Pos position, Size size, const char* const text = nullptr);
 
 	bool isGamepadTargetable() override { return true; }
 
@@ -292,9 +313,9 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 
 	DebugFont* m_font = nullptr;
 	vec4f m_textColor = vec4f(1.f);
-	vec4f m_bgColorUp = colorWhite(0.33f);
-	vec4f m_bgColorHovered = colorWhite(0.66f);
-	vec4f m_bgColorPressed = colorWhite(0.22f);
+	vec4f m_bgColorUp = colorBlack(0.66f);
+	vec4f m_bgColorHovered = colorBlack(0.78f);
+	vec4f m_bgColorPressed = colorBlack(0.22f);
 	Unit m_fontSize = Unit::fromFrac(1.f);
 	std::string m_text;
 	SignedAxis m_triangleDir = SignedAxis::signedAxis_numElements;
