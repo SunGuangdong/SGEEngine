@@ -12,7 +12,7 @@ struct TraitViewportIconRenderItem;
 ///-----------------------------------------------------------------------
 /// A viewport icon, always facing the camera represnting an object.
 /// These icons are only visible in edit mode.
-DefineTypeIdExists(TraitViewportIcon);
+RelfAddTypeIdExists(TraitViewportIcon);
 struct SGE_ENGINE_API TraitViewportIcon : public Trait {
 	SGE_TraitDecl_Full(TraitViewportIcon);
 

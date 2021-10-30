@@ -58,7 +58,7 @@ int Model::makeNewAnim() {
 	return animIndex;
 }
 
-inline void Model::setRootNodeIndex(const int newRootNodeIndex) {
+void Model::setRootNodeIndex(const int newRootNodeIndex) {
 	if (newRootNodeIndex >= 0 && newRootNodeIndex < numNodes()) {
 		m_rootNodeIndex = newRootNodeIndex;
 	} else {

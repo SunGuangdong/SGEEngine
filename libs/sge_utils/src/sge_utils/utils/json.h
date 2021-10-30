@@ -21,7 +21,6 @@ enum JID : unsigned char {
 	JID_MAP_END = 0x7d,
 	JID_ARRAY_BEGIN = 0x5b,
 	JID_ARRAY_END = 0x5d,
-	JID_BOOL = 0x10,
 	JID_INT8 = 0x11,
 	JID_INT16 = 0x12,
 	JID_INT32 = 0x13,

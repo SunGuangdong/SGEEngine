@@ -5,7 +5,7 @@
 
 namespace sge {
 
-DefineTypeIdExists(TraitActorList);
+RelfAddTypeIdExists(TraitActorList);
 struct SGE_ENGINE_API TraitActorList : public Trait {
 	SGE_TraitDecl_Full(TraitActorList);
 

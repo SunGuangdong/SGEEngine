@@ -9,9 +9,9 @@
 namespace sge {
 
 // clang-format off
-DefineTypeId(TraitScriptSlot::ScriptSlot, 21'02'01'0001);
-DefineTypeId(std::vector<TraitScriptSlot::ScriptSlot>, 21'02'01'0002);
-DefineTypeId(TraitScriptSlot, 21'02'01'0003);
+RelfAddTypeId(TraitScriptSlot::ScriptSlot, 21'02'01'0001);
+RelfAddTypeId(std::vector<TraitScriptSlot::ScriptSlot>, 21'02'01'0002);
+RelfAddTypeId(TraitScriptSlot, 21'02'01'0003);
 
 ReflBlock()
 {

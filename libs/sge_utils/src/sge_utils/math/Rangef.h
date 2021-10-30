@@ -28,6 +28,19 @@ struct Rangef {
 		return min + v * (max - min);
 	}
 
+	float sampleWithMargin(float v, float margin = 0.f) const {
+		sgeAssert(margin >= 0.f);
+
+		const float minMargin = min + margin;
+		const float maxMargin = max - margin;
+
+		if (minMargin > maxMargin) {
+			return (max + min) * 0.5f;
+		}
+
+		return minMargin + v * (maxMargin - minMargin);
+	}
+
 	bool operator==(const Rangef& ref) const { return min == ref.min && max == ref.max && locked == ref.locked; }
 
 	bool operator!=(const Rangef& ref) const { return !(*this == ref); }

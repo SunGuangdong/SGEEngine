@@ -5,9 +5,9 @@
 namespace sge {
 
 // clang-format off
-DefineTypeId(PerspectiveCameraSettings, 20'03'01'0018);
-DefineTypeId(CameraTraitCamera, 20'03'01'0019);
-DefineTypeId(ACamera, 20'03'01'0020);
+RelfAddTypeId(PerspectiveCameraSettings, 20'03'01'0018);
+RelfAddTypeId(CameraTraitCamera, 20'03'01'0019);
+RelfAddTypeId(ACamera, 20'03'01'0020);
 
 ReflBlock()
 {
@@ -19,6 +19,7 @@ ReflBlock()
 		.addMemberFlag(MFF_FloatAsDegrees)
 	ReflMember(PerspectiveCameraSettings, orthographicWidth)
 	ReflMember(PerspectiveCameraSettings, orthographicHeight)
+	ReflMember(PerspectiveCameraSettings, heightShift).uiRange(-FLT_MAX, FLT_MAX, 0.01f)
 	ReflMember(PerspectiveCameraSettings, orthographicMantainRatio)
 ;
 	

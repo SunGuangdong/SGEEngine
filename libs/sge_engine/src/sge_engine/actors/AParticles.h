@@ -7,7 +7,7 @@
 
 namespace sge {
 
-DefineTypeIdExists(AParticlesSimple);
+RelfAddTypeIdExists(AParticlesSimple);
 struct SGE_ENGINE_API AParticlesSimple : public Actor, public IActorCustomAttributeEditorTrait {
 	AABox3f getBBoxOS() const final;
 	void create() final;

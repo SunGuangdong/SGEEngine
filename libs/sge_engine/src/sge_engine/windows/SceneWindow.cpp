@@ -264,6 +264,10 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 			inspector->deleteSelection(false);
 		}
 
+		if (ImGui::MenuItem(ICON_FK_TRASH " Delete + Children")) {
+			inspector->deleteSelection(true);
+		}
+
 		if (ImGui::MenuItem(ICON_FK_FILES_O " Duplicate")) {
 			inspector->duplicateSelection();
 		}

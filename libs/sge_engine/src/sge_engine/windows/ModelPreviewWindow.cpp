@@ -55,7 +55,7 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	float ratio = (float)m_frameTarget->getWidth() / (float)m_frameTarget->getHeight();
 
 	mat4f lookAt = camera.GetViewMatrix();
-	mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(45.f), ratio, 0.1f, 10000.f,
+	mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(45.f), ratio, 0.1f, 10000.f, 0.f,
 	                                        kIsTexcoordStyleD3D); // The Y flip for OpenGL is done by the modelviewer.
 
 	sgecon->clearColor(m_frameTarget, 0, vec4f(0.f).data);
@@ -82,8 +82,7 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	}
 
 	if (ImGui::IsItemHovered()) {
-		camera.update(true, is.IsKeyDown(Key_MouseLeft), false, is.IsKeyDown(Key_MouseRight),
-		              is.GetCursorPos());
+		camera.update(true, is.IsKeyDown(Key_MouseLeft), false, is.IsKeyDown(Key_MouseRight), is.GetCursorPos());
 	}
 }
 
@@ -211,7 +210,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			float ratio = (float)m_frameTarget->getWidth() / (float)m_frameTarget->getHeight();
 
 			mat4f lookAt = camera.GetViewMatrix();
-			mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(45.f), ratio, 0.1f, 10000.f,
+			mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(45.f), ratio, 0.1f, 10000.f, 0.f,
 			                                        kIsTexcoordStyleD3D); // The Y flip for OpenGL is done by the modelviewer.
 
 			sgecon->clearColor(m_frameTarget, 0, vec4f(0.f).data);

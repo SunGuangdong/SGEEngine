@@ -18,8 +18,8 @@ struct ABlockingObstacle;
 struct AStaticObstacle;
 
 // clang-format off
-DefineTypeId(NavMeshBuildSets, 20'05'10'0001);
-DefineTypeId(ANavMesh, 20'05'10'0002);
+RelfAddTypeId(NavMeshBuildSets, 20'05'10'0001);
+RelfAddTypeId(ANavMesh, 20'05'10'0002);
 
 ReflBlock() {
 	ReflAddType(NavMeshBuildSets)

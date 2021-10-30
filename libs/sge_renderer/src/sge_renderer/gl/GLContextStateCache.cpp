@@ -307,7 +307,9 @@ void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc) {
 				break;
 
 			case FillMode::Wireframe:
+#ifndef __EMSCRIPTEN__
 				mode = GL_POLYGON_OFFSET_LINE;
+#endif
 				break;
 
 			default:

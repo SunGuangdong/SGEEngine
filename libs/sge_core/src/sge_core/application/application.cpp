@@ -304,10 +304,19 @@ void ApplicationHandler::PollEvents() {
 				WindowBase* const wnd = findWindowBySDLId(event.window.windowID);
 				if (wnd) {
 					if (event.window.event == SDL_WINDOWEVENT_SHOWN) {
-						wnd->HandleEvent(WE_Create, nullptr);
+						// The shown event can be fired multiple times on some platforms.
+						// For example when in emscripten we switch tabs.
+						// However we wrongly use that event as Create event, and this needs to change as a proper fix.
+						if (wnd->isWindowShownEventUsedAsCreate_HACK == false) {
+							wnd->HandleEvent(WE_Create, nullptr);
+							wnd->isWindowShownEventUsedAsCreate_HACK = true;
+						}
 					} else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 						WE_Resize_Data data(event.window.data1, event.window.data2);
 						wnd->HandleEvent(WE_Resize, &data);
+
+						// Caution the code above works for desktop but not for webgl builds with emscpriten.
+						// For the workaround see tag [SGE_EMSCRIPTEN_NO_SDL_RESIZE].
 					} else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 						// From https://wiki.libsdl.org/SDL_WindowEventID
 						// window size has changed, either as a result of an API call or through the system or user changing the window

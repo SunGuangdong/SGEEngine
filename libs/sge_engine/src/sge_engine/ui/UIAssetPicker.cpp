@@ -133,7 +133,7 @@ bool assetPicker(
 
 						const vec3f camPos = mat_mul_pos(mat4f::getRotationY(passedTime * sge2Pi * 0.25f),
 						                                 model->staticEval.aabox.halfDiagonal() * 1.66f + model->staticEval.aabox.center());
-						const mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(90.f), 1.f, 0.01f, 10000.f, kIsTexcoordStyleD3D);
+						const mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(90.f), 1.f, 0.01f, 10000.f, 0.f, kIsTexcoordStyleD3D);
 						const mat4f lookAt = mat4f::getLookAtRH(camPos, vec3f(0.f), vec3f(0.f, kIsTexcoordStyleD3D ? 1.f : -1.f, 0.f));
 
 						RenderDestination rdest(getCore()->getDevice()->getContext(), frameTarget);

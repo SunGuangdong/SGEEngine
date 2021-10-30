@@ -20,14 +20,26 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
                                            const mat4f& projView,
                                            const mat4f& world,
                                            const ShadowMapBuildInfo& shadowMapBuildInfo,
-                                           const Geometry& geometry) {
+                                           const Geometry& geometry,
+                                           const Texture* diffuseTexForAlphaMask,
+                                           const bool forceNoCulling) {
 	enum {
 		OPT_LightType,
 		OPT_HasVertexSkinning,
+		OPT_HasDiffuseTexForAlphaMasking,
 		kNumOptions,
 	};
 
-	enum : int { uWorld, uProjView, uPointLightPositionWs, uPointLightFarPlaneDistance, uSkinningBones, uSkinningFirstBoneOffsetInTex };
+	enum : int {
+		uWorld,
+		uProjView,
+		uPointLightPositionWs,
+		uPointLightFarPlaneDistance,
+		uSkinningBones,
+		uSkinningFirstBoneOffsetInTex,
+		uDiffuseTexForAlphaMasking,
+		uUseDiffuseTexForAlphaMasking
+	};
 
 	if (shadingPermutFWDBuildShadowMaps.isValid() == false) {
 		shadingPermutFWDBuildShadowMaps = ShadingProgramPermuator();
@@ -37,6 +49,9 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		     "OPT_LightType",
 		     {SGE_MACRO_STR(FWDDBSM_OPT_LightType_SpotOrDirectional), SGE_MACRO_STR(FWDDBSM_OPT_LightType_Point)}},
 		    {OPT_HasVertexSkinning, "OPT_HasVertexSkinning", {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
+		    {OPT_HasDiffuseTexForAlphaMasking,
+		     "OPT_HasDiffuseTexForAlphaMasking",
+		     {SGE_MACRO_STR(kasDiffuseTexForAlphaMasking_No), SGE_MACRO_STR(kasDiffuseTexForAlphaMasking_Yes)}},
 		};
 
 		const std::vector<ShadingProgramPermuator::Unform> uniformsToCache = {
@@ -45,7 +60,9 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		    {uPointLightPositionWs, "uPointLightPositionWs", ShaderType::PixelShader},
 		    {uPointLightFarPlaneDistance, "uPointLightFarPlaneDistance", ShaderType::PixelShader},
 		    {uSkinningBones, "uSkinningBones", ShaderType::VertexShader},
-		    {uSkinningFirstBoneOffsetInTex, "uSkinningFirstBoneOffsetInTex", ShaderType::VertexShader}};
+		    {uSkinningFirstBoneOffsetInTex, "uSkinningFirstBoneOffsetInTex", ShaderType::VertexShader},
+		    {uDiffuseTexForAlphaMasking, "uDiffuseTexForAlphaMasking", ShaderType::PixelShader},
+		    {uUseDiffuseTexForAlphaMasking, "uUseDiffuseTexForAlphaMasking", ShaderType::PixelShader}};
 
 		SGEDevice* const sgedev = rdest.getDevice();
 		shadingPermutFWDBuildShadowMaps->createFromFile(sgedev, "core_shaders/FWDDefault_buildShadowMaps.shader", compileTimeOptions,
@@ -53,10 +70,12 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 	}
 
 	const int optHasVertexSkinning = (geometry.hasVertexSkinning()) ? kHasVertexSkinning_Yes : kHasVertexSkinning_No;
+	const int optHasDiffuseTexForAlphaMasking = geometry.vertexDeclHasUv && diffuseTexForAlphaMask != nullptr;
 
 	const OptionPermuataor::OptionChoice optionChoice[kNumOptions] = {
 	    {OPT_LightType, shadowMapBuildInfo.isPointLight ? FWDDBSM_OPT_LightType_Point : FWDDBSM_OPT_LightType_SpotOrDirectional},
 	    {OPT_HasVertexSkinning, optHasVertexSkinning},
+	    {OPT_HasDiffuseTexForAlphaMasking, optHasDiffuseTexForAlphaMasking},
 	};
 
 	const int iShaderPerm =
@@ -81,6 +100,14 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
 
+	if (optHasDiffuseTexForAlphaMasking == kasDiffuseTexForAlphaMasking_Yes) {
+		int intTrue = 1;
+		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uUseDiffuseTexForAlphaMasking], &intTrue));
+		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
+		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uDiffuseTexForAlphaMasking], (void*)diffuseTexForAlphaMask));
+		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
+	}
+
 	// Feed the draw call data to the state group.
 	stateGroup.setProgram(shaderPerm.shadingProgram.GetPtr());
 	stateGroup.setPrimitiveTopology(PrimitiveTopology::TriangleList);
@@ -101,7 +128,12 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 			flipCulling = !flipCulling;
 		}
 
-		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_defaultBackfaceCCW : getCore()->getGraphicsResources().RS_default;
+		if (forceNoCulling) {
+			rasterState = getCore()->getGraphicsResources().RS_noCulling;
+		} else {
+			rasterState =
+			    flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
+		}
 	}
 
 	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual);

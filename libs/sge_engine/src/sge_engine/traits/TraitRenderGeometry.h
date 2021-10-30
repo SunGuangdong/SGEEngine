@@ -6,7 +6,7 @@
 
 namespace sge {
 
-DefineTypeIdExists(TraitRenderGeometry);
+RelfAddTypeIdExists(TraitRenderGeometry);
 /// Represents a custom made geometry that is going to be rendered with
 /// the default shaders. (TODO: custom shaders and materials).
 struct SGE_ENGINE_API TraitRenderGeometry : public Trait {

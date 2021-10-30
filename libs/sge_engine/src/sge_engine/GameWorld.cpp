@@ -278,9 +278,6 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(debug.forceSleepMs));
 	}
 
-	// Update the audio device.
-	getCore()->getAudioDevice()->setMasterVolume(m_masterVolume);
-
 	// Add the objects that were created during the last update to the list of playing objects.
 	for (int t = 0; t < objectsAwaitingCreation.size(); ++t) {
 		GameObject* const object = objectsAwaitingCreation[t];
@@ -731,6 +728,20 @@ void GameWorld::createPrefab(GameWorld& prefabWorld,
 	prefabWorld.instantiatePrefab(*this, false, !shouldKeepOriginalObjectIds, pOblectsToInstantiate);
 }
 
+span<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(const RigidBody* rb) const {
+	if (rb == nullptr) {
+		return {};
+	}
+
+	auto itrFind = m_physicsManifoldList.find(rb);
+	if (itrFind == m_physicsManifoldList.end()) {
+		return {};
+	}
+
+	return span<const btPersistentManifold* const>(itrFind->second.data(), itrFind->second.size());
+}
+
+
 void GameWorld::removeRigidBodyManifold(RigidBody* const rb) {
 	auto itrFind = m_physicsManifoldList.find(rb);
 	if (itrFind == m_physicsManifoldList.end()) {
@@ -776,6 +787,7 @@ void GameWorld::addPostSceneTaskLoadWorldFormFile(const char* filename) {
 	PostSceneUpdateTaskLoadWorldFormFile* task = new PostSceneUpdateTaskLoadWorldFormFile(filename, true);
 	addPostSceneTask(task);
 }
+
 
 void GameWorld::setDefaultGravity(const vec3f& gravity) {
 	physicsWorld.dynamicsWorld->setGravity(toBullet(gravity));

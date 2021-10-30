@@ -8,8 +8,10 @@
 
 namespace sge {
 // clang-format off
-DefineTypeId(TraitSprite, 20'07'11'0001);
-DefineTypeId(TraitSprite::ImageSettings, 21'04'04'0001);
+RelfAddTypeId(TraitSprite, 20'07'11'0001);
+RelfAddTypeId(TraitSprite::ImageSettings, 21'04'04'0001);
+RelfAddTypeId(TraitSprite::Element, 21'10'11'0001);
+RelfAddTypeId(std::vector<TraitSprite::Element>, 21'10'11'0002);
 
 ReflBlock() {
 	ReflAddType(TraitSprite::ImageSettings)
@@ -23,25 +25,152 @@ ReflBlock() {
 		ReflMember(TraitSprite::ImageSettings, forceNoCulling)
 		ReflMember(TraitSprite::ImageSettings, flipHorizontally)
 		ReflMember(TraitSprite::ImageSettings, spriteFrameTime).uiRange(0.f, 100000.f, 0.01f)
+		ReflMember(TraitSprite::ImageSettings, forceAlphaBlending)
 	;
 
+	ReflAddType(TraitSprite::Element)
+		ReflMember(TraitSprite::Element, isRenderable)
+		ReflMember(TraitSprite::Element, m_assetProperty)
+		ReflMember(TraitSprite::Element, m_additionalTransform)
+		ReflMember(TraitSprite::Element, imageSettings)
+	;
+
+	ReflAddType(std::vector<TraitSprite::Element>);
+
 	ReflAddType(TraitSprite)
-		ReflMember(TraitSprite, m_assetProperty)
-		ReflMember(TraitSprite, imageSettings)
+		ReflMember(TraitSprite, isRenderable)
+		ReflMember(TraitSprite, hasShadows)
+		ReflMember(TraitSprite, images)
+		ReflMember(TraitSprite, additionalTransform)
 	;
 }
 // clang-format on
 
 AABox3f TraitSprite::getBBoxOS() const {
-	const SpriteAnimationAsset* const assetSprite = getAssetProperty().getAssetSprite();
-	const AssetTexture* const assetTexture = getAssetProperty().getAssetTexture();
+	AABox3f bbox;
 
-	if ((assetSprite || assetTexture) && isAssetLoaded(getAssetProperty().getAsset())) {
-		return imageSettings.computeBBoxOS(*getAssetProperty().getAsset().get(), m_additionalTransform);
+	for (const Element& image : images) {
+		const SpriteAnimationAsset* const assetSprite = image.m_assetProperty.getAssetSprite();
+		const AssetTexture* const assetTexture = image.m_assetProperty.getAssetTexture();
+
+		if ((assetSprite || assetTexture) && isAssetLoaded(image.m_assetProperty.getAsset())) {
+			return image.imageSettings.computeBBoxOS(*image.m_assetProperty.getAsset().get(),
+			                                         additionalTransform * image.m_additionalTransform);
+		} else {
+			// Not implemented or no asset is loaded.
+		}
 	}
 
-	// Not implemented or no asset is loaded.
-	return AABox3f();
+	return bbox;
+}
+
+void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems) {
+	if (isRenderable == false) {
+		return;
+	}
+
+	if (!hasShadows && drawReason == drawReason_gameplayShadow) {
+		return;
+	}
+
+	for (const Element& image : images) {
+		if (image.isRenderable == false) {
+			continue;
+		}
+
+		TraitSpriteRenderItem renderItem;
+
+		renderItem.actor = getActor();
+		renderItem.forceNoCulling = image.imageSettings.forceNoCulling;
+		renderItem.forceNoLighting = image.imageSettings.forceNoLighting;
+		renderItem.forceAlphaBlending = image.imageSettings.forceAlphaBlending;
+		renderItem.colorTint = image.imageSettings.colorTint;
+
+		const vec3f camPos = drawSets.drawCamera->getCameraPosition();
+		const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
+		Actor* const actor = getActor();
+
+		PAsset const asset = image.m_assetProperty.getAsset();
+
+		if (isAssetLoaded(asset) && asset->getType() == AssetType::Texture2D) {
+			AssetTexture* ppTexture = asset->asTextureView();
+			if (ppTexture && ppTexture->tex.IsResourceValid()) {
+				Texture* const texture = ppTexture->tex.GetPtr();
+				if (texture) {
+					renderItem.spriteTexture = texture;
+
+					mat4f obj2world = image.imageSettings.computeObjectToWorldTransform(
+					    *asset.get(), drawSets.drawCamera, actor->getTransform(), additionalTransform * image.m_additionalTransform);
+
+					renderItem.obj2world = obj2world;
+
+					renderItem.zSortingPositionWs = obj2world.c3.xyz();
+					renderItem.needsAlphaSorting =
+					    ppTexture->meta.isSemiTransparent || renderItem.colorTint.w < 0.999f || image.imageSettings.forceAlphaBlending;
+				}
+			}
+		} else if (isAssetLoaded(asset) && asset->getType() == AssetType::Sprite) {
+			SpriteAnimationAsset* const pSprite = asset->asSprite();
+			if (pSprite && isAssetLoaded(pSprite->textureAsset, AssetType::Texture2D)) {
+				// Get the frame of the sprite to be rendered.
+				const SpriteAnimation::Frame* const frame = pSprite->spriteAnimation.getFrameForTime(image.imageSettings.spriteFrameTime);
+				if (frame) {
+					renderItem.spriteTexture = pSprite->textureAsset->asTextureView()->tex.GetPtr();
+
+					mat4f obj2world = image.imageSettings.computeObjectToWorldTransform(
+					    *asset.get(), drawSets.drawCamera, actor->getTransform(), additionalTransform * image.m_additionalTransform);
+					renderItem.obj2world = obj2world;
+
+					// Compute the UVW transform so we get only this frame portion of the texture to be displayed.
+					renderItem.uvwTransform =
+					    mat4f::getTranslation(frame->uvRegion.x, frame->uvRegion.y, 0.f) *
+					    mat4f::getScaling(frame->uvRegion.z - frame->uvRegion.x, frame->uvRegion.w - frame->uvRegion.y, 0.f);
+
+					renderItem.zSortingPositionWs = obj2world.c3.xyz();
+					renderItem.needsAlphaSorting = pSprite->textureAsset->asTextureView()->meta.isSemiTransparent ||
+					                               renderItem.colorTint.w < 0.999f || image.imageSettings.forceAlphaBlending;
+				}
+			}
+		} else {
+			return;
+		}
+
+		if (renderItem.spriteTexture != nullptr) {
+			renderItems.emplace_back(renderItem);
+		}
+	}
+}
+
+/// TraitSprite Attribute Editor.
+void editTraitSprite(GameInspector& inspector, GameObject* actor, MemberChain chain) {
+	if (ImGui::CollapsingHeader(ICON_FK_PICTURE_O " Sprte Trait")) {
+		chain.add(sgeFindMember(TraitSprite, images));
+		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
+		chain.pop();
+	}
+}
+
+void editTraitSprite_Element(GameInspector& inspector, GameObject* actor, MemberChain chain) {
+	TraitSprite::Element& image = *(TraitSprite::Element*)chain.follow(actor);
+
+
+	if (ImGui::CollapsingHeader(ICON_FK_PICTURE_O " Sprte Trait")) {
+		chain.add(sgeFindMember(TraitSprite::Element, m_assetProperty));
+		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
+		chain.pop();
+
+		if (image.m_assetProperty.getAssetSprite()) {
+			chain.add(sgeFindMember(TraitSprite::Element, imageSettings));
+			ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
+			chain.pop();
+		}
+
+		if (image.m_assetProperty.getAssetTexture()) {
+			chain.add(sgeFindMember(TraitSprite::Element, imageSettings));
+			ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
+			chain.pop();
+		}
+	}
 }
 
 mat4f TraitSprite::ImageSettings::computeObjectToWorldTransform(const Asset& asset,
@@ -71,7 +200,7 @@ mat4f TraitSprite::ImageSettings::computeObjectToWorldTransform(const Asset& ass
 		if (drawCamera != nullptr) {
 			const mat4f billboardFacingMtx = billboarding_getOrentationMtx(
 			    m_billboarding, nodeToWorldTransform, drawCamera->getCameraPosition(), drawCamera->getView(), defaultFacingAxisZ);
-			objToWorld = billboardFacingMtx * anchorAlignMtx * localOffsetmtx * additionaTransform;
+			objToWorld = billboardFacingMtx * additionaTransform * anchorAlignMtx * localOffsetmtx;
 		} else {
 			objToWorld = anchorAlignMtx * localOffsetmtx * additionaTransform;
 
@@ -130,6 +259,13 @@ AABox3f TraitSprite::ImageSettings::computeBBoxOS(const Asset& asset, const mat4
 			bboxOs.expand(vec3f(pExtreme.z, 0.f, 0.f));
 			bboxOs.expand(vec3f(-pExtreme.z, 0.f, 0.f));
 		} break;
+		case billboarding_xOnly: {
+			vec3f pExtreme = p0.getAbs().pickMax(p1.getAbs());
+			bboxOs.expand(vec3f(0.f, 0.f, pExtreme.x));
+			bboxOs.expand(vec3f(0.f, 0.f, -pExtreme.x));
+			bboxOs.expand(vec3f(0.f, pExtreme.x, 0.f));
+			bboxOs.expand(vec3f(0.f, -pExtreme.x, 0.f));
+		} break;
 		case billboarding_faceCamera: {
 			vec3f pExtreme = p0.getAbs().pickMax(p1.getAbs());
 			float d = pExtreme.length();
@@ -147,92 +283,9 @@ AABox3f TraitSprite::ImageSettings::computeBBoxOS(const Asset& asset, const mat4
 	return bboxOs;
 }
 
-void TraitSprite::getRenderItems(const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems) {
-	TraitSpriteRenderItem renderItem;
-
-	renderItem.actor = getActor();
-	renderItem.forceNoCulling = imageSettings.forceNoCulling;
-	renderItem.forceNoLighting = imageSettings.forceNoLighting;
-	renderItem.colorTint = imageSettings.colorTint;
-
-	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
-	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
-	Actor* const actor = getActor();
-
-	PAsset const asset = getAssetProperty().getAsset();
-
-	if (isAssetLoaded(asset) && asset->getType() == AssetType::Texture2D) {
-		AssetTexture* ppTexture = asset->asTextureView();
-		if (ppTexture && ppTexture->tex.IsResourceValid()) {
-			Texture* const texture = ppTexture->tex.GetPtr();
-			if (texture) {
-				renderItem.spriteTexture = texture;
-
-				mat4f obj2world = imageSettings.computeObjectToWorldTransform(*asset.get(), drawSets.drawCamera, actor->getTransform(),
-				                                                              m_additionalTransform);
-
-				renderItem.obj2world = obj2world;
-
-				renderItem.zSortingPositionWs = obj2world.c3.xyz();
-				renderItem.needsAlphaSorting = ppTexture->meta.isSemiTransparent || renderItem.colorTint.w < 0.999f;
-			}
-		}
-	} else if (isAssetLoaded(asset) && asset->getType() == AssetType::Sprite) {
-		SpriteAnimationAsset* const pSprite = asset->asSprite();
-		if (pSprite && isAssetLoaded(pSprite->textureAsset, AssetType::Texture2D)) {
-			// Get the frame of the sprite to be rendered.
-			const SpriteAnimation::Frame* const frame = pSprite->spriteAnimation.getFrameForTime(imageSettings.spriteFrameTime);
-			if (frame) {
-				renderItem.spriteTexture = pSprite->textureAsset->asTextureView()->tex.GetPtr();
-
-				mat4f obj2world = imageSettings.computeObjectToWorldTransform(*asset.get(), drawSets.drawCamera, actor->getTransform(),
-				                                                              m_additionalTransform);
-				renderItem.obj2world = obj2world;
-
-				// Compute the UVW transform so we get only this frame portion of the texture to be displayed.
-				renderItem.uvwTransform =
-				    mat4f::getTranslation(frame->uvRegion.x, frame->uvRegion.y, 0.f) *
-				    mat4f::getScaling(frame->uvRegion.z - frame->uvRegion.x, frame->uvRegion.w - frame->uvRegion.y, 0.f);
-
-				renderItem.zSortingPositionWs = obj2world.c3.xyz();
-				renderItem.needsAlphaSorting =
-				    pSprite->textureAsset->asTextureView()->meta.isSemiTransparent || renderItem.colorTint.w < 0.999f;
-			}
-		}
-	} else {
-		return;
-	}
-
-	if (renderItem.spriteTexture != nullptr) {
-		renderItems.emplace_back(renderItem);
-	}
-}
-
-/// TraitSprite Attribute Editor.
-void editTraitSprite(GameInspector& inspector, GameObject* actor, MemberChain chain) {
-	TraitSprite& traitSprite = *(TraitSprite*)chain.follow(actor);
-
-	if (ImGui::CollapsingHeader(ICON_FK_PICTURE_O " Sprte Trait")) {
-		chain.add(sgeFindMember(TraitSprite, m_assetProperty));
-		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
-		chain.pop();
-
-		if (traitSprite.m_assetProperty.getAssetSprite()) {
-			chain.add(sgeFindMember(TraitSprite, imageSettings));
-			ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
-			chain.pop();
-		}
-
-		if (traitSprite.m_assetProperty.getAssetTexture()) {
-			chain.add(sgeFindMember(TraitSprite, imageSettings));
-			ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
-			chain.pop();
-		}
-	}
-}
-
 SgePluginOnLoad() {
 	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitSprite), editTraitSprite);
+	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitSprite::Element), editTraitSprite_Element);
 }
 
 

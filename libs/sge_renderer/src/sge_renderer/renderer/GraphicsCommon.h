@@ -392,6 +392,14 @@ struct Texture2DDesc {
 	    , numSamples(numSamples)
 	    , sampleQuality(sampleQuality) {}
 
+	float widthByHeight() const {
+		return float(width) / float(height);
+	}
+
+	float heightByWidth() const {
+		return float(height) / float(width);
+	}
+
 	int width;
 	int height;
 	int numMips;
@@ -457,6 +465,7 @@ struct TextureDesc {
 	TextureUsage::Enum usage;
 	UniformType::Enum textureType;
 	TextureFormat::Enum format;
+	bool generateMips = false;
 
 	union {
 		Texture1DDesc texture1D;
@@ -466,6 +475,11 @@ struct TextureDesc {
 	};
 
 	bool hasMipMaps() const {
+
+		if (generateMips) {
+			return true;
+		}
+
 		if (textureType == UniformType::Texture1D)
 			return texture1D.numMips > 1;
 		if (textureType == UniformType::Texture2D)

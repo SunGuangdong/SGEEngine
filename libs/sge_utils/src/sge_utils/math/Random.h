@@ -5,11 +5,11 @@
 
 namespace sge {
 
-//---------------------------------------------------------------------------
-// Random
-//---------------------------------------------------------------------------
+/// A random number generator, non thread-safe.
 struct Random {
-	Random(unsigned int startSeed = 5489) { m_generator.seed(startSeed); }
+	Random(unsigned int startSeed = 5489) { setSeed(startSeed); }
+
+	void setSeed(unsigned int seed) { m_generator.seed(seed); }
 
 	float next01() const {
 		std::uniform_real_distribution<float> distribution(0.f, 1.f);
@@ -28,11 +28,19 @@ struct Random {
 	}
 
 	/// Returns a random non-negative integer.
-	int nextInt() {
+	int nextInt() const {
 		std::uniform_int_distribution<> distribution;
 		const int rnd = distribution(m_generator);
 		return rnd;
 	}
+
+	/// Returns an integer between [0; maxIntPlusOne).
+	/// Notice it is an open interval maxIntPlusOne-1 is the max value.
+	/// Useful for indexing an array.
+	int nextIntBefore(int maxIntPlusOne) const { return maxIntPlusOne != 0 ? nextInt() % maxIntPlusOne : 0; }
+
+	bool nextBool() const { return nextInt() % 2; }
+	float nextFlipFLoat() const { return nextInt() % 2 ? 1.f : -1.f; }
 
 	float nextInRange(float f) const { return next01() * f; }
 

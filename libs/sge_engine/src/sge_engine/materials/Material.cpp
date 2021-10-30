@@ -5,8 +5,8 @@
 namespace sge {
 
 // clang-format off
-DefineTypeId(OMaterial, 20'10'14'0001);
-DefineTypeId(MDiffuseMaterial, 20'10'14'0002);
+RelfAddTypeId(OMaterial, 20'10'14'0001);
+RelfAddTypeId(MDiffuseMaterial, 20'10'14'0002);
 ReflBlock() {
 	ReflAddObject(OMaterial);
 

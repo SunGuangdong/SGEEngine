@@ -45,7 +45,7 @@ if(EMSCRIPTEN)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_WEBGL2=1")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s FULL_ES3=1") # TODO: Does it work without this one?
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH=1") # By default Emscripten has a fixed pool size for dynamic allocations.
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0") # Emscripten debug symbols take a lot of space for disable it by default.
 	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
 endif()
@@ -170,6 +170,7 @@ add_subdirectory(./libs_ext/bullet)
 add_subdirectory(./libs_ext/recastnavigation)
 add_subdirectory(./libs_ext/imgui)
 add_subdirectory(./libs_ext/doctest)
+add_subdirectory(./libs_ext/miniaudio)
 
 # Use SDL2 as a dll.
 # The code shouldn't depend on SDL2 being a DLL
@@ -235,6 +236,7 @@ sge_mark_external_target(SDL2-static)
 #sge_mark_external_target(doctest) # doctest doesn't create any targets, so it is not needed.
 sge_mark_external_target(mcpp)
 sge_mark_external_target(HLSLParser)
+sge_mark_external_target(miniaudio)
 
 # Internal projects.
 sge_mark_internal_lib(mdlconvlib)
@@ -255,5 +257,4 @@ include(copy_engine_helper.cmake)
 # Samples
 add_subdirectory(samples/Demo)
 add_subdirectory(samples/TemplateGame)
-add_subdirectory(samples/CharacterGame)
 add_subdirectory(samples/SpriteGame2D)

@@ -93,9 +93,6 @@ void ColoredWidget::draw(const UIDrawSets& drawSets) {
 	                             bboxScissorsSS.size().y, m_color, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
-//----------------------------------------------------
-// TextWidget
-//----------------------------------------------------
 void TextWidget::draw(const UIDrawSets& drawSets) {
 	if (m_text.empty()) {
 		return;
@@ -109,7 +106,7 @@ void TextWidget::draw(const UIDrawSets& drawSets) {
 
 	const vec2f textDim = font->computeTextDimensions(m_text.c_str(), textHeight);
 
-	this->getSize().minSizeX = Unit::fromPixels(textDim.x);
+		this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
 	const float textPosX = bboxSS.center().x - textDim.x * 0.5f;
 	const float textPosY = bboxSS.center().y + textHeight * 0.5f - textDim.y * 0.5f;
@@ -136,11 +133,25 @@ std::shared_ptr<ImageWidget> ImageWidget::create(UIContext& owningContext, Pos p
 	return w;
 }
 
+std::shared_ptr<ImageWidget> ImageWidget::createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture) {
+	float(texture->getDesc().texture2D.width), float(texture->getDesc().texture2D.height);
+	gamegui::Size size;
+	size.sizeX = height;
+	size.sizeY = height;
+	size.sizeX.value *= float(texture->getDesc().texture2D.width) / float(texture->getDesc().texture2D.height);
+
+	auto w = std::make_shared<ImageWidget>(owningContext, position, size);
+	w->m_texture = texture;
+	return w;
+}
+
 
 void ImageWidget::draw(const UIDrawSets& drawSets) {
 	if (m_texture.IsResourceValid()) {
 		const AABox2f bboxSS = getBBoxPixels();
-		drawSets.quickDraw->drawRectTexture(drawSets.rdest, bboxSS, m_texture, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		float opacity = calcTotalOpacity();
+		drawSets.quickDraw->drawRectTexture(drawSets.rdest, bboxSS, m_texture, getCore()->getGraphicsResources().BS_backToFrontAlpha,
+		                                    vec2f(0), vec2f(1.f), opacity);
 	}
 }
 

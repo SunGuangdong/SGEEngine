@@ -29,6 +29,7 @@ struct ShadingLightData {
 	vec4f lightSpotDirAndCosAngle = vec4f(1.f, 0.f, 0.f, 0.f);
 	// (x,y,z) the color of the light multiplied by the intensity). w - flags as float.
 	vec4f lightColorWFlags = vec4f(0.f);
+	float shadowMapBias = 0.f;
 
 	Texture* shadowMap = nullptr;
 	mat4f shadowMapProjView = mat4f::getIdentity();

@@ -11,9 +11,9 @@ namespace sge {
 //--------------------------------------------------------------------
 
 // clang-format off
-DefineTypeId(ObjectId, 20'03'06'0005);
-DefineTypeId(GameObject, 20'03'01'0011);
-DefineTypeId(std::vector<ObjectId>, 20'03'07'0012);
+RelfAddTypeId(ObjectId, 20'03'06'0005);
+RelfAddTypeId(GameObject, 20'03'01'0011);
+RelfAddTypeId(std::vector<ObjectId>, 20'03'07'0012);
 
 ReflBlock()
 {

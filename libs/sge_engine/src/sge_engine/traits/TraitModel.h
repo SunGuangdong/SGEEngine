@@ -32,7 +32,7 @@ struct TraitModelRenderItem;
 ///    In that way you have a generic actor type that could be configured to your desiers.
 ///    In order for the game object to take into account the change you need in your Actor::postUpdate to
 ///    to update the trait, see if the model has been changed and maybe update the rigid body for that actor.
-DefineTypeIdExists(TraitModel);
+RelfAddTypeIdExists(TraitModel);
 struct SGE_ENGINE_API TraitModel : public Trait {
 	SGE_TraitDecl_Full(TraitModel);
 
@@ -51,7 +51,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	AABox3f getBBoxOS() const;
 
-	void getRenderItems(std::vector<TraitModelRenderItem>& renderItems);
+	void getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems);
 
 	void invalidateCachedAssets();
 
@@ -120,6 +120,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	bool isRenderable = true;               ///< True if the whole trait is renderable.
 	bool isFixedModelsSize = true;          ///< if true the interface will not offer adding/removing more models to the trait.
 	std::vector<PerModelSettings> m_models; ///< A list of all models in their settings to rendered by the trait.
+	bool forceNoShadows = false;
 };
 
 } // namespace sge

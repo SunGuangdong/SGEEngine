@@ -24,17 +24,21 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 
 	glcon->BindTextureEx(glTexTarget, GL_TEXTURE0, m_glTexture);
 
-
 	const bool isCompressed = TextureFormat::IsBC(m_desc.format);
+
+	if (desc.generateMips) {
+		sgeAssert(desc.textureType == UniformType::Texture2D && "The auto generated mips has been written so far only for 2D textures!");
+	}
 
 	GLint glInternalFormat;
 	GLenum glFormat, glType;
 	TextureFormat_GetGLNative(m_desc.format, glInternalFormat, glFormat, glType);
 
 	if (glTexTarget == GL_TEXTURE_2D) {
-		//[TODO] See the hack above...
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+		DumpAllGLErrors();
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		DumpAllGLErrors();
 
 		int width = m_desc.texture2D.width;
 		int height = m_desc.texture2D.height;
@@ -45,6 +49,11 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 				// SGE_DEBUG_LOG("glInternalFormat = %x glFormat = %x glType = %x\n", glInternalFormat, glFormat, glType);
 				const void* initialDataForMipLevel = (initalData) ? initalData[iMipLevel].data : NULL;
 				glTexImage2D(GL_TEXTURE_2D, iMipLevel, glInternalFormat, width, height, 0, glFormat, glType, initialDataForMipLevel);
+				DumpAllGLErrors();
+				if (m_desc.generateMips && m_desc.texture2D.numMips == 1) {
+					glGenerateMipmap(GL_TEXTURE_2D);
+				}
+				DumpAllGLErrors();
 			} else {
 				sgeAssert(initalData);
 				sgeAssert(initalData[iMipLevel].data != NULL);
@@ -53,13 +62,12 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 				glCompressedTexImage2D(GL_TEXTURE_2D, iMipLevel, glInternalFormat, width, height,
 				                       0, // border
 				                       int(initalData[iMipLevel].sliceByteSize), initalData[iMipLevel].data);
+				DumpAllGLErrors();
 			}
 
 			width = maxOf(width / 2, 1);
 			height = maxOf(height / 2, 1);
 		}
-
-		DumpAllGLErrors();
 	}
 #if !defined(__EMSCRIPTEN__)
 	else if (glTexTarget == GL_TEXTURE_2D_MULTISAMPLE) {
@@ -183,11 +191,11 @@ void TextureGL::applySamplerDesc(const SamplerDesc& samplerDesc, bool shouldBind
 	if (forceUsePointSampling == false) {
 		if (samplerDesc.filter == TextureFilter::Min_Mag_Mip_Linear) {
 			samplerFilterMin = m_desc.hasMipMaps() ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
-			samplerFilterMag = m_desc.hasMipMaps() ? GL_LINEAR_MIPMAP_LINEAR : GL_LINEAR;
+			samplerFilterMag = GL_LINEAR;
 		}
 		if (samplerDesc.filter == TextureFilter::Min_Mag_Mip_Point) {
 			samplerFilterMin = m_desc.hasMipMaps() ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
-			samplerFilterMag = m_desc.hasMipMaps() ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
+			samplerFilterMag = GL_NEAREST;
 		}
 	} else {
 		samplerFilterMin = GL_NEAREST;

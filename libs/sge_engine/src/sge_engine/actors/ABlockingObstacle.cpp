@@ -11,7 +11,7 @@
 namespace sge {
 
 // clang-format off
-DefineTypeId(ABlockingObstacle, 20'03'02'0013);
+RelfAddTypeId(ABlockingObstacle, 20'03'02'0013);
 ReflBlock() {
 	ReflAddActor(ABlockingObstacle)
 		ReflMember(ABlockingObstacle, targetDesc)

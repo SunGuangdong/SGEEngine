@@ -158,7 +158,6 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 
 				if (bboxss.isInside(is.GetCursorPos())) {
 					handleCursor(child);
-					break;
 				}
 			}
 		};

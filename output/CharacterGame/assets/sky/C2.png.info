@@ -1,0 +1,10 @@
+{
+	"version":1,
+	"sampler":{
+		"addressModeX":"repeat",
+		"addressModeY":"repeat",
+		"addressModeZ":"repeat",
+		"filter":"linear"
+	},
+	"isSemiTransparent":true
+}

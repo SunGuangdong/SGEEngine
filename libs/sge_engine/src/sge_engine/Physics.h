@@ -105,6 +105,8 @@ struct SGE_ENGINE_API CollsionShapeDesc {
 	static CollsionShapeDesc createSphere(const float radius, const transf3d& offset = transf3d());
 	static CollsionShapeDesc createCapsule(const float height, const float radius, const transf3d& offset = transf3d());
 	static CollsionShapeDesc createCylinder(const vec3f& halfDiagonal, const transf3d& offset = transf3d());
+	static CollsionShapeDesc createCylinder(float height, float radius, const transf3d& offset = transf3d());
+	static CollsionShapeDesc createCylinderBottomAligned(float height, float radius, transf3d offset = transf3d());
 	static CollsionShapeDesc createCone(const float height, const float radius, const transf3d& offset = transf3d());
 	static CollsionShapeDesc createConvexPoly(std::vector<vec3f> verts, std::vector<int> indices);
 	static CollsionShapeDesc createTriMesh(std::vector<vec3f> verts, std::vector<int> indices);
@@ -206,7 +208,8 @@ struct SGE_ENGINE_API RigidBody {
 	void create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce);
 	void create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce);
 
-	/// Specifies is the rigid body should not respond to collsions with other objects.
+	/// Specifies if the rigid body should not respond to collsions with other objects.
+	/// The contant points will still be generated.
 	void setNoCollisionResponse(bool dontRespontToCollisions);
 	bool hasNoCollisionResponse() const;
 

@@ -17,8 +17,12 @@ using namespace sge;
 //-----------------------------------------------------------------------------
 // BasicModelDraw
 //-----------------------------------------------------------------------------
-void ConstantColorWireShader::drawGeometry(
-    const RenderDestination& rdest, const mat4f& projView, const mat4f& world, const Geometry& geometry, const vec4f& shadingColor) {
+void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
+                                           const mat4f& projView,
+                                           const mat4f& world,
+                                           const Geometry& geometry,
+                                           const vec4f& shadingColor,
+                                           bool forceNoCulling) {
 	enum : int { OPT_HasVertexSkinning, kNumOptions };
 
 	enum : int {
@@ -67,6 +71,15 @@ void ConstantColorWireShader::drawGeometry(
 		rd.depthBiasSlope = -1.f;
 		m_rasterWireframeDepthBiasCCW = rdest.sgecon->getDevice()->requestRasterizerState(rd);
 	}
+	
+	if (m_rasterWireframeDepthBiasNoCulling.HasResource() == false) {
+		RasterDesc rd;
+		rd.fillMode = FillMode::Wireframe;
+		rd.cullMode = CullMode::None;
+		rd.depthBiasAdd = 0.f;
+		rd.depthBiasSlope = -1.f;
+		m_rasterWireframeDepthBiasNoCulling = rdest.sgecon->getDevice()->requestRasterizerState(rd);
+	}
 
 	const int optHasVertexSkinning = (geometry.hasVertexSkinning()) ? kHasVertexSkinning_Yes : kHasVertexSkinning_No;
 
@@ -91,7 +104,11 @@ void ConstantColorWireShader::drawGeometry(
 
 	const bool flipCulling = determinant(world) < 0.f;
 
-	RasterizerState* const rasterState = flipCulling ? m_rasterWireframeDepthBiasCCW : m_rasterWireframeDepthBias;
+	RasterizerState* rasterState = flipCulling ? m_rasterWireframeDepthBiasCCW : m_rasterWireframeDepthBias;
+	if (forceNoCulling) {
+		rasterState = m_rasterWireframeDepthBiasNoCulling;
+	}
+
 	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual);
 
 	StaticArray<BoundUniform, 24> uniforms;
@@ -120,10 +137,11 @@ void ConstantColorWireShader::drawGeometry(
 }
 
 void ConstantColorWireShader::draw(const RenderDestination& rdest,
-                               const mat4f& projView,
-                               const mat4f& preRoot,
-                               const EvaluatedModel& evalModel,
-                               const vec4f& shadingColor) {
+                                   const mat4f& projView,
+                                   const mat4f& preRoot,
+                                   const EvaluatedModel& evalModel,
+                                   const vec4f& shadingColor,
+                                   bool forceNoCulling) {
 	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
 		const ModelNode* rawNode = evalModel.m_model->nodeAt(iNode);
@@ -133,7 +151,7 @@ void ConstantColorWireShader::draw(const RenderDestination& rdest,
 			const EvaluatedMesh& evalMesh = evalModel.getEvalMesh(meshAttachment.attachedMeshIndex);
 			mat4f const finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? preRoot : preRoot * evalNode.evalGlobalTransform;
 
-			drawGeometry(rdest, projView, finalTrasform, evalMesh.geometry, shadingColor);
+			drawGeometry(rdest, projView, finalTrasform, evalMesh.geometry, shadingColor, forceNoCulling);
 		}
 	}
 }

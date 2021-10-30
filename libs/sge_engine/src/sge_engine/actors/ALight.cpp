@@ -6,9 +6,9 @@ namespace sge {
 
 
 // clang-format off
-DefineTypeId(LightType, 20'03'01'0015);
-DefineTypeId(LightDesc, 20'03'01'0016);
-DefineTypeId(ALight, 20'03'01'0017);
+RelfAddTypeId(LightType, 20'03'01'0015);
+RelfAddTypeId(LightDesc, 20'03'01'0016);
+RelfAddTypeId(ALight, 20'03'01'0017);
 
 ReflBlock() {
 	ReflAddType(LightType)
@@ -25,6 +25,7 @@ ReflBlock() {
 	        .addMemberFlag(MFF_Vec3fAsColor) ReflMember(LightDesc, spotLightAngle)
 	        .addMemberFlag(MFF_FloatAsDegrees) ReflMember(LightDesc, hasShadows)
 		ReflMember(LightDesc, shadowMapRes)
+		ReflMember(LightDesc, shadowMapBias).uiRange(0.f, 100.f, 0.0001f);
 	;
 
 	ReflAddActor(ALight)

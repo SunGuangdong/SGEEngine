@@ -4,7 +4,7 @@
 
 namespace sge {
 
-DefineTypeId(ACRSpline, 20'03'02'0023);
+RelfAddTypeId(ACRSpline, 20'03'02'0023);
 // clang-format off
 
 ReflBlock() {

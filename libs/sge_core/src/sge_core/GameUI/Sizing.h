@@ -11,6 +11,7 @@ enum UnitMeasure : int {
 	unitMeasure_fraction,  // same as percentage but in range [0;1]
 	unitMeasure_wFraction, // fraction but from the width of the parent widget
 	unitMeasure_hFraction, // fraction but from the height of the parent widget
+
 };
 
 struct Unit {
@@ -63,6 +64,12 @@ struct Unit {
 				sgeAssert(false && "Unimplemented unit mode!");
 				return 0.f;
 		}
+	}
+
+	Unit operator*(float f) const {
+		Unit result = *this;
+		result.value *= f;
+		return result;
 	}
 
 	UnitMeasure mode = unitMeasure_pixels;

@@ -1,8 +1,8 @@
 #include "TraitModel.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
-#include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_engine/EngineGlobal.h"
+#include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/TypeRegister.h"
@@ -19,11 +19,11 @@ namespace sge {
 struct MDiffuseMaterial; // User for creating material overrides.
 
 // clang-format off
-DefineTypeId(TraitModel, 20'03'01'0004);
-DefineTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
-DefineTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
-DefineTypeId(TraitModel::MaterialOverride, 20'10'15'0001);
-DefineTypeId(std::vector<TraitModel::MaterialOverride>, 20'10'15'0002);
+RelfAddTypeId(TraitModel, 20'03'01'0004);
+RelfAddTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
+RelfAddTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
+RelfAddTypeId(TraitModel::MaterialOverride, 20'10'15'0001);
+RelfAddTypeId(std::vector<TraitModel::MaterialOverride>, 20'10'15'0002);
 
 ReflBlock() {
 	ReflAddType(TraitModel::MaterialOverride)
@@ -198,7 +198,11 @@ AABox3f TraitModel::getBBoxOS() const {
 	return bbox;
 }
 
-void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) {
+void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems) {
+	if (drawReason == drawReason_gameplayShadow && forceNoShadows) {
+		return;
+	}
+
 	for (int iModel = 0; iModel < int(m_models.size()); iModel++) {
 		PerModelSettings& modelSets = m_models[iModel];
 		if (!modelSets.isRenderable) {
@@ -227,7 +231,7 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
 					const EvaluatedMaterial& mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex);
 					PBRMaterial material;
-					
+
 					material.alphaMultiplier = modelSets.alphaMultiplier * mtl.alphaMultiplier;
 
 					material.diffuseColor = mtl.diffuseColor;
@@ -252,7 +256,7 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 
 					if (material.diffuseTexture != nullptr) {
 						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_diffuseMap;
-					} else if(evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor) {
+					} else if (evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor) {
 						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_vertexColor;
 					}
 
@@ -263,7 +267,8 @@ void TraitModel::getRenderItems(std::vector<TraitModelRenderItem>& renderItems) 
 					renderItem.iModel = iModel;
 					renderItem.iEvalNode = iNode;
 					renderItem.iEvalNodeMechAttachmentIndex = iAttach;
-					renderItem.needsAlphaSorting = getActor()->m_forceAlphaZSort || mtl.needsAlphaSorting || material.alphaMultiplier < 0.999f;
+					renderItem.needsAlphaSorting =
+					    getActor()->m_forceAlphaZSort || mtl.needsAlphaSorting || material.alphaMultiplier < 0.999f;
 
 					renderItems.push_back(renderItem);
 				}
@@ -293,6 +298,10 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 
 	if (ImGui::CollapsingHeader(ICON_FK_CUBE " Model Trait", ImGuiTreeNodeFlags_DefaultOpen)) {
 		int deleteModelIndex = -1;
+
+		chain.add(sgeFindMember(TraitModel, isRenderable));
+		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
+		chain.pop();
 
 		// Per model User Interface.
 		for (int iModel = 0; iModel < traitModel.m_models.size(); ++iModel) {
@@ -399,7 +408,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 						if (ImGui::Button("Extract Skeleton")) {
 							AssetModel* modelAsset = modelSets.m_assetProperty.getAssetModel();
 							GameWorld* world = inspector.getWorld();
-							ALocator* allBonesParent = world->m_allocator<ALocator>();
+							ALocator* allBonesParent = world->allocObjectT<ALocator>();
 							allBonesParent->setTransform(traitModel.getActor()->getTransform());
 
 							struct NodeRemapEl {
@@ -417,7 +426,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 								const float boneLength = node->limbLength > 0.f ? node->limbLength : boneLengthAuto;
 
 								nodeRemap[iNode].localTransform = node->staticLocalTransform;
-								nodeRemap[iNode].boneActor = inspector.getWorld()->m_allocator<ABone>(ObjectId(), node->name.c_str());
+								nodeRemap[iNode].boneActor = inspector.getWorld()->allocObjectT<ABone>(ObjectId(), node->name.c_str());
 								nodeRemap[iNode].boneActor->boneLength = boneLength;
 							}
 

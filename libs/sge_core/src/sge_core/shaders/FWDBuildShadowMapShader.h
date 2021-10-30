@@ -19,7 +19,9 @@ struct SGE_CORE_API FWDBuildShadowMapShader {
 	                  const mat4f& projView,
 	                  const mat4f& world,
 	                  const ShadowMapBuildInfo& shadowMapBuildInfo,
-	                  const Geometry& geometry);
+	                  const Geometry& geometry,
+	                  const Texture* diffuseTexForAlphaMask,
+	                  const bool forceNoCulling);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermutFWDBuildShadowMaps;

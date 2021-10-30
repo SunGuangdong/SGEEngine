@@ -334,14 +334,7 @@ void QuickDraw::initalize2DDrawResources(SGEContext* context) {
 	rsScissors->create(rdScissorsDesc);
 
 	// Create the alpha blending state.
-	BlendDesc blendDesc;
-	blendDesc.enabled = true;
-	blendDesc.srcBlend = Blend::SrcColor;
-	blendDesc.destBlend = Blend::InvSrcColor;
-	blendDesc.blendOp = BlendOp::Add;
-	blendDesc.alphaSrcBlend = Blend::Alpha_Src;
-	blendDesc.alphaDestBlend = Blend::Alpha_InvSrc;
-	blendDesc.blendOp = BlendOp::Add;
+	BlendDesc blendDesc = BlendDesc::GetDefaultBackToFrontAlpha();
 
 	m_textBlendState = sgedev->requestResource<BlendState>();
 	m_textBlendState->create(blendDesc);

@@ -98,45 +98,45 @@ TypeId sgeTypeIdFn() {
 /// to use id same id in different libraries (dlls/so and so on) where
 /// the function specialization isn't acessible.
 #if 1
-#define DefineTypeIdInline(T, _id)        \
+#define RelfAddTypeIdInline(T, _id)        \
 	template <>                           \
 	inline TypeId sge::sgeTypeIdFn<T>() { \
 		return TypeId(_id);               \
 	}
 
 #ifdef SGE_ENGINE_BUILDING_DLL
-#define DefineTypeId(T, _id)                 \
+#define RelfAddTypeId(T, _id)                 \
 	template <>                              \
 	SGE_ENGINE_API TypeId sgeTypeIdFn<T>() { \
 		return TypeId(_id);                  \
 	}
 #else
-#define DefineTypeId(T, _id)  \
+#define RelfAddTypeId(T, _id)  \
 	template <>               \
 	TypeId sgeTypeIdFn<T>() { \
 		return TypeId(_id);   \
 	}
 #endif
 #else
-#define DefineTypeIdInline(T, _id)
-#define DefineTypeId(T, _id)
+#define RelfAddTypeIdInline(T, _id)
+#define RelfAddTypeId(T, _id)
 #endif
 
 // Mark that the type id already exists, this is used for situations were we
 #if 1
 #ifdef SGE_ENGINE_BUILDING_DLL
-#define DefineTypeIdExists(T) \
+#define RelfAddTypeIdExists(T) \
 	struct T;                 \
 	template <>               \
 	SGE_ENGINE_API TypeId sgeTypeIdFn<T>();
 #else
-#define DefineTypeIdExists(T) \
+#define RelfAddTypeIdExists(T) \
 	struct T;                 \
 	template <>               \
 	TypeId sgeTypeIdFn<T>();
 #endif
 #else
-#define DefineTypeIdExists(T)
+#define RelfAddTypeIdExists(T)
 #endif
 
 /// A macros used to quckly obtain id for a particular type.
@@ -673,11 +673,9 @@ struct MemberFieldChainKnot {
 	int arrayIdx = -1;
 };
 
-//---------------------------------------------------------------------------
-// MemberChain
-// Is a way to refer to a remote member (member of a member of a member ...)
-// in some memory.
-//---------------------------------------------------------------------------
+/// MemberChain
+/// Is a way to refer to a remote member (member of a member of a member ...)
+/// in some memory. The structure belives you that the chain start from the correct type.
 struct SGE_ENGINE_API MemberChain {
 	MemberChain() = default;
 

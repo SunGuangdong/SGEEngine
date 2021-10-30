@@ -15,6 +15,7 @@ struct SkyShaderSettings {
 		mode_colorGradinet = 0,
 		mode_textureSphericalMapped = 1,
 		mode_textureCubeMapped = 2,
+		mode_stillTexture = 3,
 		
 	};
 
@@ -34,6 +35,10 @@ struct SGE_CORE_API SkyShader {
 	GpuHandle<Buffer> m_skySphereVB;
 	int m_skySphereNumVerts = 0;
 	VertexDeclIndex m_skySphereVBVertexDeclIdx = VertexDeclIndex_Null;
+
+	GpuHandle<Buffer> m_fullScreenQuadVB;
+	int m_fullScreenQuadNumVerts = 0;
+	VertexDeclIndex m_fullScreenQuadDeclIdx = VertexDeclIndex_Null;
 
 	GpuHandle<Buffer> cbParms;
 	StateGroup stateGroup;

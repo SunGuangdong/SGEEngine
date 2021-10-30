@@ -12,6 +12,7 @@
 #include "sge_engine/Physics.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/utils/Event.h"
+#include "sge_utils/utils/span.h"
 #include "sge_utils/utils/vector_set.h"
 
 namespace sge {
@@ -104,7 +105,7 @@ struct SGE_ENGINE_API GameWorld {
 
 	/// @brief Type-safe allocation of a GameObject.
 	template <typename T>
-	T* m_allocator(ObjectId const specificId = ObjectId(), const char* name = nullptr) {
+	T* allocObjectT(ObjectId const specificId = ObjectId(), const char* name = nullptr) {
 		return dynamic_cast<T*>(allocObject(sgeTypeId(T), specificId, name));
 	}
 
@@ -144,6 +145,17 @@ struct SGE_ENGINE_API GameWorld {
 		}
 
 		return &itr->second;
+	}
+
+	template <typename T>
+	T* getFistObject() {
+		const std::vector<GameObject*>* objs = getObjects(sgeTypeId(T));
+
+		if (objs && !objs->empty()) {
+			return static_cast<T*>(objs->at(0));
+		}
+
+		return nullptr;
 	}
 
 	/// @brief Retrieves an object with the specified id.
@@ -261,6 +273,8 @@ struct SGE_ENGINE_API GameWorld {
 	/// @brief A shortcut for addPostSceneTask. Useful for changeing the levels.
 	void addPostSceneTaskLoadWorldFormFile(const char* filename);
 
+	span<const btPersistentManifold* const> getRigidBodyManifolds(const RigidBody* rb) const;
+
 	/// @brief Removes all manifold for the specified rigid body.
 	///        Used if for some reason the rigid body is invalidated during updates.
 	void removeRigidBodyManifold(RigidBody* rb);
@@ -342,9 +356,6 @@ struct SGE_ENGINE_API GameWorld {
 		/// Useful for checking if game logic works for any timestep.
 		int forceSleepMs = 0;
 	} debug;
-
-	// Audio stuff
-	float m_masterVolume = 1.0f;
 };
 
 } // namespace sge

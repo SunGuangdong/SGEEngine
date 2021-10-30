@@ -74,6 +74,12 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 
 	void addChild(std::shared_ptr<IWidget> widget);
 
+	template <typename TWidget>
+	std::shared_ptr<TWidget> addChildT(std::shared_ptr<TWidget> widget) {
+		addChild(widget);
+		return widget;
+	}
+
 	const std::vector<std::shared_ptr<IWidget>>& getChildren() const { return m_children; }
 
 	void setLayout(ILayout* layout);
@@ -102,11 +108,23 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	const Pos& getContentsOrigin() const { return m_contentsOrigin; }
 	void setContentsOrigin(const Pos& o) { m_contentsOrigin = o; }
 
+	float getOpacity() const { return opacity; }
+	void setOpacity(float opacity) { this->opacity = opacity; }
+
+	float calcTotalOpacity() {
+		std::shared_ptr<IWidget> parent = getParent();
+		if (parent) {
+			return parent->calcTotalOpacity() * opacity;
+		}
+		return opacity;
+	}
+
   protected:
 	AABox2f getParentBBoxSS() const;
 	Pos getParentContentOrigin() const;
 
   private:
+	float opacity = 1.f;
 	Pos m_position;
 	Size m_size;
 	bool m_isSuspended = false;
@@ -159,7 +177,7 @@ struct SGE_CORE_API ColoredWidget final : public IWidget {
 		return true;
 	}
 
-  private:
+  public:
 	vec4f m_color = vec4f(1.f);
 };
 
@@ -188,6 +206,13 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 	void setFont(DebugFont* font) { m_font = font; }
 	void setFontSize(Unit fontSize) { m_fontSize = fontSize; }
 
+	bool m_algnTextHCenter = true;
+	bool m_algnTextVCenter = true;
+
+	bool enableYScroll = false;
+	float yScrollPixels = 0.f;
+	bool isScrollingY = false;
+
   private:
 	DebugFont* m_font = nullptr;
 	vec4f m_color = vec4f(1.f);
@@ -204,6 +229,7 @@ struct SGE_CORE_API ImageWidget final : public IWidget {
 	}
 
 	static std::shared_ptr<ImageWidget> create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture);
+	static std::shared_ptr<ImageWidget> createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture);
 	virtual void draw(const UIDrawSets& drawSets) override;
 
   private:
@@ -222,6 +248,8 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 	}
 
 	static std::shared_ptr<ButtonWidget> create(UIContext& owningContext, Pos position, Size size, const char* const text = nullptr);
+	static std::shared_ptr<ButtonWidget>
+	    createImageWidth(UIContext& owningContext, Pos position, Size size, const char* const text = nullptr);
 
 	bool isGamepadTargetable() override { return true; }
 
@@ -271,9 +299,9 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 
 	DebugFont* m_font = nullptr;
 	vec4f m_textColor = vec4f(1.f);
-	vec4f m_bgColorUp = colorWhite(0.33f);
-	vec4f m_bgColorHovered = colorWhite(0.66f);
-	vec4f m_bgColorPressed = colorWhite(0.22f);
+	vec4f m_bgColorUp = colorBlack(0.66f);
+	vec4f m_bgColorHovered = colorBlack(0.78f);
+	vec4f m_bgColorPressed = colorBlack(0.22f);
 	Unit m_fontSize = Unit::fromFrac(1.f);
 	std::string m_text;
 	SignedAxis m_triangleDir = SignedAxis::signedAxis_numElements;

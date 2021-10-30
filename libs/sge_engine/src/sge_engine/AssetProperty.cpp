@@ -65,7 +65,7 @@ const SpriteAnimationAsset* AssetProperty::getAssetSprite() const {
 	return m_asset->asSprite();
 }
 
-AudioAsset* AssetProperty::getAssetAudio() {
+AudioDataAsset* AssetProperty::getAssetAudio() {
 	if (isAssetLoaded(m_asset) == false || m_asset->getType() != AssetType::Audio) {
 		return nullptr;
 	}
@@ -73,7 +73,7 @@ AudioAsset* AssetProperty::getAssetAudio() {
 	return m_asset->asAudio();
 }
 
-const AudioAsset* AssetProperty::getAssetAudio() const {
+const AudioDataAsset* AssetProperty::getAssetAudio() const {
 	if (isAssetLoaded(m_asset) == false || m_asset->getType() != AssetType::Audio) {
 		return nullptr;
 	}
@@ -81,9 +81,9 @@ const AudioAsset* AssetProperty::getAssetAudio() const {
 	return m_asset->asAudio();
 }
 
-void AssetProperty::setAsset(std::shared_ptr<Asset>& asset) {
-	m_asset = asset;
-	m_targetAsset = asset->getPath();
+void AssetProperty::setAsset(std::shared_ptr<Asset> asset) {
+	m_asset = std::move(asset);
+	m_targetAsset = m_asset->getPath();
 	m_currentAsset = m_asset->getPath();
 }
 
@@ -91,7 +91,7 @@ void AssetProperty::setTargetAsset(const char* const assetPath) {
 	m_targetAsset = assetPath ? assetPath : "";
 }
 
-DefineTypeId(AssetProperty, 20'03'01'0001);
+RelfAddTypeId(AssetProperty, 20'03'01'0001);
 ReflBlock() {
 	ReflAddType(AssetProperty) ReflMember(AssetProperty, m_targetAsset);
 }

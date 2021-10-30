@@ -115,7 +115,9 @@ struct SGEGameWindow : public WindowBase {
 		ImGui::GetIO().LogFilename = NULL;
 
 		// Setup Audio device
-		AudioDevice* const audioDevice = AudioDevice::create(AudioDeviceDesc{});
+		AudioDevice* const audioDevice = new AudioDevice();
+		audioDevice->createAudioDevice();
+		audioDevice->startAudioDevice();
 
 		getCore()->setup(device, audioDevice);
 		getCore()->getAssetLib()->scanForAvailableAssets("assets");
@@ -239,7 +241,31 @@ EM_BOOL emsc_canvasResizeCb(int eventType, const void* reserved, void* userData)
 }
 #endif
 
+#ifdef __EMSCRIPTEN__
+// [SGE_EMSCRIPTEN_NO_SDL_RESIZE]
+EM_JS(int, sge_emscripten_getCanvasWidth, (), { return document.getElementById("canvas").width; });
+EM_JS(int, sge_emscripten_getCanvasHeight, (), { return document.getElementById("canvas").height; });
+#endif
+
 void main_loop() {
+#ifdef __EMSCRIPTEN__
+	// [SGE_EMSCRIPTEN_NO_SDL_RESIZE]
+	// SDL does not recieve any events about the canvas chaning size, so as a workaround
+	// we check the canvas size on each frame and fire a fake resize event if needed.
+	// SDL_SetWindowSize also seem to not work.
+	{
+		const int canvasWidth = sge_emscripten_getCanvasWidth();
+		const int canvasHeight = sge_emscripten_getCanvasHeight();
+
+		for (WindowBase* const wnd : sge::ApplicationHandler::get()->getAllWindows()) {
+			// if(wnd->GetClientWidth() != canvasWidth || wnd->GetClientHeight() != canvasHeight) {
+			WE_Resize_Data fakeResizeEventData(canvasWidth, canvasHeight);
+			wnd->HandleEvent(WE_Resize, &fakeResizeEventData);
+			// wnd->resizeWindow(canvasWidth, canvasHeight);
+			//}
+		}
+	}
+#endif
 	sge::ApplicationHandler::get()->PollEvents();
 	for (WindowBase* wnd : sge::ApplicationHandler::get()->getAllWindows()) {
 		SGEGameWindow* gameWindow = dynamic_cast<SGEGameWindow*>(wnd);
@@ -296,7 +322,7 @@ int main(int argc, char* argv[]) {
 
 	JsonParser jp;
 	[[maybe_unused]] SGEGameWindow* wnd = sge::ApplicationHandler::get()->NewWindow<SGEGameWindow>(
-	    "SGEEngine Game Player", windowSize.x, windowSize.y, false, !g_playerSettings.windowIsResizable);
+	    "Broomin Around", windowSize.x, windowSize.y, false, !g_playerSettings.windowIsResizable);
 
 #ifdef __EMSCRIPTEN__
 	EmscriptenFullscreenStrategy fullscreenStrategy = {};

@@ -1,5 +1,4 @@
 #include "AssetLibrary.h"
-#include "sge_audio/AudioTrack.h"
 #include "sge_core/ICore.h"
 #include "sge_core/dds/dds.h"
 #include "sge_core/model/EvaluatedModel.h"
@@ -127,7 +126,7 @@ SGE_CORE_API const char* assetType_getName(const AssetType type) {
 		case AssetType::Sprite:
 			return "Sprite";
 		case AssetType::Audio:
-			return "Vorbis Audio";
+			return "Audio";
 		default:
 			sgeAssertFalse("Not implemented");
 			return "NotImplemented";
@@ -175,7 +174,7 @@ AssetTextureMeta AssetTexture::loadTextureSettingInfoFile(const std::string& bas
 
 	try {
 		AssetTextureMeta result;
-		
+
 		auto jRoot = jp.getRoot();
 
 		int version = jRoot->getMemberOrThrow("version").getNumberAsOrThrow<int>();
@@ -189,8 +188,13 @@ AssetTextureMeta AssetTexture::loadTextureSettingInfoFile(const std::string& bas
 			}
 
 			const JsonValue* jIsSemiTransparent = jRoot->getMember("isSemiTransparent");
-			if (jIsSemiTransparent && jIsSemiTransparent->jid == JID_BOOL) {
-				result.isSemiTransparent = jIsSemiTransparent->getAsBool();
+			if (jIsSemiTransparent) {
+				result.isSemiTransparent = jIsSemiTransparent->jid == JID_TRUE;
+			}
+
+			const JsonValue* jShoudGenerateMips = jRoot->getMember("shouldGenerateMips");
+			if (jShoudGenerateMips) {
+				result.shouldGenerateMips = jShoudGenerateMips->jid == JID_TRUE;
 			}
 
 			return result;
@@ -236,6 +240,14 @@ AssetType assetType_guessFromExtension(const char* const ext, bool includeExtern
 	}
 
 	if (sge_stricmp(ext, "ogg") == 0) {
+		return AssetType::Audio;
+	}
+
+	if (sge_stricmp(ext, "mp3") == 0) {
+		return AssetType::Audio;
+	}
+
+	if (sge_stricmp(ext, "wav") == 0) {
 		return AssetType::Audio;
 	}
 
@@ -329,7 +341,9 @@ struct TextureViewAssetFactory : public IAssetFactory {
 		ddsLoadCode_importOrCreationFailed,
 	};
 
-	AssetTextureMeta getAssetTextureMeta(const char* const pAssetPath) const { return AssetTexture::loadTextureSettingInfoFile(pAssetPath); }
+	AssetTextureMeta getAssetTextureMeta(const char* const pAssetPath) const {
+		return AssetTexture::loadTextureSettingInfoFile(pAssetPath);
+	}
 
 	// Check if the file version in DDS already exists, if not or the import fails the function returns false;
 	DDSLoadCode loadDDS(void* const pAsset, const char* const pPath, AssetLibrary* const pMngr) {
@@ -398,6 +412,8 @@ struct TextureViewAssetFactory : public IAssetFactory {
 
 		TextureDesc textureDesc;
 
+		texture.meta = getAssetTextureMeta(pPath);
+
 		textureDesc.textureType = UniformType::Texture2D;
 		textureDesc.format = TextureFormat::R8G8B8A8_UNORM;
 		textureDesc.usage = TextureUsage::ImmutableResource;
@@ -407,6 +423,7 @@ struct TextureViewAssetFactory : public IAssetFactory {
 		textureDesc.texture2D.sampleQuality = 0;
 		textureDesc.texture2D.width = width;
 		textureDesc.texture2D.height = height;
+		textureDesc.generateMips = texture.meta.shouldGenerateMips;
 
 		TextureData textureDataDesc;
 		textureDataDesc.data = textureData;
@@ -414,7 +431,6 @@ struct TextureViewAssetFactory : public IAssetFactory {
 
 		texture.tex = pMngr->getDevice()->requestResource<Texture>();
 
-		texture.meta = getAssetTextureMeta(pPath);
 		texture.tex->create(textureDesc, &textureDataDesc, texture.meta.assetSamplerDesc);
 
 		if (textureData != nullptr) {
@@ -476,23 +492,20 @@ struct SpriteAssetFactory : public IAssetFactory {
 };
 
 //-------------------------------------------------------
-// AudioAssetFactory
+// AudioDataAssetFactory
 //-------------------------------------------------------
-struct AudioAssetFactory : public IAssetFactory {
+struct AudioDataAssetFactory : public IAssetFactory {
 	bool load(void* const pAsset, const char* const pPath, AssetLibrary* const UNUSED(assetLib)) final {
-		AudioAsset& audio = *reinterpret_cast<AudioAsset*>(pAsset);
+		AudioDataAsset& audio = *reinterpret_cast<AudioDataAsset*>(pAsset);
 
-		std::vector<char> fileContents;
-		if (!FileReadStream::readFile(pPath, fileContents)) {
-			return false;
-		}
-		audio.reset(new AudioTrack(std::move(fileContents)));
+		audio.audioData = std::make_shared<AudioData>();
+		audio.audioData->createFromFile(pPath);
 		return true;
 	}
 
 	void unload(void* const pAsset, AssetLibrary* const UNUSED(pMngr)) final {
-		AudioAsset& audio = *reinterpret_cast<AudioAsset*>(pAsset);
-		audio.reset();
+		AudioDataAsset& audio = *reinterpret_cast<AudioDataAsset*>(pAsset);
+		audio.audioData.reset();
 	}
 };
 
@@ -507,7 +520,7 @@ AssetLibrary::AssetLibrary(SGEDevice* const sgedev) {
 	this->registerAssetType(AssetType::Texture2D, new TAssetAllocatorDefault<AssetTexture>(), new TextureViewAssetFactory());
 	this->registerAssetType(AssetType::Text, new TAssetAllocatorDefault<std::string>(), new TextAssetFactory());
 	this->registerAssetType(AssetType::Sprite, new TAssetAllocatorDefault<SpriteAnimationAsset>(), new SpriteAssetFactory());
-	this->registerAssetType(AssetType::Audio, new TAssetAllocatorDefault<sge::AudioAsset>(), new AudioAssetFactory());
+	this->registerAssetType(AssetType::Audio, new TAssetAllocatorDefault<sge::AudioDataAsset>(), new AudioDataAssetFactory());
 }
 
 void AssetLibrary::registerAssetType(const AssetType type, IAssetAllocator* const pAllocator, IAssetFactory* const pFactory) {

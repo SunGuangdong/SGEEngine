@@ -1,9 +1,9 @@
 #include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_core/Camera.h"
-#include "sge_core/shaders/LightDesc.h"
 #include "sge_core/DebugDraw.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
+#include "sge_core/shaders/LightDesc.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/IWorldScript.h"
@@ -266,6 +266,7 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets) {
 
 		shadingLight.lightPositionAndType = position;
 		shadingLight.lightColorWFlags = vec4f(color, float(flags));
+		shadingLight.shadowMapBias = lightDesc.shadowMapBias;
 		shadingLight.lightSpotDirAndCosAngle = vec4f(light->getTransformMtx().c0.xyz().normalized0(), spotLightCosAngle);
 		shadingLight.lightXShadowRange = vec4f(lightDesc.range, 0.f, 0.f, 0.f);
 
@@ -331,11 +332,11 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 	}
 
 	if (TraitModel* const trait = getTrait<TraitModel>(actor); item.editMode == editMode_actors && trait != nullptr) {
-		trait->getRenderItems(m_RIs_traitModel);
+		trait->getRenderItems(drawReason, m_RIs_traitModel);
 	}
 
 	if (TraitSprite* const trait = getTrait<TraitSprite>(actor); item.editMode == editMode_actors && trait != nullptr) {
-		trait->getRenderItems(drawSets, m_RIs_traitSprite);
+		trait->getRenderItems(drawReason, drawSets, m_RIs_traitSprite);
 	}
 
 	if (TraitParticlesSimple* const trait = getTrait<TraitParticlesSimple>(actor); item.editMode == editMode_actors && trait != nullptr) {
@@ -533,6 +534,22 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 	// Draw the render items.
 	drawCurrentRenderItems(drawSets, drawReason, true);
 
+	if (getWorld()->inspector && getWorld()->inspector->m_physicsDebugDrawEnabled) {
+		drawSets.rdest.sgecon->clearDepth(drawSets.rdest.frameTarget, 1.f);
+
+		getWorld()->m_physicsDebugDraw.preDebugDraw(drawSets.drawCamera->getProjView(), drawSets.quickDraw, drawSets.rdest);
+		getWorld()->physicsWorld.dynamicsWorld->debugDrawWorld();
+		getWorld()->m_physicsDebugDraw.postDebugDraw();
+	}
+
+	if (drawReason == drawReason_gameplay || drawReason == drawReason_editing) {
+		for (ObjectId scriptObj : getWorld()->m_scriptObjects) {
+			if (IWorldScript* script = dynamic_cast<IWorldScript*>(getWorld()->getObjectById(scriptObj))) {
+				script->onPostDraw(drawSets);
+			}
+		}
+	}
+
 	// Draw the debug draw commands.
 	getCore()->getDebugDraw().draw(drawSets.rdest, drawSets.drawCamera->getProjView());
 }
@@ -588,14 +605,14 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 	if (!drawReason_IsVisualizeSelection(drawReason)) {
 		if (drawReason == drawReason_gameplayShadow) {
 			m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), finalTrasform,
-			                                *drawSets.shadowMapBuildInfo, geom);
+			                                *drawSets.shadowMapBuildInfo, geom, ri.mtl.diffuseTexture, false);
 		} else {
-			m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), finalTrasform, lighting,
-			                         &geom, ri.mtl, ri.traitModel->m_models[ri.iModel].instanceDrawMods);
+			m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), finalTrasform, lighting, &geom,
+			                         ri.mtl, ri.traitModel->m_models[ri.iModel].instanceDrawMods);
 		}
 	} else {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), finalTrasform, geom,
-		                                   getSelectionTintColor(drawReason));
+		                                   getSelectionTintColor(drawReason), false);
 	}
 }
 
@@ -614,11 +631,11 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), ri.obj2world, texPlaneGeom,
-		                                   getSelectionTintColor(drawReason));
+		                                   getSelectionTintColor(drawReason), true);
 	} else if (drawReason == drawReason_gameplayShadow) {
 		// Shadow maps.
 		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), ri.obj2world,
-		                                *drawSets.shadowMapBuildInfo, texPlaneGeom);
+		                                *drawSets.shadowMapBuildInfo, texPlaneGeom, ri.spriteTexture, ri.forceNoCulling);
 	} else {
 		// Gameplay shaded.
 		PBRMaterial texPlaneMtl = m_texturedPlaneDraw.getMaterial(ri.spriteTexture);
@@ -628,6 +645,7 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 		mods.gameTime = getWorld()->timeSpendPlaying;
 		mods.forceNoLighting = ri.forceNoLighting;
 		mods.forceNoCulling = ri.forceNoCulling;
+		mods.forceAdditiveBlending = ri.forceAlphaBlending;
 
 		m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), ri.obj2world, lighting,
 		                         &texPlaneGeom, texPlaneMtl, mods);
@@ -670,8 +688,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 					for (const ParticleGroupState::ParticleState& particle : pstate.getParticles()) {
 						mat4f particleTForm = n2w * mat4f::getTranslation(particle.pos) * mat4f::getScaling(particle.scale);
 
-						m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm,
-						                 lighting, model->staticEval, InstanceDrawMods());
+						m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, lighting,
+						                 model->staticEval, InstanceDrawMods());
 					}
 				}
 			}
@@ -912,84 +930,15 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 		if (simpleObstacle->geometry.hasData()) {
 			if (drawReason_IsVisualizeSelection(drawReason)) {
 				m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), simpleObstacle->getTransformMtx(),
-				                                   simpleObstacle->geometry, selectionTint);
+				                                   simpleObstacle->geometry, selectionTint, false);
 			} else {
 				m_modeldraw.drawGeometry(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(),
-				                         simpleObstacle->getTransformMtx(), lighting, &simpleObstacle->geometry,
-				                         simpleObstacle->material, InstanceDrawMods());
+				                         simpleObstacle->getTransformMtx(), lighting, &simpleObstacle->geometry, simpleObstacle->material,
+				                         InstanceDrawMods());
 			}
 		}
 	} else if (actorType == sgeTypeId(ACamera) && drawReason_IsVisualizeSelection(drawReason)) {
 		if (editMode == editMode_actors) {
-			float const bodyEnd = -0.3f;
-			float const sizeZ = 0.35f;
-			float height = 0.35f;
-			float eyeScaleStart = 0.5f;
-
-			vec3f vertices[] = {
-			    // Body
-			    vec3f(bodyEnd, -height, -sizeZ),
-			    vec3f(bodyEnd, -height, sizeZ),
-			    vec3f(bodyEnd, height, -sizeZ),
-			    vec3f(bodyEnd, height, sizeZ),
-
-			    vec3f(-1.f, -height, -sizeZ),
-			    vec3f(-1.f, -height, sizeZ),
-			    vec3f(-1.f, height, -sizeZ),
-			    vec3f(-1.f, height, sizeZ),
-
-			    vec3f(bodyEnd, -height, -sizeZ),
-			    vec3f(bodyEnd, height, -sizeZ),
-			    vec3f(bodyEnd, -height, sizeZ),
-			    vec3f(bodyEnd, height, sizeZ),
-
-			    vec3f(-1.f, -height, -sizeZ),
-			    vec3f(-1.f, height, -sizeZ),
-			    vec3f(-1.f, -height, sizeZ),
-			    vec3f(-1.f, height, sizeZ),
-
-			    vec3f(bodyEnd, height, sizeZ),
-			    vec3f(-1.f, height, sizeZ),
-			    vec3f(bodyEnd, -height, sizeZ),
-			    vec3f(-1.f, -height, sizeZ),
-
-			    vec3f(bodyEnd, height, -sizeZ),
-			    vec3f(-1.f, height, -sizeZ),
-			    vec3f(bodyEnd, -height, -sizeZ),
-			    vec3f(-1.f, -height, -sizeZ),
-
-			    // Eye
-			    vec3f(0.f, -height, -sizeZ),
-			    vec3f(0.f, -height, sizeZ),
-			    vec3f(0.f, height, -sizeZ),
-			    vec3f(0.f, height, sizeZ),
-
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * sizeZ),
-
-			    vec3f(0.f, -height, -sizeZ),
-			    vec3f(0.f, height, -sizeZ),
-			    vec3f(0.f, -height, sizeZ),
-			    vec3f(0.f, height, sizeZ),
-
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * sizeZ),
-
-			    vec3f(0.f, height, sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * sizeZ),
-			    vec3f(0.f, -height, sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * sizeZ),
-
-			    vec3f(0.f, height, -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * height, eyeScaleStart * -sizeZ),
-			    vec3f(0.f, -height, -sizeZ),
-			    vec3f(bodyEnd, eyeScaleStart * -height, eyeScaleStart * -sizeZ),
-			};
-
 			if (const TraitCamera* const traitCamera = getTrait<TraitCamera>(actor)) {
 				const auto intersectPlanes = [](const Plane& p0, const Plane& p1, const Plane& p2) -> vec3f {
 					// http://www.ambrsoft.com/TrigoCalc/Plan3D/3PlanesIntersection_.htm
@@ -1003,8 +952,8 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 				};
 
 
-				const ICamera* const icam = traitCamera->getCamera();
-				const Frustum* const f = icam->getFrustumWS();
+				const ICamera* const ifaceCamera = traitCamera->getCamera();
+				const Frustum* const f = ifaceCamera->getFrustumWS();
 				if (f) {
 					const vec3f frustumVerts[8] = {
 					    intersectPlanes(f->t, f->r, f->n), intersectPlanes(f->t, f->l, f->n),
@@ -1025,7 +974,7 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 					    frustumVerts[3],
 					    frustumVerts[0],
 
-					    // Lines that connect near and far.
+					    // Lines that connect near and far planes.
 					    frustumVerts[4 + 0],
 					    frustumVerts[4 + 1],
 					    frustumVerts[4 + 1],

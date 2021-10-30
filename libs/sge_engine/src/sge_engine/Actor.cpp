@@ -9,7 +9,7 @@ namespace sge {
 // struct Actor
 //--------------------------------------------------------------------
 // clang-format off
-DefineTypeId(Actor, 20'03'01'0022);
+RelfAddTypeId(Actor, 20'03'01'0022);
 
 ReflBlock()
 {
@@ -42,7 +42,13 @@ const mat4f& Actor::getTransformMtx() const {
 //}
 
 void Actor::setTransform(const transf3d& transform, bool killVelocity) {
-	setTransformEx(transform, killVelocity, false, true);
+	// Recompute binding is making alot of trouble, if the child object has 
+	// self moving logic e do want to recompute binding when we call
+	// setTransform.
+	// When then object is static we usually do not call this at all, except in the editor.
+	// I do not know... some debugging is needed do pick the best behaviour or we need to make this thing explicit.
+	bool recomputeBinding = false;
+	setTransformEx(transform, killVelocity, recomputeBinding, true);
 }
 
 void Actor::setLocalTransform(const transf3d& localTransform, bool killVelocity) {

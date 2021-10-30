@@ -5,9 +5,9 @@
 namespace sge {
 
 // clang-format off
-DefineTypeId(CollsionShapeDesc::Type,        21'02'28'0003);
-DefineTypeId(CollsionShapeDesc,              21'02'28'0004);
-DefineTypeId(std::vector<CollsionShapeDesc>, 21'02'28'0005);
+RelfAddTypeId(CollsionShapeDesc::Type,        21'02'28'0003);
+RelfAddTypeId(CollsionShapeDesc,              21'02'28'0004);
+RelfAddTypeId(std::vector<CollsionShapeDesc>, 21'02'28'0005);
 ReflBlock()
 {
 	ReflAddType(CollsionShapeDesc::Type)
@@ -169,6 +169,16 @@ CollsionShapeDesc CollsionShapeDesc::createCylinder(const vec3f& halfDiagonal, c
 	r.offset = transf3d(offset.p, offset.r, vec3f(1.f));
 
 	return r;
+}
+
+CollsionShapeDesc CollsionShapeDesc::createCylinder(float height, float radius, const transf3d& offset) {
+	vec3f halfDiagonal = vec3f(radius, height * 0.5f, radius);
+	return createCylinder(halfDiagonal, offset);
+}
+
+CollsionShapeDesc CollsionShapeDesc::createCylinderBottomAligned(float height, float radius, transf3d offset) {
+	offset.p.y += height * 0.5f;
+	return createCylinder(height, radius, offset);
 }
 
 CollsionShapeDesc CollsionShapeDesc::createCone(const float height, const float radius, const transf3d& offset) {
@@ -342,7 +352,7 @@ void SgeCustomMoutionState::setWorldTransform(const btTransform& UNUSED(centerOf
 		// Caution:
 		// Bullet cannot change the scaling of the object so use the one inside the actor.
 		newActorTransform.s = m_pRigidBody->actor->getTransform().s;
-		m_pRigidBody->actor->setTransform(newActorTransform, false);
+		m_pRigidBody->actor->setTransformEx(newActorTransform, false, false, false);
 #endif
 	}
 }
@@ -575,7 +585,7 @@ void RigidBody::applyLinearVelocity(const vec3f& v) {
 	}
 }
 
-inline void RigidBody::setLinearVelocity(const vec3f& v) {
+void RigidBody::setLinearVelocity(const vec3f& v) {
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setLinearVelocity(toBullet(v));
