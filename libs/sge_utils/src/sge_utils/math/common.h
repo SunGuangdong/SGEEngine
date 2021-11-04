@@ -23,6 +23,10 @@ enum Axis {
 	axis_z = 2,
 };
 
+/// @brief An enum indicating axes in 3D with a sign.
+/// This is a friendly reminder that these do not match the
+/// Cube Map signed axes in OpenGL and D3D.
+/// This enum is designed to be an extenstion to @Axis enum.
 enum SignedAxis {
 	axis_x_pos = 0,
 	axis_y_pos = 1,

@@ -110,7 +110,6 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		uTexDiffuseZSampler,
 		uTexDiffuseXYZScaling,
 		uLightShadowMap,
-		uPointLightShadowMap,
 		uTexMetalness,
 		uTexMetalnessSampler,
 		uTexRoughness,
@@ -165,7 +164,6 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		    {uTexDiffuseZSampler, "texDiffuseZ_sampler", ShaderType::PixelShader},
 		    {uTexDiffuseXYZScaling, "texDiffuseXYZScaling", ShaderType::PixelShader},
 		    {uLightShadowMap, "lightShadowMap", ShaderType::PixelShader},
-		    {uPointLightShadowMap, "uPointLightShadowMap", ShaderType::PixelShader},
 		    {uTexMetalness, "uTexMetalness", ShaderType::PixelShader},
 		    {uTexMetalnessSampler, "uTexMetalness_sampler", ShaderType::PixelShader},
 		    {uTexRoughness, "uTexRoughness", ShaderType::PixelShader},
@@ -328,27 +326,6 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 #endif
 	}
 
-	if (emptyCubeShadowMap.IsResourceValid() == false) {
-		TextureDesc texDesc;
-		texDesc.textureType = UniformType::TextureCube;
-		texDesc.format = TextureFormat::D24_UNORM_S8_UINT;
-		texDesc.usage = TextureUsage::DepthStencilResource;
-		texDesc.textureCube.width = 16;
-		texDesc.textureCube.height = 16;
-		texDesc.textureCube.arraySize = 1;
-		texDesc.textureCube.numMips = 1;
-		texDesc.textureCube.sampleQuality = 0;
-		texDesc.textureCube.numSamples = 1;
-
-		emptyCubeShadowMap = getCore()->getDevice()->requestResource<Texture>();
-		[[maybe_unused]] const bool succeeded = emptyCubeShadowMap->create(texDesc, nullptr);
-	}
-
-	if (shaderPerm.uniformLUT[uPointLightShadowMap].isNull() == false) {
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uPointLightShadowMap], (emptyCubeShadowMap.GetPtr())));
-		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-	}
-
 	if (OPT_HasVertexSkinning_choice == kHasVertexSkinning_Yes) {
 		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uTexSkinningBones], (geometry->skinningBoneTransforms)));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
@@ -377,13 +354,8 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 			paramsCb.lightColorWFlag = shadingLight.lightColorWFlags;
 
 			if (shadingLight.shadowMap != nullptr && shaderPerm.uniformLUT[uLightShadowMap].isNull() == false) {
-				if (shadingLight.lightPositionAndType.w == 0.f) {
-					uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uPointLightShadowMap], (shadingLight.shadowMap)));
-					sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-				} else {
-					uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uLightShadowMap], (shadingLight.shadowMap)));
-					sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-				}
+				uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uLightShadowMap], (shadingLight.shadowMap)));
+				sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 			}
 
 			paramsCb.lightShadowMapProjView = shadingLight.shadowMapProjView;

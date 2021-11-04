@@ -27,9 +27,7 @@ struct ANavMesh;
 
 struct LightShadowInfo {
 	ShadowMapBuildInfo buildInfo;
-	GpuHandle<Texture> pointLightDepthTexture; ///< This could be a single 2D or a Cube texture depending on the light source.
-	GpuHandle<FrameTarget>
-	    pointLightFrameTargets[signedAxis_numElements]; ///< FrameTarget used specifically for rendering point light shadow maps.
+	//GpuHandle<Texture> pointLightDepthTexture; ///< This could be a single 2D or a Cube texture depending on the light source.
 	GpuHandle<FrameTarget> frameTarget;                 ///< Regular frame target for spot and directional lights.
 	bool isCorrectlyUpdated = false;
 };

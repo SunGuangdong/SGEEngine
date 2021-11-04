@@ -4,6 +4,7 @@
 #ifndef SHADECOMMON_H
 #define SHADECOMMON_H
 
+#define kMaxLights 4
 
 // Setting for OPT_HasVertexColor, vertex color can be used as diffuse source or for tinting.
 #define kHasVertexColor_No  0
@@ -33,8 +34,9 @@
 
 // Lights flags encoded as float use up to 23
 // These are going to be casted as float in the shader BTW.
-#define kLightFlg_DontLight    1 // user for objects that have no light affecting them besides the amibient one.
-#define kLightFlg_HasShadowMap 2
+#define kLightFlg_IsPointLight 1 
+#define kLightFlg_DontLight    2 // user for objects that have no light affecting them besides the amibient one.
+#define kLightFlg_HasShadowMap 4
 
 // Material flags.
 #define kPBRMtl_Flags_HasNormalMap                1

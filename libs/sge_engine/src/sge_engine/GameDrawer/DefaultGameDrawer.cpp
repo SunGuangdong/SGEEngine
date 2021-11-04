@@ -105,85 +105,29 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets) {
 
 		lsi.buildInfo = shadowMapBuildInfoOpt.get();
 
-		// Create the appropriatley sized frame target for the shadow map.
+		int shadowMapWidth = lightDesc.shadowMapRes;
+		int shadowMapHegiht = lightDesc.shadowMapRes;
+
 		if (isPointLight) {
-			// No regular shadow maps are needed so relese them.
-			lsi.frameTarget.Release();
-
-			const int shadowMapWidth = lightDesc.shadowMapRes;
-			const int shadowMapHegiht = lightDesc.shadowMapRes;
-
-
-			const bool shouldCreateNewShadowMapTexture = lsi.pointLightDepthTexture.IsResourceValid() == false ||
-			                                             lsi.pointLightDepthTexture->getDesc().textureType != UniformType::TextureCube ||
-			                                             lsi.pointLightDepthTexture->getDesc().textureCube.width != shadowMapWidth ||
-			                                             lsi.pointLightDepthTexture->getDesc().textureCube.height != shadowMapHegiht;
-
-			if (shouldCreateNewShadowMapTexture) {
-				TextureDesc texDesc;
-				texDesc.textureType = UniformType::TextureCube;
-				texDesc.format = TextureFormat::D24_UNORM_S8_UINT;
-				texDesc.usage = TextureUsage::DepthStencilResource;
-				texDesc.textureCube.width = shadowMapWidth;
-				texDesc.textureCube.height = shadowMapHegiht;
-				texDesc.textureCube.arraySize = 1;
-				texDesc.textureCube.numMips = 1;
-				texDesc.textureCube.sampleQuality = 0;
-				texDesc.textureCube.numSamples = 1;
-
-				lsi.pointLightDepthTexture = getCore()->getDevice()->requestResource<Texture>();
-				[[maybe_unused]] const bool succeeded = lsi.pointLightDepthTexture->create(texDesc, nullptr);
-				sgeAssert(succeeded);
-
-
-				for (int iSignedAxis = 0; iSignedAxis < SGE_ARRSZ(lsi.pointLightFrameTargets); ++iSignedAxis) {
-					// Destroy the prevously existing frame target for the face.
-					lsi.pointLightFrameTargets[iSignedAxis].Release();
-
-					// Create the new one.
-					GpuHandle<FrameTarget>& faceFrameTarget = lsi.pointLightFrameTargets[iSignedAxis];
-					faceFrameTarget = getCore()->getDevice()->requestResource<FrameTarget>();
-
-					TargetDesc faceTargetDesc;
-					faceTargetDesc.baseTextureType = UniformType::TextureCube;
-					faceTargetDesc.textureCube.face = SignedAxis(iSignedAxis);
-					faceTargetDesc.textureCube.mipLevel = 0;
-
-					[[maybe_unused]] const bool targetSucceeded =
-					    faceFrameTarget->create(0, nullptr, nullptr, lsi.pointLightDepthTexture, faceTargetDesc);
-
-					sgeAssert(targetSucceeded);
-				}
-			}
-
-		} else {
-			// No point light frame targets are going to be needed so release them.
-			for (int t = 0; t < SGE_ARRSZ(lsi.pointLightFrameTargets); ++t) {
-				lsi.pointLightFrameTargets[t].Release();
-			}
-
-			lsi.pointLightDepthTexture.Release();
-
-			// Create the shadow map frame target (with texture) for the shadow map.
-			const int shadowMapWidth = lightDesc.shadowMapRes;
-			const int shadowMapHegiht = lightDesc.shadowMapRes;
-
-			GpuHandle<FrameTarget>& shadowFrameTarget = lsi.frameTarget;
-
-			const bool shouldCreateNewShadowMapTexture = shadowFrameTarget.IsResourceValid() == false ||
-			                                             shadowFrameTarget->getWidth() != shadowMapWidth ||
-			                                             shadowFrameTarget->getHeight() != shadowMapHegiht;
-
-			if (shouldCreateNewShadowMapTexture) {
-				// Caution, TODO: On Safari (the web browser) I've read that it needs a color render target.
-				// Keep that in mind when testing and developing.
-				shadowFrameTarget = getCore()->getDevice()->requestResource<FrameTarget>();
-				shadowFrameTarget->create2D(shadowMapWidth, shadowMapHegiht, TextureFormat::Unknown, TextureFormat::D24_UNORM_S8_UINT);
-			}
+			// Point light shadow will render a cube map to a single 2D texture.
+			// The specified shadow map resolution should be the resolution of each side of the cubemap faces.
+			shadowMapWidth = lightDesc.shadowMapRes * 4;
+			shadowMapHegiht = lightDesc.shadowMapRes * 3;
 		}
 
+		// Create the appropriatley sized frame target for the shadow map.
+		GpuHandle<FrameTarget>& shadowFrameTarget = lsi.frameTarget;
+		const bool shouldCreateNewShadowMapTexture = shadowFrameTarget.IsResourceValid() == false ||
+		                                             shadowFrameTarget->getWidth() != shadowMapWidth ||
+		                                             shadowFrameTarget->getHeight() != shadowMapHegiht;
+		if (shouldCreateNewShadowMapTexture) {
+			// Caution, TODO: On Safari (the web browser) I've read that it needs a color render target.
+			// Keep that in mind when testing and developing.
+			shadowFrameTarget = getCore()->getDevice()->requestResource<FrameTarget>();
+			shadowFrameTarget->create2D(shadowMapWidth, shadowMapHegiht, TextureFormat::Unknown, TextureFormat::D24_UNORM_S8_UINT);
+		}
 
-		// Draw the shadow map to the created frame target.
+		// Draws the shadow map to the created frame target.
 		const auto drawShadowMapFromCamera = [this, &lsi](const RenderDestination& rendDest, ICamera* gameCamera,
 		                                                  ICamera* drawCamera) -> void {
 			GameDrawSets drawShadowSets;
@@ -197,24 +141,30 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets) {
 			drawWorld(drawShadowSets, drawReason_gameplayShadow);
 		};
 
-		if (shadowMapBuildInfoOpt->isPointLight) {
-			for (int iSignedAxis = 0; iSignedAxis < signedAxis_numElements; ++iSignedAxis) {
-				// Clear the pre-existing state.
-				GpuHandle<FrameTarget>& faceFrameTarget = lsi.pointLightFrameTargets[iSignedAxis];
-				getCore()->getDevice()->getContext()->clearColor(faceFrameTarget, 0, vec4f(0.f).data);
-				getCore()->getDevice()->getContext()->clearDepth(faceFrameTarget, 1.f);
+		// Clear the pre-existing image in the shadow map.
+		getCore()->getDevice()->getContext()->clearColor(shadowFrameTarget, 0, vec4f(0.f).data);
+		getCore()->getDevice()->getContext()->clearDepth(shadowFrameTarget, 1.f);
 
-				// Render the scene for the current face of the cube map.
-				RenderDestination rdest(getCore()->getDevice()->getContext(), faceFrameTarget);
+		if (shadowMapBuildInfoOpt->isPointLight) {
+			// Compute the shadow map sub regions to be used a viewport for rendering each face.
+			const short mapSideRes = short(lightDesc.shadowMapRes);
+			Rect2s viewports[signedAxis_numElements];
+			viewports[axis_x_pos] = Rect2s(mapSideRes, mapSideRes, 0, mapSideRes);
+			viewports[axis_x_neg] = Rect2s(mapSideRes, mapSideRes, 2 * mapSideRes, mapSideRes);
+			viewports[axis_y_pos] = Rect2s(mapSideRes, mapSideRes, mapSideRes, 0);
+			viewports[axis_y_neg] = Rect2s(mapSideRes, mapSideRes, mapSideRes, 2 * mapSideRes);
+			viewports[axis_z_pos] = Rect2s(mapSideRes, mapSideRes, mapSideRes, mapSideRes);
+			viewports[axis_z_neg] = Rect2s(mapSideRes, mapSideRes, 3 * mapSideRes, mapSideRes);
+
+			// Render the scene for each face of the cube map.
+			// TODO: avoid rendering individual faces that would not cast shadow in the visiable area of the game camera.
+			for (int iSignedAxis = 0; iSignedAxis < signedAxis_numElements; ++iSignedAxis) {
+				RenderDestination rdest(getCore()->getDevice()->getContext(), shadowFrameTarget, viewports[iSignedAxis]);
 				drawShadowMapFromCamera(rdest, gameCamera, &shadowMapBuildInfoOpt->pointLightShadowMapCameras[iSignedAxis]);
 			}
 		} else {
-			// Clear the pre-existing state.
-			getCore()->getDevice()->getContext()->clearColor(lsi.frameTarget, 0, vec4f(0.f).data);
-			getCore()->getDevice()->getContext()->clearDepth(lsi.frameTarget, 1.f);
-
 			// Non-point lights have only one camera that uses the whole texture for storing the shadow map.
-			RenderDestination rdest(getCore()->getDevice()->getContext(), lsi.frameTarget);
+			RenderDestination rdest(getCore()->getDevice()->getContext(), shadowFrameTarget);
 			drawShadowMapFromCamera(rdest, gameCamera, &shadowMapBuildInfoOpt->shadowMapCamera);
 		}
 
@@ -250,9 +200,10 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets) {
 		LightShadowInfo& lsi = m_perLightShadowFrameTarget[light->getId()];
 		if (lightDesc.hasShadows && lsi.isCorrectlyUpdated) {
 			if (lsi.buildInfo.isPointLight) {
-				if (lsi.pointLightDepthTexture.IsResourceValid()) {
-					shadingLight.shadowMap = lsi.pointLightDepthTexture;
-					shadingLight.shadowMapProjView = mat4f::getIdentity(); // Not used.
+				if (lsi.frameTarget.IsResourceValid()) {
+					shadingLight.shadowMap = lsi.frameTarget->getDepthStencil();
+					shadingLight.shadowMapProjView =
+					    mat4f::getIdentity(); // Not used for points light. They use the near/far projection settings and linear depth maps
 					flags |= kLightFlg_HasShadowMap;
 				}
 			} else {
@@ -552,6 +503,17 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 
 	// Draw the debug draw commands.
 	getCore()->getDebugDraw().draw(drawSets.rdest, drawSets.drawCamera->getProjView());
+
+
+#if 0
+	// This code here is something needed only for debugging shadow maps.
+	// I ended up writing this from stach more than 10 times that is why I decided to keep it.
+	if (drawReason == drawReason_editing) {
+		if (m_shadingLights.size() > 0 && m_shadingLights[0].shadowMap) {
+			drawSets.quickDraw->drawTexture(drawSets.rdest, 0.f, 0.f, 256.f, m_shadingLights[0].shadowMap);
+		}
+	}
+#endif
 }
 
 void DefaultGameDrawer::drawSky(const GameDrawSets& drawSets, const DrawReason drawReason) {

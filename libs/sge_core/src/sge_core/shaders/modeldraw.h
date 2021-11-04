@@ -106,7 +106,6 @@ struct SGE_CORE_API BasicModelDraw {
   private:
 	Optional<ShadingProgramPermuator> shadingPermutFWDShading;
 	Optional<ShadingProgramPermuator> shadingPermutFWDBuildShadowMaps;
-	GpuHandle<Texture> emptyCubeShadowMap;
 	GpuHandle<Buffer> paramsBuffer;
 	StateGroup stateGroup;
 };

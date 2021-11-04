@@ -7,10 +7,34 @@
 #endif
 
 #include "lib_pbr.shader"
+#include "lib_textureMapping.shader"
 
 //--------------------------------------------------------------------
 // Uniforms
 //--------------------------------------------------------------------
+
+#if 0
+struct MaterialSample {
+	float4 albedo;
+	float metallic;
+	float roughness;
+
+	vec3 hitNormalWs;
+	vec3 hitPointWs;
+};
+
+struct Light {
+	float3 lightPosition;
+	int lightFlags; // A set of flags based on kLightFlg_ macros.
+
+	float lightShadowRange;
+	float lightShadowBias;
+	float spotLightCosAngle;
+	float lightData_padding; // Padding for easily matching the C++ memory layout.
+
+	float4x4 lightShadowMapProjView;
+};
+#endif
 
 // https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-packing-rules?redirectedfrom=MSDN
 cbuffer ParamsCbFWDDefaultShading {
@@ -55,7 +79,6 @@ uniform sampler2D uTexRoughness;
 
 // Shadows.
 sampler2D lightShadowMap;
-uniform samplerCUBE uPointLightShadowMap;
 
 // Skinning.
 #if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
@@ -285,8 +308,10 @@ float4 psMain(VS_OUTPUT IN)
 					// [FWDDEF_POINTLIGHT_LINEAR_ZDEPTH]
 					float3 lightToVertexWs = IN.v_posWS - lightPosF4.xyz;
 					float lightToVertexWsLength = length(lightToVertexWs);
-					const float shadowSampleDistanceToLight =
-					    lightShadowRange.x * texCUBE(uPointLightShadowMap, lightToVertexWs / lightToVertexWsLength).x;
+
+					float2 sampleUv = directionToUV_cubeMapping(lightToVertexWs / lightToVertexWsLength, 1.f / tex2Dsize(lightShadowMap));
+					const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
+					const float shadowSampleDistanceToLight = lightShadowRange.x * shadowZ;
 					const float currentFragmentDistanceToLight = lightToVertexWsLength;
 
 					if (shadowSampleDistanceToLight < (currentFragmentDistanceToLight - lightShadowBias.x) || NdotL <= 0.0) {
@@ -381,8 +406,6 @@ float4 psMain(VS_OUTPUT IN)
 			}
 		}
 	}
-
-	
 
 	float4 finalColor = diffuseColor;
 

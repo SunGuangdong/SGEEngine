@@ -115,26 +115,15 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 	stateGroup.setVB(0, geometry.vertexBuffer, uint32(geometry.vbByteOffset), geometry.stride);
 
 	RasterizerState* rasterState = nullptr;
-	{
-		// We are baking shadow maps and we want to render the backfaces
-		// *opposing to the regular rendering which uses front faces... duh).
-		// This is done to avoid the Shadow Acne artifacts caused by floating point
-		// innacuraties introduced by the depth texture.
+	if (forceNoCulling) {
+		rasterState = getCore()->getGraphicsResources().RS_noCulling;
+	} else {
+		// TODO: Add a way to specify in the geometry to use the back faces for geometries.
+		// This would remove the shadow acne for those gemetries without needed any depth bias.
 		bool flipCulling = determinant(world) > 0.f;
-
-		// Caution: [POINT_LIGHT_SHADOWMAP_TRIANGLE_WINING_FLIP]
-		// Triangle winding would need an aditional flip based on the rendering API.
-		if (shadowMapBuildInfo.isPointLight && kIsTexcoordStyleD3D) {
-			flipCulling = !flipCulling;
-		}
-
-		if (forceNoCulling) {
-			rasterState = getCore()->getGraphicsResources().RS_noCulling;
-		} else {
-			rasterState =
-			    flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
-		}
+		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
 	}
+
 
 	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual);
 

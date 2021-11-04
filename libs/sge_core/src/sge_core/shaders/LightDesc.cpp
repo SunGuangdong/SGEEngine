@@ -65,14 +65,13 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 			const vec3f camPosWs = lightWs.p;
 			mat4f shadowProjMtx = mat4f::getPerspectiveFovRH(half_pi(), 1.f, 0.1f, range, 0.f, kIsTexcoordStyleD3D);
 
-			// Caution: [POINT_LIGHT_SHADOWMAP_TRIANGLE_WINING_FLIP]
+			
 			// When we render Cube maps depending on the rendering API we need to
 			// modify the projection matrix so the final cube map is render correctly.
-			// however these modification could change the determinant sign of the projection
-			// matrix, resulting in flipping the triangle winding.
+			// OpenGL needs to have the Y axis flipped in the texture, as the tex coords start from
+			// bottom up.
 			if (kIsTexcoordStyleD3D) {
-				// 1. A myterious X-axis flip, the same one is done for OpenGL.
-				shadowProjMtx = mat4f::getScaling(-1.f, 1.f, 1.f) * shadowProjMtx;
+				// So far no changes needed here.
 			} else {
 				// 1. A myterious x-axis flip, the same one is done for Direct3D.
 				// 2. A Y-axis flip as texture space (0,0) for OpenGL is bottom left,

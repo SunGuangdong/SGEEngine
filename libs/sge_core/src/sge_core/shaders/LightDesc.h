@@ -17,7 +17,7 @@ struct SGE_CORE_API ShadowMapBuildInfo {
 	    : shadowMapCamera(shadowMapCamera) {}
 
 	bool isPointLight = false;
-	RawCamera shadowMapCamera; // todo multiple camera for point lights.
+	RawCamera shadowMapCamera;
 	RawCamera pointLightShadowMapCameras[SignedAxis::signedAxis_numElements];
 	float pointLightFarPlaneDistance = 0.f;
 };
