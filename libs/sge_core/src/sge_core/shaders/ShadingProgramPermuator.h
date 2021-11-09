@@ -7,9 +7,15 @@
 
 namespace sge {
 
-//------------------------------------------------------------
-// ShadingProgramPermuator
-//------------------------------------------------------------
+
+/// ShadingProgramPermuator provides a way to compile the specified file (and all of its includes)
+/// to a ShadingProgram, while providing a way to specify multiple compile time options.
+/// The permutatior will generate all possible combinations of these compile time options as you can request
+/// any combination of compile time option and their values and get a ShadingProgram for it.
+/// For example if you have shader that supports both skinned and non-skinned geometry. When the geometry
+/// is skinned each vertex usually has a an attributes for bones ids and weights, when there is no skinning
+/// these attributes should not be defined as the vertex buffer does not have values for them and the input assembled would fail.
+/// Or another example could be a shading program that does less computations on mobile or other weaker devices.
 struct SGE_CORE_API ShadingProgramPermuator {
 	struct Unform {
 		int safetyIndex; ///< The user specified to the ShadingProgramPermuator an array of uniforms to be found. In order to decrease

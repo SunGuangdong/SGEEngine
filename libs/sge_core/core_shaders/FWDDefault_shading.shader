@@ -8,34 +8,13 @@
 
 #include "lib_pbr.shader"
 #include "lib_textureMapping.shader"
+#include "lib_lighting.shader"
+
+
 
 //--------------------------------------------------------------------
 // Uniforms
 //--------------------------------------------------------------------
-
-#if 0
-struct MaterialSample {
-	float4 albedo;
-	float metallic;
-	float roughness;
-
-	vec3 hitNormalWs;
-	vec3 hitPointWs;
-};
-
-struct Light {
-	float3 lightPosition;
-	int lightFlags; // A set of flags based on kLightFlg_ macros.
-
-	float lightShadowRange;
-	float lightShadowBias;
-	float spotLightCosAngle;
-	float lightData_padding; // Padding for easily matching the C++ memory layout.
-
-	float4x4 lightShadowMapProjView;
-};
-#endif
-
 // https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-packing-rules?redirectedfrom=MSDN
 cbuffer ParamsCbFWDDefaultShading {
 	float4x4 projView;
@@ -53,19 +32,14 @@ cbuffer ParamsCbFWDDefaultShading {
 	float alphaMultiplier;
 
 	float4 uRimLightColorWWidth;
-	float3 ambientLightColor;
-
-	// Lights uniforms.
-	float4 lightPosition;           // Position, w encodes the type of the light.
-	float4 lightSpotDirAndCosAngle; // all Used in spot lights :( other lights do not use it
-	float4 lightColorWFlag;         // w used for flags.
-
-	float4x4 lightShadowMapProjView;
-	float4 lightShadowRange;
-	float4 lightShadowBias;
+	float3 uAmbientLightColor;
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+
+	ShaderLightData lights[kMaxLights];
+	int lightsCnt;
+	int lightCnt_padding[3];
 };
 
 // Material.
@@ -78,7 +52,7 @@ uniform sampler2D uTexMetalness;
 uniform sampler2D uTexRoughness;
 
 // Shadows.
-sampler2D lightShadowMap;
+uniform sampler2D uLightShadowMap[kMaxLights];
 
 // Skinning.
 #if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
@@ -99,17 +73,17 @@ float2 directionToUV_Spherical(float3 dir) {
 //--------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------
-struct VS_INPUT {
+struct IAVertex {
 	float3 a_position : a_position;
-
-#if OPT_HasUV == kHasUV_Yes
-	float2 a_uv : a_uv;
-#endif
-
 	float3 a_normal : a_normal;
+
 #if OPT_HasTangentSpace == kHasTangetSpace_Yes
 	float3 a_tangent : a_tangent;
 	float3 a_binormal : a_binormal;
+#endif
+
+#if OPT_HasUV == kHasUV_Yes
+	float2 a_uv : a_uv;
 #endif
 
 #if OPT_HasVertexColor == kHasVertexColor_Yes
@@ -122,7 +96,7 @@ struct VS_INPUT {
 #endif
 };
 
-struct VS_OUTPUT {
+struct StageVertexOut {
 	float4 SV_Position : SV_Position;
 	float3 v_posWS : v_posWS;
 
@@ -141,8 +115,8 @@ struct VS_OUTPUT {
 #endif
 };
 
-VS_OUTPUT vsMain(VS_INPUT vsin) {
-	VS_OUTPUT res;
+StageVertexOut vsMain(IAVertex vsin) {
+	StageVertexOut res;
 
 	float3 vertexPosOs = vsin.a_position;
 	float3 normalOs = vsin.a_normal;
@@ -184,22 +158,25 @@ VS_OUTPUT vsMain(VS_INPUT vsin) {
 // Pixel Shader
 //--------------------------------------------------------------------
 #ifdef SGE_PIXEL_SHADER
-float4 psMain(VS_OUTPUT IN)
-    : SV_Target0 {
-	float4 diffuseColor = uDiffuseColorTint; //pow(uDiffuseColorTint, 2.2f);
+float4 psMain(StageVertexOut inVert) : SV_Target0 {
+
+	MaterialSample mtlSample;
+
+	mtlSample.albedo = uDiffuseColorTint;
 
 	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromConstantColor) {
 		// We already use uDiffuseColorTint. So nothing to do here.
-	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
+	} 
+	else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
 	#if (OPT_HasUV == kHasUV_Yes)
-		diffuseColor *= tex2D(texDiffuse, IN.v_uv);
-		//diffuseColor.xyz = pow(diffuseColor.xyz, 2.2f);
+		mtlSample.albedo *= tex2D(texDiffuse, inVert.v_uv); // TODO: srgb to linear.
 	#else // Should never happen.
 		return float4(1.f, 0.f, 1.f, 1.f);
 	#endif
-	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromVertexColor) {
+	} 
+	else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromVertexColor) {
 	#if OPT_HasVertexColor == kHasVertexColor_Yes
-		diffuseColor = IN.v_vertexDiffuse;
+		mtlSample.albedo = inVert.v_vertexDiffuse;
 	#else // Should never happen.
 		return float4(1.f, 0.f, 1.f, 1.f);
 	#endif
@@ -207,236 +184,63 @@ float4 psMain(VS_OUTPUT IN)
 
 #if OPT_HasVertexColor == kHasVertexColor_Yes
 	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseTintByVertexColor) {
-		diffuseColor *= IN.v_vertexDiffuse;
+		mtlSample.albedo *= inVert.v_vertexDiffuse;
 	}
 #endif
 
-	// TODO: Triplanar mapping.
-
-	if (diffuseColor.w <= 0.f || alphaMultiplier <= 0.f) {
-		discard;
-	}
-
-	// DOING SHADING HERE
-
-	float3 normal;
-
 	if (uPBRMtlFlags & kPBRMtl_Flags_HasNormalMap) {
-#if (OPT_HasUV == kHasUV_Yes) && OPT_HasTangentSpace == kHasTangetSpace_Yes)
-		const float3 normalMapNorm = 2.f * tex2D(uTexNormalMap, IN.v_uv).xyz - float3(1.f, 1.f, 1.f);
-		const float3 normalFromNormalMap = normalMapNorm.x * normalize(IN.v_tangent) + normalMapNorm.y * normalize(IN.v_binormal) +
-		                                   normalMapNorm.z * normalize(IN.v_normal);
-		normal = normalize(normalFromNormalMap);
+#if (OPT_HasUV == kHasUV_Yes) && (OPT_HasTangentSpace == kHasTangetSpace_Yes)
+		const float3 normalMapNorm = 2.f * tex2D(uTexNormalMap, inVert.v_uv).xyz - float3(1.f, 1.f, 1.f);
+		const float3 normalFromNormalMap = 
+			  normalMapNorm.x * normalize(inVert.v_tangent) 
+			+ normalMapNorm.y * normalize(inVert.v_binormal) 
+			+ normalMapNorm.z * normalize(inVert.v_normal);
+
+		mtlSample.shadeNormalWs = normalize(normalFromNormalMap);
 #else
 		return float4(1.f, 1.f, 0.f, 1.f);
 #endif
 	} else {
-		normal = normalize(IN.v_normal);
+		mtlSample.shadeNormalWs = normalize(inVert.v_normal);
 	}
 
-	// GGX Crap:
-	const float3 N = normalize(normal);
-	const float3 V = normalize(cameraPositionWs.xyz - IN.v_posWS);
+	
+	// If the fragment is going to be fully transparent discard the sample.
+	if (mtlSample.albedo.w <= 0.f || alphaMultiplier <= 0.f) {
+		discard;
+	}
 
-	float3 lighting = float3(0.f, 0.f, 0.f);
-	if ((uPBRMtlFlags & kPBRMtl_Flags_NoLighting) == 0) {
-		// Lighting.
-		const int fLightFlags = (int)lightColorWFlag.w;
-		const bool dontLight = (fLightFlags & kLightFlg_DontLight) != 0;
-		if (dontLight == false) {
-			// GGX Material crap:
-			float metallic = uMetalness;
-			float roughness = uRoughness;
+	mtlSample.hitPointWs = inVert.v_posWS;
+	mtlSample.vertexToCameraDirWs = (cameraPositionWs - inVert.v_posWS);
+
+	mtlSample.metallic = uMetalness;
+	mtlSample.roughness = uRoughness;
 
 #if OPT_HasUV == kHasUV_Yes
-			if (uPBRMtlFlags & kPBRMtl_Flags_HasMetalnessMap) {
-				metallic *= tex2D(uTexMetalness, IN.v_uv).r;
-			}
+	if (uPBRMtlFlags & kPBRMtl_Flags_HasMetalnessMap) {
+		mtlSample.metallic *= tex2D(uTexMetalness, inVert.v_uv).r; // TODO: srgb to linear.
+	}
 
-			if ((uPBRMtlFlags & kPBRMtl_Flags_HasRoughnessMap) != 0) {
-				roughness *= tex2D(uTexRoughness, IN.v_uv).r;
-			}
+	if ((uPBRMtlFlags & kPBRMtl_Flags_HasRoughnessMap) != 0) {
+		mtlSample.roughness *= tex2D(uTexRoughness, inVert.v_uv).r; // TODO: srgb to linear.
+	}
 #endif
 
-			const float3 F0 = lerp(float3(0.04f, 0.04f, 0.04f), diffuseColor.xyz, metallic);
-
-			float3 lightRadiance = float3(0.f, 0.f, 0.f);
-			float3 L = float3(0.f, 0.f, 0.f);
-
-			const float4 lightPosF4 = lightPosition;
-			const float3 lightColor = lightColorWFlag.xyz;
-			const float range2 = lightShadowRange.x * lightShadowRange.x;
-
-
-			if (lightPosF4.w == 0.f) {
-				// Point Light.
-				const float3 toLightWs = lightPosF4.xyz - IN.v_posWS;
-				float k = 1.f - lerp(0.f, 1.f, saturate(dot(toLightWs, toLightWs) / range2));
-				lightRadiance.xyz = lightColor * saturate(k * k);
-				L = normalize(toLightWs);
-			} else if (lightPosF4.w == 1.f) {
-				// Direction Light.
-				lightRadiance.xyz = lightColor;
-				L = lightPosF4.xyz;
-			} else if (lightPosF4.w == 2.f) {
-				// Spot Light.
-				const float3 toLightWs = lightPosF4.xyz - IN.v_posWS;
-				const float3 revSpotLightDirWs = -lightSpotDirAndCosAngle.xyz;
-				const float spotLightAngleCosine = lightSpotDirAndCosAngle.w;
-				const float visibilityCosine = saturate(dot(normalize(toLightWs), revSpotLightDirWs));
-				const float c = saturate(visibilityCosine - spotLightAngleCosine);
-				const float range = 1.f - spotLightAngleCosine;
-				const float scale = saturate(c / range);
-				const float k = 1.f - lerp(0.f, 1.f, saturate(dot(toLightWs, toLightWs) / range2));
-				lightRadiance.xyz = lightColor * (scale * saturate(k * k));
-				L = normalize(toLightWs);
-			}
-
-			const float NdotL = max(dot(N, L), 0.0);
-
-			const bool useShadowsMap = (fLightFlags & kLightFlg_HasShadowMap) != 0;
-			
-			// A  multiplier telling us how much the shadow should dim the lighting.
-			// Usually it is a boolean telling if the object is in shadow or not.
-			// However to make the shadows softer we use PCF filtering. This returns 
-			// a value in [0;1] where 1 means there is no shadow, and 0 mean the object is totally in shadow.
-			float lightMultDueToShadow = 1.f;
-#if 1
-			if (useShadowsMap != 0) {
-				if (lightPosF4.w == 0.f) {
-					// Point light.
-					// [FWDDEF_POINTLIGHT_LINEAR_ZDEPTH]
-					float3 lightToVertexWs = IN.v_posWS - lightPosF4.xyz;
-					float lightToVertexWsLength = length(lightToVertexWs);
-
-					float2 sampleUv = directionToUV_cubeMapping(lightToVertexWs / lightToVertexWsLength, 1.f / tex2Dsize(lightShadowMap));
-					const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
-					const float shadowSampleDistanceToLight = lightShadowRange.x * shadowZ;
-					const float currentFragmentDistanceToLight = lightToVertexWsLength;
-
-					if (shadowSampleDistanceToLight < (currentFragmentDistanceToLight - lightShadowBias.x) || NdotL <= 0.0) {
-						lightMultDueToShadow = 0.f;
-					}
-				} else {
-					// Direction and Spot lights.
-					const float4 pixelShadowProj = mul(lightShadowMapProjView, float4(IN.v_posWS, 1.f));
-					const float4 pixelShadowNDC = pixelShadowProj / pixelShadowProj.w;
-
-					float2 shadowMapSampleLocation = pixelShadowNDC.xy;
-#ifndef OpenGL
-					shadowMapSampleLocation = shadowMapSampleLocation * float2(0.5, -0.5) + float2(0.5, 0.5);
-#else
-					shadowMapSampleLocation = shadowMapSampleLocation * float2(0.5, 0.5) + float2(0.5, 0.5);
-#endif
-
-					const float2 pixelSizeUVShadow = (1.0 / tex2Dsize(lightShadowMap));
-
-					float samplesWeights = 0.f;
-					const int pcfWidth = 2;
-					const int pcfTotalSampleCnt = (2 * pcfWidth + 1) * (2 * pcfWidth + 1);
-					int pcfTotalSampleCnt2 = 0;
-					for (int ix = -pcfWidth; ix <= pcfWidth; ix += 1) {
-						for (int iy = -pcfWidth; iy <= pcfWidth; iy += 1) {
-							const float2 sampleUv =
-							    shadowMapSampleLocation + float2(float(ix) * pixelSizeUVShadow.x, float(iy) * pixelSizeUVShadow.y);
-
-#ifndef OpenGL
-							const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
-							const float currentZ = pixelShadowNDC.z;
-#else
-							const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
-							const float currentZ = (pixelShadowNDC.z + 1.0) * 0.5;
-#endif
-
-							if (shadowZ < (currentZ - lightShadowBias.x) || NdotL <= 0.0) {
-								samplesWeights += 1.f;
-							}
-							
-							pcfTotalSampleCnt2++;
-						}
-					}
-
-					lightMultDueToShadow = 1.f - (samplesWeights / (float)(pcfTotalSampleCnt2));
-					
-					// Make directional light fade as they capture some limited area,
-					// and when the shadow map ends in the distance this will hide the rough edge
-					// where the shadow map ends.
-					if (lightPosF4.w == 1.f) {
-						const float distanceFromCamera = length(IN.v_posWS - cameraPositionWs);
-						const float fadeStart = lightShadowRange.x * 0.80f;
-						if(distanceFromCamera > fadeStart) {
-							const float fadeOffDistance = lightShadowRange.x * 0.2f;
-							float k = min(1.f, (distanceFromCamera - fadeStart) / fadeOffDistance);
-							
-							// Slowly add up to lightMultDueToShadow until it reaches 1.
-							lightMultDueToShadow = lightMultDueToShadow + (1.f - lightMultDueToShadow) * k;
-						}
-					}
-					
-				}
-			}
-#endif // shadow map enabled
-
-			if (NdotL > 1e-6f && lightMultDueToShadow > 1e-6f) {
-				const float3 H = normalize(V + L);
-
-				// cook-torrance brdf
-#if 1
-				const float NDF = DistributionGGX(N, H, roughness);
-				const float G = GeometrySmith(N, V, L, roughness);
-				const float3 F = fresnelSchlick(max(dot(H, V), 0.0), F0);
-
-				const float3 kS = F;
-				const float3 kD = (float3(1.f, 1.f, 1.f) - kS) * (1.0 - metallic);
-
-				const float3 numerator = NDF * G * F;
-				const float denominator = 4.f * max(dot(N, V), 0.f) * max(dot(N, L), 0.f);
-				const float3 specular = numerator / max(denominator, 0.001f);
-
-				lighting += lightMultDueToShadow * (kD * diffuseColor.xyz / PI + specular) * lightRadiance * NdotL;
-#else
-				const float3 lightLighting = lightMultDueToShadow * diffuseColor.xyz * lightRadiance * NdotL;
-				lighting += lightLighting;
-#endif
-			}
-
-			if (NdotL < 0.f) {
-				const float3 ambience = lightColor * 0.5f;
-				lighting += ((normal.y * 0.5f + 0.5f) * ambience + ambience * 0.05f) * diffuseColor.xyz;
-			}
+	// Compute the lighting for each light.
+	float4 finalColor;
+	if (uPBRMtlFlags & kPBRMtl_Flags_NoLighting) {
+		finalColor = mtlSample.albedo;
+	} else {
+		finalColor = float4(0.f, 0.f, 0.f, mtlSample.albedo.w);
+		for (int iLight = 0; iLight < lightsCnt; ++iLight) {
+			finalColor.xyz += Light_computeDirectLighting(lights[iLight], uLightShadowMap[iLight], mtlSample, cameraPositionWs);
 		}
+
+		// Add ambient lighting.
+		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor;
 	}
 
-	float4 finalColor = diffuseColor;
-
-	if ((uPBRMtlFlags & kPBRMtl_Flags_NoLighting) == 0) {
-		const float3 ambientLightColorLinear = ambientLightColor; // pow(ambientLightColor, 2.2f);
-		const float3 fakeAmbientDetail = ambientLightColorLinear * diffuseColor.xyz;
-		//const float3 fakeAmbientDetail =
-		//    ((normal.y * 0.5f + 0.5f) * ambientLightColorLinear + ambientLightColorLinear * 0.05f) * diffuseColor.xyz;
-		const float3 rimLighting =
-		    smoothstep(1.f - uRimLightColorWWidth.w, 1.f, (1.f - dot(uCameraLookDirWs, N))) * diffuseColor.xyz * uRimLightColorWWidth.xyz;
-
-		finalColor = float4(lighting, diffuseColor.w) + float4(fakeAmbientDetail + rimLighting, 0.f);
-	}
-
-	//// Saturate the color, to make the selection highlight visiable for really brightly lit objects.
-	// finalColor.x = saturate(finalColor.x);
-	// finalColor.y = saturate(finalColor.y);
-	// finalColor.z = saturate(finalColor.z);
-
-	// Apply tone mapping.
-	// finalColor.xyz = finalColor / (finalColor + float3(1.f, 1.f, 1.f));
-
-	// Back to linear color space.
-	//finalColor.xyz = pow(finalColor, 1.0f / 2.2f);
-
-#if OPT_HasVertexColor == kHasVertexColor_Yes
-	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseTintByVertexColor) {
-		diffuseColor.w = IN.v_vertexDiffuse.w;
-	}
-#endif
-
+	// Applt the alpha multiplier.
 	finalColor.w *= alphaMultiplier;
 
 	return finalColor;

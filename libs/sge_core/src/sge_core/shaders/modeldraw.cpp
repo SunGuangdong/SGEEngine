@@ -8,14 +8,18 @@
 #include <sge_utils/math/mat4.h>
 
 // Caution:
-// this include is an exception do not include anything else like it.
+// these includes is an exception do not include anything else like it:
+// Note: it used to be just one file...
+// but how does one share a struct between HLSL and C++ without something like this?
 #include "../core_shaders/FWDDefault_buildShadowMaps.h"
 #include "../core_shaders/ShadeCommon.h"
+#include "../core_shaders/ShaderLightData.h"
 
 using namespace sge;
 
 // https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-packing-rules?redirectedfrom=MSDN
-struct ParamsCbFWDDefaultShading {
+
+__declspec(align(4)) struct ParamsCbFWDDefaultShading {
 	mat4f projView;
 	mat4f world;
 	mat4f uvwTransform;
@@ -25,30 +29,21 @@ struct ParamsCbFWDDefaultShading {
 	vec4f uDiffuseColorTint;
 	vec3f texDiffuseXYZScaling;
 	float uMetalness;
-	float uRoughness;
 
+	float uRoughness;
 	int uPBRMtlFlags;
 	float alphaMultiplier;
-	int uPBRMtlFlags_padding;
-
+	int alphaMultiplier_padding;
 
 	vec4f uRimLightColorWWidth;
-	vec3f ambientLightColor;
-	float ambientLightColor_padding;
-
-	// Lights uniforms.
-	vec4f lightPosition;           // Position, w encodes the type of the light.
-	vec4f lightSpotDirAndCosAngle; // all Used in spot lights :( other lights do not use it
-	vec4f lightColorWFlag;         // w used for flags.
-
-	mat4f lightShadowMapProjView;
-	vec4f lightShadowRange;
-
-	vec4f lightShadowBias;
-	// float lightShadowBias_padding[3];
+	vec3f uAmbientLightColor;
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+
+	ShaderLightData lights[kMaxLights];
+	int lightsCnt;
+	int lightCnt_padding[3];
 };
 
 //-----------------------------------------------------------------------------
@@ -79,7 +74,7 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
                                              const InstanceDrawMods& mods) {
 	SGEDevice* const sgedev = rdest.getDevice();
 	if (!paramsBuffer.IsResourceValid()) {
-		BufferDesc bd = BufferDesc::GetDefaultConstantBuffer(1024, ResourceUsage::Dynamic);
+		BufferDesc bd = BufferDesc::GetDefaultConstantBuffer(4096, ResourceUsage::Dynamic);
 		paramsBuffer = sgedev->requestResource<Buffer>();
 		paramsBuffer->create(bd, nullptr);
 	}
@@ -109,11 +104,12 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		uTexDiffuseZ,
 		uTexDiffuseZSampler,
 		uTexDiffuseXYZScaling,
-		uLightShadowMap,
 		uTexMetalness,
 		uTexMetalnessSampler,
 		uTexRoughness,
 		uTexRoughnessSampler,
+		uLightShadowMap,
+		uLightShadowMapSampler,
 		uTexSkinningBones,
 		uParamsCbFWDDefaultShading_vertex,
 		uParamsCbFWDDefaultShading_pixel,
@@ -163,11 +159,12 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 		    {uTexDiffuseZ, "texDiffuseZ", ShaderType::PixelShader},
 		    {uTexDiffuseZSampler, "texDiffuseZ_sampler", ShaderType::PixelShader},
 		    {uTexDiffuseXYZScaling, "texDiffuseXYZScaling", ShaderType::PixelShader},
-		    {uLightShadowMap, "lightShadowMap", ShaderType::PixelShader},
 		    {uTexMetalness, "uTexMetalness", ShaderType::PixelShader},
 		    {uTexMetalnessSampler, "uTexMetalness_sampler", ShaderType::PixelShader},
 		    {uTexRoughness, "uTexRoughness", ShaderType::PixelShader},
 		    {uTexRoughnessSampler, "uTexRoughness_sampler", ShaderType::PixelShader},
+		    {uLightShadowMap, "uLightShadowMap", ShaderType::PixelShader},
+		    {uLightShadowMapSampler, "uLightShadowMap_sampler", ShaderType::PixelShader},
 		    {uTexSkinningBones, "uSkinningBones", ShaderType::VertexShader},
 		    {uParamsCbFWDDefaultShading_vertex, "ParamsCbFWDDefaultShading", ShaderType::VertexShader},
 		    {uParamsCbFWDDefaultShading_pixel, "ParamsCbFWDDefaultShading", ShaderType::PixelShader},
@@ -332,98 +329,76 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	}
 
 	// Lights and draw call.
-	const int preLightsNumUnuforms = uniforms.size();
-	for (int iLight = 0; iLight < lighting.lightsCount; ++iLight) {
-		const ShadingLightData& shadingLight = *lighting.ppLightData[iLight];
-		// Delete the uniforms form the previous light.
-		uniforms.resize(preLightsNumUnuforms);
+	Texture* shadowMaps[kMaxLights] = {nullptr};
 
-		// Do the ambient lighting only with the 1st light.
-		if (iLight == 0) {
-			paramsCb.ambientLightColor = lighting.ambientLightColor;
-			paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
-		} else {
-			vec4f zeroColor(0.f);
-			paramsCb.ambientLightColor = vec3f(0.f);
-			paramsCb.uRimLightColorWWidth = vec4f(0.f);
-		}
+	paramsCb.lightsCnt = minOf((int)SGE_ARRSZ(paramsCb.lights), lighting.lightsCount);
+	for (int iLight = 0; iLight < paramsCb.lightsCnt; ++iLight) {
+		ShaderLightData& shaderLight = paramsCb.lights[iLight];
+		const ShadingLightData* srcLight = lighting.ppLightData[iLight];
 
-		if ((pbrMtlFlags & kPBRMtl_Flags_NoLighting) == 0) {
-			paramsCb.lightPosition = shadingLight.lightPositionAndType;
-			paramsCb.lightSpotDirAndCosAngle = shadingLight.lightSpotDirAndCosAngle;
-			paramsCb.lightColorWFlag = shadingLight.lightColorWFlags;
+		if_checked(srcLight && srcLight->pLightDesc) {
+			// We assume that the light is enabled if it reached here.
+			// We don't want to make the code more complicated with redundadnt checks.
+			sgeAssert(srcLight->pLightDesc->isOn == true);
 
-			if (shadingLight.shadowMap != nullptr && shaderPerm.uniformLUT[uLightShadowMap].isNull() == false) {
-				uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uLightShadowMap], (shadingLight.shadowMap)));
-				sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
+			const bool shouldHaveShadows = srcLight->pLightDesc->hasShadows && srcLight->shadowMap;
+
+			shaderLight.lightType = int(srcLight->pLightDesc->type);
+			shaderLight.lightPosition = srcLight->lightPositionWs;
+			shaderLight.lightDirection = srcLight->lightDirectionWs;
+			shaderLight.lightShadowRange = srcLight->pLightDesc->range;
+			shaderLight.lightShadowBias = srcLight->pLightDesc->shadowMapBias;
+			shaderLight.lightColor = srcLight->pLightDesc->color * srcLight->pLightDesc->intensity;
+			shaderLight.spotLightAngleCosine = cosf(srcLight->pLightDesc->spotLightAngle);
+			shaderLight.lightShadowMapProjView = srcLight->shadowMapProjView;
+
+			int lightFlags = 0;
+			if (shouldHaveShadows) {
+				lightFlags |= kLightFlg_HasShadowMap;
 			}
 
-			paramsCb.lightShadowMapProjView = shadingLight.shadowMapProjView;
-			paramsCb.lightShadowRange = shadingLight.lightXShadowRange;
-			paramsCb.lightShadowBias = vec4f(shadingLight.shadowMapBias);
+			shaderLight.lightFlags = lightFlags;
+
+			// Bind the shadow map.
+			if (shouldHaveShadows && !shaderPerm.uniformLUT[uLightShadowMap].isNull()) {
+				shadowMaps[iLight] = srcLight->shadowMap;
+			}
 		}
-
-		if (mods.forceAdditiveBlending) {
-			stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-			                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
-		} else {
-			stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-			                          (iLight == 0) ? getCore()->getGraphicsResources().BS_backToFrontAlpha
-			                                        : getCore()->getGraphicsResources().BS_addativeColor);
-		}
-
-		void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);
-		memcpy(paramsMappedData, &paramsCb, sizeof(paramsCb));
-		sgedev->getContext()->unMap(paramsBuffer);
-
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uParamsCbFWDDefaultShading_vertex], paramsBuffer.GetPtr()));
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uParamsCbFWDDefaultShading_pixel], paramsBuffer.GetPtr()));
-
-		dc.setUniforms(uniforms.data(), uniforms.size());
-		dc.setStateGroup(&stateGroup);
-
-		if (geometry->ibFmt != UniformType::Unknown) {
-			dc.drawIndexed(geometry->numElements, 0, 0);
-		} else {
-			dc.draw(geometry->numElements, 0);
-		}
-
-		rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
 	}
 
-	// if the number of lights affecting the object is zero,
-	// then there were no draw call created. However we need to draw the object
-	// in order for it to affect the z-depth or even get light by the ambient lighting.
-	if (lighting.lightsCount == 0) {
-		paramsCb.ambientLightColor = lighting.ambientLightColor;
-		paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 
-		vec4f colorWFlags(0.f);
-		colorWFlags.w = float(kLightFlg_DontLight);
-		paramsCb.lightColorWFlag = colorWFlags;
+	// TODO: Do we have binding arrays of textures in any shape of form?
+	uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uLightShadowMap], (&shadowMaps)));
+	sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 
-		void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);
-		memcpy(paramsMappedData, &paramsCb, sizeof(paramsCb));
-		sgedev->getContext()->unMap(paramsBuffer);
+	paramsCb.uAmbientLightColor = lighting.ambientLightColor;
+	paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uParamsCbFWDDefaultShading_vertex], paramsBuffer.GetPtr()));
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uParamsCbFWDDefaultShading_pixel], paramsBuffer.GetPtr()));
-
-		stateGroup.setPrimitiveTopology(PrimitiveTopology::TriangleList);
+	if (mods.forceAdditiveBlending) {
 		stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
 		                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
-
-		dc.setUniforms(uniforms.data(), uniforms.size());
-		dc.setStateGroup(&stateGroup);
-
-		if (geometry->ibFmt != UniformType::Unknown) {
-			dc.drawIndexed(geometry->numElements, 0, 0);
-		} else {
-			dc.draw(geometry->numElements, 0);
-		}
-
-		rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
+	} else {
+		stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
+		                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
+
+	void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);
+	memcpy(paramsMappedData, &paramsCb, sizeof(paramsCb));
+	sgedev->getContext()->unMap(paramsBuffer);
+
+	uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uParamsCbFWDDefaultShading_vertex], paramsBuffer.GetPtr()));
+	uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uParamsCbFWDDefaultShading_pixel], paramsBuffer.GetPtr()));
+
+	dc.setUniforms(uniforms.data(), uniforms.size());
+	dc.setStateGroup(&stateGroup);
+
+	if (geometry->ibFmt != UniformType::Unknown) {
+		dc.drawIndexed(geometry->numElements, 0, 0);
+	} else {
+		dc.draw(geometry->numElements, 0);
+	}
+
+	rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
 }
 
 void BasicModelDraw::draw(const RenderDestination& rdest,

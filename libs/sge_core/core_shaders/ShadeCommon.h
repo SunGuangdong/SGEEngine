@@ -23,20 +23,8 @@
 #define kHasVertexSkinning_Yes 1
 
 // OPT_DiffuseTexForAlphaMasking
-#define kasDiffuseTexForAlphaMasking_No 0
-#define kasDiffuseTexForAlphaMasking_Yes 1
-
-// // Settings for OPT_DiffuseColorSrc
-// #define kDiffuseColorSrcConstant 0
-// #define kDiffuseColorSrcVertex 1
-// #define kDiffuseColorSrcTexture 2
-// #define kDiffuseColorSrcTriplanarTex 3
-
-// Lights flags encoded as float use up to 23
-// These are going to be casted as float in the shader BTW.
-#define kLightFlg_IsPointLight 1 
-#define kLightFlg_DontLight    2 // user for objects that have no light affecting them besides the amibient one.
-#define kLightFlg_HasShadowMap 4
+#define kHasDiffuseTexForAlphaMasking_No 0
+#define kHasDiffuseTexForAlphaMasking_Yes 1
 
 // Material flags.
 #define kPBRMtl_Flags_HasNormalMap                1
@@ -48,6 +36,5 @@
 #define kPBRMtl_Flags_DiffuseFromVertexColor      32
 #define kPBRMtl_Flags_DiffuseTintByVertexColor    64
 #define kPBRMtl_Flags_NoLighting                  128
-
 
 #endif

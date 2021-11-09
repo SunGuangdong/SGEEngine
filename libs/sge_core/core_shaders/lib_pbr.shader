@@ -1,10 +1,9 @@
 #ifndef SGE_LIB_PBR
 #define SGE_LIB_PBR
 
-//--------------------------------------------------------------------
 // GGX
 // https://learnopengl.com/PBR/Lighting
-//--------------------------------------------------------------------
+
 float DistributionGGX(float3 N, float3 H, float a) {
 	float a2 = a * a;
 	float NdotH = max(dot(N, H), 0.0);
@@ -41,9 +40,6 @@ float3 fresnelSchlickRoughness(float cosTheta, float3 F0, float roughness) {
 	return F0 + (max(float3(1.f - roughness, 1.f - roughness, 1.f - roughness), F0) - F0) * pow(1.0 - cosTheta, 5.0);
 }
 
-// ----------------------------------------------------------------------------
-// GGX Importance sample
-// ----------------------------------------------------------------------------
 float VanDerCorpus(int n, int  base) {
 	float invBase = 1.0 / float(base);
 	float denom = 1.0;

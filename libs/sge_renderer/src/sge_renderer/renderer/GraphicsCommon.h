@@ -334,6 +334,7 @@ struct UniformType {
 		Texture3D,
 		ConstantBuffer,
 		SamplerState,
+		Struct,
 
 		// Caution: Usable only by the input assambler.
 		// An int that gets expanded to 4 floats when used as an vertex attribute.

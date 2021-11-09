@@ -22,10 +22,12 @@ struct SGE_CORE_API ShadowMapBuildInfo {
 	float pointLightFarPlaneDistance = 0.f;
 };
 
+// [LIGHTYPE_ENUM_COPY]
+// This enum needs to match between shaders and C++.
 enum LightType : int {
-	light_point,
-	light_directional,
-	light_spot,
+	light_point = 0,
+	light_directional = 1,
+	light_spot = 2,
 };
 
 /// @brief Describes properties of a single light.

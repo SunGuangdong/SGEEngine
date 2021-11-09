@@ -67,7 +67,7 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 				D3D11_SHADER_BUFFER_DESC cbufferDesc;
 				d3dCbRefl->GetDesc(&cbufferDesc);
 
-				bool const isGlobal = strncmp("$Globals", bufferName, 8) == 0;
+				bool const isGlobalCbuffer = strncmp("$Globals", bufferName, 8) == 0;
 
 				CBufferRefl cbRefl;
 
@@ -105,9 +105,16 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 					switch (d3dTypeDesc.Type) {
 						case D3D_SVT_INT:
 							typeFormat = UniformType::Int;
+							var.type = UniformType::PickType(typeFormat, lanes, registers);
 							break;
 						case D3D_SVT_FLOAT:
 							typeFormat = UniformType::Float;
+							var.type = UniformType::PickType(typeFormat, lanes, registers);
+							break;
+						case D3D_SVT_VOID:
+							// Usually this is a struct.
+							var.type = UniformType::Struct;
+
 							break;
 
 						default:
@@ -116,10 +123,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 							break;
 					};
 
-					var.type = UniformType::PickType(typeFormat, lanes, registers);
-
 					// If this is the global CBuffer add this as a numeric uniform.
-					if (isGlobal) {
+					if (isGlobalCbuffer) {
 						NumericUniformRefl numericRefl;
 
 						numericRefl.nameStrIdx = var.nameStrIdx;
@@ -142,7 +147,7 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 				textureRefl.nameStrIdx = device->getStringIndex(textureRefl.name);
 				textureRefl.d3d11_shaderType = shader->getShaderType();
 				textureRefl.d3d11_bindingSlot = d3dResourceDesc.BindPoint;
-				textureRefl.arraySize = 1;
+				textureRefl.arraySize = d3dResourceDesc.BindCount;
 
 				const size_t openBraceLocation = textureRefl.name.find('[');
 				const bool isArrayElement = openBraceLocation != std::string::npos;

@@ -6,9 +6,12 @@ cmake_minimum_required(VERSION 3.5)
 
 project(sge_core)
 
-add_dir_rec_2(SOURCES_SGE_ENGINE "./src" 3)
+add_dir_rec_2(SOURCES_SGE_CORE "./src" 3)
+add_dir_rec_2(SOURCES_SGE_SHADERS "./core_shaders" 1)
 
-add_library(sge_core SHARED ${SOURCES_SGE_ENGINE})
+set_source_files_properties(${SOURCES_SGE_SHADERS} PROPERTIES HEADER_FILE_ONLY TRUE)
+
+add_library(sge_core SHARED ${SOURCES_SGE_CORE} ${SOURCES_SGE_SHADERS})
 target_compile_definitions(sge_core PRIVATE SGE_CORE_BUILDING_DLL=1)
 
 target_include_directories(sge_core PUBLIC "./src")

@@ -51,7 +51,7 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		    {OPT_HasVertexSkinning, "OPT_HasVertexSkinning", {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
 		    {OPT_HasDiffuseTexForAlphaMasking,
 		     "OPT_HasDiffuseTexForAlphaMasking",
-		     {SGE_MACRO_STR(kasDiffuseTexForAlphaMasking_No), SGE_MACRO_STR(kasDiffuseTexForAlphaMasking_Yes)}},
+		     {SGE_MACRO_STR(kasDiffuseTexForAlphaMasking_No), SGE_MACRO_STR(kHasDiffuseTexForAlphaMasking_Yes)}},
 		};
 
 		const std::vector<ShadingProgramPermuator::Unform> uniformsToCache = {
@@ -100,7 +100,7 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
 
-	if (optHasDiffuseTexForAlphaMasking == kasDiffuseTexForAlphaMasking_Yes) {
+	if (optHasDiffuseTexForAlphaMasking == kHasDiffuseTexForAlphaMasking_Yes) {
 		int intTrue = 1;
 		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uUseDiffuseTexForAlphaMasking], &intTrue));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);

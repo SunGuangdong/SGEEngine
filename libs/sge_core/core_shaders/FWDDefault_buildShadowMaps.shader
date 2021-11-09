@@ -37,7 +37,7 @@ struct VS_INPUT
 	float4 a_bonesWeights : a_bonesWeights;	
 #endif
 
-#if OPT_HasDiffuseTexForAlphaMasking == kasDiffuseTexForAlphaMasking_Yes
+#if OPT_HasDiffuseTexForAlphaMasking == kHasDiffuseTexForAlphaMasking_Yes
 	float2 a_uv : a_uv;
 #endif
 };
@@ -48,7 +48,7 @@ struct VS_OUTPUT {
 	float3 vertexPosWs : vertexPosWs;
 #endif
 
-#if OPT_HasDiffuseTexForAlphaMasking == kasDiffuseTexForAlphaMasking_Yes
+#if OPT_HasDiffuseTexForAlphaMasking == kHasDiffuseTexForAlphaMasking_Yes
 	float2 v_uv : v_uv;
 #endif
 };
@@ -72,7 +72,7 @@ VS_OUTPUT vsMain(VS_INPUT vsin)
 	res.vertexPosWs = worldPos.xyz;
 #endif
 
-#if OPT_HasDiffuseTexForAlphaMasking == kasDiffuseTexForAlphaMasking_Yes
+#if OPT_HasDiffuseTexForAlphaMasking == kHasDiffuseTexForAlphaMasking_Yes
 	res.v_uv = vsin.a_uv;
 #endif
 
@@ -93,7 +93,7 @@ PS_OUTPUT psMain(VS_OUTPUT IN)
 	PS_OUTPUT psOut;
 	psOut.target0 = float4(1.f, 1.f, 1.f, 1.f);
 	
-#if OPT_HasDiffuseTexForAlphaMasking == kasDiffuseTexForAlphaMasking_Yes
+#if OPT_HasDiffuseTexForAlphaMasking == kHasDiffuseTexForAlphaMasking_Yes
 	if (uUseDiffuseTexForAlphaMasking) {
 		const float alpha = tex2D(uDiffuseTexForAlphaMasking, IN.v_uv).w;
 		if(alpha < 0.98f) {

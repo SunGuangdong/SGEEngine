@@ -65,7 +65,6 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 			const vec3f camPosWs = lightWs.p;
 			mat4f shadowProjMtx = mat4f::getPerspectiveFovRH(half_pi(), 1.f, 0.1f, range, 0.f, kIsTexcoordStyleD3D);
 
-			
 			// When we render Cube maps depending on the rendering API we need to
 			// modify the projection matrix so the final cube map is render correctly.
 			// OpenGL needs to have the Y axis flipped in the texture, as the tex coords start from

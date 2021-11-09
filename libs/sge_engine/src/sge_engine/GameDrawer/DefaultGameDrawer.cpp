@@ -182,21 +182,20 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets) {
 		}
 
 		vec3f color = lightDesc.color * lightDesc.intensity;
-		vec4f position(0.f);
+		vec3f position(0.f);
 		float spotLightCosAngle = 1.f; // Defaults to cos(0)
 
 		if (lightDesc.type == light_point) {
-			position = vec4f(light->getTransform().p, float(light_point));
+			position = light->getTransform().p;
 		} else if (lightDesc.type == light_directional) {
-			position = vec4f(-light->getTransformMtx().c0.xyz().normalized0(), float(light_directional));
+			position = -light->getTransformMtx().c0.xyz().normalized0();
 		} else if (lightDesc.type == light_spot) {
-			position = vec4f(light->getTransform().p, float(light_spot));
+			position = light->getTransform().p;
 			spotLightCosAngle = cosf(lightDesc.spotLightAngle);
 		} else {
 			sgeAssert(false);
 		}
 
-		int flags = 0;
 		LightShadowInfo& lsi = m_perLightShadowFrameTarget[light->getId()];
 		if (lightDesc.hasShadows && lsi.isCorrectlyUpdated) {
 			if (lsi.buildInfo.isPointLight) {
@@ -204,23 +203,18 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets) {
 					shadingLight.shadowMap = lsi.frameTarget->getDepthStencil();
 					shadingLight.shadowMapProjView =
 					    mat4f::getIdentity(); // Not used for points light. They use the near/far projection settings and linear depth maps
-					flags |= kLightFlg_HasShadowMap;
 				}
 			} else {
 				if (lsi.frameTarget.IsResourceValid()) {
 					shadingLight.shadowMap = lsi.frameTarget->getDepthStencil();
 					shadingLight.shadowMapProjView = lsi.buildInfo.shadowMapCamera.getProjView();
-					flags |= kLightFlg_HasShadowMap;
 				}
 			}
 		}
 
-		shadingLight.lightPositionAndType = position;
-		shadingLight.lightColorWFlags = vec4f(color, float(flags));
-		shadingLight.shadowMapBias = lightDesc.shadowMapBias;
-		shadingLight.lightSpotDirAndCosAngle = vec4f(light->getTransformMtx().c0.xyz().normalized0(), spotLightCosAngle);
-		shadingLight.lightXShadowRange = vec4f(lightDesc.range, 0.f, 0.f, 0.f);
-
+		shadingLight.pLightDesc = &lightDesc;
+		shadingLight.lightPositionWs = position;
+		shadingLight.lightDirectionWs = light->getTransformMtx().c0.xyz().normalized0();
 		shadingLight.lightBoxWs = light->getBBoxOS().getTransformed(light->getTransformMtx());
 
 		m_shadingLights.push_back(shadingLight);

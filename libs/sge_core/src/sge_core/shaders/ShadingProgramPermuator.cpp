@@ -50,6 +50,7 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 	// Compile the shaders and cache the unforms LUT.
 	std::string shaderCodeFull;
 	perPermutationShadingProg.resize(numPerm);
+	size_t shaderCodeSize = strlen(shaderCode);
 	for (int iPerm = 0; iPerm < compileTimeOptionsPermutator.getAllPermunations().size(); ++iPerm) {
 		const auto& perm = compileTimeOptionsPermutator.getAllPermunations()[iPerm];
 
@@ -63,9 +64,10 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 
 		shaderCodeFull.clear();
 		shaderCodeFull += macrosToPreapend;
-		shaderCodeFull += shaderCode;
+		shaderCodeFull.append(shaderCode, shaderCodeSize);
 
-		const CreateShaderResult programCreateResult = perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
+		const CreateShaderResult programCreateResult = 
+			perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
 		    shaderCodeFull.c_str(), shaderCodeFull.c_str(), outIncludedFiles);
 
 		if (programCreateResult.succeeded == false) {

@@ -14,7 +14,7 @@ struct SGE_ENGINE_API ALight : public Actor {
 	void create() final;
 	AABox3f getBBoxOS() const final;
 	void update(const GameUpdateSets& updateSets) final;
-	LightDesc getLightDesc() const { return m_lightDesc; }
+	const LightDesc& getLightDesc() const { return m_lightDesc; }
 
   public:
 	LightDesc m_lightDesc;

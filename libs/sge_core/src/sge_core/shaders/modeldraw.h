@@ -3,6 +3,7 @@
 #include "ShadingProgramPermuator.h"
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/sgecore_api.h"
+#include "sge_core/shaders/LightDesc.h"
 #include "sge_utils/math/mat4.h"
 #include "sge_utils/utils/OptionPermutator.h"
 #include "sge_utils/utils/optional.h"
@@ -23,20 +24,12 @@ struct MaterialOverride {
 // passing it toe shader
 //------------------------------------------------------------
 struct ShadingLightData {
-	/// (x,y,z) - position or direction in case of directional light.
-	/// w holds type of the light (a member of LightType) as a float.
-	vec4f lightPositionAndType = vec4f(0.f);
-	vec4f lightSpotDirAndCosAngle = vec4f(1.f, 0.f, 0.f, 0.f);
-	// (x,y,z) the color of the light multiplied by the intensity). w - flags as float.
-	vec4f lightColorWFlags = vec4f(0.f);
-	float shadowMapBias = 0.f;
-
+	const LightDesc* pLightDesc = nullptr;
 	Texture* shadowMap = nullptr;
-	mat4f shadowMapProjView = mat4f::getIdentity();
-	// x is the light shadow range, (y,z,w) unused.
-	vec4f lightXShadowRange = vec4f(0.f);
-
 	AABox3f lightBoxWs;
+	mat4f shadowMapProjView = mat4f::getIdentity();
+	vec3f lightPositionWs = vec3f(0.f);
+	vec3f lightDirectionWs = vec3f(0.f);
 };
 
 //------------------------------------------------------------
@@ -105,7 +98,6 @@ struct SGE_CORE_API BasicModelDraw {
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermutFWDShading;
-	Optional<ShadingProgramPermuator> shadingPermutFWDBuildShadowMaps;
 	GpuHandle<Buffer> paramsBuffer;
 	StateGroup stateGroup;
 };
