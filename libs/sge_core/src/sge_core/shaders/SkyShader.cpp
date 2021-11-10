@@ -49,6 +49,7 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 		}
 
 		shaderFilesWatcher.initialize(includedFilesByShaders, 1.f);
+		SGE_DEBUG_CHECK("Reloaded SkyShader\n");
 	}
 
 	if (!cbParms.IsResourceValid()) {

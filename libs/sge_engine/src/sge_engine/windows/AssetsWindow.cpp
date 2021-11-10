@@ -12,6 +12,7 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/ui/ImGuiDragDrop.h"
+#include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/strings.h"
@@ -702,7 +703,7 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 				bool changedMipMapGen = ImGui::Checkbox("##Auto Generate MipMaps", &texAsset->meta.shouldGenerateMips);
 				hadChange |= changedMipMapGen;
 				if (changedMipMapGen) {
-					getCore()->getLog().writeWarning("Auto MipMap generation will take effect after a restart!");
+					getLog()->writeWarning("Auto MipMap generation will take effect after a restart!");
 				}
 
 				hadChange |= doAddressModeUI("Tiling X", texAsset->meta.assetSamplerDesc.addressModes[0]);

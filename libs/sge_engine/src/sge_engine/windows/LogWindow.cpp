@@ -1,4 +1,5 @@
 #include "sge_core/ICore.h"
+#include "sge_log/Log.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 
@@ -14,17 +15,17 @@ void LogWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSE
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened)) {
-		const CoreLog& log = getCore()->getLog();
+		const Log& log = *getLog();
 
 		for (auto& msg : log.getMessages()) {
 			switch (msg.type) {
-				case CoreLog::messageType_check:
+				case Log::messageType_check:
 					ImGui::TextColored(ImVec4(0.f, 1.f, 0.f, 1.f), msg.message.c_str());
 					break;
-				case CoreLog::messageType_error:
+				case Log::messageType_error:
 					ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), msg.message.c_str());
 					break;
-				case CoreLog::messageType_warning:
+				case Log::messageType_warning:
 					ImGui::TextColored(ImVec4(0.f, 1.f, 1.f, 1.f), msg.message.c_str());
 					break;
 				default:

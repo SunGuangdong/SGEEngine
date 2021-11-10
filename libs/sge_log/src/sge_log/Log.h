@@ -1,6 +1,7 @@
 #pragma once
 
-#include "sgecore_api.h"
+#include "sge_log_api.h"
+
 #include <string>
 #include <vector>
 
@@ -8,7 +9,7 @@
 
 namespace sge {
 
-struct SGE_CORE_API CoreLog : public Noncopyable {
+struct SGE_LOG_API Log : public Noncopyable {
 	enum MessageType : int {
 		/// Just a message that something has been done.
 		messageType_log,
@@ -41,5 +42,29 @@ struct SGE_CORE_API CoreLog : public Noncopyable {
 	std::vector<Message> m_messages;
 };
 
+#if defined(SGE_USE_DEBUG)
+// https://stackoverflow.com/questions/5588855/standard-alternative-to-gccs-va-args-trick
+#define SGE_DEBUG_LOG(_str_msg_, ...) \
+	{ sge::getLog()->write((_str_msg_), ##__VA_ARGS__); }
+#define SGE_DEBUG_CHECK(_str_msg_, ...) \
+	{ sge::getLog()->writeCheck((_str_msg_), ##__VA_ARGS__); }
+#define SGE_DEBUG_ERR(_str_msg_, ...) \
+	{ sge::getLog()->writeError((_str_msg_), ##__VA_ARGS__); }
+#define SGE_DEBUG_WAR(_str_msg_, ...) \
+	{ sge::getLog()->writeWarning((_str_msg_), ##__VA_ARGS__); }
+#else
+#define SGE_DEBUG_LOG(_str_msg_, ...) \
+	{}
+#define SGE_DEBUG_CHECK(_str_msg_, ...) \
+	{}
+#define SGE_DEBUG_ERR(_str_msg_, ...) \
+	{}
+#define SGE_DEBUG_WAR(_str_msg_, ...) \
+	{}
+#endif
+
+/// The global of the current module(dll, exe, ect.). However we could "borrow" another modules "ICore" and use theirs.
+SGE_LOG_API Log* getLog();
+SGE_LOG_API void setLog(Log* global);
 
 } // namespace sge

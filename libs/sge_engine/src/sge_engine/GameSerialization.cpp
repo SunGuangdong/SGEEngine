@@ -2,6 +2,7 @@
 #include "GameInspector.h"
 #include "GameWorld.h"
 #include "sge_core/ICore.h"
+#include "sge_log/Log.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/json.h"

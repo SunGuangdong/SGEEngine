@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CoreLog.h"
 #include "sge_audio/AudioDevice.h"
+#include "sge_log/Log.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/mat4.h"
 #include "sge_utils/sge_utils.h"
@@ -77,31 +77,9 @@ struct SGE_CORE_API ICore {
 	virtual const FrameStatistics& getLastFrameStatistics() const = 0;
 	virtual void setLastFrameStatistics(const FrameStatistics& stats) = 0;
 
-	virtual CoreLog& getLog() = 0;
-
 	virtual AudioDevice* getAudioDevice() = 0;
 };
 
-#if defined(SGE_USE_DEBUG)
-// https://stackoverflow.com/questions/5588855/standard-alternative-to-gccs-va-args-trick
-#define SGE_DEBUG_LOG(_str_msg_, ...) \
-	{ sge::getCore()->getLog().write((_str_msg_), ##__VA_ARGS__); }
-#define SGE_DEBUG_CHECK(_str_msg_, ...) \
-	{ sge::getCore()->getLog().writeCheck((_str_msg_), ##__VA_ARGS__); }
-#define SGE_DEBUG_ERR(_str_msg_, ...) \
-	{ sge::getCore()->getLog().writeError((_str_msg_), ##__VA_ARGS__); }
-#define SGE_DEBUG_WAR(_str_msg_, ...) \
-	{ sge::getCore()->getLog().writeWarning((_str_msg_), ##__VA_ARGS__); }
-#else
-#define SGE_DEBUG_LOG(_str_msg_, ...) \
-	{}
-#define SGE_DEBUG_CHECK(_str_msg_, ...) \
-	{}
-#define SGE_DEBUG_ERR(_str_msg_, ...) \
-	{}
-#define SGE_DEBUG_WAR(_str_msg_, ...) \
-	{}
-#endif
 
 /// The global of the current module(dll, exe, ect.). However we could "borrow" another modules "ICore" and use theirs.
 SGE_CORE_API ICore* getCore();

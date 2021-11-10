@@ -3,6 +3,7 @@
 #include <unordered_map>
 // HLSLParser +  MCPP
 #include "HLSLTranslator.h"
+#include "sge_log/Log.h"
 #include "sge_mcpp.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/strings.h"
@@ -44,9 +45,9 @@ void output_fn(int c, void* userdata) {
 	args->output += char(c);
 }
 
-void error_fn(void* UNUSED(userdata), char* UNUSED(format), va_list UNUSED(arg)) {
+void error_fn(void* UNUSED(userdata), char* format, va_list arg) {
 	// This is not really called only when error accure
-	// SGE_DEBUG_WAR(format, arg);
+	SGE_DEBUG_WAR(format, arg);
 }
 
 std::string preprocess(const char* code, const char* const* macros, const int numMacros, std::set<std::string>* outIncludedFiles) {

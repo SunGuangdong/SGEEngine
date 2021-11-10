@@ -1,3 +1,4 @@
+#include "sge_log/Log.h"
 #include "sge_utils/utils/timer.h"
 #include <iostream>
 
@@ -111,8 +112,8 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc) {
 
 	DumpAllGLErrors();
 
-	//[[maybe_unused]] const GLubyte* glVersion = glGetString(GL_VERSION);
-	// SGE_DEBUG_LOG("OpenGL Version = %s\n", glVersion);
+	[maybe_unused]] const GLubyte* glVersion = glGetString(GL_VERSION);
+	SGE_DEBUG_LOG("OpenGL Version = %s\n", glVersion);
 
 	m_immContext = new SGEContextImmediate;
 	m_immContext->SetSGEDevice(this);

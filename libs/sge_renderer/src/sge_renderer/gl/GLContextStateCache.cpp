@@ -1,5 +1,6 @@
 #include "GLContextStateCache.h"
 #include "GraphicsCommon_gl.h"
+#include "sge_log/Log.h"
 
 namespace sge {
 
@@ -80,11 +81,9 @@ void GLContextStateCache::BindBuffer(const GLenum bufferTarget, const GLuint buf
 	//
 	const BUFFER_FREQUENCY freq = GetBufferTargetByFrequency(bufferTarget);
 
-#if SGE_GL_CONTEXT_STRICT
 	if (m_boundBuffers[freq].isMapped) {
 		SGE_DEBUG_ERR("SGE GLContext API PROHIBITS Buffer Binding when currently bound buffer on that slot is mapped!");
 	}
-#endif
 
 	if (UPDATE_ON_DIFF(m_boundBuffers[freq].buffer, buffer)) {
 		glBindBuffer(bufferTarget, buffer);
@@ -296,7 +295,7 @@ void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc) {
 		}
 	}
 #endif
-	
+
 	bool biasChanged = UPDATE_ON_DIFF(m_rasterDesc.depthBiasAdd, desc.depthBiasAdd);
 	biasChanged = UPDATE_ON_DIFF(m_rasterDesc.depthBiasSlope, desc.depthBiasSlope) || biasChanged;
 	if (biasChanged) {

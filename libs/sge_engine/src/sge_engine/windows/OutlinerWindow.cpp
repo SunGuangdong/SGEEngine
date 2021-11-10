@@ -1,3 +1,4 @@
+#define IMGUI_DEFINE_MATH_OPERATORS
 
 #include "OutlinerWindow.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
@@ -7,7 +8,7 @@
 #include "sge_utils/utils/ScopeGuard.h"
 #include "sge_utils/utils/strings.h"
 
-#define IMGUI_DEFINE_MATH_OPERATORS
+
 #include "imgui/imgui_internal.h"
 
 #include "sge_core/SGEImGui.h"

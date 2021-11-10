@@ -26,6 +26,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_engine/TypeRegister.h"
 #include "sge_engine/setImGuiContextEngine.h"
 #include "sge_engine/windows/EditorWindow.h"
+#include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/DLLHandler.h"
 #include "sge_utils/utils/FileStream.h"
@@ -181,7 +182,8 @@ struct SGEGameWindow : public WindowBase {
 			getEngineGlobal()->changeActivePlugin(m_pluginInst);
 
 			if (m_pluginInst) {
-				m_pluginInst->onLoaded(ImGui::GetCurrentContext(), getCore());
+				m_pluginInst->onLoaded(SgeGlobalSingletons());
+
 				typeLib().performRegistration();
 				if (shouldCurrentWorldBeReloaded) {
 					getEngineGlobal()->getEditorWindow()->loadWorldFromFile(
@@ -284,7 +286,6 @@ int sge_main(int argc, char** argv) {
 #include <SDL.h>
 #include <SDL_syswm.h>
 #endif
-
 
 
 // Caution:

@@ -1,5 +1,6 @@
 #include "GraphicsInterface_d3d11.h"
 #include "sge_utils/utils/timer.h"
+#include "sge_log/Log.h"
 
 #include "Buffer_d3d11.h"
 #include "FrameTarget_d3d11.h"
@@ -86,7 +87,7 @@ bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc) {
 	m_immContext->SetSGEDevice(this);
 	setVsync(mainFrameDesc.vSync);
 
-	// SGE_DEBUG_LOG("D3D11 Device Created with FeatureLevel = 0x%x\n", m_workingFeatureLevel);
+	 SGE_DEBUG_LOG("D3D11 Device Created with FeatureLevel = 0x%x\n", m_workingFeatureLevel);
 
 	// Create the swapchain to the target window and allocate the default FrameTargetD3D11
 	const bool succeedeCreatingSC = D3D11_CreateSwapChain(mainFrameDesc);

@@ -4,6 +4,7 @@
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/model/Model.h"
 #include "sge_core/model/ModelReader.h"
+#include "sge_log/Log.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/Path.h"

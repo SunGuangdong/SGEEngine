@@ -3,15 +3,13 @@
 #include "sge_core/shaders/modeldraw.h"
 #include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_engine/IPlugin.h"
+#include "sge_log/Log.h"
 
 namespace sge {
 struct PluginGame final : public IPlugin {
 	virtual IGameDrawer* allocateGameDrawer() { return new DefaultGameDrawer(); }
 
-	void onLoaded(ImGuiContext* imguiCtx, ICore* global) override {
-		ImGui::SetCurrentContext(imguiCtx);
-		setCore(global);
-	}
+	void onLoaded(const SgeGlobalSingletons& sgeSingletons) override { sgeSingletons.applyGlobalState(); }
 
 	void onUnload() {}
 	void run() {}

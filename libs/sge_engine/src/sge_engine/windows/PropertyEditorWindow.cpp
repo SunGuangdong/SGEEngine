@@ -116,18 +116,19 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 	} else if (memberTypeDesc->typeId == sgeTypeId(transf3d)) {
 		static bool uiTransformInLocalSpace = false;
 
-		bool const isLogicTransform = member.is(&Actor::m_logicTransform);
+		const bool isLogicTransform = member.is(&Actor::m_logicTransform);
+		const bool actorHasParent = inspector.getWorld()->getParentActor(gameObject->getId()) != nullptr;
 
 		ImGuiEx::BeginGroupPanel(memberName, ImVec2(-1.f, -1.f));
 
-		if (isLogicTransform) {
+		if (actorHasParent && isLogicTransform) {
 			ImGuiEx::Label("View in Local Space");
 			ImGui::Checkbox("##Local Space", &uiTransformInLocalSpace);
 		}
 
 		bool thisIsTransformInLocalSpace = false;
 		if (isLogicTransform && uiTransformInLocalSpace && actor) {
-			thisIsTransformInLocalSpace = inspector.getWorld()->getParentActor(gameObject->getId()) != nullptr;
+			thisIsTransformInLocalSpace = actorHasParent;
 		}
 
 		transf3d& memberRef = *(transf3d*)(pMember);

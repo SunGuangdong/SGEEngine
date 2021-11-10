@@ -8,10 +8,7 @@ namespace sge {
 struct PluginGame final : public IPlugin {
 	virtual IGameDrawer* allocateGameDrawer() { return new DefaultGameDrawer(); }
 
-	void onLoaded(ImGuiContext* imguiCtx, ICore* global) override {
-		ImGui::SetCurrentContext(imguiCtx);
-		setCore(global);
-	}
+	void onLoaded(const SgeGlobalSingletons& sgeSingletons) override { sgeSingletons.applyGlobalState(); }
 
 	void onUnload() {}
 	void run() {}

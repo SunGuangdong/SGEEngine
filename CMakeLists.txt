@@ -199,11 +199,15 @@ if(SGE_REND_API STREQUAL "OpenGL")
 	endif()
 endif()
 
+add_subdirectory(./libs/sge_log)
 add_subdirectory(./libs/sge_renderer)
 add_subdirectory(./libs/sge_audio)
 add_subdirectory(./libs/sge_core)
 add_subdirectory(./libs/sge_engine)
 add_subdirectory(./sge_player)
+
+# In Emscripten (Web builds) we do not want to build the editor
+# only the game targets are designed to be buildable.
 if(NOT EMSCRIPTEN)
 	add_subdirectory(./sge_editor)
 	add_subdirectory(./libs/mdlconvlib)
@@ -219,7 +223,8 @@ set(CMAKE_RELWITHDEBINFO_POSTFIX "" CACHE STRING "" FORCE)
 # Organize the generated project in gropus to have them nicely displaced in the IDE (if supported).
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-# External projects.
+# Mark external projects as such, so they appear in a separate "folder" in Visual Studio
+# not polluting the project list.
 sge_mark_external_target(glew)
 sge_mark_external_target(lua)
 sge_mark_external_target(imgui)
@@ -239,10 +244,11 @@ sge_mark_external_target(mcpp)
 sge_mark_external_target(HLSLParser)
 sge_mark_external_target(miniaudio)
 
-# Internal projects.
+# Mark internal projects as such in order to have them grouped together.
 sge_mark_internal_lib(mdlconvlib)
 sge_mark_internal_lib(sge_utils)
 sge_mark_internal_lib(sge_utils_Tests)
+sge_mark_internal_lib(sge_log)
 sge_mark_internal_lib(sge_renderer)
 sge_mark_internal_lib(sge_audio)
 sge_mark_internal_lib(sge_core)

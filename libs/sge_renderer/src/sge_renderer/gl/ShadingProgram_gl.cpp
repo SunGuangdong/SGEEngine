@@ -1,9 +1,10 @@
-#include <algorithm>
-#include <stdio.h>
-
+#include "ShadingProgram_gl.h"
 #include "GraphicsInterface_gl.h"
 #include "Shader_gl.h"
-#include "ShadingProgram_gl.h"
+#include "sge_log/Log.h"
+
+#include <algorithm>
+#include <stdio.h>
 
 namespace sge {
 
@@ -41,7 +42,7 @@ bool ShadingProgramGL::create(Shader* vertShdr, Shader* pixelShdr) {
 			sgeAssert(false);
 			// Display the error message.
 			sgeAssert(false);
-			// SGE_DEBUG_ERR((char*)infoLog.data());
+			SGE_DEBUG_ERR((char*)infoLog.data());
 		}
 
 		// clean up

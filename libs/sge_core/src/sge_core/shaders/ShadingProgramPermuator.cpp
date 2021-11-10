@@ -1,5 +1,6 @@
 #include "ShadingProgramPermuator.h"
 #include "sge_core/ICore.h"
+#include "sge_log/Log.h"
 #include "sge_utils/utils/FileStream.h"
 
 namespace sge {
@@ -66,8 +67,7 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 		shaderCodeFull += macrosToPreapend;
 		shaderCodeFull.append(shaderCode, shaderCodeSize);
 
-		const CreateShaderResult programCreateResult = 
-			perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
+		const CreateShaderResult programCreateResult = perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
 		    shaderCodeFull.c_str(), shaderCodeFull.c_str(), outIncludedFiles);
 
 		if (programCreateResult.succeeded == false) {

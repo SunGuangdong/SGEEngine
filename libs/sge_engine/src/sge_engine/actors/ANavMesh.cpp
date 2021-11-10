@@ -8,6 +8,7 @@
 #include "sge_core/ICore.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/traits/TraitRigidBody.h"
+#include "sge_log/Log.h"
 #include "sge_utils/utils/ScopeGuard.h"
 
 #include "sge_engine/windows/PropertyEditorWindow.h"

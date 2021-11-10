@@ -47,10 +47,7 @@ struct Core : public ICore {
 	const FrameStatistics& getLastFrameStatistics() const final { return lastFrameStatistics; }
 	void setLastFrameStatistics(const FrameStatistics& stats) final { lastFrameStatistics = stats; }
 
-	CoreLog& getLog() override { return m_log; }
-
   public:
-	CoreLog m_log;
 
 	SGEDevice* m_sgedev = nullptr;  // The sge device attached to the main window.
 	SGEContext* m_sgecon = nullptr; // The context attached to the m_sgedev.
@@ -384,6 +381,7 @@ ICore* getCore() {
 }
 
 void setCore(ICore* core) {
+	sgeAssert(core);
 	g_pWorkingCore = core;
 }
 

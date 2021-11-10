@@ -1,7 +1,7 @@
 #include "D3D11ContextStateCache.h"
-
-#include <sge_utils/utils/comptr.h>
-#include <sge_utils/utils/range_loop.h>
+#include "sge_log/Log.h"
+#include "sge_utils/utils/comptr.h"
+#include "sge_utils/utils/range_loop.h"
 
 namespace sge {
 
@@ -345,9 +345,10 @@ void D3D11ContextStateCache::ResolveBindRTVorDSVHazzard(ID3D11Resource* const* r
 					m_boundResources[iStage].srvs[iSlot]->GetResource(&srvResource);
 
 				if (srvResource == resources[iResource]) {
-					// SGE_DEBUG_WAR(
-					//	"[RES-HAZZARD][D3D11]Trying to bind resource(stage:%d, slot:%d) as RTV/DSV while it's already bound as SRV."
-					//	"SRV will be unbound! The D3D11 warrning will be silenced by this action!\n", iStage, iSlot);
+					SGE_DEBUG_WAR(
+					    "[RES-HAZZARD][D3D11]Trying to bind resource(stage:%d, slot:%d) as RTV/DSV while it's already bound as SRV."
+					    "SRV will be unbound! The D3D11 warrning will be silenced by this action!\n",
+					    iStage, iSlot);
 					ID3D11ShaderResourceView* nullSRVs[] = {NULL};
 					BindSRVs((ShaderType::Enum)iStage, iSlot, 1, nullSRVs);
 				}

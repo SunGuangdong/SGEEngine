@@ -59,6 +59,11 @@ endif()
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:sge_engine> ${target_output_dir}/
 	)
 	
+	# sge_log
+	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
+		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:sge_log> ${target_output_dir}/
+	)
+	
 	# SDL2
 	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SDL2> ${target_output_dir}/
