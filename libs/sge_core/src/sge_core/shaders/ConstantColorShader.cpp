@@ -1,5 +1,5 @@
 #include "ConstantColorShader.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/model/Model.h"

@@ -36,7 +36,8 @@ namespace sge {
 
 struct LegacyRenderItem : IRenderItem {
 	LegacyRenderItem(std::function<void()> drawFn)
-	    : drawFn(drawFn) {}
+	    : drawFn(drawFn) {
+	}
 
 	std::function<void()> drawFn;
 };
@@ -634,8 +635,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 
 	for (ParticleGroupDesc& pdesc : traitParticles->m_pgroups) {
 		if (pdesc.m_visMethod == ParticleGroupDesc::vis_model3D) {
-			AssetModel* model = pdesc.m_particleModel.getAssetModel();
-			if (model != nullptr) {
+			AssetIface_Model3D* modelIface = pdesc.m_particleModel.getAssetInterface<AssetIface_Model3D>();
+			if (modelIface != nullptr) {
 				const auto& itr = traitParticles->m_pgroupState.find(pdesc.m_name);
 				const mat4f n2w = itr->second.getParticlesToWorldMtx();
 				if (itr != traitParticles->m_pgroupState.end()) {
@@ -645,7 +646,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 						mat4f particleTForm = n2w * mat4f::getTranslation(particle.pos) * mat4f::getScaling(particle.scale);
 
 						m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, lighting,
-						                 model->staticEval, InstanceDrawMods());
+						                 modelIface->getSharedEval(), InstanceDrawMods());
 					}
 				}
 			}
@@ -684,13 +685,13 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 	for (int iGroup = 0; iGroup < numPGroups; ++iGroup) {
 		TraitParticlesProgrammable::ParticleGroup* pgrp = particlesTrait->getPGroup(iGroup);
 
-		if (pgrp->spriteTexture->getType() == AssetType::Model) {
+		if (isAssetLoaded(pgrp->spriteTexture, assetType_model3d)) {
 			for (const TraitParticlesProgrammable::ParticleGroup::ParticleData& particle : pgrp->allParticles) {
 				mat4f particleTForm =
 				    mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) * mat4f::getScaling(particle.scale);
 
 				m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), particleTForm, lighting,
-				                 pgrp->spriteTexture->asModel()->staticEval, InstanceDrawMods());
+				                 getAssetIface<AssetIface_Model3D>(pgrp->spriteTexture)->getStaticEval(), InstanceDrawMods());
 			}
 		} else {
 			if (m_partRendDataGen.generate(*pgrp, *drawSets.rdest.sgecon, *drawSets.drawCamera, n2w)) {
@@ -720,9 +721,9 @@ void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
 	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
 	Actor* const actor = modelTrait->getActor();
 
-	PAsset const asset = modelTrait->getAssetProperty().getAsset();
+	std::shared_ptr<Asset> const asset = modelTrait->getAssetProperty().getAsset();
 
-	if (isAssetLoaded(asset) && asset->getType() == AssetType::Model) {
+	if (isAssetLoaded(asset) && asset->getType() == assetType_model3d) {
 		AssetModel* const model = modelTrait->getAssetProperty().getAssetModel();
 
 		std::vector<MaterialOverride> mtlOverrides;

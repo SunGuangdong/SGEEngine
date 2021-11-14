@@ -1,5 +1,5 @@
 #include "ModelPreviewWindow.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
@@ -16,7 +16,7 @@ static bool promptForModel(std::shared_ptr<Asset>& asset) {
 
 	const std::string filename = FileOpenDialog("Pick a model", true, "*.mdl\0*.mdl\0", nullptr);
 	if (!filename.empty()) {
-		asset = assetLib->getAsset(AssetType::Model, filename.c_str(), true);
+		asset = assetLib->getAssetFromFile(filename.c_str());
 		return true;
 	}
 	return false;
@@ -111,15 +111,16 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			animationDonors.clear();
 			previewAimationTime = 0.f;
 			autoPlayAnimation = true;
-			if (m_model) {
-				m_eval.initialize(assetLib, &m_model->asModel()->model);
+			if (isAssetLoaded(m_model, assetType_model3d)) {
+				m_eval.initialize(assetLib, &getAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
 			}
 		}
 
 		if (isAssetLoaded(m_model)) {
 			if (ImGui::Button("Add Animation Donor")) {
-				PAsset donor;
+				std::shared_ptr<Asset> donor;
 				if (promptForModel(donor)) {
+					sgeAssert(isAssetLoaded(donor));
 					animationDonors.push_back(donor);
 					m_eval.addAnimationDonor(donor);
 				}
@@ -127,10 +128,11 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 		}
 
 		ImGui::SameLine();
-		if (isAssetLoaded(m_model))
+		if (isAssetLoaded(m_model)) {
 			ImGui::Text("%s", m_model->getPath().c_str());
-		else
+		} else {
 			ImGui::Text("Pick a Model");
+		}
 
 		ImGui::EndChild();
 		ImGui::NextColumn();
@@ -152,7 +154,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 				}
 
 				for (int iDonor = 0; iDonor < animationDonors.size(); ++iDonor) {
-					const Model& donorModel = animationDonors[iDonor]->asModel()->model;
+					const Model& donorModel = getAssetIface<AssetIface_Model3D>(animationDonors[iDonor])->getModel3D();
 					for (int t = 0; t < donorModel.numAnimations(); ++t) {
 						const ModelAnimation* anim = donorModel.animationAt(t);
 						if (ImGui::Selectable((animationDonors[iDonor]->getPath() + " | " + anim->animationName).c_str())) {

@@ -23,7 +23,7 @@
 #include "sge_engine/traits/TraitScriptSlot.h"
 
 namespace sge {
-struct MDiffuseMaterial;
+//struct MDiffuseMaterial;
 struct TraitModel;
 
 //----------------------------------------------------------

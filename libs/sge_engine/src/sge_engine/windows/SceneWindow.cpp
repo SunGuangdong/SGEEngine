@@ -1,5 +1,5 @@
 #include "IconsForkAwesome/IconsForkAwesome.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/Camera.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
@@ -221,11 +221,15 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 				}
 
 				if (createActorFilter.PassFilter(td->name)) {
-					Texture* const iconTexture =
-					    getEngineGlobal()->getEngineAssets().getIconForObjectType(td->typeId)->asTextureView()->tex.GetPtr();
+					const AssetIface_Texture2D* texIface =
+					    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(td->typeId));
+					Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
-					ImGui::Image(iconTexture, ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()));
-					ImGui::SameLine();
+
+					if (iconTexture) {
+						ImGui::Image(iconTexture, ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()));
+						ImGui::SameLine();
+					}
 
 					if (ImGui::MenuItem(td->name)) {
 						CmdObjectCreation* cmd = new CmdObjectCreation;

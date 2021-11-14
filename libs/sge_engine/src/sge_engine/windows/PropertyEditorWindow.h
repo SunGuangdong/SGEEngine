@@ -14,7 +14,7 @@ struct MemberChain;
 
 struct CollsionShapeDesc;
 
-enum class AssetType : int;
+enum AssetType : int;
 
 /// A set of functions that generate the User Interface for the specified member of game object.
 /// The functions could be called anywhere.

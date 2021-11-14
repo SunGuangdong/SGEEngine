@@ -62,10 +62,12 @@ void ASky::doAttributeEditor(GameInspector* inspector) {
 SkyShaderSettings ASky::getSkyShaderSetting() const {
 	SkyShaderSettings result;
 
+	const AssetIface_Texture2D* texIface = m_textureAssetProp.getAssetInterface<AssetIface_Texture2D>();
+
 	result.mode = m_mode;
 	result.topColor = m_topColor;
 	result.bottomColor = m_bottomColor;
-	result.texture = m_textureAssetProp.getAssetTexture() ? m_textureAssetProp.getAssetTexture()->tex.GetPtr() : nullptr;
+	result.texture = texIface ? texIface->getTexture() : nullptr;
 
 	return result;
 }

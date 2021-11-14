@@ -161,10 +161,9 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 
 	material = PBRMaterial();
 
-	material.diffuseTextureX = m_textureX.getAssetTexture() ? m_textureX.getAssetTexture()->tex.GetPtr() : nullptr;
-	material.diffuseTextureY = m_textureY.getAssetTexture() ? m_textureY.getAssetTexture()->tex.GetPtr() : nullptr;
-	material.diffuseTextureZ = material.diffuseTextureX;
-
+	//material.diffuseTextureX = m_textureX.getAssetTexture() ? m_textureX.getAssetTexture()->tex.GetPtr() : nullptr;
+	//material.diffuseTextureY = m_textureY.getAssetTexture() ? m_textureY.getAssetTexture()->tex.GetPtr() : nullptr;
+	//material.diffuseTextureZ = material.diffuseTextureX;
 
 	material.diffuseTexXYZScaling = vec3f(1.f / m_textureXScale, 1.f / m_textureYScale, 1.f / m_textureXScale);
 }

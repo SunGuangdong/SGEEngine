@@ -1,3 +1,4 @@
+#if 0
 #include "Material.h"
 
 #include "sge_core/Geometry.h"
@@ -60,3 +61,4 @@ PBRMaterial MDiffuseMaterial::getMaterial() {
 }
 
 } // namespace sge
+#endif

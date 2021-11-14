@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 
 #include "sge_engine/Actor.h"
 #include "sge_engine/RigidBodyEditorConfig.h"

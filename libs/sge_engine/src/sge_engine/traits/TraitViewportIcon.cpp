@@ -2,6 +2,7 @@
 #include "sge_core/Camera.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitViewportIconRenderItem.h"
 #include "sge_engine/enums2d.h"
+#include "sge_core/AssetLibrary/AssetTexture2D.h"
 
 namespace sge {
 RelfAddTypeId(TraitViewportIcon, 20'05'22'0001);
@@ -14,7 +15,7 @@ ReflBlock() {
 // TraitViewportIcon
 //-----------------------------------------------------------------------
 TraitViewportIcon::TraitViewportIcon()
-    : m_assetProperty(AssetType::Texture2D)
+    : m_assetProperty(assetType_texture2d)
     , m_pixelSizeUnitsScreenSpace(0.0011f) {
 }
 
@@ -44,9 +45,8 @@ mat4f TraitViewportIcon::computeNodeToWorldMtx(const ICamera& camera) const {
 }
 
 Texture* TraitViewportIcon::getIconTexture() const {
-	const AssetTexture* const assetTextureView = m_assetProperty.getAssetTexture();
-	Texture* const texture =
-	    (assetTextureView != nullptr && assetTextureView->tex.IsResourceValid()) ? assetTextureView->tex.GetPtr() : nullptr;
+	const AssetIface_Texture2D* texIface = m_assetProperty.getAssetInterface<AssetIface_Texture2D>();
+	Texture* const texture = texIface ? texIface->getTexture() : nullptr;
 	return texture;
 }
 

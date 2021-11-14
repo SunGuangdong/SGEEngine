@@ -305,7 +305,8 @@ ParticleGroupState::SpriteRendData*
 	          [&](const SortingData& a, const SortingData& b) { return a.distanceAlongRay > b.distanceAlongRay; });
 
 	// Obtain the sprite texture and check if it is valid.
-	Texture* const sprite = pdesc.m_particlesSprite.getAssetTexture() ? pdesc.m_particlesSprite.getAssetTexture()->tex.GetPtr() : nullptr;
+	const AssetIface_Texture2D* texIface = pdesc.m_particlesSprite.getAssetInterface<AssetIface_Texture2D>();
+	Texture* const sprite = texIface ? texIface->getTexture() : nullptr;
 	if (sprite == nullptr) {
 		spriteRenderData = NullOptional();
 		return nullptr;
@@ -528,8 +529,7 @@ bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleG
 	          [&](const SortingData& a, const SortingData& b) { return a.distanceAlongRay > b.distanceAlongRay; });
 
 	// Obtain the sprite texture and check if it is valid.
-	Texture* const sprite = particles.spriteTexture->asTextureView()->tex.GetPtr();
-
+	Texture* const sprite = getAssetIface<AssetIface_Texture2D>(particles.spriteTexture)->getTexture();
 
 	// Compute the sprite sub-images UV regions.
 	const int numFrames = std::max(particles.spriteFramsCount.volume(), 0);

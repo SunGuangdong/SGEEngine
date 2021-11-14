@@ -1,3 +1,5 @@
+#if 0
+
 #pragma once
 
 #include "sge_engine/GameObject.h"
@@ -18,10 +20,10 @@ struct SGE_ENGINE_API OMaterial : public GameObject {
 
 struct SGE_ENGINE_API MDiffuseMaterial : public OMaterial {
 	MDiffuseMaterial()
-	    : diffuseTexture(AssetType::Texture2D)
-	    , normalTexture(AssetType::Texture2D)
-	    , metalnessTexture(AssetType::Texture2D)
-	    , roughnessTexture(AssetType::Texture2D) {}
+	    : diffuseTexture(assetType_texture2d)
+	    , normalTexture(assetType_texture2d)
+	    , metalnessTexture(assetType_texture2d)
+	    , roughnessTexture(assetType_texture2d) {}
 
 	void create() override {}
 
@@ -41,3 +43,5 @@ struct SGE_ENGINE_API MDiffuseMaterial : public OMaterial {
 };
 
 } // namespace sge
+
+#endif

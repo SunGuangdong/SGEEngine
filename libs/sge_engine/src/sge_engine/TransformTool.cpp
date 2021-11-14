@@ -1,6 +1,6 @@
 #include "TransformTool.h"
 #include "GameInspector.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include <imgui/imgui.h>
 
 #include "sge_engine/GameDrawer/GameDrawer.h"

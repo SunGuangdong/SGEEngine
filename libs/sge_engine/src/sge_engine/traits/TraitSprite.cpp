@@ -50,10 +50,10 @@ AABox3f TraitSprite::getBBoxOS() const {
 	AABox3f bbox;
 
 	for (const Element& image : images) {
-		const SpriteAnimationAsset* const assetSprite = image.m_assetProperty.getAssetSprite();
-		const AssetTexture* const assetTexture = image.m_assetProperty.getAssetTexture();
+		const AssetIface_SpriteAnim* const spriteIface = image.m_assetProperty.getAssetInterface<AssetIface_SpriteAnim>();
+		const AssetIface_Texture2D* const texIface = image.m_assetProperty.getAssetInterface<AssetIface_Texture2D>();
 
-		if ((assetSprite || assetTexture) && isAssetLoaded(image.m_assetProperty.getAsset())) {
+		if (spriteIface || texIface) {
 			return image.imageSettings.computeBBoxOS(*image.m_assetProperty.getAsset().get(),
 			                                         additionalTransform * image.m_additionalTransform);
 		} else {
@@ -90,32 +90,28 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 		const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
 		Actor* const actor = getActor();
 
-		PAsset const asset = image.m_assetProperty.getAsset();
+		const std::shared_ptr<Asset>& asset = image.m_assetProperty.getAsset();
 
-		if (isAssetLoaded(asset) && asset->getType() == AssetType::Texture2D) {
-			AssetTexture* ppTexture = asset->asTextureView();
-			if (ppTexture && ppTexture->tex.IsResourceValid()) {
-				Texture* const texture = ppTexture->tex.GetPtr();
-				if (texture) {
-					renderItem.spriteTexture = texture;
+		if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+			if (Texture* const texture = texIface->getTexture()) {
+				renderItem.spriteTexture = texture;
 
-					mat4f obj2world = image.imageSettings.computeObjectToWorldTransform(
-					    *asset.get(), drawSets.drawCamera, actor->getTransform(), additionalTransform * image.m_additionalTransform);
+				mat4f obj2world = image.imageSettings.computeObjectToWorldTransform(
+				    *asset.get(), drawSets.drawCamera, actor->getTransform(), additionalTransform * image.m_additionalTransform);
 
-					renderItem.obj2world = obj2world;
+				renderItem.obj2world = obj2world;
 
-					renderItem.zSortingPositionWs = obj2world.c3.xyz();
-					renderItem.needsAlphaSorting =
-					    ppTexture->meta.isSemiTransparent || renderItem.colorTint.w < 0.999f || image.imageSettings.forceAlphaBlending;
-				}
+				renderItem.zSortingPositionWs = obj2world.c3.xyz();
+				renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent || renderItem.colorTint.w < 0.999f ||
+				                               image.imageSettings.forceAlphaBlending;
 			}
-		} else if (isAssetLoaded(asset) && asset->getType() == AssetType::Sprite) {
-			SpriteAnimationAsset* const pSprite = asset->asSprite();
-			if (pSprite && isAssetLoaded(pSprite->textureAsset, AssetType::Texture2D)) {
+		} else if (const AssetIface_SpriteAnim* spriteIface = getAssetIface<AssetIface_SpriteAnim>(asset)) {
+			if (const AssetIface_Texture2D* texIfaceSprite = getAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
 				// Get the frame of the sprite to be rendered.
-				const SpriteAnimation::Frame* const frame = pSprite->spriteAnimation.getFrameForTime(image.imageSettings.spriteFrameTime);
+				const SpriteAnimation::Frame* const frame =
+				    spriteIface->getSpriteAnimation().spriteAnimation.getFrameForTime(image.imageSettings.spriteFrameTime);
 				if (frame) {
-					renderItem.spriteTexture = pSprite->textureAsset->asTextureView()->tex.GetPtr();
+					renderItem.spriteTexture = texIfaceSprite->getTexture();
 
 					mat4f obj2world = image.imageSettings.computeObjectToWorldTransform(
 					    *asset.get(), drawSets.drawCamera, actor->getTransform(), additionalTransform * image.m_additionalTransform);
@@ -127,8 +123,8 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 					    mat4f::getScaling(frame->uvRegion.z - frame->uvRegion.x, frame->uvRegion.w - frame->uvRegion.y, 0.f);
 
 					renderItem.zSortingPositionWs = obj2world.c3.xyz();
-					renderItem.needsAlphaSorting = pSprite->textureAsset->asTextureView()->meta.isSemiTransparent ||
-					                               renderItem.colorTint.w < 0.999f || image.imageSettings.forceAlphaBlending;
+					renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent || renderItem.colorTint.w < 0.999f ||
+					                               image.imageSettings.forceAlphaBlending;
 				}
 			}
 		} else {
@@ -159,13 +155,13 @@ void editTraitSprite_Element(GameInspector& inspector, GameObject* actor, Member
 		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 		chain.pop();
 
-		if (image.m_assetProperty.getAssetSprite()) {
+		if (image.m_assetProperty.getAssetInterface<AssetIface_SpriteAnim>()) {
 			chain.add(sgeFindMember(TraitSprite::Element, imageSettings));
 			ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 			chain.pop();
 		}
 
-		if (image.m_assetProperty.getAssetTexture()) {
+		if (image.m_assetProperty.getAssetInterface<AssetIface_Texture2D>()) {
 			chain.add(sgeFindMember(TraitSprite::Element, imageSettings));
 			ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 			chain.pop();
@@ -179,15 +175,14 @@ mat4f TraitSprite::ImageSettings::computeObjectToWorldTransform(const Asset& ass
                                                                 const mat4f& additionaTransform) const {
 	vec2f imageSize = vec2f(0.f);
 	bool hasValidImageToRender = false;
-	if (isAssetLoaded(asset, AssetType::Sprite)) {
-		const SpriteAnimationAsset* sprite = asset.asSprite();
+	if (const AssetIface_SpriteAnim* spriteIface = getAssetIface<AssetIface_SpriteAnim>(asset)) {
+		const SpriteAnimationWithTextures* sprite = &spriteIface->getSpriteAnimation();
 		const SpriteAnimation::Frame* frame = sprite->spriteAnimation.getFrameForTime(spriteFrameTime);
 		imageSize = vec2f(float(frame->wh.x), float(frame->wh.y));
 		hasValidImageToRender = true;
-	} else if (isAssetLoaded(asset, AssetType::Texture2D)) {
-		const AssetTexture* assetTex = asset.asTextureView();
-		if (assetTex && assetTex->tex.IsResourceValid()) {
-			imageSize = vec2f(float(assetTex->tex->getDesc().texture2D.width), float(assetTex->tex->getDesc().texture2D.height));
+	} else if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+		if (Texture* tex = texIface->getTexture()) {
+			imageSize = vec2f(float(tex->getDesc().texture2D.width), float(tex->getDesc().texture2D.height));
 			hasValidImageToRender = true;
 		}
 	}
@@ -223,8 +218,9 @@ mat4f TraitSprite::ImageSettings::computeObjectToWorldTransform(const Asset& ass
 
 AABox3f TraitSprite::ImageSettings::computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const {
 	// What is happening here is the following:
-	// When there is no billboarding applied the bounding box computation is pretty strait forward -
-	// Just transform the verticies of of quad by object-to-node space transfrom and we are done.
+	// When there is no billboarding applied the bounding box computation is pretty strait forward:
+	// Transform the verticies of of quad by object-to-node space transfrom and we are done.
+	// 
 	// However when there is billboarding the plane is allowed to rotate (based on the type of the bilboarding).
 	// it might be sweeping around an axis (Up only billboarding) or facing the camera (meaning int can rotate freely around its center
 	// point).

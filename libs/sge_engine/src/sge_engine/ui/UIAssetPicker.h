@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine/sge_engine_api.h"
 
 namespace sge {

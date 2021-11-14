@@ -11,7 +11,7 @@ bool AssetProperty::update() {
 
 	m_currentAsset = m_targetAsset;
 	if (m_currentAsset.empty() == false) {
-		m_asset = getCore()->getAssetLib()->getAsset(m_currentAsset.c_str(), true);
+		m_asset = getCore()->getAssetLib()->getAssetFromFile(m_currentAsset.c_str());
 	} else {
 		m_asset = std::shared_ptr<Asset>();
 	}
@@ -19,67 +19,6 @@ bool AssetProperty::update() {
 	return true;
 }
 
-AssetModel* AssetProperty::getAssetModel() {
-	if (isAssetLoaded(m_asset) == false || m_asset->getType() != AssetType::Model) {
-		return nullptr;
-	}
-
-	return m_asset->asModel();
-}
-
-const AssetModel* AssetProperty::getAssetModel() const {
-	if (!isAssetLoaded(m_asset, AssetType::Model)) {
-		return nullptr;
-	}
-	return m_asset->asModel();
-}
-
-AssetTexture* AssetProperty::getAssetTexture() {
-	if (!isAssetLoaded(m_asset, AssetType::Texture2D)) {
-		return nullptr;
-	}
-
-	return m_asset->asTextureView();
-}
-
-const AssetTexture* AssetProperty::getAssetTexture() const {
-	if (!isAssetLoaded(m_asset, AssetType::Texture2D)) {
-		return nullptr;
-	}
-	return m_asset->asTextureView();
-}
-
-SpriteAnimationAsset* AssetProperty::getAssetSprite() {
-	if (!isAssetLoaded(m_asset, AssetType::Sprite)) {
-		return nullptr;
-	}
-
-	return m_asset->asSprite();
-}
-
-const SpriteAnimationAsset* AssetProperty::getAssetSprite() const {
-	if (!isAssetLoaded(m_asset, AssetType::Sprite)) {
-		return nullptr;
-	}
-
-	return m_asset->asSprite();
-}
-
-AudioDataAsset* AssetProperty::getAssetAudio() {
-	if (isAssetLoaded(m_asset) == false || m_asset->getType() != AssetType::Audio) {
-		return nullptr;
-	}
-
-	return m_asset->asAudio();
-}
-
-const AudioDataAsset* AssetProperty::getAssetAudio() const {
-	if (isAssetLoaded(m_asset) == false || m_asset->getType() != AssetType::Audio) {
-		return nullptr;
-	}
-
-	return m_asset->asAudio();
-}
 
 void AssetProperty::setAsset(std::shared_ptr<Asset> asset) {
 	m_asset = std::move(asset);

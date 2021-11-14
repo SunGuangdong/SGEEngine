@@ -1,6 +1,6 @@
 
 #include "Animator.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_utils/utils/common.h"
 
@@ -19,12 +19,13 @@ void ModelAnimator::addTrack(int newTrackId, float fadeInTime, TrackTransition t
 void ModelAnimator::addAnimationToTrack(int newTrackId, const char* const donorModelPath, const char* donorAnimationName) {
 	AnimatorTrack& track = m_tracks[newTrackId];
 
-	std::shared_ptr<Asset> donorModel = getCore()->getAssetLib()->getAsset(donorModelPath, true);
-	if (isAssetLoaded(donorModel, AssetType::Model)) {
+	std::shared_ptr<Asset> donorModel = getCore()->getAssetLib()->getAssetFromFile(donorModelPath);
+	if (isAssetLoaded(donorModel, assetType_model3d)) {
 		AnimatorTrack::AnimationDonor donor;
 		donor.modelAnimationDonor = donorModel;
 		donor.donorIndex = m_modelToBeAnimated->addAnimationDonor(donorModel);
-		donor.animationIndexInDonor = donorModel->asModel()->model.getAnimationIndexByName(donorAnimationName);
+		donor.animationIndexInDonor =
+		    getAssetIface<AssetIface_Model3D>(donorModel)->getModel3D().getAnimationIndexByName(donorAnimationName);
 
 		track.animations.push_back(donor);
 	}

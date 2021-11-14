@@ -9,7 +9,7 @@
 
 #include "sge_core/SGEImGui.h"
 
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_renderer/renderer/renderer.h"
 
 #include "InfoWindow.h"
@@ -44,7 +44,7 @@ void InfoWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUS
 		ImGui::Value("Primitives Count", (int)framestats.numPrimitiveDrawn);
 		ImGui::Value("VSync Enabled", getCore()->getDevice()->getVsync());
 
-		SGEDevice* const sgedev = getCore()->getAssetLib()->getDevice();
+		SGEDevice* const sgedev = getCore()->getDevice();
 
 		if (ImGui::CollapsingHeader("VertexDeclarations")) {
 			for (const auto& declPair : sgedev->getVertexDeclMap()) {

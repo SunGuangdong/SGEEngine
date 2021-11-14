@@ -4,7 +4,7 @@
 #include "ModelPreviewWindow.h"
 #include "imgui/imgui.h"
 #include "sgeImportFBXFile.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_utils/utils/DLLHandler.h"
 #include <string>
 
@@ -30,7 +30,7 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 		bool preview = true;
 		ModelPreviewWidget modelPreviewWidget;
 
-		PAsset tempAsset;
+		std::shared_ptr<Asset> tempAsset;
 	};
 
   public:
@@ -60,7 +60,7 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	std::filesystem::path m_rightClickedPath;
 
 	// A pointer to the asset that currently has a preview.
-	PAsset explorePreviewAsset;
+	std::shared_ptr<Asset> explorePreviewAsset;
 
 	/// When in explorer the user has selected a 3d model this widget is used to draw the preview.
 	ModelPreviewWidget m_exploreModelPreviewWidget;

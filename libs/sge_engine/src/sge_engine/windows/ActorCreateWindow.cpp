@@ -1,4 +1,4 @@
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
@@ -55,16 +55,21 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), const InputStat
 					continue;
 				}
 
-				Texture* const icon =
-				    getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId)->asTextureView()->tex.GetPtr();
+				const AssetIface_Texture2D* texIface =
+				    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId));
+				Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
 				ImGui::BeginChildFrame(ImHashStr(typeDesc->name), kWidgetSize, ImGuiWindowFlags_NoBackground);
 
+
 				float indent = (ImGui::GetContentRegionAvailWidth() - kItemWidth) * 0.5f;
 				ImGui::Indent(indent);
-				ImGui::ImageButton(icon, ImVec2(32, 32), ImVec2(0.f, 0.f), ImVec2(1.f, 1.f), 0);
+				if (iconTexture) {
+					ImGui::ImageButton(iconTexture, ImVec2(32, 32), ImVec2(0.f, 0.f), ImVec2(1.f, 1.f), 0);
+				}
 				bool isImageButtonPressed = ImGui::IsItemClicked(0);
 				ImGui::Unindent(indent);
+
 
 				if (ImGui::IsItemHovered()) {
 					ImGui::SetTooltip(typeDesc->name);

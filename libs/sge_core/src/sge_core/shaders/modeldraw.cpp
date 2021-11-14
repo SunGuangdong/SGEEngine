@@ -1,5 +1,5 @@
 #include "modeldraw.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/model/Model.h"
@@ -434,21 +434,19 @@ void BasicModelDraw::draw(const RenderDestination& rdest,
 					material.metalness = mtl.metallic;
 					material.roughness = mtl.roughness;
 
-					material.diffuseTexture = isAssetLoaded(mtl.diffuseTexture) && mtl.diffuseTexture->asTextureView()
-					                              ? mtl.diffuseTexture->asTextureView()->tex.GetPtr()
-					                              : nullptr;
+					const auto getTexFromAsset = [](const std::shared_ptr<Asset>& asset) -> Texture* {
+						if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+							return texIface->getTexture();
+						}
 
-					material.texNormalMap = isAssetLoaded(mtl.texNormalMap) && mtl.texNormalMap->asTextureView()
-					                            ? mtl.texNormalMap->asTextureView()->tex.GetPtr()
-					                            : nullptr;
+						return nullptr;
+					};
 
-					material.texMetalness = isAssetLoaded(mtl.texMetallic) && mtl.texMetallic->asTextureView()
-					                            ? mtl.texMetallic->asTextureView()->tex.GetPtr()
-					                            : nullptr;
+					material.diffuseTexture = getTexFromAsset(mtl.diffuseTexture);
+					material.texNormalMap = getTexFromAsset(mtl.texNormalMap);
+					material.texMetalness = getTexFromAsset(mtl.texMetallic);
+					material.texRoughness = getTexFromAsset(mtl.texRoughness);
 
-					material.texRoughness = isAssetLoaded(mtl.texRoughness) && mtl.texRoughness->asTextureView()
-					                            ? mtl.texRoughness->asTextureView()->tex.GetPtr()
-					                            : nullptr;
 				} else {
 					material = itr->mtl;
 				}

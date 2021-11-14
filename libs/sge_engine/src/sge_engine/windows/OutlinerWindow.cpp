@@ -2,7 +2,7 @@
 
 #include "OutlinerWindow.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_utils/utils/ScopeGuard.h"
@@ -82,10 +82,13 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 				}
 
 				// Add the GUI elements itself.
-				Texture* const iconTexture =
-				    getEngineGlobal()->getEngineAssets().getIconForObjectType(currentEntity->getType())->asTextureView()->tex.GetPtr();
+				const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(
+				    getEngineGlobal()->getEngineAssets().getIconForObjectType(currentEntity->getType()));
+				Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
-				ImGui::Image(iconTexture, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()));
+				if (iconTexture) {
+					ImGui::Image(iconTexture, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()));
+				}
 				ImGui::SameLine();
 
 				void* const treeNodeId = (void*)size_t(currentEntity->getId().id + 1); // Avoid having id 0 in the outliner

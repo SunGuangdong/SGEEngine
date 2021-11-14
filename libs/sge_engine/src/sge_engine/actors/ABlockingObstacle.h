@@ -19,8 +19,8 @@ struct GameInspector;
 //--------------------------------------------------------------------
 struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCustomAttributeEditorTrait {
 	ABlockingObstacle()
-	    : m_textureX(AssetType::Texture2D)
-	    , m_textureY(AssetType::Texture2D) {}
+	    : m_textureX(assetType_texture2d)
+	    , m_textureY(assetType_texture2d) {}
 
 	void create() final;
 	void onPlayStateChanged(bool const isStartingToPlay) override;

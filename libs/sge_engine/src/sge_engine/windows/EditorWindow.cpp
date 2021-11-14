@@ -42,28 +42,28 @@ namespace sge {
 void EditorWindow::Assets::load() {
 	AssetLibrary* assetLib = getCore()->getAssetLib();
 
-	m_assetPlayIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/play.png", true);
-	m_assetForkPlayIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/forkplay.png", true);
-	m_assetPauseIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/pause.png", true);
-	m_assetOpenIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/open.png", true);
-	m_assetSaveIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/save.png", true);
-	m_assetRefreshIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/refresh.png", true);
-	m_assetRebuildIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/rebuild.png", true);
-	m_assetPickingIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/pick.png", true);
-	m_assetTranslationIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/translation.png", true);
-	m_assetRotationIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/rotation.png", true);
-	m_assetScalingIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/scale.png", true);
-	m_assetVolumeScaleIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/volumeScale.png", true);
-	m_assetSnapToGridOffIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/snapToGridOff.png", true);
-	m_assetSnapToGridOnIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/snapToGridOn.png", true);
+	m_assetPlayIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/play.png");
+	m_assetForkPlayIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/forkplay.png");
+	m_assetPauseIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/pause.png");
+	m_assetOpenIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/open.png");
+	m_assetSaveIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/save.png");
+	m_assetRefreshIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/refresh.png");
+	m_assetRebuildIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/rebuild.png");
+	m_assetPickingIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/pick.png");
+	m_assetTranslationIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/translation.png");
+	m_assetRotationIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/rotation.png");
+	m_assetScalingIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/scale.png");
+	m_assetVolumeScaleIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/volumeScale.png");
+	m_assetSnapToGridOffIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/snapToGridOff.png");
+	m_assetSnapToGridOnIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/snapToGridOn.png");
 
-	m_showGameUIOnIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/showGameUIOn.png", true);
-	m_showGameUIOffIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/showGameUIOff.png", true);
+	m_showGameUIOnIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/showGameUIOn.png");
+	m_showGameUIOffIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/showGameUIOff.png");
 
-	m_orthoIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/ortho.png", true);
-	m_xIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/x.png", true);
-	m_yIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/y.png", true);
-	m_zIcon = assetLib->getAsset(AssetType::Texture2D, "assets/editor/textures/icons/z.png", true);
+	m_orthoIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/ortho.png");
+	m_xIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/x.png");
+	m_yIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/y.png");
+	m_zIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/z.png");
 }
 
 void EditorWindow::onGamePluginPreUnload() {
@@ -531,27 +531,36 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 	// Rendering.
 	sgecon->clearDepth(getCore()->getDevice()->getWindowFrameTarget(), 1.f);
 
+	const auto imageButton = [](const std::shared_ptr<Asset>& asset) -> bool {
+		const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset);
+		if (texIface && texIface->getTexture()) {
+			bool isPressed = ImGui::ImageButton(texIface->getTexture(), ImVec2(24, 24));
+			return isPressed;
+		}
+		return false;
+	};
+
+
 	if (ImGui::BeginChild("Toolbar", ImVec2(0, 48), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar)) {
 		if (m_assets.m_assetPlayIcon && m_sceneInstance.getInspector().m_disableAutoStepping) {
-			if (ImGui::ImageButton(m_assets.m_assetPlayIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24)))
+			if (imageButton(m_assets.m_assetPlayIcon))
 				m_sceneInstance.getInspector().m_disableAutoStepping = false;
-		} else if (m_assets.m_assetPauseIcon && !m_sceneInstance.getInspector().m_disableAutoStepping) {
-			if (ImGui::ImageButton(m_assets.m_assetPauseIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24)))
+		} else if (imageButton(m_assets.m_assetPauseIcon)) {
+			if (imageButton(m_assets.m_assetPauseIcon))
 				m_sceneInstance.getInspector().m_disableAutoStepping = true;
 		}
 
 
 		ImGui::SameLine();
 
-		if (m_assets.m_assetPickingIcon && ImGui::ImageButton(m_assets.m_assetPickingIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_assetPickingIcon)) {
 			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_selectionTool);
 		}
 		ImGuiEx::TextTooltip("Enables the scene selection tool.\nShortcut: Q");
 
 		ImGui::SameLine();
 
-		if (m_assets.m_assetTranslationIcon &&
-		    ImGui::ImageButton(m_assets.m_assetTranslationIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_assetTranslationIcon)) {
 			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Translation;
 			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
 		}
@@ -559,8 +568,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 		ImGui::SameLine();
 
-		if (m_assets.m_assetRotationIcon &&
-		    ImGui::ImageButton(m_assets.m_assetRotationIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_assetRotationIcon)) {
 			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Rotation;
 			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
 		}
@@ -568,7 +576,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 		ImGui::SameLine();
 
-		if (m_assets.m_assetScalingIcon && ImGui::ImageButton(m_assets.m_assetScalingIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_assetScalingIcon)) {
 			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Scaling;
 			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
 		}
@@ -576,8 +584,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 		ImGui::SameLine();
 
-		if (m_assets.m_assetVolumeScaleIcon &&
-		    ImGui::ImageButton(m_assets.m_assetVolumeScaleIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_assetVolumeScaleIcon)) {
 			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_ScaleVolume;
 			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
 		}
@@ -585,7 +592,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 		ImGui::SameLine();
 
-		if (ImGui::ImageButton(m_assets.m_assetForkPlayIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_assetForkPlayIcon)) {
 			GamePlayWindow* oldGameplayWindow = getEngineGlobal()->findFirstWindowOfType<GamePlayWindow>();
 			if (oldGameplayWindow != nullptr) {
 				getEngineGlobal()->removeWindow(oldGameplayWindow);
@@ -605,13 +612,11 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGui::SameLine();
 
 		if (m_sceneInstance.getInspector().m_transformTool.m_useSnapSettings) {
-			if (m_assets.m_assetSnapToGridOnIcon &&
-			    ImGui::ImageButton(m_assets.m_assetSnapToGridOnIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+			if (imageButton(m_assets.m_assetSnapToGridOnIcon)) {
 				m_sceneInstance.getInspector().m_transformTool.m_useSnapSettings = false;
 			}
 		} else {
-			if (m_assets.m_assetSnapToGridOffIcon &&
-			    ImGui::ImageButton(m_assets.m_assetSnapToGridOffIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+			if (imageButton(m_assets.m_assetSnapToGridOffIcon)) {
 				m_sceneInstance.getInspector().m_transformTool.m_useSnapSettings = true;
 			}
 		}
@@ -623,20 +628,22 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGui::Separator();
 		ImGui::SameLine();
 
-		if (m_assets.m_assetRebuildIcon && ImGui::ImageButton(m_assets.m_orthoIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+
+
+		if (imageButton(m_assets.m_assetRebuildIcon)) {
 			getInspector().getWorld()->m_editorCamera.isOrthograhpic = !getInspector().getWorld()->m_editorCamera.isOrthograhpic;
 		}
 		ImGuiEx::TextTooltip("Toggle the orthographic/perspective mode of the preview camera.");
 
 		ImGui::SameLine();
-		if (m_assets.m_assetRebuildIcon && ImGui::ImageButton(m_assets.m_xIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_xIcon)) {
 			getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw = 0.f;
 			getInspector().getWorld()->m_editorCamera.m_orbitCamera.pitch = 0.f;
 		}
 		ImGuiEx::TextTooltip("Align the preview camera to +X axis.");
 
 		ImGui::SameLine();
-		if (m_assets.m_assetRebuildIcon && ImGui::ImageButton(m_assets.m_yIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_yIcon)) {
 			getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw =
 			    deg2rad(90.f) * float(int(getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw / deg2rad(90.f)));
 			getInspector().getWorld()->m_editorCamera.m_orbitCamera.pitch = deg2rad(90.f);
@@ -644,7 +651,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGuiEx::TextTooltip("Align the preview camera to +Y axis.");
 
 		ImGui::SameLine();
-		if (m_assets.m_assetRebuildIcon && ImGui::ImageButton(m_assets.m_zIcon->asTextureView()->tex.GetPtr(), ImVec2(24, 24))) {
+		if (imageButton(m_assets.m_zIcon)) {
 			getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw = deg2rad(-90.f);
 			getInspector().getWorld()->m_editorCamera.m_orbitCamera.pitch = 0.f;
 		}

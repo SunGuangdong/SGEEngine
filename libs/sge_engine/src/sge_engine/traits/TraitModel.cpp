@@ -16,7 +16,7 @@
 
 namespace sge {
 
-struct MDiffuseMaterial; // User for creating material overrides.
+//struct MDiffuseMaterial; // User for creating material overrides.
 
 // clang-format off
 RelfAddTypeId(TraitModel, 20'03'01'0004);
@@ -69,9 +69,9 @@ void TraitModel::PerModelSettings::setModel(std::shared_ptr<Asset>& asset, bool 
 //-----------------------------------------------------------------
 AABox3f TraitModel::PerModelSettings::getBBoxOS() const {
 	// If the attached asset is a model use it to compute the bounding box.
-	const AssetModel* const assetModel = m_assetProperty.getAssetModel();
-	if (assetModel && assetModel->staticEval.isInitialized()) {
-		AABox3f bbox = assetModel->staticEval.aabox.getTransformed(m_additionalTransform);
+	const AssetIface_Model3D* const modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+	if (modelIface) {
+		AABox3f bbox = modelIface->getStaticEval().aabox.getTransformed(m_additionalTransform);
 		return bbox;
 	}
 
@@ -89,8 +89,8 @@ void TraitModel::PerModelSettings::computeNodeToBoneIds(TraitModel& ownerTraitMo
 		return;
 	}
 
-	AssetModel* assetmodel = m_assetProperty.getAssetModel();
-	if (assetmodel == nullptr) {
+	AssetIface_Model3D* modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+	if (modelIface == nullptr) {
 		return;
 	}
 
@@ -111,8 +111,8 @@ void TraitModel::PerModelSettings::computeNodeToBoneIds(TraitModel& ownerTraitMo
 		boneActors.insert(bone);
 	}
 
-	for (const int iNode : rng_int(assetmodel->model.numNodes())) {
-		const ModelNode* node = assetmodel->model.nodeAt(iNode);
+	for (const int iNode : rng_int(modelIface->getModel3D().numNodes())) {
+		const ModelNode* node = modelIface->getModel3D().nodeAt(iNode);
 		for (Actor* boneActor : boneActors) {
 			if (node->name == boneActor->getDisplayName()) {
 				nodeToBoneId[iNode] = boneActor->getId();
@@ -123,12 +123,12 @@ void TraitModel::PerModelSettings::computeNodeToBoneIds(TraitModel& ownerTraitMo
 }
 
 void TraitModel::PerModelSettings::computeSkeleton(TraitModel& ownerTraitModel, std::vector<mat4f>& boneOverrides) {
-	AssetModel* assetmodel = m_assetProperty.getAssetModel();
-	if (assetmodel == nullptr) {
+	AssetIface_Model3D* modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+	if (modelIface == nullptr) {
 		return;
 	}
 
-	boneOverrides.resize(assetmodel->model.numNodes());
+	boneOverrides.resize(modelIface->getModel3D().numNodes());
 
 	if (useSkeleton == false) {
 		return;
@@ -208,15 +208,15 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 		if (!modelSets.isRenderable) {
 			continue;
 		}
+		AssetIface_Model3D* modelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 
-		const AssetModel* const assetModel = modelSets.m_assetProperty.getAssetModel();
 		mat4f node2world = getActor()->getTransformMtx();
 
 		const EvaluatedModel* evalModel = nullptr;
 		if (modelSets.m_evalModel.hasValue()) {
 			evalModel = &modelSets.m_evalModel.get();
-		} else if (assetModel) {
-			evalModel = &assetModel->staticEval;
+		} else if (modelIface) {
+			evalModel = &modelIface->getStaticEval();
 		}
 
 		if (evalModel) {
@@ -238,25 +238,25 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 					material.metalness = mtl.metallic;
 					material.roughness = mtl.roughness;
 
-					material.diffuseTexture = isAssetLoaded(mtl.diffuseTexture) && mtl.diffuseTexture->asTextureView()
-					                              ? mtl.diffuseTexture->asTextureView()->tex.GetPtr()
-					                              : nullptr;
+					const auto getTexFromAsset = [](const std::shared_ptr<Asset>& asset) -> Texture* {
+						if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+							return texIface->getTexture();
+						}
 
-					material.texNormalMap = isAssetLoaded(mtl.texNormalMap) && mtl.texNormalMap->asTextureView()
-					                            ? mtl.texNormalMap->asTextureView()->tex.GetPtr()
-					                            : nullptr;
+						return nullptr;
+					};
 
-					material.texMetalness = isAssetLoaded(mtl.texMetallic) && mtl.texMetallic->asTextureView()
-					                            ? mtl.texMetallic->asTextureView()->tex.GetPtr()
-					                            : nullptr;
+					material.diffuseTexture = getTexFromAsset(mtl.diffuseTexture);
+					material.texNormalMap = getTexFromAsset(mtl.texNormalMap);
+					material.texMetalness = getTexFromAsset(mtl.texMetallic);
+					material.texRoughness = getTexFromAsset(mtl.texRoughness);
 
-					material.texRoughness = isAssetLoaded(mtl.texRoughness) && mtl.texRoughness->asTextureView()
-					                            ? mtl.texRoughness->asTextureView()->tex.GetPtr()
-					                            : nullptr;
+					const bool meshHasVertexColor =
+					    evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor;
 
 					if (material.diffuseTexture != nullptr) {
 						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_diffuseMap;
-					} else if (evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor) {
+					} else if (meshHasVertexColor) {
 						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_vertexColor;
 					}
 
@@ -326,9 +326,9 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 				chain.pop();
 
 				// Material and Skeleton overrides interface.
-				if (AssetModel* loadedAsset = modelSets.m_assetProperty.getAssetModel()) {
-					for (ModelMaterial* mtl : loadedAsset->model.getMatrials()) {
-						// ImGui::Text(loadedAsset->model.m_materials[t]->name.c_str());
+				AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+				if (loadedModelIface) {
+					for (ModelMaterial* mtl : loadedModelIface->getModel3D().getMatrials()) {
 						// Check if override for this material already exists.
 						auto itrExisting = find_if(modelSets.m_materialOverrides, [&](const TraitModel::MaterialOverride& ovr) -> bool {
 							return ovr.materialName == mtl->name;
@@ -344,10 +344,10 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 					// Now do the UI for each available slot (keep in mind that we are keeping old slots (from previous models still
 					// available).
 					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Material Override")) {
-						for (int iMtl : rng_int(loadedAsset->model.numMaterials())) {
+						for (int iMtl : rng_int(loadedModelIface->getModel3D().numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
 
-							const ModelMaterial* mtl = loadedAsset->model.materialAt(iMtl);
+							const ModelMaterial* mtl = loadedModelIface->getModel3D().materialAt(iMtl);
 
 							// ImGui::Text(loadedAsset->model.m_materials[t]->name.c_str());
 							// Check if override for this material already exists.
@@ -366,7 +366,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 									if (modelSets.m_materialOverrides[slotIndex].materialObjId.isNull()) {
 										if (ImGui::Button("Create New Material")) {
 											CmdObjectCreation* cmdMtlCreate = new CmdObjectCreation();
-											cmdMtlCreate->setup(sgeTypeId(MDiffuseMaterial));
+											//cmdMtlCreate->setup(sgeTypeId(MDiffuseMaterial));
 											cmdMtlCreate->apply(&inspector);
 
 											CmdMemberChange* const cmdAssignMaterial = new CmdMemberChange();
@@ -406,7 +406,6 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 					// Skeletion UI
 					if (ImGui::CollapsingHeader(ICON_FK_WRENCH " Skeleton (WIP)")) {
 						if (ImGui::Button("Extract Skeleton")) {
-							AssetModel* modelAsset = modelSets.m_assetProperty.getAssetModel();
 							GameWorld* world = inspector.getWorld();
 							ALocator* allBonesParent = world->allocObjectT<ALocator>();
 							allBonesParent->setTransform(traitModel.getActor()->getTransform());
@@ -419,8 +418,10 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 
 							transf3d n2w = actor->getActor()->getTransform();
 
-							for (int iNode : rng_int(modelAsset->model.numNodes())) {
-								const ModelNode* node = modelAsset->model.nodeAt(iNode);
+							//AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+							Model& loadedModel = loadedModelIface->getModel3D();
+							for (int iNode : rng_int(loadedModel.numNodes())) {
+								const ModelNode* node = loadedModel.nodeAt(iNode);
 
 								const float boneLengthAuto = 0.1f;
 								const float boneLength = node->limbLength > 0.f ? node->limbLength : boneLengthAuto;
@@ -432,7 +433,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 
 							std::function<void(int nodeIndex, NodeRemapEl* parent)> traverseGlobalTransform;
 							traverseGlobalTransform = [&](int nodeIndex, NodeRemapEl* parent) -> void {
-								const ModelNode* node = modelAsset->model.nodeAt(nodeIndex);
+								const ModelNode* node = loadedModel.nodeAt(nodeIndex);
 
 								NodeRemapEl* const remapNode = nodeRemap.find_element(nodeIndex);
 								if (parent) {
@@ -449,8 +450,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 								}
 							};
 
-
-							traverseGlobalTransform(modelAsset->model.getRootNodeIndex(), nullptr);
+							traverseGlobalTransform(loadedModel.getRootNodeIndex(), nullptr);
 						}
 
 

@@ -1,5 +1,5 @@
 #include "RigidBodyFromModel.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_engine/Physics.h"
@@ -69,20 +69,19 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 }
 
 bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, const char* modelAssetPath) {
-	std::shared_ptr<Asset> modelAsset = getCore()->getAssetLib()->getAsset(AssetType::Model, modelAssetPath, true);
-	if (!isAssetLoaded(modelAsset)) {
+	std::shared_ptr<Asset> modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelAssetPath);
+	if (!isAssetLoaded(modelAsset, assetType_model3d)) {
 		return false;
 	}
 
-	return addCollisionShapeBasedOnModel(shapeDescs, modelAsset->asModel()->staticEval);
+	return addCollisionShapeBasedOnModel(shapeDescs, getAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval());
 }
 
 bool addCollisionShapeBasedOnTraitModel(std::vector<CollsionShapeDesc>& shapeDescs, TraitModel& traitModel) {
 	bool hadShapes = false;
 	for (TraitModel::PerModelSettings& mdlSets : traitModel.m_models) {
-		AssetModel* const assetModel = mdlSets.m_assetProperty.getAssetModel();
-		if (assetModel) {
-			hadShapes |= addCollisionShapeBasedOnModel(shapeDescs, assetModel->staticEval);
+		if (AssetIface_Model3D* mdlIface = mdlSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>()) {
+			hadShapes |= addCollisionShapeBasedOnModel(shapeDescs, mdlIface->getStaticEval());
 		}
 	}
 

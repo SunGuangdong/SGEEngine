@@ -9,7 +9,7 @@ namespace sge {
 
 struct ASky : public Actor, public IActorCustomAttributeEditorTrait {
 	ASky()
-	    : m_textureAssetProp(AssetType::Texture2D) {}
+	    : m_textureAssetProp(assetType_texture2d) {}
 
 	AABox3f getBBoxOS() const override { return AABox3f(); }
 

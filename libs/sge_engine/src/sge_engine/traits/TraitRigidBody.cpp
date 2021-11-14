@@ -1,5 +1,5 @@
 #include "TraitRigidBody.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/Physics.h"
@@ -50,13 +50,13 @@ bool TraitRigidBody::createBasedOnModel(const EvaluatedModel& eval, float mass, 
 }
 
 bool TraitRigidBody::createBasedOnModel(const char* modelPath, float mass, bool noResponse, bool addToWorldNow) {
-	std::shared_ptr<Asset> asset = getCore()->getAssetLib()->getAsset(AssetType::Model, modelPath, true);
-	if (isAssetLoaded(asset)) {
-		return createBasedOnModel(asset->asModel()->staticEval, mass, noResponse, addToWorldNow);
+	std::shared_ptr<Asset> modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelPath);
+	if (!isAssetLoaded(modelAsset, assetType_model3d)) {
+		sgeAssert(false && "Failed to load an asset.");
+		return false;
 	}
 
-	sgeAssert(false && "Failed to load an asset");
-	return false;
+	return createBasedOnModel(getAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval(), mass, noResponse, addToWorldNow);
 }
 
 bool TraitRigidBody::isInWorld() const {

@@ -1,6 +1,7 @@
 #include <functional>
 
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
+#include "sge_core/ICore.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/utils/range_loop.h"
 
@@ -19,7 +20,7 @@ void EvaluatedModel::initialize(AssetLibrary* const assetLibrary, Model* model) 
 }
 
 int EvaluatedModel::addAnimationDonor(const std::shared_ptr<Asset>& donorAsset) {
-	if (isAssetLoaded(donorAsset, AssetType::Model) == false || !isInitialized()) {
+	if (isAssetLoaded(donorAsset, assetType_model3d) == false || !isInitialized()) {
 		return -1;
 	}
 
@@ -39,7 +40,7 @@ int EvaluatedModel::addAnimationDonor(const std::shared_ptr<Asset>& donorAsset) 
 	for (const int iOrigNode : range_int(m_model->numNodes())) {
 		const std::string& originalNodeName = m_model->nodeAt(iOrigNode)->name;
 		animDonor.originalNodeId_to_donorNodeId[iOrigNode] =
-		    animDonor.donorModel->asModel()->model.findFistNodeIndexWithName(originalNodeName);
+		    getAssetIface<AssetIface_Model3D>(animDonor.donorModel)->getModel3D().findFistNodeIndexWithName(originalNodeName);
 	}
 
 	m_donors.emplace_back(std::move(animDonor));
@@ -101,7 +102,7 @@ bool EvaluatedModel::evaluateFromMomentsInternal(const EvalMomentSets evalMoment
 			}
 		}
 
-		const Model& donorModel = (donor != nullptr) ? donor->donorModel->asModel()->model : *m_model;
+		const Model& donorModel = (donor != nullptr) ? getAssetIface<AssetIface_Model3D>(donor->donorModel)->getModel3D() : *m_model;
 		const ModelAnimation* const donorAnimation = donorModel.animationAt(moment.animationIndex);
 
 		const float evalTime = moment.time;
@@ -185,25 +186,25 @@ bool EvaluatedModel::evaluateMaterials() {
 		// Check if there is a diffuse texture attached here.
 		if (rawMaterial->diffuseTextureName.empty() == false) {
 			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->diffuseTextureName;
-			evalMtl.diffuseTexture = m_assetLibrary->getAsset(AssetType::Texture2D, texPath.c_str(), true);
+			evalMtl.diffuseTexture = m_assetLibrary->getAssetFromFile(texPath.c_str());
 		}
 
 		// Normal map.
 		if (rawMaterial->normalTextureName.empty() == false) {
 			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->normalTextureName;
-			evalMtl.texNormalMap = m_assetLibrary->getAsset(AssetType::Texture2D, texPath.c_str(), true);
+			evalMtl.texNormalMap = m_assetLibrary->getAssetFromFile(texPath.c_str());
 		}
 
 		// Metallic map.
 		if (rawMaterial->metallicTextureName.empty() == false) {
 			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->metallicTextureName;
-			evalMtl.texMetallic = m_assetLibrary->getAsset(AssetType::Texture2D, texPath.c_str(), true);
+			evalMtl.texMetallic = m_assetLibrary->getAssetFromFile(texPath.c_str());
 		}
 
 		// Roughness map.
 		if (rawMaterial->roughnessTextureName.empty() == false) {
 			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->roughnessTextureName;
-			evalMtl.texRoughness = m_assetLibrary->getAsset(AssetType::Texture2D, texPath.c_str(), true);
+			evalMtl.texRoughness = m_assetLibrary->getAssetFromFile(texPath.c_str());
 		}
 	}
 
@@ -211,7 +212,7 @@ bool EvaluatedModel::evaluateMaterials() {
 }
 
 bool EvaluatedModel::evaluateSkinning() {
-	SGEContext* const context = m_assetLibrary->getDevice()->getContext();
+	SGEContext* const context = getCore()->getDevice()->getContext();
 
 	m_evaluatedMeshes.resize(m_model->numMeshes());
 	m_perMeshSkinningBonesTransformOFfsetInTex.resize(m_model->numMeshes(), -1);
@@ -307,7 +308,7 @@ const ModelAnimation* EvaluatedModel::findAnimation(const int idxDonor, const in
 	}
 
 	if (idxDonor >= 0 && idxDonor < m_donors.size()) {
-		return m_donors[idxDonor].donorModel->asModel()->model.animationAt(animIndex);
+		return getAssetIface<AssetIface_Model3D>(m_donors[idxDonor].donorModel)->getModel3D().animationAt(animIndex);
 	}
 
 	return nullptr;

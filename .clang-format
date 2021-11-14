@@ -2,7 +2,7 @@
 AlignEscapedNewlinesLeft: 'true'
 AllowAllParametersOfDeclarationOnNextLine: 'true'
 AllowShortBlocksOnASingleLine: 'false'
-AllowShortFunctionsOnASingleLine: InlineOnly
+AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: 'false'
 AllowShortLoopsOnASingleLine: 'false'
 AlwaysBreakBeforeMultilineStrings: 'true'
@@ -10,6 +10,7 @@ AlwaysBreakTemplateDeclarations: 'true'
 BinPackParameters: 'false'
 BreakBeforeBraces: Attach
 BreakConstructorInitializersBeforeComma: 'true'
+BreakBeforeTernaryOperators: 'true'
 ColumnLimit: '140'
 IndentCaseLabels: 'true'
 IndentWidth: '4'

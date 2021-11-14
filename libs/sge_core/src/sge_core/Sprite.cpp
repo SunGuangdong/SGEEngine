@@ -1,5 +1,5 @@
 #include "Sprite.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"
@@ -165,19 +165,19 @@ const SpriteAnimation::Frame* SpriteAnimation::getFrameForTime(float time) const
 }
 
 
-bool SpriteAnimationAsset::importSprite(SpriteAnimationAsset& outSprite, const char* const filename, AssetLibrary& assetLib) {
+bool SpriteAnimationWithTextures::importSprite(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib) {
 	if (SpriteAnimation::importSprite(outSprite.spriteAnimation, filename)) {
-		outSprite.textureAsset = assetLib.getAsset(AssetType::Texture2D, outSprite.spriteAnimation.texturePath.c_str(), true);
+		outSprite.textureAsset = assetLib.getAssetFromFile(outSprite.spriteAnimation.texturePath.c_str());
 		return isAssetLoaded(outSprite.textureAsset);
 	}
 	return false;
 }
 
-bool SpriteAnimationAsset::importFromAsepriteSpriteSheetJsonFile(SpriteAnimationAsset& outSprite,
+bool SpriteAnimationWithTextures::importFromAsepriteSpriteSheetJsonFile(SpriteAnimationWithTextures& outSprite,
                                                                  const char* const filename,
                                                                  AssetLibrary& assetLib) {
 	if (SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(outSprite.spriteAnimation, filename)) {
-		outSprite.textureAsset = assetLib.getAsset(AssetType::Texture2D, outSprite.spriteAnimation.texturePath.c_str(), true);
+		outSprite.textureAsset = assetLib.getAssetFromFile(outSprite.spriteAnimation.texturePath.c_str());
 		return isAssetLoaded(outSprite.textureAsset);
 	}
 	return false;

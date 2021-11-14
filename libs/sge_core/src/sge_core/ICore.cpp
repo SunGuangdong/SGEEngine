@@ -1,5 +1,5 @@
 #include "Gizmo3D.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/DebugDraw.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
@@ -78,7 +78,7 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) {
 
 	m_audioDevice = sgeAudioDevice;
 
-	m_assetLibrary = std::make_unique<AssetLibrary>(sgedev);
+	m_assetLibrary = std::make_unique<AssetLibrary>();
 
 	// Uniform string indices.
 	m_graphicsResources.projViewWorld_strIdx = sgedev->getStringIndex("projViewWorld");

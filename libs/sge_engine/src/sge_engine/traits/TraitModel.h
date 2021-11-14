@@ -67,7 +67,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	struct PerModelSettings {
 		PerModelSettings()
-		    : m_assetProperty(AssetType::Model) {}
+		    : m_assetProperty(assetType_model3d) {}
 
 		/// Invalidates the asset property focing an update.
 		void invalidateCachedAssets() { m_assetProperty.clear(); }

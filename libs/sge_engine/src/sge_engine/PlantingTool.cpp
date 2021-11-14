@@ -1,7 +1,7 @@
 #include "PlantingTool.h"
 #include "GameInspector.h"
 #include "Physics.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/application/input.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"

@@ -3,7 +3,7 @@
 
 #include "sge_core/SGEImGui.h"
 
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_renderer/renderer/renderer.h"
 
 #include "IconsForkAwesome/IconsForkAwesome.h"

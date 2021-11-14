@@ -3,7 +3,7 @@
 #if 1
 
 #include "model/EvaluatedModel.h"
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_utils/utils/optional.h"
 #include "sgecore_api.h"
 #include <unordered_map>
@@ -37,8 +37,8 @@ struct AnimatorTrack {
 		float playbackSpeed = 1.f;
 
 		const ModelAnimation* getAnimation() const {
-			if (isAssetLoaded(modelAnimationDonor, AssetType::Model)) {
-				return modelAnimationDonor->asModel()->model.animationAt(animationIndexInDonor);
+			if (isAssetLoaded(modelAnimationDonor, assetType_model3d)) {
+				return getAssetIface<AssetIface_Model3D>(modelAnimationDonor)->getModel3D().animationAt(animationIndexInDonor);
 			}
 
 			return nullptr;

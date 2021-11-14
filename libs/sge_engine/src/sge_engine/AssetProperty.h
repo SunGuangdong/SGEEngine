@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_core/AssetLibrary.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine_api.h"
 #include "sge_utils/utils/StaticArray.h"
 
@@ -11,7 +11,9 @@ namespace sge {
 struct SGE_ENGINE_API AssetProperty {
 	AssetProperty() = delete;
 
-	explicit AssetProperty(AssetType assetType) { m_acceptedAssetTypes.push_back(assetType); }
+	explicit AssetProperty(AssetType assetType) {
+		m_acceptedAssetTypes.push_back(assetType);
+	}
 
 	AssetProperty(AssetType assetType0, AssetType assetType1) {
 		m_acceptedAssetTypes.push_back(assetType0);
@@ -33,7 +35,9 @@ struct SGE_ENGINE_API AssetProperty {
 	/// @return True if new asset was assigned.
 	bool update();
 
-	bool isUpToDate() const { return m_targetAsset == m_currentAsset; }
+	bool isUpToDate() const {
+		return m_targetAsset == m_currentAsset;
+	}
 
 	void clear() {
 		m_currentAsset.clear();
@@ -41,28 +45,30 @@ struct SGE_ENGINE_API AssetProperty {
 	}
 
 	/// @brief Changes directly the current asset.
-	/// @param asset 
+	/// @param asset
 	void setAsset(std::shared_ptr<Asset> asset);
 
 	/// @brief Sets the asset that will generate a change when calling @update.
 	/// Useful when others depend on knowing what this asset is.
-	/// @param assetPath 
+	/// @param assetPath
 	void setTargetAsset(const char* const assetPath);
 
-	std::shared_ptr<Asset>& getAsset() { return m_asset; }
-	const std::shared_ptr<Asset>& getAsset() const { return m_asset; }
+	std::shared_ptr<Asset>& getAsset() {
+		return m_asset;
+	}
+	const std::shared_ptr<Asset>& getAsset() const {
+		return m_asset;
+	}
 
-	AssetModel* getAssetModel();
-	const AssetModel* getAssetModel() const;
+	template <typename TAssetIface>
+	TAssetIface* getAssetInterface() {
+		return getAssetIface<TAssetIface>(m_asset);
+	}
 
-	AssetTexture* getAssetTexture();
-	const AssetTexture* getAssetTexture() const;
-
-	SpriteAnimationAsset* getAssetSprite();
-	const SpriteAnimationAsset* getAssetSprite() const;
-
-	AudioDataAsset* getAssetAudio();
-	const AudioDataAsset* getAssetAudio() const;
+	template <typename TAssetIface>
+	const TAssetIface* getAssetInterface() const {
+		return getAssetIface<TAssetIface>(m_asset);
+	}
 
 	AssetProperty& operator=(const AssetProperty& ref) {
 		m_targetAsset = ref.m_targetAsset;
@@ -78,7 +84,7 @@ struct SGE_ENGINE_API AssetProperty {
 
   public:
 	// Caution: there is a custom copy logic.
-	StaticArray<AssetType, int(AssetType::Count)> m_acceptedAssetTypes;
+	StaticArray<AssetType, int(assetType_count)> m_acceptedAssetTypes;
 	std::string m_targetAsset;
 
 	std::string m_currentAsset;
