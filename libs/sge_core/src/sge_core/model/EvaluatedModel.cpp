@@ -19,8 +19,8 @@ void EvaluatedModel::initialize(AssetLibrary* const assetLibrary, Model* model) 
 	m_model = model;
 }
 
-int EvaluatedModel::addAnimationDonor(const std::shared_ptr<Asset>& donorAsset) {
-	if (isAssetLoaded(donorAsset, assetType_model3d) == false || !isInitialized()) {
+int EvaluatedModel::addAnimationDonor(const AssetPtr& donorAsset) {
+	if (isAssetLoaded(donorAsset, assetIface_model3d) == false || !isInitialized()) {
 		return -1;
 	}
 

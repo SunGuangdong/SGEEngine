@@ -5,6 +5,7 @@
 
 #include "sge_core/Geometry.h"
 #include "sge_core/model/Model.h"
+#include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/Box.h"
@@ -18,10 +19,10 @@ struct AssetLibrary;
 struct Asset;
 
 struct EvaluatedMaterial {
-	std::shared_ptr<Asset> diffuseTexture;
-	std::shared_ptr<Asset> texNormalMap;
-	std::shared_ptr<Asset> texMetallic;
-	std::shared_ptr<Asset> texRoughness;
+	AssetPtr diffuseTexture;
+	AssetPtr texNormalMap;
+	AssetPtr texMetallic;
+	AssetPtr texRoughness;
 
 	vec4f diffuseColor = vec4f(1.f, 0.f, 1.f, 1.f);
 	float metallic = 1.f;
@@ -79,7 +80,7 @@ struct SGE_CORE_API EvaluatedModel {
 	/// Adds an animation that can be specified to the evaluate function.
 	/// Returns the index of the donor.
 	/// The asset will be taken form the assetLibrary specified to @initialize.
-	int addAnimationDonor(const std::shared_ptr<Asset>& donorAsset);
+	int addAnimationDonor(const AssetPtr& donorAsset);
 
 	/// Evaluates the model at the specified momemnt.
 	bool evaluateStatic() { return evaluateFromMoments(nullptr, 0); }
@@ -128,7 +129,7 @@ struct SGE_CORE_API EvaluatedModel {
 	struct AnimationDonor {
 		/// TODO: handle asset changeing. In that case the asset will still be valid,
 		/// but the data in it bill be different and @originalNodeId_to_donorNodeId will be wrong and we will crash.
-		std::shared_ptr<Asset> donorModel;
+		AssetPtr donorModel;
 		std::vector<int> originalNodeId_to_donorNodeId;
 	};
 

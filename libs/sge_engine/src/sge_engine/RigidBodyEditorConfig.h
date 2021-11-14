@@ -72,7 +72,7 @@ struct SGE_ENGINE_API RigidBodyConfigurator : public RigidBodyPropertiesConfigur
 
   public:
 	ShapeSource shapeSource = shapeSource_fromTraitModel;
-	AssetProperty assetPropery = AssetProperty(assetType_model3d);
+	AssetProperty assetPropery = AssetProperty(assetIface_model3d);
 	std::vector<CollsionShapeDesc> collisionShapes;
 };
 

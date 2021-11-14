@@ -22,17 +22,17 @@
 namespace sge {
 
 
-const char* assetType_getName(const AssetType type) {
+const char* assetIface_getName(const AssetIfaceType type) {
 	switch (type) {
-		case assetType_model3d:
+		case assetIface_model3d:
 			return "3D Model";
-		case assetType_texture2d:
+		case assetIface_texture2d:
 			return "Texture";
-		case assetType_text:
+		case assetIface_text:
 			return "Text";
-		case assetType_spriteAnim:
+		case assetIface_spriteAnim:
 			return "Sprite Animation";
-		case assetType_audio:
+		case assetIface_audio:
 			return "Audio";
 		default:
 			sgeAssertFalse("Not implemented");
@@ -40,46 +40,46 @@ const char* assetType_getName(const AssetType type) {
 	}
 }
 
-AssetType assetType_guessFromExtension(const char* const ext, bool includeExternalExtensions) {
+AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool includeExternalExtensions) {
 	if (ext == nullptr) {
-		return assetType_unknown;
+		return assetIface_unknown;
 	}
 
 	if (sge_stricmp(ext, "mdl") == 0) {
-		return assetType_model3d;
+		return assetIface_model3d;
 	}
 
 	if (includeExternalExtensions && sge_stricmp(ext, "fbx") == 0) {
-		return assetType_model3d;
+		return assetIface_model3d;
 	}
 
 	if (includeExternalExtensions && sge_stricmp(ext, "dae") == 0) {
-		return assetType_model3d;
+		return assetIface_model3d;
 	}
 
 	if (includeExternalExtensions && sge_stricmp(ext, "obj") == 0) {
-		return assetType_model3d;
+		return assetIface_model3d;
 	}
 
 	if (sge_stricmp(ext, "png") == 0 || sge_stricmp(ext, "dds") == 0 || sge_stricmp(ext, "jpg") == 0 || sge_stricmp(ext, "tga") == 0 ||
 	    sge_stricmp(ext, "bmp") == 0 || sge_stricmp(ext, "hdr") == 0) {
-		return assetType_texture2d;
+		return assetIface_texture2d;
 	}
 
 	if (sge_stricmp(ext, "txt") == 0) {
-		return assetType_text;
+		return assetIface_text;
 	}
 
 	if (sge_stricmp(ext, "sprite") == 0) {
-		return assetType_spriteAnim;
+		return assetIface_spriteAnim;
 	}
 
 	if (sge_stricmp(ext, "ogg") == 0 || sge_stricmp(ext, "mp3") == 0 || sge_stricmp(ext, "wav") == 0) {
-		return assetType_audio;
+		return assetIface_audio;
 	}
 
 
-	return assetType_unknown;
+	return assetIface_unknown;
 }
 
 bool AssetLibrary::hasAsset(const std::string& path) const {
@@ -88,7 +88,7 @@ bool AssetLibrary::hasAsset(const std::string& path) const {
 	return result;
 }
 
-const std::map<std::string, std::shared_ptr<Asset>>& AssetLibrary::getAllAssets() const {
+const std::map<std::string, AssetPtr>& AssetLibrary::getAllAssets() const {
 	return m_allAssets;
 }
 
@@ -106,13 +106,13 @@ void AssetLibrary::scanForAvailableAssets(const char* const path) {
 				const std::string ext = entry.path().extension().u8string();
 				const char* extCStr = ext.c_str();
 
-				// the extension() method returns the dot, however assetType_guessFromExtension
+				// the extension() method returns the dot, however assetIface_guessFromExtension
 				// needs the extension without the dot.
 				if (extCStr != nullptr && extCStr[0] == '.') {
 					extCStr++;
 
-					const AssetType guessedType = assetType_guessFromExtension(extCStr, false);
-					if (guessedType != assetType_unknown) {
+					const AssetIfaceType guessedType = assetIface_guessFromExtension(extCStr, false);
+					if (guessedType != assetIface_unknown) {
 						// markThatAssetExists(entry.path().generic_u8string().c_str(), guessedType);
 						getAssetFromFile(entry.path().generic_u8string().c_str(), false);
 					}
@@ -122,27 +122,27 @@ void AssetLibrary::scanForAvailableAssets(const char* const path) {
 	}
 }
 
-std::shared_ptr<Asset> AssetLibrary::newAsset(std::string assetPath, AssetType type) {
-	std::shared_ptr<Asset> newlyLoadedAsset;
+AssetPtr AssetLibrary::newAsset(std::string assetPath, AssetIfaceType type) {
+	AssetPtr newlyLoadedAsset;
 
 	switch (type) {
-		case sge::assetType_texture2d: {
+		case sge::assetIface_texture2d: {
 			auto assetTyped = newAsset<AssetTexture2d>(assetPath.c_str());
 			newlyLoadedAsset = assetTyped;
 		} break;
-		case sge::assetType_model3d: {
+		case sge::assetIface_model3d: {
 			auto assetTyped = newAsset<AssetModel3D>(assetPath.c_str());
 			newlyLoadedAsset = assetTyped;
 		} break;
-		case sge::assetType_spriteAnim: {
+		case sge::assetIface_spriteAnim: {
 			auto assetTyped = newAsset<AssetSpriteAnim>(assetPath.c_str());
 			newlyLoadedAsset = assetTyped;
 		} break;
-		case sge::assetType_audio: {
+		case sge::assetIface_audio: {
 			auto assetTyped = newAsset<AssetAudio>(assetPath.c_str());
 			newlyLoadedAsset = assetTyped;
 		} break;
-		case sge::assetType_text: {
+		case sge::assetIface_text: {
 			auto assetTyped = newAsset<AssetText>(assetPath.c_str());
 			newlyLoadedAsset = assetTyped;
 		} break;
@@ -178,7 +178,7 @@ std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const 
 	return std::move(pathToAsset);
 }
 
-std::shared_ptr<Asset> AssetLibrary::getAssetFromFile(const char* path, bool loadIfMissing) {
+AssetPtr AssetLibrary::getAssetFromFile(const char* path, bool loadIfMissing) {
 	const double loadStartTime = Timer::now_seconds();
 
 	const std::string pathToAsset = resloveAssetPathToRelative(path);
@@ -188,8 +188,8 @@ std::shared_ptr<Asset> AssetLibrary::getAssetFromFile(const char* path, bool loa
 		return nullptr;
 	}
 
-	const AssetType assetType = assetType_guessFromExtension(extractFileExtension(path).c_str(), false);
-	if (assetType == assetType_unknown) {
+	const AssetIfaceType assetType = assetIface_guessFromExtension(extractFileExtension(path).c_str(), false);
+	if (assetType == assetIface_unknown) {
 		sgeAssert(false);
 		return nullptr;
 	}
@@ -204,7 +204,7 @@ std::shared_ptr<Asset> AssetLibrary::getAssetFromFile(const char* path, bool loa
 		return itrFindAssetByPath != m_allAssets.end() ? itrFindAssetByPath->second : nullptr;
 	}
 
-	std::shared_ptr<Asset> assetToModify =
+	AssetPtr assetToModify =
 	    itrFindAssetByPath != m_allAssets.end() ? itrFindAssetByPath->second : newAsset(pathToAsset.c_str(), assetType);
 
 	sgeAssert(isAssetSupportingInteface(assetToModify, assetType));
@@ -219,7 +219,7 @@ std::shared_ptr<Asset> AssetLibrary::getAssetFromFile(const char* path, bool loa
 	return assetToModify;
 }
 
-bool AssetLibrary::reloadAssetModified(std::shared_ptr<Asset>& assetToModify) {
+bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify) {
 	if (!assetToModify) {
 		sgeAssert(false);
 		return false;
@@ -253,24 +253,24 @@ bool AssetLibrary::reloadAssetModified(std::shared_ptr<Asset>& assetToModify) {
 	return true;
 }
 
-SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetType type) {
+SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType type) {
 	switch (type) {
-		case sge::assetType_unknown:
+		case sge::assetIface_unknown:
 			return true;
 			break;
-		case sge::assetType_texture2d:
+		case sge::assetIface_texture2d:
 			return dynamic_cast<const AssetIface_Texture2D*>(&asset) != nullptr;
 			break;
-		case sge::assetType_model3d:
+		case sge::assetIface_model3d:
 			return dynamic_cast<const AssetIface_Model3D*>(&asset) != nullptr;
 			break;
-		case sge::assetType_spriteAnim:
+		case sge::assetIface_spriteAnim:
 			return dynamic_cast<const AssetIface_SpriteAnim*>(&asset) != nullptr;
 			break;
-		case sge::assetType_audio:
+		case sge::assetIface_audio:
 			return dynamic_cast<const IAssetInterface_Audio*>(&asset) != nullptr;
 			break;
-		case sge::assetType_text:
+		case sge::assetIface_text:
 			return dynamic_cast<const IAssetInterface_Text*>(&asset) != nullptr;
 			break;
 		default:
@@ -281,31 +281,31 @@ SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetType type) 
 	return false;
 }
 
-SGE_CORE_API bool isAssetSupportingInteface(const std::shared_ptr<Asset>& asset, AssetType type) {
+SGE_CORE_API bool isAssetSupportingInteface(const AssetPtr& asset, AssetIfaceType type) {
 	return asset && isAssetSupportingInteface(*asset.get(), type);
 }
 
-SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetType type) {
+SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetIfaceType type) {
 	if (isAssetLoaded(asset) == false) {
 		return false;
 	}
 	switch (type) {
-		case sge::assetType_unknown:
+		case sge::assetIface_unknown:
 			return true;
 			break;
-		case sge::assetType_texture2d:
+		case sge::assetIface_texture2d:
 			return dynamic_cast<AssetIface_Texture2D*>(&asset) != nullptr;
 			break;
-		case sge::assetType_model3d:
+		case sge::assetIface_model3d:
 			return dynamic_cast<AssetIface_Model3D*>(&asset) != nullptr;
 			break;
-		case sge::assetType_spriteAnim:
+		case sge::assetIface_spriteAnim:
 			return dynamic_cast<AssetIface_SpriteAnim*>(&asset) != nullptr;
 			break;
-		case sge::assetType_audio:
+		case sge::assetIface_audio:
 			return dynamic_cast<IAssetInterface_Audio*>(&asset) != nullptr;
 			break;
-		case sge::assetType_text:
+		case sge::assetIface_text:
 			return dynamic_cast<IAssetInterface_Text*>(&asset) != nullptr;
 			break;
 		default:
@@ -317,7 +317,7 @@ SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetType type) {
 }
 
 /// Returns true if the specified asset is loaded and it supports the specified interface.
-bool isAssetLoaded(const std::shared_ptr<Asset>& asset, AssetType type) {
+bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type) {
 	if (isAssetLoaded(asset) == false) {
 		return false;
 	}

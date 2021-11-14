@@ -685,7 +685,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 	for (int iGroup = 0; iGroup < numPGroups; ++iGroup) {
 		TraitParticlesProgrammable::ParticleGroup* pgrp = particlesTrait->getPGroup(iGroup);
 
-		if (isAssetLoaded(pgrp->spriteTexture, assetType_model3d)) {
+		if (isAssetLoaded(pgrp->spriteTexture, assetIface_model3d)) {
 			for (const TraitParticlesProgrammable::ParticleGroup::ParticleData& particle : pgrp->allParticles) {
 				mat4f particleTForm =
 				    mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) * mat4f::getScaling(particle.scale);
@@ -721,9 +721,9 @@ void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
 	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
 	Actor* const actor = modelTrait->getActor();
 
-	std::shared_ptr<Asset> const asset = modelTrait->getAssetProperty().getAsset();
+	AssetPtr const asset = modelTrait->getAssetProperty().getAsset();
 
-	if (isAssetLoaded(asset) && asset->getType() == assetType_model3d) {
+	if (isAssetLoaded(asset) && asset->getType() == assetIface_model3d) {
 		AssetModel* const model = modelTrait->getAssetProperty().getAssetModel();
 
 		std::vector<MaterialOverride> mtlOverrides;

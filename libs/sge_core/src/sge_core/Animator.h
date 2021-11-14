@@ -31,13 +31,13 @@ struct AnimatorTrack {
 	AnimatorTrack() = default;
 
 	struct AnimationDonor {
-		std::shared_ptr<Asset> modelAnimationDonor;
+		AssetPtr modelAnimationDonor;
 		int donorIndex = -1;
 		int animationIndexInDonor = -1;
 		float playbackSpeed = 1.f;
 
 		const ModelAnimation* getAnimation() const {
-			if (isAssetLoaded(modelAnimationDonor, assetType_model3d)) {
+			if (isAssetLoaded(modelAnimationDonor, assetIface_model3d)) {
 				return getAssetIface<AssetIface_Model3D>(modelAnimationDonor)->getModel3D().animationAt(animationIndexInDonor);
 			}
 

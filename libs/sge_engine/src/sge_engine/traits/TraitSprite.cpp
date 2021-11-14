@@ -90,7 +90,7 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 		const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
 		Actor* const actor = getActor();
 
-		const std::shared_ptr<Asset>& asset = image.m_assetProperty.getAsset();
+		const AssetPtr& asset = image.m_assetProperty.getAsset();
 
 		if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
 			if (Texture* const texture = texIface->getTexture()) {

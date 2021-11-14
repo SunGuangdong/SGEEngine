@@ -11,23 +11,23 @@ namespace sge {
 struct SGE_ENGINE_API AssetProperty {
 	AssetProperty() = delete;
 
-	explicit AssetProperty(AssetType assetType) {
-		m_acceptedAssetTypes.push_back(assetType);
+	explicit AssetProperty(AssetIfaceType assetType) {
+		m_acceptedAssetIfaceTypes.push_back(assetType);
 	}
 
-	AssetProperty(AssetType assetType0, AssetType assetType1) {
-		m_acceptedAssetTypes.push_back(assetType0);
-		m_acceptedAssetTypes.push_back(assetType1);
+	AssetProperty(AssetIfaceType assetType0, AssetIfaceType assetType1) {
+		m_acceptedAssetIfaceTypes.push_back(assetType0);
+		m_acceptedAssetIfaceTypes.push_back(assetType1);
 	}
 
-	AssetProperty(AssetType assetType0, AssetType assetType1, AssetType assetType2) {
-		m_acceptedAssetTypes.push_back(assetType0);
-		m_acceptedAssetTypes.push_back(assetType1);
-		m_acceptedAssetTypes.push_back(assetType2);
+	AssetProperty(AssetIfaceType assetType0, AssetIfaceType assetType1, AssetIfaceType assetType2) {
+		m_acceptedAssetIfaceTypes.push_back(assetType0);
+		m_acceptedAssetIfaceTypes.push_back(assetType1);
+		m_acceptedAssetIfaceTypes.push_back(assetType2);
 	}
 
-	AssetProperty(AssetType assetType, const char* const initialTargetAsset) {
-		m_acceptedAssetTypes.push_back(assetType);
+	AssetProperty(AssetIfaceType assetType, const char* const initialTargetAsset) {
+		m_acceptedAssetIfaceTypes.push_back(assetType);
 		setTargetAsset(initialTargetAsset);
 	}
 
@@ -46,17 +46,17 @@ struct SGE_ENGINE_API AssetProperty {
 
 	/// @brief Changes directly the current asset.
 	/// @param asset
-	void setAsset(std::shared_ptr<Asset> asset);
+	void setAsset(AssetPtr asset);
 
 	/// @brief Sets the asset that will generate a change when calling @update.
 	/// Useful when others depend on knowing what this asset is.
 	/// @param assetPath
 	void setTargetAsset(const char* const assetPath);
 
-	std::shared_ptr<Asset>& getAsset() {
+	AssetPtr& getAsset() {
 		return m_asset;
 	}
-	const std::shared_ptr<Asset>& getAsset() const {
+	const AssetPtr& getAsset() const {
 		return m_asset;
 	}
 
@@ -72,7 +72,7 @@ struct SGE_ENGINE_API AssetProperty {
 
 	AssetProperty& operator=(const AssetProperty& ref) {
 		m_targetAsset = ref.m_targetAsset;
-		m_acceptedAssetTypes = ref.m_acceptedAssetTypes;
+		m_acceptedAssetIfaceTypes = ref.m_acceptedAssetIfaceTypes;
 		m_uiPossibleAssets = ref.m_uiPossibleAssets;
 
 		// m_currentAsset not copied so when an object is duplicated it would need to force inititalize it,
@@ -84,11 +84,11 @@ struct SGE_ENGINE_API AssetProperty {
 
   public:
 	// Caution: there is a custom copy logic.
-	StaticArray<AssetType, int(assetType_count)> m_acceptedAssetTypes;
+	StaticArray<AssetIfaceType, int(assetIface_count)> m_acceptedAssetIfaceTypes;
 	std::string m_targetAsset;
 
 	std::string m_currentAsset;
-	std::shared_ptr<Asset> m_asset;
+	AssetPtr m_asset;
 	std::vector<std::string> m_uiPossibleAssets;
 };
 

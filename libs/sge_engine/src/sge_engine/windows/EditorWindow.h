@@ -19,30 +19,30 @@ struct SceneWindow;
 struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
   private:
 	struct Assets {
-		std::shared_ptr<Asset> m_assetForkPlayIcon;
-		std::shared_ptr<Asset> m_assetPlayIcon;
-		std::shared_ptr<Asset> m_assetPauseIcon;
-		std::shared_ptr<Asset> m_assetOpenIcon;
-		std::shared_ptr<Asset> m_assetSaveIcon;
-		std::shared_ptr<Asset> m_assetRefreshIcon;
-		std::shared_ptr<Asset> m_assetRebuildIcon;
+		AssetPtr m_assetForkPlayIcon;
+		AssetPtr m_assetPlayIcon;
+		AssetPtr m_assetPauseIcon;
+		AssetPtr m_assetOpenIcon;
+		AssetPtr m_assetSaveIcon;
+		AssetPtr m_assetRefreshIcon;
+		AssetPtr m_assetRebuildIcon;
 
-		std::shared_ptr<Asset> m_assetPickingIcon;
-		std::shared_ptr<Asset> m_assetTranslationIcon;
-		std::shared_ptr<Asset> m_assetRotationIcon;
-		std::shared_ptr<Asset> m_assetScalingIcon;
-		std::shared_ptr<Asset> m_assetVolumeScaleIcon;
+		AssetPtr m_assetPickingIcon;
+		AssetPtr m_assetTranslationIcon;
+		AssetPtr m_assetRotationIcon;
+		AssetPtr m_assetScalingIcon;
+		AssetPtr m_assetVolumeScaleIcon;
 
-		std::shared_ptr<Asset> m_assetSnapToGridOffIcon;
-		std::shared_ptr<Asset> m_assetSnapToGridOnIcon;
+		AssetPtr m_assetSnapToGridOffIcon;
+		AssetPtr m_assetSnapToGridOnIcon;
 
-		std::shared_ptr<Asset> m_showGameUIOnIcon;
-		std::shared_ptr<Asset> m_showGameUIOffIcon;
+		AssetPtr m_showGameUIOnIcon;
+		AssetPtr m_showGameUIOffIcon;
 
-		std::shared_ptr<Asset> m_orthoIcon;
-		std::shared_ptr<Asset> m_xIcon;
-		std::shared_ptr<Asset> m_yIcon;
-		std::shared_ptr<Asset> m_zIcon;
+		AssetPtr m_orthoIcon;
+		AssetPtr m_xIcon;
+		AssetPtr m_yIcon;
+		AssetPtr m_zIcon;
 
 		void load();
 	};

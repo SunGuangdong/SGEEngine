@@ -8,6 +8,7 @@
 #include "sge_engine/sge_engine_api.h"
 #include "sge_engine/typelibHelper.h"
 #include "sge_engine/windows/IImGuiWindow.h"
+#include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_utils/utils/Event.h"
 
 namespace sge {
@@ -25,11 +26,11 @@ using PropertyEditorGeneratorForTypeFn = void (*)(GameInspector& inspector, Game
 /// EngineGlobalAssets holds assets that are used by the interface and across multiple GameWorlds.
 struct SGE_ENGINE_API EngineGlobalAssets {
 	void initialize();
-	std::shared_ptr<Asset> getIconForObjectType(const TypeId type);
+	AssetPtr getIconForObjectType(const TypeId type);
 
   private:
-	std::shared_ptr<Asset> unknownObjectIcon;
-	std::unordered_map<TypeId, std::shared_ptr<Asset>> perObjectTypeIcon;
+	AssetPtr unknownObjectIcon;
+	std::unordered_map<TypeId, AssetPtr> perObjectTypeIcon;
 };
 
 struct IEngineGlobal {

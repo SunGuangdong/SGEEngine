@@ -24,7 +24,7 @@ struct SGE_ENGINE_API ModelPreviewWidget {
 struct ModelPreviewWindow : public IImGuiWindow {
 	struct MomentDataUI {
 		bool isEnabled = true;
-		std::shared_ptr<Asset> modelAsset;
+		AssetPtr modelAsset;
 		int animationMagicIndex = 0; // 0 is static moment, eveything else is the animation index + 1
 		EvalMomentSets moment;       // The actual moment that is going to be used.
 	};
@@ -38,7 +38,7 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	void update(SGEContext* const sgecon, const InputState& is) override;
 	const char* getWindowName() const override { return m_windowName.c_str(); }
 
-	std::shared_ptr<Asset>& getModel() { return m_model; }
+	AssetPtr& getModel() { return m_model; }
 
   private:
 	std::string m_windowName;
@@ -46,7 +46,7 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	bool m_isOpened = true;
 
 	bool m_autoPlay = true;
-	std::shared_ptr<Asset> m_model;
+	AssetPtr m_model;
 	GpuHandle<FrameTarget> m_frameTarget;
 
 	orbit_camera camera;
@@ -56,7 +56,7 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	bool autoPlayAnimation = true;
 	float previewAimationTime = 0;
 	std::string animationComboPreviewValue = "<None>";
-	std::vector<std::shared_ptr<Asset>> animationDonors;
+	std::vector<AssetPtr> animationDonors;
 
 	EvaluatedModel m_eval;
 };

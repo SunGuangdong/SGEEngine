@@ -20,10 +20,10 @@ struct SGE_ENGINE_API OMaterial : public GameObject {
 
 struct SGE_ENGINE_API MDiffuseMaterial : public OMaterial {
 	MDiffuseMaterial()
-	    : diffuseTexture(assetType_texture2d)
-	    , normalTexture(assetType_texture2d)
-	    , metalnessTexture(assetType_texture2d)
-	    , roughnessTexture(assetType_texture2d) {}
+	    : diffuseTexture(assetIface_texture2d)
+	    , normalTexture(assetIface_texture2d)
+	    , metalnessTexture(assetIface_texture2d)
+	    , roughnessTexture(assetIface_texture2d) {}
 
 	void create() override {}
 

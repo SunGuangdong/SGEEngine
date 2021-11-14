@@ -15,13 +15,13 @@ struct Actor;
 struct Asset;
 
 SGE_ENGINE_API bool assetPicker(
-    const char* label, std::string& assetPath, AssetLibrary* const assetLibrary, const AssetType assetTypes[], const int numAssetTypes);
+    const char* label, std::string& assetPath, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes);
 
 SGE_ENGINE_API bool assetPicker(const char* label,
-                                std::shared_ptr<Asset>& asset,
+                                AssetPtr& asset,
                                 AssetLibrary* const assetLibrary,
-                                const AssetType assetTypes[],
-                                const int numAssetTypes);
+                                const AssetIfaceType assetTypes[],
+                                const int numAssetIfaceTypes);
 
 SGE_ENGINE_API bool actorPicker(const char* label,
                                 GameWorld& world,

@@ -13,14 +13,14 @@ bool AssetProperty::update() {
 	if (m_currentAsset.empty() == false) {
 		m_asset = getCore()->getAssetLib()->getAssetFromFile(m_currentAsset.c_str());
 	} else {
-		m_asset = std::shared_ptr<Asset>();
+		m_asset = AssetPtr();
 	}
 
 	return true;
 }
 
 
-void AssetProperty::setAsset(std::shared_ptr<Asset> asset) {
+void AssetProperty::setAsset(AssetPtr asset) {
 	m_asset = std::move(asset);
 	m_targetAsset = m_asset->getPath();
 	m_currentAsset = m_asset->getPath();

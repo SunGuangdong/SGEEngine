@@ -56,7 +56,7 @@ void TraitModel::PerModelSettings::setModel(const char* assetPath, bool updateNo
 	}
 }
 
-void TraitModel::PerModelSettings::setModel(std::shared_ptr<Asset>& asset, bool updateNow) {
+void TraitModel::PerModelSettings::setModel(AssetPtr& asset, bool updateNow) {
 	m_assetProperty.setAsset(asset);
 	m_evalModel = NullOptional();
 	if (updateNow) {
@@ -165,7 +165,7 @@ void TraitModel::setModel(const char* assetPath, bool updateNow) {
 	}
 }
 
-void TraitModel::setModel(std::shared_ptr<Asset>& asset, bool updateNow) {
+void TraitModel::setModel(AssetPtr& asset, bool updateNow) {
 	m_models.resize(1);
 
 	m_models[0].m_assetProperty.setAsset(asset);
@@ -180,7 +180,7 @@ void TraitModel::addModel(const char* assetPath, bool updateNow) {
 	m_models.back().setModel(assetPath, updateNow);
 }
 
-void TraitModel::addModel(std::shared_ptr<Asset>& asset, bool updateNow) {
+void TraitModel::addModel(AssetPtr& asset, bool updateNow) {
 	m_models.push_back(PerModelSettings());
 	m_models.back().setModel(asset, updateNow);
 }
@@ -238,7 +238,7 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 					material.metalness = mtl.metallic;
 					material.roughness = mtl.roughness;
 
-					const auto getTexFromAsset = [](const std::shared_ptr<Asset>& asset) -> Texture* {
+					const auto getTexFromAsset = [](const AssetPtr& asset) -> Texture* {
 						if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
 							return texIface->getTexture();
 						}

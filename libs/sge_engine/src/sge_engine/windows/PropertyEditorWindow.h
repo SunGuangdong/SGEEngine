@@ -14,7 +14,7 @@ struct MemberChain;
 
 struct CollsionShapeDesc;
 
-enum AssetType : int;
+enum AssetIfaceType : int;
 
 /// A set of functions that generate the User Interface for the specified member of game object.
 /// The functions could be called anywhere.
@@ -28,8 +28,8 @@ namespace ProperyEditorUIGen {
 	                                          const char* label,
 	                                          GameObject* gameObject,
 	                                          MemberChain chain,
-	                                          const AssetType possibleAssetTypes[],
-	                                          const int numPossibleAssetTypes);
+	                                          const AssetIfaceType possibleAssetIfaceTypes[],
+	                                          const int numPossibleAssetIfaceTypes);
 
 	SGE_ENGINE_API void editDynamicProperties(GameInspector& inspector, GameObject* gameObject, MemberChain chain);
 } // namespace ProperyEditorUIGen

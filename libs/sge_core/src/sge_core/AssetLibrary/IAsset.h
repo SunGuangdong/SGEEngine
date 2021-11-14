@@ -1,7 +1,9 @@
 #pragma once
 
 #include "IAssetInterface.h"
+#include "sge_utils/sge_utils.h"
 #include <memory>
+#include <string>
 
 namespace sge {
 
@@ -35,7 +37,8 @@ struct SGE_CORE_API Asset {
 
   public:
 	struct LoadAssetFromFileData {
-		sint64 lastAcessTime = 0; ///< The the modification time of file when we last tried to loaded it (no matter if we succeeded or not).
+		/// The the modification time of file when we last tried to loaded it (no matter if we succeeded or not).
+		sint64 lastAcessTime = 0;
 	};
 
   protected:
@@ -45,8 +48,13 @@ struct SGE_CORE_API Asset {
 	LoadAssetFromFileData m_loadAssetFromFileData;
 };
 
+using AssetPtr = std::shared_ptr<Asset>;
+using AssetWeak = std::weak_ptr<Asset>;
+
+/// If the specified asset is loaded, the function
+/// retrieves the specified asset interface if available.
 template <typename TAssetInterface>
-TAssetInterface* getAssetIface(std::shared_ptr<Asset>& asset) {
+TAssetInterface* getAssetIface(AssetPtr& asset) {
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<TAssetInterface*>(asset.get());
 	}
@@ -54,8 +62,10 @@ TAssetInterface* getAssetIface(std::shared_ptr<Asset>& asset) {
 	return nullptr;
 }
 
+/// If the specified asset is loaded, the function
+/// retrieves the specified asset interface if available.
 template <typename TAssetInterface>
-const TAssetInterface* getAssetIface(const std::shared_ptr<Asset>& asset) {
+const TAssetInterface* getAssetIface(const AssetPtr& asset) {
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<const TAssetInterface*>(asset.get());
 	}
@@ -63,6 +73,8 @@ const TAssetInterface* getAssetIface(const std::shared_ptr<Asset>& asset) {
 	return nullptr;
 }
 
+/// If the specified asset is loaded, the function
+/// retrieves the specified asset interface if available.
 template <typename TAssetInterface>
 TAssetInterface* getAssetIface(Asset& asset) {
 	if (isAssetLoaded(asset)) {
@@ -72,6 +84,8 @@ TAssetInterface* getAssetIface(Asset& asset) {
 	return nullptr;
 }
 
+/// If the specified asset is loaded, the function
+/// retrieves the specified asset interface if available.
 template <typename TAssetInterface>
 const TAssetInterface* getAssetIface(const Asset& asset) {
 	if (isAssetLoaded(asset)) {
@@ -80,17 +94,16 @@ const TAssetInterface* getAssetIface(const Asset& asset) {
 
 	return nullptr;
 }
-
-
+/// Returns true if the specified asset is loaded.
 inline bool isAssetLoaded(const Asset& asset) {
 	bool loaded = asset.getStatus() == AssetStatus_Loaded;
 	return loaded;
 }
 
-inline bool isAssetLoaded(const std::shared_ptr<Asset>& asset) {
+/// Returns true if the specified asset is loaded.
+inline bool isAssetLoaded(const AssetPtr& asset) {
 	bool loaded = asset && isAssetLoaded(*asset);
 	return loaded;
 }
-
 
 } // namespace sge

@@ -19,7 +19,7 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 		bool importFailed = false;
 		/// The full path to the file we are about to import.
 		std::string fileToImportPath;
-		AssetType assetType;
+		AssetIfaceType assetType;
 		
 		/// The directory where the imported file(s) will be.
 		std::string outputDir;
@@ -30,7 +30,7 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 		bool preview = true;
 		ModelPreviewWidget modelPreviewWidget;
 
-		std::shared_ptr<Asset> tempAsset;
+		AssetPtr tempAsset;
 	};
 
   public:
@@ -60,7 +60,7 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	std::filesystem::path m_rightClickedPath;
 
 	// A pointer to the asset that currently has a preview.
-	std::shared_ptr<Asset> explorePreviewAsset;
+	AssetPtr explorePreviewAsset;
 
 	/// When in explorer the user has selected a 3d model this widget is used to draw the preview.
 	ModelPreviewWidget m_exploreModelPreviewWidget;

@@ -19,8 +19,8 @@ void ModelAnimator::addTrack(int newTrackId, float fadeInTime, TrackTransition t
 void ModelAnimator::addAnimationToTrack(int newTrackId, const char* const donorModelPath, const char* donorAnimationName) {
 	AnimatorTrack& track = m_tracks[newTrackId];
 
-	std::shared_ptr<Asset> donorModel = getCore()->getAssetLib()->getAssetFromFile(donorModelPath);
-	if (isAssetLoaded(donorModel, assetType_model3d)) {
+	AssetPtr donorModel = getCore()->getAssetLib()->getAssetFromFile(donorModelPath);
+	if (isAssetLoaded(donorModel, assetIface_model3d)) {
 		AnimatorTrack::AnimationDonor donor;
 		donor.modelAnimationDonor = donorModel;
 		donor.donorIndex = m_modelToBeAnimated->addAnimationDonor(donorModel);

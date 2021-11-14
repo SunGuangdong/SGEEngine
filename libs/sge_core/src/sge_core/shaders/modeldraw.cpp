@@ -434,7 +434,7 @@ void BasicModelDraw::draw(const RenderDestination& rdest,
 					material.metalness = mtl.metallic;
 					material.roughness = mtl.roughness;
 
-					const auto getTexFromAsset = [](const std::shared_ptr<Asset>& asset) -> Texture* {
+					const auto getTexFromAsset = [](const AssetPtr& asset) -> Texture* {
 						if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
 							return texIface->getTexture();
 						}

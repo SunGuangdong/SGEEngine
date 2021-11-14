@@ -21,20 +21,20 @@ namespace sge {
 struct Asset;
 
 
-enum AssetType : int {
-	assetType_unknown = 0,
-	assetType_texture2d,
-	assetType_model3d,
-	assetType_spriteAnim,
-	assetType_audio,
-	assetType_text,
+enum AssetIfaceType : int {
+	assetIface_unknown = 0,
+	assetIface_texture2d,
+	assetIface_model3d,
+	assetIface_spriteAnim,
+	assetIface_audio,
+	assetIface_text,
 
-	assetType_count,
+	assetIface_count,
 };
 
 
 /// @brief Returns a name suitable for displaying to the user for the specified asset type.
-SGE_CORE_API const char* assetType_getName(const AssetType type);
+SGE_CORE_API const char* assetIface_getName(const AssetIfaceType type);
 
 /// @brief Guesses the potential assset type based in the specified extension. Keep in mind that this is a guess.
 /// @param [in] ext the extension to be used for guessing. Should not include the dot.
@@ -42,7 +42,7 @@ SGE_CORE_API const char* assetType_getName(const AssetType type);
 /// @param [in] includeExternalExtensions True if unconverted file types should be concidered,
 ///             like fbx/obj/dae could be guessed as a 3d model.
 /// @return the guessed asset type.
-SGE_CORE_API AssetType assetType_guessFromExtension(const char* const ext, bool includeExternalExtensions);
+SGE_CORE_API AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool includeExternalExtensions);
 
 /// AssetLibrary loads and bookkeeps loaded assets by it
 /// and enables other assets to load dependancy asset (3D model might refer to a texture via a material).
@@ -55,10 +55,10 @@ struct SGE_CORE_API AssetLibrary {
 	/// This directory is used for creating a "dir-tree" for aviable assets.
 	void scanForAvailableAssets(const char* path);
 
-	std::shared_ptr<Asset> getAssetFromFile(const char* path, bool loadIfMissing = true);
+	AssetPtr getAssetFromFile(const char* path, bool loadIfMissing = true);
 	bool hasAsset(const std::string& path) const;
-	const std::map<std::string, std::shared_ptr<Asset>>& getAllAssets() const;
-	bool reloadAssetModified(std::shared_ptr<Asset>& asset);
+	const std::map<std::string, AssetPtr>& getAllAssets() const;
+	bool reloadAssetModified(AssetPtr& asset);
 
 	template <typename TAsset>
 	std::shared_ptr<TAsset> newAsset(std::string assetPath) {
@@ -84,19 +84,19 @@ struct SGE_CORE_API AssetLibrary {
 	/// In order to load the file onces (if other assets reference it) we need to have a unified
 	/// path to these assets.
 	std::string resloveAssetPathToRelative(const char* pathRaw) const;
-	std::shared_ptr<Asset> newAsset(std::string assetPath, AssetType type);
+	AssetPtr newAsset(std::string assetPath, AssetIfaceType type);
 
   private:
 	std::string m_gameAssetsDir;
-	std::map<std::string, std::shared_ptr<Asset>> m_allAssets;
+	std::map<std::string, AssetPtr> m_allAssets;
 };
 
 
-SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetType type);
-SGE_CORE_API bool isAssetSupportingInteface(const std::shared_ptr<Asset>& asset, AssetType type);
+SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType type);
+SGE_CORE_API bool isAssetSupportingInteface(const AssetPtr& asset, AssetIfaceType type);
 
-SGE_CORE_API bool isAssetLoaded(const Asset& asset, AssetType type);
-SGE_CORE_API bool isAssetLoaded(const std::shared_ptr<Asset>& asset, AssetType type);
+SGE_CORE_API bool isAssetLoaded(const Asset& asset, AssetIfaceType type);
+SGE_CORE_API bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type);
 
 
 

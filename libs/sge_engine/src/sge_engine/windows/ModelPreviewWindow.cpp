@@ -11,7 +11,7 @@
 
 namespace sge {
 
-static bool promptForModel(std::shared_ptr<Asset>& asset) {
+static bool promptForModel(AssetPtr& asset) {
 	AssetLibrary* const assetLib = getCore()->getAssetLib();
 
 	const std::string filename = FileOpenDialog("Pick a model", true, "*.mdl\0*.mdl\0", nullptr);
@@ -111,14 +111,14 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			animationDonors.clear();
 			previewAimationTime = 0.f;
 			autoPlayAnimation = true;
-			if (isAssetLoaded(m_model, assetType_model3d)) {
+			if (isAssetLoaded(m_model, assetIface_model3d)) {
 				m_eval.initialize(assetLib, &getAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
 			}
 		}
 
 		if (isAssetLoaded(m_model)) {
 			if (ImGui::Button("Add Animation Donor")) {
-				std::shared_ptr<Asset> donor;
+				AssetPtr donor;
 				if (promptForModel(donor)) {
 					sgeAssert(isAssetLoaded(donor));
 					animationDonors.push_back(donor);

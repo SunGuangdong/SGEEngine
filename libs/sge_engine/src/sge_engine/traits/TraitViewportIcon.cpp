@@ -15,7 +15,7 @@ ReflBlock() {
 // TraitViewportIcon
 //-----------------------------------------------------------------------
 TraitViewportIcon::TraitViewportIcon()
-    : m_assetProperty(assetType_texture2d)
+    : m_assetProperty(assetIface_texture2d)
     , m_pixelSizeUnitsScreenSpace(0.0011f) {
 }
 

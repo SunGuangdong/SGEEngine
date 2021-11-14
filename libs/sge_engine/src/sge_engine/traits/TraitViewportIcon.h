@@ -25,7 +25,7 @@ struct SGE_ENGINE_API TraitViewportIcon : public Trait {
 		}
 	}
 
-	void setTexture(std::shared_ptr<Asset> asset, bool updateNow) {
+	void setTexture(AssetPtr asset, bool updateNow) {
 		m_assetProperty.setAsset(asset);
 		if (updateNow) {
 			postUpdate();

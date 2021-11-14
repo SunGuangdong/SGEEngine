@@ -84,7 +84,7 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 	};
 
 	struct Element {
-		Element() : m_assetProperty(assetType_texture2d, assetType_spriteAnim) {}
+		Element() : m_assetProperty(assetIface_texture2d, assetIface_spriteAnim) {}
 
 		bool isRenderable = true;
 		AssetProperty m_assetProperty;

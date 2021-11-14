@@ -258,8 +258,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 
 		if (assetPropery.m_uiPossibleAssets.size() == 0) {
 			chain.add(typeLib().findMember(&AssetProperty::m_targetAsset));
-			editStringAsAssetPath(inspector, memberName, gameObject, chain, assetPropery.m_acceptedAssetTypes.data(),
-			                      assetPropery.m_acceptedAssetTypes.size());
+			editStringAsAssetPath(inspector, memberName, gameObject, chain, assetPropery.m_acceptedAssetIfaceTypes.data(),
+			                      assetPropery.m_acceptedAssetIfaceTypes.size());
 			chain.pop();
 		} else {
 			ImGuiEx::Label("Asset");
@@ -680,13 +680,13 @@ void ProperyEditorUIGen::editStringAsAssetPath(GameInspector& inspector,
                                                const char* label,
                                                GameObject* gameObject,
                                                MemberChain chain,
-                                               const AssetType possibleAssetTypes[],
-                                               const int numPossibleAssetTypes) {
+                                               const AssetIfaceType possibleAssetIfaceTypes[],
+                                               const int numPossibleAssetIfaceTypes) {
 	std::string& srcString = *(std::string*)chain.follow(gameObject);
 
 	std::string stringEdit = srcString;
 
-	bool const change = assetPicker(label, stringEdit, getCore()->getAssetLib(), possibleAssetTypes, numPossibleAssetTypes);
+	bool const change = assetPicker(label, stringEdit, getCore()->getAssetLib(), possibleAssetIfaceTypes, numPossibleAssetIfaceTypes);
 
 	if (change) {
 		std::string newData = stringEdit;

@@ -69,8 +69,8 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 }
 
 bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, const char* modelAssetPath) {
-	std::shared_ptr<Asset> modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelAssetPath);
-	if (!isAssetLoaded(modelAsset, assetType_model3d)) {
+	AssetPtr modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelAssetPath);
+	if (!isAssetLoaded(modelAsset, assetIface_model3d)) {
 		return false;
 	}
 

@@ -2,6 +2,7 @@
 
 #include "sge_utils/math/vec4.h"
 #include "sgecore_api.h"
+#include "sge_core/AssetLibrary/IAsset.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -65,7 +66,7 @@ struct SGE_CORE_API SpriteAnimationWithTextures {
 	static bool importFromAsepriteSpriteSheetJsonFile(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib);
 
 	SpriteAnimation spriteAnimation;
-	std::shared_ptr<Asset> textureAsset; /// The texture that holds the frames of the sprite.
+	AssetPtr textureAsset; /// The texture that holds the frames of the sprite.
 };
 
 } // namespace sge

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <memory>
-
 #include "IAsset.h"
+#include "sge_renderer/renderer/renderer.h"
+#include <memory>
 
 namespace sge {
 

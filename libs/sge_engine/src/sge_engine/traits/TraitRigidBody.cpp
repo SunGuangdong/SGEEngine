@@ -50,8 +50,8 @@ bool TraitRigidBody::createBasedOnModel(const EvaluatedModel& eval, float mass, 
 }
 
 bool TraitRigidBody::createBasedOnModel(const char* modelPath, float mass, bool noResponse, bool addToWorldNow) {
-	std::shared_ptr<Asset> modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelPath);
-	if (!isAssetLoaded(modelAsset, assetType_model3d)) {
+	AssetPtr modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelPath);
+	if (!isAssetLoaded(modelAsset, assetIface_model3d)) {
 		sgeAssert(false && "Failed to load an asset.");
 		return false;
 	}

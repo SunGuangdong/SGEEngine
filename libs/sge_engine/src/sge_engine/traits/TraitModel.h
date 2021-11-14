@@ -39,10 +39,10 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	TraitModel() = default;
 
 	void setModel(const char* assetPath, bool updateNow);
-	void setModel(std::shared_ptr<Asset>& asset, bool updateNow);
+	void setModel(AssetPtr& asset, bool updateNow);
 
 	void addModel(const char* assetPath, bool updateNow);
-	void addModel(std::shared_ptr<Asset>& asset, bool updateNow);
+	void addModel(AssetPtr& asset, bool updateNow);
 
 	/// Not called automatically see the class comment above.
 	/// Updates the working models.
@@ -67,7 +67,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	struct PerModelSettings {
 		PerModelSettings()
-		    : m_assetProperty(assetType_model3d) {}
+		    : m_assetProperty(assetIface_model3d) {}
 
 		/// Invalidates the asset property focing an update.
 		void invalidateCachedAssets() { m_assetProperty.clear(); }
@@ -90,7 +90,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 		bool getNoLighting() const { return instanceDrawMods.forceNoLighting; }
 
 		void setModel(const char* assetPath, bool updateNow);
-		void setModel(std::shared_ptr<Asset>& asset, bool updateNow);
+		void setModel(AssetPtr& asset, bool updateNow);
 
 		AABox3f getBBoxOS() const;
 

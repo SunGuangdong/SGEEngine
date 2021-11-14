@@ -47,8 +47,8 @@ struct ParticleGroupDesc {
 
 	// Model and sprites.
 	Visualization m_visMethod = vis_model3D;
-	AssetProperty m_particleModel = AssetProperty(assetType_model3d);
-	AssetProperty m_particlesSprite = AssetProperty(assetType_texture2d);
+	AssetProperty m_particleModel = AssetProperty(assetIface_model3d);
+	AssetProperty m_particlesSprite = AssetProperty(assetIface_texture2d);
 	vec2i m_spriteGrid = vec2i(1); // The number of sub images in the specified texture by x and y. They go row-wise left to right.
 	float m_spritePixelsPerUnit = 32.f;
 	float m_spriteFPS = 30.f;
@@ -195,7 +195,7 @@ struct SGE_ENGINE_API TraitParticlesProgrammable : public Trait {
 
 		bool isInWorldSpace = true;
 		std::vector<ParticleData> allParticles;
-		std::shared_ptr<Asset> spriteTexture;
+		AssetPtr spriteTexture;
 		vec2i spriteFramsCount = vec2i(1); /// The number of sub-images in X and Y direction.
 		AABox3f bbox;                      /// The bounding box of the particles in world or in object space depending on @isInWorldSpace.
 		bool needsZAlphaSorting = false;

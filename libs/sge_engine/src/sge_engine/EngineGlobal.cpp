@@ -32,14 +32,14 @@ void EngineGlobalAssets::initialize() {
 	for (const auto& typeId : typeLib().m_gameObjectTypes) {
 		const TypeDesc* td = typeLib().find(typeId);
 		std::string assetName = "assets/editor/textures/icons/obj/" + std::string(td->name) + ".png";
-		std::shared_ptr<Asset> asset = getCore()->getAssetLib()->getAssetFromFile(assetName.c_str());
+		AssetPtr asset = getCore()->getAssetLib()->getAssetFromFile(assetName.c_str());
 		if (isAssetLoaded(asset)) {
 			perObjectTypeIcon[typeId] = asset;
 		}
 	}
 }
 
-std::shared_ptr<Asset> EngineGlobalAssets::getIconForObjectType(const TypeId type) {
+AssetPtr EngineGlobalAssets::getIconForObjectType(const TypeId type) {
 	auto itr = perObjectTypeIcon.find(type);
 
 	if (itr != perObjectTypeIcon.end()) {

@@ -19,7 +19,7 @@
 namespace sge {
 
 bool assetPicker(
-    const char* label, std::string& assetPath, AssetLibrary* const assetLibrary, const AssetType assetTypes[], const int numAssetTypes) {
+    const char* label, std::string& assetPath, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes) {
 	ImGuiEx::IDGuard idGuard(label);
 	ImGuiEx::Label(label);
 
@@ -54,7 +54,7 @@ bool assetPicker(
 		int textureItemsInLine = 0;
 
 
-		auto doAssetTypeMenu = [&](const AssetType assetType) -> void {
+		auto doAssetIfaceTypeMenu = [&](const AssetIfaceType assetType) -> void {
 			filter.Draw();
 			if (ImGui::IsItemClicked(2)) {
 				ImGui::ClearActiveID(); // Hack: (if we do not make this call ImGui::InputText will set it's cached value.
@@ -70,14 +70,14 @@ bool assetPicker(
 					continue;
 				}
 
-				const std::shared_ptr<Asset>& asset = itr.second;
-				if (assetType == assetType_texture2d) {
+				const AssetPtr& asset = itr.second;
+				if (assetType == assetIface_texture2d) {
 					if (true /* isAssetLoadFailed(asset) == false*/) {
 						if (!isAssetLoaded(asset)) {
 							if (ImGui::Button(itr.first.c_str(), ImVec2(48, 48))) {
 								getCore()->getAssetLib()->getAssetFromFile(asset->getPath().c_str());
 							}
-						} else if (isAssetLoaded(asset, assetType_texture2d)) {
+						} else if (isAssetLoaded(asset, assetIface_texture2d)) {
 							Texture* texture = getAssetIface<AssetIface_Texture2D>(asset)->getTexture();
 							if (texture && ImGui::ImageButton(texture, ImVec2(48, 48))) {
 								assetPath = itr.first;
@@ -98,7 +98,7 @@ bool assetPicker(
 						else
 							ImGui::SameLine();
 					}
-				} else if (assetType == assetType_model3d) {
+				} else if (assetType == assetIface_model3d) {
 					if (isAssetLoaded(asset)) {
 						ImGui::Text(ICON_FK_CHECK);
 					} else {
@@ -117,7 +117,7 @@ bool assetPicker(
 						}
 					}
 
-					if (ImGui::IsItemHovered() && isAssetLoaded(asset, assetType_model3d)) {
+					if (ImGui::IsItemHovered() && isAssetLoaded(asset, assetIface_model3d)) {
 						ImGui::BeginTooltip();
 
 						const int textureSize = 256;
@@ -165,14 +165,14 @@ bool assetPicker(
 			}
 		};
 
-		if (numAssetTypes == 1) {
-			doAssetTypeMenu(assetTypes[0]);
+		if (numAssetIfaceTypes == 1) {
+			doAssetIfaceTypeMenu(assetTypes[0]);
 		} else {
-			for (int iType = 0; iType < numAssetTypes; ++iType) {
-				const AssetType assetType = assetTypes[iType];
+			for (int iType = 0; iType < numAssetIfaceTypes; ++iType) {
+				const AssetIfaceType assetType = assetTypes[iType];
 
-				if (ImGui::BeginMenu(assetType_getName(assetType))) {
-					doAssetTypeMenu(assetType);
+				if (ImGui::BeginMenu(assetIface_getName(assetType))) {
+					doAssetIfaceTypeMenu(assetType);
 					ImGui::EndMenu();
 				}
 			}
@@ -184,13 +184,13 @@ bool assetPicker(
 }
 
 SGE_ENGINE_API bool assetPicker(const char* label,
-                                std::shared_ptr<Asset>& asset,
+                                AssetPtr& asset,
                                 AssetLibrary* const assetLibrary,
-                                const AssetType assetTypes[],
-                                const int numAssetTypes) {
+                                const AssetIfaceType assetTypes[],
+                                const int numAssetIfaceTypes) {
 	std::string tempPath = isAssetLoaded(asset) ? asset->getPath() : "";
 
-	if (assetPicker(label, tempPath, assetLibrary, assetTypes, numAssetTypes)) {
+	if (assetPicker(label, tempPath, assetLibrary, assetTypes, numAssetIfaceTypes)) {
 		asset = assetLibrary->getAssetFromFile(tempPath.c_str());
 		return true;
 	}
