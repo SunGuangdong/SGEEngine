@@ -258,6 +258,7 @@ bool AssetTexture2d::saveTextureSettingsToInfoFile() const {
 	jRoot->setMember("version", jvb(1));
 	jRoot->setMember("sampler", samplerDesc_toJson(m_textureMeta.assetSamplerDesc, jvb));
 	jRoot->setMember("isSemiTransparent", jvb(m_textureMeta.isSemiTransparent));
+	jRoot->setMember("shouldGenerateMips", jvb(m_textureMeta.shouldGenerateMips));
 
 	JsonWriter jsonWriter;
 	bool success = jsonWriter.WriteInFile(infoPath.c_str(), jRoot, true);

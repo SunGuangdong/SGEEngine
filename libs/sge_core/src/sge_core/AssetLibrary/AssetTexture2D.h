@@ -8,6 +8,8 @@ namespace sge {
 
 struct Texture;
 
+/// Contains some additional data about a texture (for example a loaded *.png file)
+/// That cannot be stored in the source file.
 struct AssetTextureMeta {
 	/// The sampler description defined by the asset file.
 	/// This is no necessery the actual descriptor assigned to @tex.

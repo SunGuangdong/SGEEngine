@@ -7,20 +7,17 @@
 #include "sge_core/sgecore_api.h"
 #include "sge_utils/sge_utils.h"
 
-#include "IAsset.h"
-
 #include "AssetAudio.h"
 #include "AssetModel3D.h"
 #include "AssetSpriteAnim.h"
 #include "AssetText.h"
 #include "AssetTexture2D.h"
 
-
 namespace sge {
 
-struct Asset;
-
-
+/// An enum for each asset interface that is supported.
+/// If you add a new asset interface type make sure to
+/// add it here and handle it where it is needed.
 enum AssetIfaceType : int {
 	assetIface_unknown = 0,
 	assetIface_texture2d,
@@ -31,7 +28,6 @@ enum AssetIfaceType : int {
 
 	assetIface_count,
 };
-
 
 /// @brief Returns a name suitable for displaying to the user for the specified asset type.
 SGE_CORE_API const char* assetIface_getName(const AssetIfaceType type);
@@ -45,7 +41,8 @@ SGE_CORE_API const char* assetIface_getName(const AssetIfaceType type);
 SGE_CORE_API AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool includeExternalExtensions);
 
 /// AssetLibrary loads and bookkeeps loaded assets by it
-/// and enables other assets to load dependancy asset (3D model might refer to a texture via a material).
+/// and enables other assets to load dependancy asset.
+/// For example a 3D model might refer to a texture via a material.
 struct SGE_CORE_API AssetLibrary {
 	AssetLibrary() = default;
 	~AssetLibrary() = default;
@@ -55,9 +52,19 @@ struct SGE_CORE_API AssetLibrary {
 	/// This directory is used for creating a "dir-tree" for aviable assets.
 	void scanForAvailableAssets(const char* path);
 
+	/// Returns the requested asset.
+	/// The input path will internally get converted to relative path to the current working directory.
+	/// This converted path will get used to identify the asset later.
 	AssetPtr getAssetFromFile(const char* path, bool loadIfMissing = true);
+
+	/// Returns true if an asset with the specified path is allocated.
 	bool hasAsset(const std::string& path) const;
+
+	/// Retrieves the internal state of all assets.
 	const std::map<std::string, AssetPtr>& getAllAssets() const;
+
+	/// Tries to reload the specified asset. The asset will not be reloaded
+	/// the the modified time of the input file hasn't changed.
 	bool reloadAssetModified(AssetPtr& asset);
 
 	template <typename TAsset>
@@ -91,13 +98,18 @@ struct SGE_CORE_API AssetLibrary {
 	std::map<std::string, AssetPtr> m_allAssets;
 };
 
-
+/// Returns true if the specified asset supports the specified interface.
+/// The asset does not need to be loaded to return true.
 SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType type);
+
+/// Returns true if the specified asset supports the specified interface.
+/// The asset does not need to be loaded to return true.
 SGE_CORE_API bool isAssetSupportingInteface(const AssetPtr& asset, AssetIfaceType type);
 
+/// Returns true if the specified asset is loaded and supports the specified interface.
 SGE_CORE_API bool isAssetLoaded(const Asset& asset, AssetIfaceType type);
+
+/// Returns true if the specified asset is loaded and supports the specified interface.
 SGE_CORE_API bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type);
-
-
 
 } // namespace sge
