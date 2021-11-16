@@ -424,7 +424,7 @@ ParticleGroupState::SpriteRendData*
 	    Geometry(spriteRenderData->vertexBuffer, nullptr, nullptr, -1, vertexDeclIdx, true, true, true, false,
 	             PrimitiveTopology::TriangleList, 0, 0, strideSizeBytes, UniformType::Unknown, int(vertices.size()));
 
-	spriteRenderData->material.diffuseColorSrc = PBRMaterial::diffuseColorSource_diffuseMap;
+	spriteRenderData->material.diffuseColorSrc = DefaultPBRMtlData::diffuseColorSource_diffuseMap;
 	spriteRenderData->material.diffuseTexture = sprite;
 	spriteRenderData->material.tintByVertexColor = true;
 	return &spriteRenderData.get();

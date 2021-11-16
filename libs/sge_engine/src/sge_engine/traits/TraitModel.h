@@ -47,7 +47,9 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	/// Not called automatically see the class comment above.
 	/// Updates the working models.
 	/// Returns true if a model has been changed (no matter if it is valid or not).
-	bool postUpdate() { return updateAssetProperties(); }
+	bool postUpdate() {
+		return updateAssetProperties();
+	}
 
 	AABox3f getBBoxOS() const;
 
@@ -60,17 +62,15 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	bool updateAssetProperties();
 
   public:
-	struct MaterialOverride {
-		std::string materialName;
-		ObjectId materialObjId;
-	};
-
 	struct PerModelSettings {
 		PerModelSettings()
-		    : m_assetProperty(assetIface_model3d) {}
+		    : m_assetProperty(assetIface_model3d) {
+		}
 
 		/// Invalidates the asset property focing an update.
-		void invalidateCachedAssets() { m_assetProperty.clear(); }
+		void invalidateCachedAssets() {
+			m_assetProperty.clear();
+		}
 
 		bool updateAssetProperty() {
 			if (m_assetProperty.update()) {
@@ -86,8 +86,12 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 			nodeToBoneId.clear();
 		}
 
-		void setNoLighting(bool v) { instanceDrawMods.forceNoLighting = v; }
-		bool getNoLighting() const { return instanceDrawMods.forceNoLighting; }
+		void setNoLighting(bool v) {
+			instanceDrawMods.forceNoLighting = v;
+		}
+		bool getNoLighting() const {
+			return instanceDrawMods.forceNoLighting;
+		}
 
 		void setModel(const char* assetPath, bool updateNow);
 		void setModel(AssetPtr& asset, bool updateNow);
@@ -107,8 +111,6 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 		Optional<EvaluatedModel> m_evalModel;
 		float alphaMultiplier = 1.f;
 		InstanceDrawMods instanceDrawMods;
-
-		std::vector<MaterialOverride> m_materialOverrides;
 
 		// External skeleton, useful for IK. Not sure for regular skinned meshes.
 		bool useSkeleton = false;

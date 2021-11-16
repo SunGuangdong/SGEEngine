@@ -131,13 +131,5 @@ Geometry TexturedPlaneDraw::getGeometry(SGEDevice* sgedev) {
 	return geom;
 }
 
-PBRMaterial TexturedPlaneDraw::getMaterial(Texture* texture) const {
-	PBRMaterial mtl;
-	mtl.diffuseColorSrc = PBRMaterial::diffuseColorSource_diffuseMap;
-	mtl.diffuseTexture = texture;
-	mtl.metalness = 0.f;
-	mtl.roughness = 1.f;
-	return mtl;
-}
 
 } // namespace sge

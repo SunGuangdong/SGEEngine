@@ -157,9 +157,6 @@ AssetTextureMeta loadAssetTextureMeta2(const std::string& baseAssetPath) {
 	return AssetTextureMeta();
 }
 
-
-
-
 AssetTexture2d::DDSLoadCode AssetTexture2d::loadDDS(const char* const rawPath) {
 	std::string const ddsPath = (extractFileExtension(rawPath) == "dds") ? rawPath : std::string(rawPath) + ".dds";
 

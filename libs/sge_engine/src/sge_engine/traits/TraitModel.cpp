@@ -1,13 +1,13 @@
 #include "TraitModel.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/materials/DefaultPBRMtl.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/TypeRegister.h"
 #include "sge_engine/actors/ALocator.h"
-#include "sge_engine/materials/Material.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 #include "sge_utils/loop.h"
 #include "sge_utils/stl_algorithm_ex.h"
@@ -16,27 +16,17 @@
 
 namespace sge {
 
-//struct MDiffuseMaterial; // User for creating material overrides.
+// struct MDiffuseMaterial; // User for creating material overrides.
 
 // clang-format off
 RelfAddTypeId(TraitModel, 20'03'01'0004);
 RelfAddTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
 RelfAddTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
-RelfAddTypeId(TraitModel::MaterialOverride, 20'10'15'0001);
-RelfAddTypeId(std::vector<TraitModel::MaterialOverride>, 20'10'15'0002);
-
 ReflBlock() {
-	ReflAddType(TraitModel::MaterialOverride)
-		ReflMember(TraitModel::MaterialOverride, materialName)
-		ReflMember(TraitModel::MaterialOverride, materialObjId).setPrettyName("Material Object")
-	;
-	ReflAddType(std::vector<TraitModel::MaterialOverride>);
-
 	ReflAddType(TraitModel::PerModelSettings)
 		ReflMember(TraitModel::PerModelSettings, isRenderable)
 		ReflMember(TraitModel::PerModelSettings, alphaMultiplier).uiRange(0.f, 1.f, 0.01f)
 		ReflMember(TraitModel::PerModelSettings, m_assetProperty)
-		ReflMember(TraitModel::PerModelSettings, m_materialOverrides)
 		ReflMember(TraitModel::PerModelSettings, useSkeleton)
 		ReflMember(TraitModel::PerModelSettings, rootSkeletonId)
 	;
@@ -229,38 +219,9 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 				const ModelNode* node = evalModel->m_model->nodeAt(iNode);
 				int numAttachments = int(node->meshAttachments.size());
 				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
-					const EvaluatedMaterial& mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex);
-					PBRMaterial material;
+					IMaterial* mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex).get();
 
-					material.alphaMultiplier = modelSets.alphaMultiplier * mtl.alphaMultiplier;
-
-					material.diffuseColor = mtl.diffuseColor;
-					material.metalness = mtl.metallic;
-					material.roughness = mtl.roughness;
-
-					const auto getTexFromAsset = [](const AssetPtr& asset) -> Texture* {
-						if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
-							return texIface->getTexture();
-						}
-
-						return nullptr;
-					};
-
-					material.diffuseTexture = getTexFromAsset(mtl.diffuseTexture);
-					material.texNormalMap = getTexFromAsset(mtl.texNormalMap);
-					material.texMetalness = getTexFromAsset(mtl.texMetallic);
-					material.texRoughness = getTexFromAsset(mtl.texRoughness);
-
-					const bool meshHasVertexColor =
-					    evalModel->getEvalMesh(node->meshAttachments[iAttach].attachedMeshIndex).geometry.vertexDeclHasVertexColor;
-
-					if (material.diffuseTexture != nullptr) {
-						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_diffuseMap;
-					} else if (meshHasVertexColor) {
-						material.diffuseColorSrc = PBRMaterial::diffuseColorSource_vertexColor;
-					}
-
-					renderItem.mtl = material;
+					renderItem.pMtl = mtl;
 					renderItem.zSortingPositionWs = mat_mul_pos(node2world, evalNode.aabbGlobalSpace.center());
 					renderItem.traitModel = this;
 					renderItem.evalModel = evalModel;
@@ -268,7 +229,7 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 					renderItem.iEvalNode = iNode;
 					renderItem.iEvalNodeMechAttachmentIndex = iAttach;
 					renderItem.needsAlphaSorting =
-					    getActor()->m_forceAlphaZSort || mtl.needsAlphaSorting || material.alphaMultiplier < 0.999f;
+					    getActor()->m_forceAlphaZSort || mtl->getNeedsAlphaSorting() || mtl->getAlphaMult() < 0.999f;
 
 					renderItems.push_back(renderItem);
 				}
@@ -328,21 +289,24 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 				// Material and Skeleton overrides interface.
 				AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 				if (loadedModelIface) {
-					for (ModelMaterial* mtl : loadedModelIface->getModel3D().getMatrials()) {
-						// Check if override for this material already exists.
-						auto itrExisting = find_if(modelSets.m_materialOverrides, [&](const TraitModel::MaterialOverride& ovr) -> bool {
-							return ovr.materialName == mtl->name;
-						});
+#if 0
+				 for (ModelMaterial* mtl : loadedModelIface->getModel3D().getMatrials()) {
+					// Check if override for this material already exists.
+					auto itrExisting = find_if(modelSets.m_materialOverrides, [&](const TraitModel::MaterialOverride& ovr) -> bool {
+						return ovr.materialName == mtl->name;
+					});
 
-						if (itrExisting == std::end(modelSets.m_materialOverrides)) {
-							TraitModel::MaterialOverride ovr;
-							ovr.materialName = mtl->name;
-							modelSets.m_materialOverrides.emplace_back(ovr);
-						}
+					if (itrExisting == std::end(modelSets.m_materialOverrides)) {
+						TraitModel::MaterialOverride ovr;
+						ovr.materialName = mtl->name;
+						modelSets.m_materialOverrides.emplace_back(ovr);
 					}
+				}
+#endif
 
-					// Now do the UI for each available slot (keep in mind that we are keeping old slots (from previous models still
-					// available).
+// Now do the UI for each available slot (keep in mind that we are keeping old slots (from previous models still
+// available).
+#if 0
 					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Material Override")) {
 						for (int iMtl : rng_int(loadedModelIface->getModel3D().numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
@@ -402,7 +366,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 							}
 						}
 					}
-
+#endif
 					// Skeletion UI
 					if (ImGui::CollapsingHeader(ICON_FK_WRENCH " Skeleton (WIP)")) {
 						if (ImGui::Button("Extract Skeleton")) {
@@ -418,7 +382,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 
 							transf3d n2w = actor->getActor()->getTransform();
 
-							//AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+							// AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 							Model& loadedModel = loadedModelIface->getModel3D();
 							for (int iNode : rng_int(loadedModel.numNodes())) {
 								const ModelNode* node = loadedModel.nodeAt(iNode);

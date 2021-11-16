@@ -9,6 +9,7 @@
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitRigidBody.h"
+#include "sge_core/materials/DefaultPBRMtl.h"
 
 namespace sge {
 
@@ -46,7 +47,7 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 	GpuHandle<Buffer> vertexBuffer;
 	GpuHandle<Buffer> indexBuffer;
 	Geometry geometry;
-	PBRMaterial material;
+	DefaultPBRMtlData material;
 	int numVerts = 0;
 	int numIndices = 0;
 	TraitRigidBody m_traitRB;

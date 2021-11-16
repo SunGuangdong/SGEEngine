@@ -18,8 +18,11 @@
 
 namespace sge {
 
-bool assetPicker(
-    const char* label, std::string& assetPath, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes) {
+bool assetPicker(const char* label,
+                 std::string& assetPath,
+                 AssetLibrary* const assetLibrary,
+                 const AssetIfaceType assetTypes[],
+                 const int numAssetIfaceTypes) {
 	ImGuiEx::IDGuard idGuard(label);
 	ImGuiEx::Label(label);
 
@@ -142,9 +145,11 @@ bool assetPicker(
 						const mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(90.f), 1.f, 0.01f, 10000.f, 0.f, kIsTexcoordStyleD3D);
 						const mat4f lookAt = mat4f::getLookAtRH(camPos, vec3f(0.f), vec3f(0.f, kIsTexcoordStyleD3D ? 1.f : -1.f, 0.f));
 
+						RawCamera camera = RawCamera(camPos, lookAt, proj);
+
 						RenderDestination rdest(getCore()->getDevice()->getContext(), frameTarget);
-						getCore()->getModelDraw().draw(rdest, camPos, -camPos.normalized0(), proj * lookAt, mat4f::getIdentity(),
-						                               ObjectLighting(), mdlIface->getStaticEval(), InstanceDrawMods());
+						getCore()->getModelDraw().drawEvalModel(rdest, camera, mat4f::getIdentity(), ObjectLighting(),
+						                                        mdlIface->getStaticEval(), InstanceDrawMods());
 
 						ImGui::Image(frameTarget->getRenderTarget(0), ImVec2(textureSize, textureSize));
 						ImGui::EndTooltip();
@@ -183,11 +188,8 @@ bool assetPicker(
 	return wasAssetPicked;
 }
 
-SGE_ENGINE_API bool assetPicker(const char* label,
-                                AssetPtr& asset,
-                                AssetLibrary* const assetLibrary,
-                                const AssetIfaceType assetTypes[],
-                                const int numAssetIfaceTypes) {
+SGE_ENGINE_API bool assetPicker(
+    const char* label, AssetPtr& asset, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes) {
 	std::string tempPath = isAssetLoaded(asset) ? asset->getPath() : "";
 
 	if (assetPicker(label, tempPath, assetLibrary, assetTypes, numAssetIfaceTypes)) {
