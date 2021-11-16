@@ -70,7 +70,7 @@ void PrefabWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UN
 				} else {
 					const char* const errorMsg = "Please selected object to create a prefab!";
 					getEngineGlobal()->showNotification(errorMsg);
-					SGE_DEBUG_WAR(errorMsg);
+					sgeLogWarn(errorMsg);
 				}
 
 				ImGui::CloseCurrentPopup();

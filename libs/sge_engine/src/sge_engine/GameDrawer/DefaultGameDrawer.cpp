@@ -3,7 +3,7 @@
 #include "sge_core/DebugDraw.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
-#include "sge_core/materials/DefaultPBRMtl.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_core/materials/IMaterial.h"
 #include "sge_core/shaders/LightDesc.h"
 #include "sge_engine/GameInspector.h"
@@ -558,18 +558,16 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 
 	const Geometry& geom = evalMesh.geometry;
 
-	mat4f const finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? n2w : n2w * evalNode.evalGlobalTransform;
+	mat4f finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? n2w : n2w * evalNode.evalGlobalTransform;
+	finalTrasform = finalTrasform * ri.traitModel->m_models[ri.iModel].m_additionalTransform;
 
 	if (!drawReason_IsVisualizeSelection(drawReason)) {
 		if (drawReason == drawReason_gameplayShadow) {
 			m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), finalTrasform,
 			                                *drawSets.shadowMapBuildInfo, geom, /* ri.mtl.diffuseTexture*/ nullptr, false);
 		} else {
-			IMaterialData* mtlData = ri.pMtl->getMaterialDataLocalStorage();
-			if_checked(mtlData) {
-				m_modeldraw.drawGeometry(drawSets.rdest, *drawSets.drawCamera, finalTrasform, lighting, geom, mtlData,
-				                         ri.traitModel->m_models[ri.iModel].instanceDrawMods);
-			}
+			drawGeometry(drawSets.rdest, *drawSets.drawCamera, finalTrasform, lighting, geom, ri.pMtlData,
+			             ri.traitModel->m_models[ri.iModel].instanceDrawMods);
 		}
 	} else {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), finalTrasform, geom,
@@ -611,7 +609,7 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 		mods.forceNoCulling = ri.forceNoCulling;
 		mods.forceAdditiveBlending = ri.forceAlphaBlending;
 
-		m_modeldraw.drawGeometry(drawSets.rdest, *drawSets.drawCamera, ri.obj2world, lighting, texPlaneGeom, &texPlaneMtl, mods);
+		drawGeometry(drawSets.rdest, *drawSets.drawCamera, ri.obj2world, lighting, texPlaneGeom, &texPlaneMtl, mods);
 	}
 }
 
@@ -649,8 +647,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 					for (const ParticleGroupState::ParticleState& particle : pstate.getParticles()) {
 						mat4f particleTForm = n2w * mat4f::getTranslation(particle.pos) * mat4f::getScaling(particle.scale);
 
-						m_modeldraw.drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting,
-						                          modelIface->getSharedEval(), InstanceDrawMods());
+						drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting, modelIface->getSharedEval(),
+						              InstanceDrawMods());
 					}
 				}
 			}
@@ -667,7 +665,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 					mods.forceNoLighting = true;
 					mods.forceAdditiveBlending = true;
 
-					m_modeldraw.drawGeometry(drawSets.rdest, *drawSets.drawCamera, n2w, lighting, srd->geometry, &srd->material, mods);
+					drawGeometry(drawSets.rdest, *drawSets.drawCamera, n2w, lighting, srd->geometry, &srd->material, mods);
 				}
 			}
 		}
@@ -693,8 +691,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 				mat4f particleTForm =
 				    mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) * mat4f::getScaling(particle.scale);
 
-				m_modeldraw.drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting,
-				                          getAssetIface<AssetIface_Model3D>(pgrp->spriteTexture)->getStaticEval(), InstanceDrawMods());
+				drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting,
+				              getAssetIface<AssetIface_Model3D>(pgrp->spriteTexture)->getStaticEval(), InstanceDrawMods());
 			}
 		} else {
 			if (m_partRendDataGen.generate(*pgrp, *drawSets.rdest.sgecon, *drawSets.drawCamera, n2w)) {
@@ -703,8 +701,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 				mods.forceAdditiveBlending = true;
 
 				const mat4f identity = mat4f::getIdentity();
-				m_modeldraw.drawGeometry(drawSets.rdest, *drawSets.drawCamera, identity, lighting, m_partRendDataGen.geometry,
-				                         &m_partRendDataGen.material, mods);
+				drawGeometry(drawSets.rdest, *drawSets.drawCamera, identity, lighting, m_partRendDataGen.geometry,
+				             &m_partRendDataGen.material, mods);
 			}
 		}
 	}
@@ -892,8 +890,8 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 				m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), simpleObstacle->getTransformMtx(),
 				                                   simpleObstacle->geometry, selectionTint, false);
 			} else {
-				m_modeldraw.drawGeometry(drawSets.rdest, *drawSets.drawCamera, simpleObstacle->getTransformMtx(), lighting,
-				                         simpleObstacle->geometry, &simpleObstacle->material, InstanceDrawMods());
+				drawGeometry(drawSets.rdest, *drawSets.drawCamera, simpleObstacle->getTransformMtx(), lighting, simpleObstacle->geometry,
+				             &simpleObstacle->material, InstanceDrawMods());
 			}
 		}
 	} else if (actorType == sgeTypeId(ACamera) && drawReason_IsVisualizeSelection(drawReason)) {

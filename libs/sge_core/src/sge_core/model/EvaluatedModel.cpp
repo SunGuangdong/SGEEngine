@@ -5,7 +5,7 @@
 #include "sge_utils/math/transform.h"
 #include "sge_utils/utils/range_loop.h"
 
-#include "sge_core/materials/DefaultPBRMtl.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 
 #include "EvaluatedModel.h"
 #include "Model.h"

@@ -44,22 +44,22 @@ struct SGE_LOG_API Log : public Noncopyable {
 
 #if defined(SGE_USE_DEBUG)
 // https://stackoverflow.com/questions/5588855/standard-alternative-to-gccs-va-args-trick
-#define SGE_DEBUG_LOG(_str_msg_, ...) \
+#define sgeLogInfo(_str_msg_, ...) \
 	{ sge::getLog()->write((_str_msg_), ##__VA_ARGS__); }
-#define SGE_DEBUG_CHECK(_str_msg_, ...) \
+#define sgeLogCheck(_str_msg_, ...) \
 	{ sge::getLog()->writeCheck((_str_msg_), ##__VA_ARGS__); }
-#define SGE_DEBUG_ERR(_str_msg_, ...) \
+#define sgeLogError(_str_msg_, ...) \
 	{ sge::getLog()->writeError((_str_msg_), ##__VA_ARGS__); }
-#define SGE_DEBUG_WAR(_str_msg_, ...) \
+#define sgeLogWarn(_str_msg_, ...) \
 	{ sge::getLog()->writeWarning((_str_msg_), ##__VA_ARGS__); }
 #else
-#define SGE_DEBUG_LOG(_str_msg_, ...) \
+#define sgeLogInfo(_str_msg_, ...) \
 	{}
-#define SGE_DEBUG_CHECK(_str_msg_, ...) \
+#define sgeLogCheck(_str_msg_, ...) \
 	{}
-#define SGE_DEBUG_ERR(_str_msg_, ...) \
+#define sgeLogError(_str_msg_, ...) \
 	{}
-#define SGE_DEBUG_WAR(_str_msg_, ...) \
+#define sgeLogWarn(_str_msg_, ...) \
 	{}
 #endif
 

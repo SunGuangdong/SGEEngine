@@ -6,7 +6,7 @@ namespace sge {
 
 struct TraitModel;
 struct EvaluatedModel;
-struct IMaterial;
+struct IMaterialData;
 
 struct TraitModelRenderItem : public IRenderItem {
 	TraitModel* traitModel = nullptr;
@@ -15,7 +15,7 @@ struct TraitModelRenderItem : public IRenderItem {
 	int iEvalNode = -1; // The mesh to be rendered from the model.
 	int iEvalNodeMechAttachmentIndex = -1;
 
-	IMaterial* pMtl;
+	IMaterialData* pMtlData;
 };
 
 } // namespace sge

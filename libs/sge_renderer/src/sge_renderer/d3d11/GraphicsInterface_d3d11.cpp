@@ -87,7 +87,7 @@ bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc) {
 	m_immContext->SetSGEDevice(this);
 	setVsync(mainFrameDesc.vSync);
 
-	 SGE_DEBUG_LOG("D3D11 Device Created with FeatureLevel = 0x%x\n", m_workingFeatureLevel);
+	 sgeLogInfo("D3D11 Device Created with FeatureLevel = 0x%x\n", m_workingFeatureLevel);
 
 	// Create the swapchain to the target window and allocate the default FrameTargetD3D11
 	const bool succeedeCreatingSC = D3D11_CreateSwapChain(mainFrameDesc);
@@ -146,7 +146,7 @@ bool SGEDeviceD3D11::D3D11_CreateSwapChain(const MainFrameTargetDesc& desc) {
 	size_t numCharsConverted;
 	wcstombs_s(&numCharsConverted, descVideoMbcs, adapterDesc.Description, SGE_ARRSZ(descVideoMbcs));
 
-	// SGE_DEBUG_LOG("%s\n", descVideoMbcs);
+	// sgeLogInfo("%s\n", descVideoMbcs);
 
 	TComPtr<IDXGIFactory> DXGIFactory;
 	DXGIAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&DXGIFactory);

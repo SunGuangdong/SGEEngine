@@ -38,7 +38,7 @@ AssetsWindow::AssetsWindow(std::string windowName, GameInspector& inspector)
 	}
 
 	if (m_sgeImportFBXFile == nullptr || m_sgeImportFBXFileAsMultiple == nullptr) {
-		SGE_DEBUG_WAR("Failed to load dynamic library mdlconvlib. Importing FBX files would not be possible without it!");
+		sgeLogWarn("Failed to load dynamic library mdlconvlib. Importing FBX files would not be possible without it!");
 	}
 }
 
@@ -56,7 +56,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 		Model importedModel;
 
 		if (m_sgeImportFBXFile == nullptr) {
-			SGE_DEBUG_ERR("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
+			sgeLogError("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
 		}
 
 		std::vector<std::string> referencedTextures;
@@ -71,7 +71,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 			assetLib->reloadAssetModified(assetModel);
 
 			std::string notificationMsg = string_format("Imported %s", fullAssetPath.c_str());
-			SGE_DEBUG_LOG(notificationMsg.c_str());
+			sgeLogInfo(notificationMsg.c_str());
 			getEngineGlobal()->showNotification(notificationMsg);
 
 			// Copy the referenced textures.
@@ -93,14 +93,14 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 			return true;
 		} else {
 			std::string notificationMsg = string_format("Failed to import %s", fullAssetPath.c_str());
-			SGE_DEBUG_ERR(notificationMsg.c_str());
+			sgeLogError(notificationMsg.c_str());
 			getEngineGlobal()->showNotification(notificationMsg);
 
 			return false;
 		}
 	} else if (aid.assetType == assetIface_model3d && aid.importModelsAsMultipleFiles == true) {
 		if (m_sgeImportFBXFileAsMultiple == nullptr) {
-			SGE_DEBUG_ERR("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
+			sgeLogError("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
 		}
 
 		std::vector<std::string> referencedTextures;
@@ -124,7 +124,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				assetLib->reloadAssetModified(assetModel);
 
 				std::string notificationMsg = string_format("Imported %s", path.c_str());
-				SGE_DEBUG_LOG(notificationMsg.c_str());
+				sgeLogInfo(notificationMsg.c_str());
 				getEngineGlobal()->showNotification(notificationMsg);
 			}
 
@@ -147,7 +147,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 			return true;
 		} else {
 			std::string notificationMsg = string_format("Failed to import %s", fullAssetPath.c_str());
-			SGE_DEBUG_ERR(notificationMsg.c_str());
+			sgeLogError(notificationMsg.c_str());
 			getEngineGlobal()->showNotification(notificationMsg);
 
 			return false;
@@ -175,7 +175,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 
 			return tempSpriteAnimation.saveSpriteToFile(fullAssetPath.c_str());
 		} else {
-			SGE_DEBUG_ERR("Failed to import %s as a Sprite!", aid.fileToImportPath.c_str());
+			sgeLogError("Failed to import %s as a Sprite!", aid.fileToImportPath.c_str());
 		}
 	} else if (aid.assetType == assetIface_text) {
 		createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
@@ -188,7 +188,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 	} else {
 		createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 		copyFile(aid.fileToImportPath.c_str(), fullAssetPath.c_str());
-		SGE_DEBUG_WAR("Imported a files by just copying it as it is not recognized asset type!")
+		sgeLogWarn("Imported a files by just copying it as it is not recognized asset type!")
 		return true;
 	}
 
@@ -363,21 +363,26 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						} else if (assetType == assetIface_audio) {
 							string_format(label, "%s %s", ICON_FK_FILE_AUDIO_O, entry.path().filename().string().c_str());
 						} else {
-							string_format(label, "%s %s", ICON_FK_FILE_TEXT_O, entry.path().filename().string().c_str());
+							// Not implemented asset interface.
+							string_format(label, "%s %s", ICON_FK_QUESTION_CIRCLE, entry.path().filename().string().c_str());
 						}
 
-						if (ImGui::Selectable(label.c_str())) {
-							explorePreviewAssetChanged = true;
-							explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str());
-						}
-						if (ImGui::IsItemClicked(1)) {
-							rightClickedPath = entry.path();
-						}
+						if (assetType != assetIface_unknown) {
+							if (ImGui::Selectable(label.c_str())) {
+								explorePreviewAssetChanged = true;
+								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str());
+							}
+							if (ImGui::IsItemClicked(1)) {
+								rightClickedPath = entry.path();
+							}
 
-						if (ImGui::BeginDragDropSource()) {
-							DragDropPayloadAsset::setPayload(localAssetPath);
-							ImGui::Text(localAssetPath.c_str());
-							ImGui::EndDragDropSource();
+							if (ImGui::BeginDragDropSource()) {
+								DragDropPayloadAsset::setPayload(localAssetPath);
+								ImGui::Text(localAssetPath.c_str());
+								ImGui::EndDragDropSource();
+							}
+						} else {
+							ImGui::Selectable(label.c_str());
 						}
 					}
 				}

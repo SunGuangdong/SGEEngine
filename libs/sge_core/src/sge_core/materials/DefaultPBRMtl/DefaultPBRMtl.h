@@ -1,8 +1,7 @@
-#pragma once 
-
-#include "IMaterial.h"
+#pragma once
 
 #include "sge_core/AssetLibrary/IAsset.h"
+#include "sge_core/materials/IMaterial.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_utils/math/mat4.h"
 #include "sge_utils/utils/optional.h"
@@ -17,6 +16,10 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 		diffuseColorSource_constantColor,
 		diffuseColorSource_diffuseMap,
 	};
+
+	DefaultPBRMtlData()
+	    : IMaterialData(1001) {
+	}
 
 	mat4f uvwTransform = mat4f::getIdentity();
 
@@ -55,13 +58,6 @@ struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
 	virtual void fromJson(const char* UNUSED(json)) override {
 	}
 
-	virtual bool getNeedsAlphaSorting() override {
-		return needsAlphaSorting;
-	}
-
-	virtual float getAlphaMult() override {
-		return alphaMultiplier;
-	}
 
   public:
 	AssetPtr diffuseTexture;

@@ -71,7 +71,7 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 		    shaderCodeFull.c_str(), shaderCodeFull.c_str(), outIncludedFiles);
 
 		if (programCreateResult.succeeded == false) {
-			SGE_DEBUG_ERR("Shader Compilation Failed:\n%s", programCreateResult.errors.c_str());
+			sgeLogError("Shader Compilation Failed:\n%s", programCreateResult.errors.c_str());
 			*this = ShadingProgramPermuator();
 			return false;
 		}

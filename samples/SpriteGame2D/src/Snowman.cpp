@@ -128,7 +128,7 @@ struct Snowman : public Actor {
 		}
 
 		if (Optional<vec2f> t = u.is.hasTouchPressedUV(vec2f(0.f), vec2f(1.f, 1.f))) {
-			SGE_DEBUG_LOG("T %f %f", t->x, t->y)
+			sgeLogInfo("T %f %f", t->x, t->y)
 		}
 
 		// Handle the input of hte player.

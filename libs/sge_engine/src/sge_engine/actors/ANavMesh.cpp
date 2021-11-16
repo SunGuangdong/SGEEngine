@@ -162,7 +162,7 @@ void ANavMesh::build() {
 	const int numTriangles = int(trianglesIndices.size()) / 3;
 
 	if (numTriangles == 0) {
-		SGE_DEBUG_WAR("NavMesh did not find any triangles to be used for building the navmesh!");
+		sgeLogWarn("NavMesh did not find any triangles to be used for building the navmesh!");
 		return;
 	}
 

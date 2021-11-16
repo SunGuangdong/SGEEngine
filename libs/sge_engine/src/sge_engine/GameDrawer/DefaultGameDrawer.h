@@ -1,9 +1,9 @@
 #pragma once
 
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_core/shaders/ConstantColorShader.h"
 #include "sge_core/shaders/FWDBuildShadowMapShader.h"
 #include "sge_core/shaders/SkyShader.h"
-#include "sge_core/shaders/modeldraw.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/GameObject.h"
 #include "sge_engine/TexturedPlaneDraw.h"
@@ -27,8 +27,8 @@ struct ANavMesh;
 
 struct LightShadowInfo {
 	ShadowMapBuildInfo buildInfo;
-	//GpuHandle<Texture> pointLightDepthTexture; ///< This could be a single 2D or a Cube texture depending on the light source.
-	GpuHandle<FrameTarget> frameTarget;                 ///< Regular frame target for spot and directional lights.
+	// GpuHandle<Texture> pointLightDepthTexture; ///< This could be a single 2D or a Cube texture depending on the light source.
+	GpuHandle<FrameTarget> frameTarget; ///< Regular frame target for spot and directional lights.
 	bool isCorrectlyUpdated = false;
 };
 
@@ -107,7 +107,6 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	}
 
   public:
-	BasicModelDraw m_modeldraw;
 	FWDBuildShadowMapShader m_shadowMapBuilder;
 	ConstantColorWireShader m_constantColorShader;
 	SkyShader m_skyShader;

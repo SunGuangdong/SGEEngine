@@ -6,6 +6,7 @@
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include <imgui/imgui.h>
+#include "sge_core/materials/IGeometryDrawer.h"
 
 #include "sge_core/ICore.h"
 
@@ -73,7 +74,7 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	imods.forceNoLighting = true;
 
 	RawCamera rawCamera = RawCamera(camera.eyePosition(), lookAt, proj);
-	getCore()->getModelDraw().drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(), m_eval, imods);
+	drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(), m_eval, imods);
 
 	if (kIsTexcoordStyleD3D) {
 		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y));
@@ -226,7 +227,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
 			RawCamera rawCamera = RawCamera(camera.eyePosition(), lookAt, proj);
-			getCore()->getModelDraw().drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods());
+			drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods());
 
 			ImGui::InvisibleButton("TextureCanvasIB", canvas_size);
 

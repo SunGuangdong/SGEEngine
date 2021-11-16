@@ -1,4 +1,4 @@
-#include "modeldraw.h"
+#include "DefaultPBRMtlGeomDrawer.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
@@ -15,7 +15,7 @@
 #include "../core_shaders/ShadeCommon.h"
 #include "../core_shaders/ShaderLightData.h"
 
-#include "sge_core/materials/DefaultPBRMtl.h"
+#include "DefaultPBRMtl.h"
 
 using namespace sge;
 
@@ -51,15 +51,14 @@ __declspec(align(4)) struct ParamsCbFWDDefaultShading {
 //-----------------------------------------------------------------------------
 // BasicModelDraw
 //-----------------------------------------------------------------------------
-void BasicModelDraw::drawGeometry(const RenderDestination& rdest,
-                                  const ICamera& camera,
-                                  const mat4f& geomWorldTransfrom,
-                                  const ObjectLighting& lighting,
-                                  const Geometry& geometry,
-                                  const IMaterialData* mtlDataBase,
-                                  const InstanceDrawMods& instDrawMods) {
+void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
+                                           const ICamera& camera,
+                                           const mat4f& geomWorldTransfrom,
+                                           const ObjectLighting& lighting,
+                                           const Geometry& geometry,
+                                           const IMaterialData* mtlDataBase,
+                                           const InstanceDrawMods& instDrawMods) {
 	const DefaultPBRMtlData& mtlData = *dynamic_cast<const DefaultPBRMtlData*>(mtlDataBase);
-
 
 	SGEDevice* const sgedev = rdest.getDevice();
 	if (!paramsBuffer.IsResourceValid()) {

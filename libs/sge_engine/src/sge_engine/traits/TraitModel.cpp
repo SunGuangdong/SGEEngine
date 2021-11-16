@@ -1,7 +1,7 @@
 #include "TraitModel.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/SGEImGui.h"
-#include "sge_core/materials/DefaultPBRMtl.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_engine/GameInspector.h"
@@ -220,16 +220,16 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 				int numAttachments = int(node->meshAttachments.size());
 				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
 					IMaterial* mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex).get();
+					IMaterialData* imtlData = mtl->getMaterialDataLocalStorage();
 
-					renderItem.pMtl = mtl;
+					renderItem.pMtlData = imtlData;
 					renderItem.zSortingPositionWs = mat_mul_pos(node2world, evalNode.aabbGlobalSpace.center());
 					renderItem.traitModel = this;
 					renderItem.evalModel = evalModel;
 					renderItem.iModel = iModel;
 					renderItem.iEvalNode = iNode;
 					renderItem.iEvalNodeMechAttachmentIndex = iAttach;
-					renderItem.needsAlphaSorting =
-					    getActor()->m_forceAlphaZSort || mtl->getNeedsAlphaSorting() || mtl->getAlphaMult() < 0.999f;
+					renderItem.needsAlphaSorting = imtlData->needsAlphaSorting;
 
 					renderItems.push_back(renderItem);
 				}

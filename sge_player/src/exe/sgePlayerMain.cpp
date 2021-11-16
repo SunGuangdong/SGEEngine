@@ -83,7 +83,7 @@ struct SGEGameWindow : public WindowBase {
 			gameMode.m_sceneInstance.getWorld().clear();
 
 			SGEImGui::destroy();
-			SGE_DEBUG_LOG("Destroy Called!");
+			sgeLogInfo("Destroy Called!");
 		}
 	}
 
@@ -277,7 +277,7 @@ void main_loop() {
 // Caution:
 // SDL2 might have a macro (depending on the target platform) for the main function!
 int main(int argc, char* argv[]) {
-	SGE_DEBUG_LOG("main()\n");
+	sgeLogInfo("main()\n");
 
 	sgeRegisterMiniDumpHandler();
 	setlocale(LC_NUMERIC, "C");

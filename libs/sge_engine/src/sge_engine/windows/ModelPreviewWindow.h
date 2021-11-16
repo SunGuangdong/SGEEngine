@@ -5,9 +5,9 @@
 #include "sge_engine/GameDrawer/GameDrawer.h"
 
 #include "sge_core/model/EvaluatedModel.h"
-#include "sge_core/shaders/modeldraw.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/tiny/orbit_camera.h"
+#include "sge_utils/utils/optional.h"
 
 namespace sge {
 

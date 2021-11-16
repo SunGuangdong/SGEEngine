@@ -7,8 +7,14 @@
 namespace sge {
 
 struct SGE_CORE_API IMaterialData {
-	IMaterialData() = default;
+	IMaterialData(uint32 materialFamilyId)
+	    : materialFamilyId(materialFamilyId) {
+	}
 	virtual ~IMaterialData() = default;
+
+	uint32 materialFamilyId = 0;
+	float alphaMultipler = 1.f;
+	bool needsAlphaSorting = false;
 };
 
 struct SGE_CORE_API IMaterial {
@@ -19,14 +25,6 @@ struct SGE_CORE_API IMaterial {
 
 	virtual std::string toJson() = 0;
 	virtual void fromJson(const char* json) = 0;
-
-	virtual bool getNeedsAlphaSorting() {
-		return false;
-	}
-
-	virtual float getAlphaMult() {
-		return 1.f;
-	}
 };
 
 } // namespace sge

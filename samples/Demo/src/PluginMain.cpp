@@ -1,6 +1,5 @@
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
-#include "sge_core/shaders/modeldraw.h"
 #include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_engine/IPlugin.h"
 #include "sge_log/Log.h"

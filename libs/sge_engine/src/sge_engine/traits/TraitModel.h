@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_core/Animator.h"
-#include "sge_core/shaders/modeldraw.h"
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/GameDrawer/IRenderItem.h"

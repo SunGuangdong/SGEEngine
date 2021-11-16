@@ -566,12 +566,12 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 			}
 		}
 	} catch (const ModelParseExcept& UNUSED(except)) {
-		// SGE_DEBUG_ERR("%s: Failed with exception:\n", __func__);
-		// SGE_DEBUG_ERR(except.what());
+		// sgeLogError("%s: Failed with exception:\n", __func__);
+		// sgeLogError(except.what());
 
 		return false;
 	} catch (...) {
-		// SGE_DEBUG_ERR("%s: Failed with unknown exception:\n", __func__);
+		// sgeLogError("%s: Failed with unknown exception:\n", __func__);
 		return false;
 	}
 

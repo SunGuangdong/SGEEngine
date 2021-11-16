@@ -214,7 +214,7 @@ AssetPtr AssetLibrary::getAssetFromFile(const char* path, bool loadIfMissing) {
 
 	// Measure the loading time.
 	const float loadEndTime = Timer::now_seconds();
-	SGE_DEBUG_LOG("Asset '%s' loaded in %f seconds.\n", pathToAsset.c_str(), loadEndTime - loadStartTime);
+	sgeLogInfo("Asset '%s' loaded in %f seconds.\n", pathToAsset.c_str(), loadEndTime - loadStartTime);
 
 	return assetToModify;
 }
@@ -248,7 +248,7 @@ bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify) {
 
 	// Measure the loading time.
 	const float reloadEndTime = Timer::now_seconds();
-	SGE_DEBUG_LOG("Asset '%s' reloaded in %f seconds.\n", assetToModify->getPath().c_str(), reloadEndTime - reloadStartTime);
+	sgeLogInfo("Asset '%s' reloaded in %f seconds.\n", assetToModify->getPath().c_str(), reloadEndTime - reloadStartTime);
 
 	return true;
 }

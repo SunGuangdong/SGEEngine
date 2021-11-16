@@ -83,7 +83,7 @@ struct SGEGameWindow : public WindowBase {
 			jw.WriteInFile("appdata/applicationSettings.json", jRoot, true);
 
 			SGEImGui::destroy();
-			SGE_DEBUG_LOG("Destroy Called!");
+			sgeLogInfo("Destroy Called!");
 		}
 
 		if (event == WE_FileDrop) {
@@ -189,7 +189,7 @@ struct SGEGameWindow : public WindowBase {
 					getEngineGlobal()->getEditorWindow()->loadWorldFromFile(
 					    "reload_level.lvl", !workingFilename.empty() ? workingFilename.c_str() : nullptr, true);
 				}
-				SGE_DEBUG_CHECK("Reloaded %s\n", pluginName.c_str());
+				sgeLogCheck("Reloaded %s\n", pluginName.c_str());
 			}
 		}
 	}
@@ -244,7 +244,7 @@ void main_loop() {
 }
 
 int sge_main(int argc, char** argv) {
-	SGE_DEBUG_LOG("sge_main()\n");
+	sgeLogInfo("sge_main()\n");
 
 	setlocale(LC_NUMERIC, "C");
 
@@ -291,7 +291,7 @@ int sge_main(int argc, char** argv) {
 // Caution:
 // SDL2 might have a macro (depending on the target platform) for the main function!
 int main(int argc, char* argv[]) {
-	SGE_DEBUG_LOG("main()\n");
+	sgeLogInfo("main()\n");
 	sgeRegisterMiniDumpHandler();
 
 

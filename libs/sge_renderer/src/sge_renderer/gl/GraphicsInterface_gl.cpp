@@ -113,7 +113,7 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc) {
 	DumpAllGLErrors();
 
 	[maybe_unused]] const GLubyte* glVersion = glGetString(GL_VERSION);
-	SGE_DEBUG_LOG("OpenGL Version = %s\n", glVersion);
+	sgeLogInfo("OpenGL Version = %s\n", glVersion);
 
 	m_immContext = new SGEContextImmediate;
 	m_immContext->SetSGEDevice(this);
@@ -126,7 +126,7 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc) {
 	//[[maybe_unused]] const GLubyte* vendor = glGetString(GL_VENDOR);     // Returns the vendor
 	//[[maybe_unused]] const GLubyte* renderer = glGetString(GL_RENDERER); // Returns a hint to the model
 
-	// SGE_DEBUG_LOG("Vendor = %s\nRenderer = %s\n", vendor, renderer);
+	// sgeLogInfo("Vendor = %s\nRenderer = %s\n", vendor, renderer);
 
 	// The code uses only one VAO.
 	GLuint globallyUsedDefaultVAO = -1;

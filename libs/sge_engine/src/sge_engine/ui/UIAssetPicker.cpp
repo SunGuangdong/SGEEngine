@@ -3,7 +3,7 @@
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
-#include "sge_core/shaders/modeldraw.h"
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
@@ -148,8 +148,8 @@ bool assetPicker(const char* label,
 						RawCamera camera = RawCamera(camPos, lookAt, proj);
 
 						RenderDestination rdest(getCore()->getDevice()->getContext(), frameTarget);
-						getCore()->getModelDraw().drawEvalModel(rdest, camera, mat4f::getIdentity(), ObjectLighting(),
-						                                        mdlIface->getStaticEval(), InstanceDrawMods());
+
+						drawEvalModel(rdest, camera, mat4f::getIdentity(), ObjectLighting(), mdlIface->getStaticEval(), InstanceDrawMods());
 
 						ImGui::Image(frameTarget->getRenderTarget(0), ImVec2(textureSize, textureSize));
 						ImGui::EndTooltip();
@@ -305,7 +305,7 @@ SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, con
 			ioValue = pickedType->typeId;
 			wasAssetPicked = true;
 		} else {
-			SGE_DEBUG_ERR("The speicifed type cannot be found!");
+			sgeLogError("The speicifed type cannot be found!");
 		}
 	}
 

@@ -9,7 +9,7 @@
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitRigidBody.h"
-#include "sge_core/materials/DefaultPBRMtl.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 
 namespace sge {
 

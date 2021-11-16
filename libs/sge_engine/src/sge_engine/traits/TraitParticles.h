@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_core/materials/DefaultPBRMtl.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Random.h"
 #include "sge_utils/math/Rangef.h"

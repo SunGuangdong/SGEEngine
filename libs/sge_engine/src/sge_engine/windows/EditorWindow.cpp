@@ -255,13 +255,13 @@ void EditorWindow::saveWorldToSpecificFile(const char* filename) {
 
 	if (succeeded) {
 		getEngineGlobal()->showNotification(string_format("SUCCEEDED saving '%s'", filename));
-		SGE_DEBUG_LOG("[SAVE_LEVEL] Saving game level succeeded. File is %s\n", filename);
+		sgeLogInfo("[SAVE_LEVEL] Saving game level succeeded. File is %s\n", filename);
 		m_sceneInstance.getWorld().m_workingFilePath = filename;
 
 		addReasecentScene(filename);
 	} else {
 		getEngineGlobal()->showNotification(string_format("FAILED saving level '%s'", filename));
-		SGE_DEBUG_WAR("[SAVE_LEVEL] Saving game level failed or canceled!\n");
+		sgeLogWarn("[SAVE_LEVEL] Saving game level failed or canceled!\n");
 	}
 }
 

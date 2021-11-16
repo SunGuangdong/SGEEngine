@@ -9,15 +9,21 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	mdlData.metalness = metallic;
 	mdlData.roughness = roughness;
 
-	const auto getTexFromAsset = [](const AssetPtr& asset) -> Texture* {
+	const auto getTexFromAsset = [](const AssetPtr& asset, bool* pIsSemiTransparent = nullptr) -> Texture* {
 		if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+
+			if (pIsSemiTransparent) {
+				*pIsSemiTransparent |= texIface->getTextureMeta().isSemiTransparent;
+			}
+
 			return texIface->getTexture();
 		}
 
 		return nullptr;
 	};
 
-	mdlData.diffuseTexture = getTexFromAsset(diffuseTexture);
+	bool isDiffuseSemiTransp = diffuseColor.w < 1.f;
+	mdlData.diffuseTexture = getTexFromAsset(diffuseTexture, &isDiffuseSemiTransp);
 	mdlData.texNormalMap = getTexFromAsset(texNormalMap);
 	mdlData.texMetalness = getTexFromAsset(texMetallic);
 	mdlData.texRoughness = getTexFromAsset(texRoughness);
@@ -28,6 +34,9 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	} else {
 		mdlData.diffuseColorSrc = DefaultPBRMtlData::diffuseColorSource_vertexColor;
 	}
+
+	mdlData.needsAlphaSorting = isDiffuseSemiTransp;
+	mdlData.alphaMultipler = alphaMultiplier;
 
 	return &mdlData;
 }

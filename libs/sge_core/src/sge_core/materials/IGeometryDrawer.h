@@ -33,7 +33,6 @@ struct InstanceDrawMods {
 	bool forceNoCulling = false;
 };
 
-
 //------------------------------------------------------------
 // ObjectLighting
 //------------------------------------------------------------
@@ -52,7 +51,6 @@ struct ObjectLighting {
 	const ShadingLightData** ppLightData = nullptr;
 };
 
-
 struct ICamera;
 struct RenderDestination;
 struct EvaluatedModel;
@@ -68,14 +66,23 @@ struct SGE_CORE_API IGeometryDrawer {
 	                          const Geometry& geometry,
 	                          const IMaterialData* mtlDataBase,
 	                          const InstanceDrawMods& instDrawMods) = 0;
-
-	void drawEvalModel(const RenderDestination& rdest,
-	                   const ICamera& camera,
-	                   const mat4f& geomWorldTransfrom,
-	                   const ObjectLighting& lighting,
-	                   const EvaluatedModel& evalModel,
-	                   const InstanceDrawMods& instDrawMods);
 };
+
+
+SGE_CORE_API void drawGeometry(const RenderDestination& rdest,
+                               const ICamera& camera,
+                               const mat4f& geomWorldTransfrom,
+                               const ObjectLighting& lighting,
+                               const Geometry& geometry,
+                               const IMaterialData* mtlDataBase,
+                               const InstanceDrawMods& instDrawMods);
+
+SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
+                                const ICamera& camera,
+                                const mat4f& geomWorldTransfrom,
+                                const ObjectLighting& lighting,
+                                const EvaluatedModel& evalModel,
+                                const InstanceDrawMods& instDrawMods);
 
 
 } // namespace sge

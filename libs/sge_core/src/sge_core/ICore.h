@@ -10,6 +10,7 @@
 
 namespace sge {
 struct AssetLibrary;
+struct MaterialFamilyLibrary;
 struct QuickDraw;
 struct DebugDraw;
 struct BasicModelDraw;
@@ -61,13 +62,17 @@ struct SGE_CORE_API ICore {
 
 	/// @brief AssetLibrary is the "manager" of all loaded assets - 3d models, textures and others.
 	virtual AssetLibrary* getAssetLib() = 0;
+
+	/// @brief MaterialFamilyLibrary is the manager of all available materials trough the standard material
+	/// pipeline, enabling assets to define materials and then get rendered via @IGeometryDrawer.
+	virtual MaterialFamilyLibrary* getMaterialLib() = 0;
+
 	/// @brief QuickDraw provides an easy way to draw simple shapes, textures and text.
 	virtual QuickDraw& getQuickDraw() = 0;
+
 	/// @brief DebugDraw provides a way for the user to easily draw, from anywhere in code, lines, boxes, arrows and more.
 	/// The idea of this class is to help you visualize a particlar problem - maybe it is forces, collsion geometry, guides and more.
 	virtual DebugDraw& getDebugDraw() = 0;
-
-	virtual BasicModelDraw& getModelDraw() = 0;
 
 	virtual SGEDevice* getDevice() = 0;
 	virtual GraphicsResources& getGraphicsResources() = 0;

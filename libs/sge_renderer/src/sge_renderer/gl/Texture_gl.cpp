@@ -47,7 +47,7 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 		for (int iMipLevel = 0; iMipLevel < m_desc.texture2D.numMips; ++iMipLevel) {
 			if (isCompressed == false) {
 				// The next line is used in Emscripen debugging, as there is no way of breaking here.
-				SGE_DEBUG_LOG("glInternalFormat = %x glFormat = %x glType = %x\n", glInternalFormat, glFormat, glType);
+				sgeLogInfo("glInternalFormat = %x glFormat = %x glType = %x\n", glInternalFormat, glFormat, glType);
 				const void* initialDataForMipLevel = (initalData) ? initalData[iMipLevel].data : NULL;
 				glTexImage2D(GL_TEXTURE_2D, iMipLevel, glInternalFormat, width, height, 0, glFormat, glType, initialDataForMipLevel);
 				DumpAllGLErrors();

@@ -12,7 +12,7 @@ bool AssetModel3D::loadAssetFromFile(const char* const path) {
 	FileReadStream frs(path);
 
 	if (frs.isOpened() == false) {
-		SGE_DEBUG_ERR("Unable to find model asset: '%s'!\n", path);
+		sgeLogError("Unable to find model asset: '%s'!\n", path);
 		// sgeAssert(false);
 		return false;
 	}
@@ -24,7 +24,7 @@ bool AssetModel3D::loadAssetFromFile(const char* const path) {
 	const bool succeeded = modelReader.loadModel(loadSettings, &frs, m_model);
 
 	if (!succeeded) {
-		SGE_DEBUG_ERR("Unable to load model asset: '%s'!\n", path);
+		sgeLogError("Unable to load model asset: '%s'!\n", path);
 		// sgeAssert(false);
 		return false;
 	}
