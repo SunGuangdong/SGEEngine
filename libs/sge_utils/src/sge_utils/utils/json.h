@@ -10,7 +10,7 @@ namespace sge {
 class IReadStream;
 class IWriteStream;
 
-class JsonValueBuffer;
+struct JsonValueBuffer;
 
 /////////////////////////////////////////////////////////////////////////
 // Json control characters IDs
@@ -54,32 +54,6 @@ struct JsonExceptAccess {};
 // struct JsonValue
 /////////////////////////////////////////////////////////////////////////
 struct JsonValue {
-	static size_t GetElementSizeByJID(const JID jid) {
-		if (jid == JID_INT8)
-			return 1;
-		else if (jid == JID_INT16)
-			return 2;
-		else if (jid == JID_INT32)
-			return 4;
-		else if (jid == JID_INT64)
-			return 8;
-		else if (jid == JID_REAL16)
-			return 2;
-		else if (jid == JID_REAL32)
-			return 4;
-		else if (jid == JID_REAL64)
-			return 8;
-		else if (jid == JID_UINT8)
-			return 1;
-		else if (jid == JID_UINT16)
-			return 2;
-		else {
-			sgeAssert(false);
-		}
-
-		return 0;
-	}
-
 	void clear() {
 		jid = JID_NULL;
 		uniformData.clear();
@@ -87,7 +61,9 @@ struct JsonValue {
 		members.clear();
 	}
 
-	JsonValue() { clear(); }
+	JsonValue() {
+		clear();
+	}
 
 	//[TODO] HALF
 	union {
@@ -104,7 +80,9 @@ struct JsonValue {
 	};
 
 	// general setters
-	void setBool(const bool v) { jid = v ? JID_TRUE : JID_FALSE; }
+	void setBool(const bool v) {
+		jid = v ? JID_TRUE : JID_FALSE;
+	}
 	void setFloat(const float v);
 	void setInt32(const sint32 v);
 	void setUInt32(const uint32 v);
@@ -121,11 +99,19 @@ struct JsonValue {
 
 	// Array operators
 	JsonValue* arrPush(JsonValue* value); // returns value
-	size_t arrSize() const { return arrayValues.size(); }
-	const JsonValue* arrAt(const size_t index) const { return arrayValues[index]; }
-	const std::vector<JsonValue*>& arr() const { return arrayValues; }
+	size_t arrSize() const {
+		return arrayValues.size();
+	}
+	const JsonValue* arrAt(const size_t index) const {
+		return arrayValues[index];
+	}
+	const std::vector<JsonValue*>& arr() const {
+		return arrayValues;
+	}
 
-	const char* GetString() const { return (char*)uniformData.data(); }
+	const char* GetString() const {
+		return (char*)uniformData.data();
+	}
 	const char* GetStringOrThrow() const {
 		if (jid != JID_STRING) {
 			throw JsonExceptAccess();
@@ -243,9 +229,15 @@ struct JsonValue {
 		return true;
 	}
 
-	bool isArray() const { return jid == JID_ARRAY_BEGIN; }
-	bool isMap() const { return jid == JID_MAP_BEGIN; }
-	bool isString() const { return jid == JID_STRING; }
+	bool isArray() const {
+		return jid == JID_ARRAY_BEGIN;
+	}
+	bool isMap() const {
+		return jid == JID_MAP_BEGIN;
+	}
+	bool isString() const {
+		return jid == JID_STRING;
+	}
 
 	JID jid;                                // The ID of the variable type.
 	std::vector<unsigned char> uniformData; // Just a data buffer, currently used for strings.
@@ -258,14 +250,17 @@ struct JsonValue {
 /////////////////////////////////////////////////////////////////////////
 // JsonValueBuffer
 /////////////////////////////////////////////////////////////////////////
-class JsonValueBuffer {
+struct JsonValueBuffer {
   public:
 	//[TODO] ChunkSize is currently randomly hardcoded.
 	JsonValueBuffer(size_t ChunkSize = 100)
 	    : ChunkSize(ChunkSize)
-	    , m_pointer(0) {}
+	    , m_pointer(0) {
+	}
 
-	~JsonValueBuffer() { clearAllValues(); }
+	~JsonValueBuffer() {
+		clearAllValues();
+	}
 
 	// allocates a new value
 	JsonValue* GetNewValue();
@@ -299,13 +294,20 @@ class JsonValueBuffer {
 /////////////////////////////////////////////////////////////////////////
 class JsonParser : protected JsonValueBuffer {
   public:
-	JsonParser() {}
+	JsonParser() {
+	}
 	void Clear();
 
 	bool parse(IReadStream* instream);
-	JsonValue* getRoot() { return root; }
-	const JsonValue* getRoot() const { return root; }
-	const char* getErrorMsg() const { return parsingErrorMsg; }
+	JsonValue* getRoot() {
+		return root;
+	}
+	const JsonValue* getRoot() const {
+		return root;
+	}
+	const char* getErrorMsg() const {
+		return parsingErrorMsg;
+	}
 
   private:
 	JID getNextJID();                        // returns the JID of the next element

@@ -4,6 +4,7 @@
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtlGeomDrawer.h"
 #include "sge_core/materials/MaterialFamilyList.h"
 #include "sge_core/sgecore_api.h"
@@ -195,7 +196,8 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) {
 
 	// Register the DefaultPBR material family.
 	{
-		MaterialFamilyDesc pbrFd = {1001, "DefaultPBR", []() -> IGeometryDrawer* { return new DefaultPBRMtlGeomDrawer(); }};
+		MaterialFamilyDesc pbrFd = {1001, "DefaultPBR", []() -> IGeometryDrawer* { return new DefaultPBRMtlGeomDrawer(); },
+		                            []() -> std::shared_ptr<IMaterial> { return std::make_shared<DefaultPBRMtl>(); }};
 		getMaterialLib()->registerFamily(pbrFd);
 	}
 

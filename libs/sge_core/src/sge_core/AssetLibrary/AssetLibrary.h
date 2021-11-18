@@ -25,6 +25,7 @@ enum AssetIfaceType : int {
 	assetIface_spriteAnim,
 	assetIface_audio,
 	assetIface_text,
+	assetIface_mtl,
 
 	assetIface_count,
 };

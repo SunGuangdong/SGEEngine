@@ -1,5 +1,6 @@
 #include "TraitModel.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
+#include "sge_core/AssetLibrary/AssetMaterial.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_engine/EngineGlobal.h"
@@ -8,6 +9,7 @@
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/TypeRegister.h"
 #include "sge_engine/actors/ALocator.h"
+#include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 #include "sge_utils/loop.h"
 #include "sge_utils/stl_algorithm_ex.h"
@@ -219,7 +221,23 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 				const ModelNode* node = evalModel->m_model->nodeAt(iNode);
 				int numAttachments = int(node->meshAttachments.size());
 				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
-					IMaterial* mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex).get();
+
+					int mtlIndex = node->meshAttachments[iAttach].attachedMaterialIndex;
+
+					IMaterial* mtl = nullptr;
+					if (mtlIndex < modelSets.mtlOverrides.size()) {
+						if (modelSets.mtlOverrides[mtlIndex]) {
+							const AssetIface_Material* mtlIfaceAsset = getAssetIface<AssetIface_Material>(modelSets.mtlOverrides[mtlIndex]);
+							if (mtlIfaceAsset) {
+								mtl = mtlIfaceAsset->getMaterial().get();
+							}
+						}
+					}
+
+					if (mtl == nullptr) {
+						mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex).get();
+					}
+
 					IMaterialData* imtlData = mtl->getMaterialDataLocalStorage();
 
 					renderItem.pMtlData = imtlData;
@@ -306,13 +324,20 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 
 // Now do the UI for each available slot (keep in mind that we are keeping old slots (from previous models still
 // available).
-#if 0
+#if 1
+					modelSets.mtlOverrides.resize(loadedModelIface->getModel3D().numMaterials());
+
 					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Material Override")) {
 						for (int iMtl : rng_int(loadedModelIface->getModel3D().numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
 
 							const ModelMaterial* mtl = loadedModelIface->getModel3D().materialAt(iMtl);
 
+							AssetIfaceType types[] = {assetIface_mtl};
+							assetPicker(mtl->name.c_str(), modelSets.mtlOverrides[iMtl], getCore()->getAssetLib(), types, 1);
+
+
+#if 0
 							// ImGui::Text(loadedAsset->model.m_materials[t]->name.c_str());
 							// Check if override for this material already exists.
 							auto itrExisting = find_if(modelSets.m_materialOverrides, [&](const TraitModel::MaterialOverride& ovr) -> bool {
@@ -330,7 +355,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 									if (modelSets.m_materialOverrides[slotIndex].materialObjId.isNull()) {
 										if (ImGui::Button("Create New Material")) {
 											CmdObjectCreation* cmdMtlCreate = new CmdObjectCreation();
-											//cmdMtlCreate->setup(sgeTypeId(MDiffuseMaterial));
+											// cmdMtlCreate->setup(sgeTypeId(MDiffuseMaterial));
 											cmdMtlCreate->apply(&inspector);
 
 											CmdMemberChange* const cmdAssignMaterial = new CmdMemberChange();
@@ -364,6 +389,7 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 							} else {
 								sgeAssert(false && "The slot should have been created above.");
 							}
+#endif
 						}
 					}
 #endif

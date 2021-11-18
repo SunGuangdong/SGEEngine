@@ -8,7 +8,7 @@ namespace sge {
 
 class IReadStream;
 struct JsonValue;
-class JsonValueBuffer;
+struct JsonValueBuffer;
 
 struct GameWorld;
 struct ObjectId;

@@ -188,8 +188,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 	} else {
 		createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 		copyFile(aid.fileToImportPath.c_str(), fullAssetPath.c_str());
-		sgeLogWarn("Imported a files by just copying it as it is not recognized asset type!")
-		return true;
+		sgeLogWarn("Imported a files by just copying it as it is not recognized asset type!") return true;
 	}
 
 	return false;
@@ -516,6 +515,8 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						ImGui::Text(ICON_FK_FILE " Text");
 					} else if (m_importAssetToImportInPopup.assetType == assetIface_spriteAnim) {
 						ImGui::Text(ICON_FK_FILM " Sprite");
+					} else if (m_importAssetToImportInPopup.assetType == assetIface_mtl) {
+						ImGui::Text(ICON_FK_FLASK " Material");
 					} else {
 						ImGui::Text(ICON_FK_FILE_TEXT_O " Unknown, the file is going to be copyied!");
 						ImGui::Text("If you know the type of the asset you can override it below.");
@@ -526,6 +527,7 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						assetTypeNames[int(assetIface_texture2d)] = ICON_FK_PICTURE_O " Texture";
 						assetTypeNames[int(assetIface_text)] = ICON_FK_FILE " Text";
 						assetTypeNames[int(assetIface_spriteAnim)] = ICON_FK_FILM " Sprite";
+						assetTypeNames[int(assetIface_mtl)] = ICON_FK_FLASK " Material";
 
 						ImGuiEx::Label("Import As:");
 						if (ImGui::BeginCombo("##Import As: ", assetTypeNames[int(m_importAssetToImportInPopup.assetType)])) {

@@ -3,7 +3,7 @@
 #include "sge_core/sgecore_api.h"
 #include "sge_log/Log.h"
 #include "sge_utils/sge_utils.h"
-
+#include "sge_core/materials/IGeometryDrawer.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -11,13 +11,17 @@
 
 namespace sge {
 struct IGeometryDrawer;
+struct IMaterial;
+struct JsonValue;
 
 struct SGE_CORE_API MaterialFamilyDesc {
 	using GeometryDrawerAllocFn = IGeometryDrawer* (*)();
+	using MaterialAllocFn = std::shared_ptr<IMaterial> (*)();
 
 	uint32 familyUniqueNumber;
 	std::string displayName;
 	GeometryDrawerAllocFn geomDrawAllocFn = nullptr;
+	MaterialAllocFn mtlAllocFn = nullptr;
 };
 
 struct MaterialFamilyLibrary {
@@ -62,6 +66,8 @@ struct MaterialFamilyLibrary {
 
 		return nullptr;
 	}
+
+	std::shared_ptr<IMaterial> loadMaterialFromJson(const JsonValue* jRoot, const char* materialDirectory) const;
 
   private:
 	std::unordered_map<uint32, MaterialFamilyData> m_mtlFamilies;

@@ -9,6 +9,7 @@
 
 #include "AssetAudio.h"
 #include "AssetLibrary.h"
+#include "AssetMaterial.h"
 #include "AssetModel3D.h"
 #include "AssetSpriteAnim.h"
 #include "AssetText.h"
@@ -16,11 +17,9 @@
 #include "IAsset.h"
 #include "IAssetInterface.h"
 
-
 #include <filesystem>
 
 namespace sge {
-
 
 const char* assetIface_getName(const AssetIfaceType type) {
 	switch (type) {
@@ -34,6 +33,8 @@ const char* assetIface_getName(const AssetIfaceType type) {
 			return "Sprite Animation";
 		case assetIface_audio:
 			return "Audio";
+		case assetIface_mtl:
+			return "Material";
 		default:
 			sgeAssertFalse("Not implemented");
 			return "NotImplemented";
@@ -78,6 +79,9 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 		return assetIface_audio;
 	}
 
+	if (sge_stricmp(ext, "mtl") == 0) {
+		return assetIface_mtl;
+	}
 
 	return assetIface_unknown;
 }
@@ -144,6 +148,10 @@ AssetPtr AssetLibrary::newAsset(std::string assetPath, AssetIfaceType type) {
 		} break;
 		case sge::assetIface_text: {
 			auto assetTyped = newAsset<AssetText>(assetPath.c_str());
+			newlyLoadedAsset = assetTyped;
+		} break;
+		case sge::assetIface_mtl: {
+			auto assetTyped = newAsset<AssetMaterial>(assetPath.c_str());
 			newlyLoadedAsset = assetTyped;
 		} break;
 		default:
@@ -273,6 +281,9 @@ SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType t
 		case sge::assetIface_text:
 			return dynamic_cast<const IAssetInterface_Text*>(&asset) != nullptr;
 			break;
+		case sge::assetIface_mtl:
+			return dynamic_cast<const AssetIface_Material*>(&asset) != nullptr;
+			break;
 		default:
 			sgeAssert(false && "Not implemented asset interface type");
 			break;
@@ -307,6 +318,9 @@ SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetIfaceType type) {
 			break;
 		case sge::assetIface_text:
 			return dynamic_cast<IAssetInterface_Text*>(&asset) != nullptr;
+			break;
+		case sge::assetIface_mtl:
+			return dynamic_cast<AssetIface_Material*>(&asset) != nullptr;
 			break;
 		default:
 			break;

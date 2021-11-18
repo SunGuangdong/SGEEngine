@@ -1,11 +1,11 @@
 #include "IGeometryDrawer.h"
+#include "IMaterial.h"
 #include "MaterialFamilyList.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
+#include "sge_core/shaders/LightDesc.h"
 
 namespace sge {
-
-
 
 SGE_CORE_API void drawGeometry(const RenderDestination& rdest,
                                const ICamera& camera,

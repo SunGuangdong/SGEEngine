@@ -270,16 +270,16 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				material->metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
 				material->roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
 
-				if (const JsonValue* jTex = jMaterial->getMember("diffuseTextureName")) {
-					material->diffuseTextureName = jTex->GetString();
-				}
-
 				if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("alphaMultiplier")) {
 					material->alphaMultiplier = jNeedsAlphaSorting->getNumberAs<float>();
 				}
 
 				if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("needsAlphaSorting")) {
 					material->needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
+				}
+
+				if (const JsonValue* jTex = jMaterial->getMember("diffuseTextureName")) {
+					material->diffuseTextureName = jTex->GetString();
 				}
 
 				if (const JsonValue* jTex = jMaterial->getMember("emissionTextureName")) {

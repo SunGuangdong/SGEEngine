@@ -112,6 +112,8 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 		float alphaMultiplier = 1.f;
 		InstanceDrawMods instanceDrawMods;
 
+		std::vector<AssetPtr> mtlOverrides;
+
 		// External skeleton, useful for IK. Not sure for regular skinned meshes.
 		bool useSkeleton = false;
 		ObjectId rootSkeletonId;

@@ -51,21 +51,19 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
 	virtual IMaterialData* getMaterialDataLocalStorage() override;
 
-	virtual std::string toJson() override {
-		return std::string();
-	}
-
-	virtual void fromJson(const char* UNUSED(json)) override {
-	}
+	virtual JsonValue* toJson(JsonValueBuffer& jvb) override;
+	virtual bool fromJson(const JsonValue* jMtlRoot) override;
 
 
   public:
-	AssetPtr diffuseTexture;
-	AssetPtr texNormalMap;
+	AssetPtr texDiffuse;
+	AssetPtr texEmission;
 	AssetPtr texMetallic;
 	AssetPtr texRoughness;
+	AssetPtr texNormalMap;
 
 	vec4f diffuseColor = vec4f(1.f, 0.f, 1.f, 1.f);
+	vec4f emissionColor = vec4f(0.f);
 	float metallic = 1.f;
 	float roughness = 1.f;
 	bool needsAlphaSorting = false;

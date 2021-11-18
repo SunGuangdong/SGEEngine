@@ -192,7 +192,7 @@ void ModelWriter::writeMaterials() {
 		jMaterial->setMember("metallic", jvb(mtl->metallic));
 		jMaterial->setMember("roughness", jvb(mtl->roughness));
 
-		jMaterial->setMember("needsAlphaSorting", jvb(mtl->alphaMultiplier));
+		jMaterial->setMember("alphaMultiplier", jvb(mtl->alphaMultiplier));
 		jMaterial->setMember("needsAlphaSorting", jvb(mtl->needsAlphaSorting));
 
 		if (mtl->diffuseTextureName.empty() == false)
@@ -206,6 +206,9 @@ void ModelWriter::writeMaterials() {
 
 		if (mtl->roughnessTextureName.empty() == false)
 			jMaterial->setMember("roughnessTextureName", jvb(mtl->roughnessTextureName));
+
+		if (mtl->normalTextureName.empty() == false)
+			jMaterial->setMember("normalTextureName", jvb(mtl->normalTextureName));
 	}
 
 	return;

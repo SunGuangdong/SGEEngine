@@ -189,7 +189,7 @@ bool EvaluatedModel::evaluateMaterials() {
 		// Check if there is a diffuse texture attached here.
 		if (rawMaterial->diffuseTextureName.empty() == false) {
 			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->diffuseTextureName;
-			evalMtl->diffuseTexture = m_assetLibrary->getAssetFromFile(texPath.c_str());
+			evalMtl->texDiffuse = m_assetLibrary->getAssetFromFile(texPath.c_str());
 		}
 
 		// Normal map.

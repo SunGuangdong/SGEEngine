@@ -1,14 +1,14 @@
 #include "ModelPreviewWindow.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
+#include "sge_core/Camera.h"
+#include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include <imgui/imgui.h>
-#include "sge_core/materials/IGeometryDrawer.h"
-
-#include "sge_core/ICore.h"
 
 namespace sge {
 

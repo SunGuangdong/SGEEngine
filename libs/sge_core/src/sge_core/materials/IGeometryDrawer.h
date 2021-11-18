@@ -1,15 +1,15 @@
 #pragma once
 
 #include "sge_core/sgecore_api.h"
-#include "sge_core/shaders/LightDesc.h"
 #include "sge_utils/math/mat4.h"
-
-#include "IMaterial.h"
+#include "sge_utils/math/Box.h"
 
 namespace sge {
 
 struct Texture;
 struct Geometry;
+struct LightDesc;
+struct IMaterialData;
 
 //------------------------------------------------------------
 // ShadingLightData
