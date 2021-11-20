@@ -20,16 +20,29 @@ struct TypeId {
 	int id;
 
 	explicit TypeId(int const id = 0)
-	    : id(id) {}
+	    : id(id) {
+	}
 
-	bool isNull() const { return id == 0; }
+	bool isNull() const {
+		return id == 0;
+	}
 
-	bool isValid() const { return id != 0; }
+	bool isValid() const {
+		return id != 0;
+	}
 
-	bool operator<(const TypeId& r) const { return id < r.id; }
-	bool operator>(const TypeId& r) const { return id > r.id; }
-	bool operator==(const TypeId& r) const { return id == r.id; }
-	bool operator!=(const TypeId& r) const { return id != r.id; }
+	bool operator<(const TypeId& r) const {
+		return id < r.id;
+	}
+	bool operator>(const TypeId& r) const {
+		return id > r.id;
+	}
+	bool operator==(const TypeId& r) const {
+		return id == r.id;
+	}
+	bool operator!=(const TypeId& r) const {
+		return id != r.id;
+	}
 #else
 	int hash = 0;
 	std::string name;
@@ -42,13 +55,25 @@ struct TypeId {
 		}
 	}
 
-	bool isNull() const { return hash == 0 && name.empty(); }
-	bool isValid() const { return isNull() == false; }
+	bool isNull() const {
+		return hash == 0 && name.empty();
+	}
+	bool isValid() const {
+		return isNull() == false;
+	}
 
-	bool operator<(const TypeId& r) const { return hash < r.hash; }
-	bool operator>(const TypeId& r) const { return hash > r.hash; }
-	bool operator==(const TypeId& r) const { return hash == r.hash && name == r.name; }
-	bool operator!=(const TypeId& r) const { return hash != r.hash || name != r.name; }
+	bool operator<(const TypeId& r) const {
+		return hash < r.hash;
+	}
+	bool operator>(const TypeId& r) const {
+		return hash > r.hash;
+	}
+	bool operator==(const TypeId& r) const {
+		return hash == r.hash && name == r.name;
+	}
+	bool operator!=(const TypeId& r) const {
+		return hash != r.hash || name != r.name;
+	}
 #endif
 };
 
@@ -59,12 +84,16 @@ namespace std {
 #if 1
 template <>
 struct hash<sge::TypeId> {
-	int operator()(const sge::TypeId& k) const { return k.id; }
+	int operator()(const sge::TypeId& k) const {
+		return k.id;
+	}
 };
 #else
 template <>
 struct hash<sge::TypeId> {
-	int operator()(const sge::TypeId& k) const { return k.hash; }
+	int operator()(const sge::TypeId& k) const {
+		return k.hash;
+	}
 };
 #endif
 } // namespace std
@@ -98,20 +127,20 @@ TypeId sgeTypeIdFn() {
 /// to use id same id in different libraries (dlls/so and so on) where
 /// the function specialization isn't acessible.
 #if 1
-#define RelfAddTypeIdInline(T, _id)        \
+#define RelfAddTypeIdInline(T, _id)       \
 	template <>                           \
 	inline TypeId sge::sgeTypeIdFn<T>() { \
 		return TypeId(_id);               \
 	}
 
 #ifdef SGE_ENGINE_BUILDING_DLL
-#define RelfAddTypeId(T, _id)                 \
+#define RelfAddTypeId(T, _id)                \
 	template <>                              \
 	SGE_ENGINE_API TypeId sgeTypeIdFn<T>() { \
 		return TypeId(_id);                  \
 	}
 #else
-#define RelfAddTypeId(T, _id)  \
+#define RelfAddTypeId(T, _id) \
 	template <>               \
 	TypeId sgeTypeIdFn<T>() { \
 		return TypeId(_id);   \
@@ -126,13 +155,13 @@ TypeId sgeTypeIdFn() {
 #if 1
 #ifdef SGE_ENGINE_BUILDING_DLL
 #define RelfAddTypeIdExists(T) \
-	struct T;                 \
-	template <>               \
+	struct T;                  \
+	template <>                \
 	SGE_ENGINE_API TypeId sgeTypeIdFn<T>();
 #else
 #define RelfAddTypeIdExists(T) \
-	struct T;                 \
-	template <>               \
+	struct T;                  \
+	template <>                \
 	TypeId sgeTypeIdFn<T>();
 #endif
 #else
@@ -165,16 +194,7 @@ constexpr int sge_offsetof_inheritance() {
 namespace sge {
 
 struct GameObject;
-struct Actor;
-struct OMaterial;
-struct Script;
-struct GameUpdateSets;
-
 struct TypeDesc;
-
-//-----------------------------------------------------
-//
-//-----------------------------------------------------
 
 // TODO: These here are a bit "game" specific so I maybe should find a better place for them.
 enum MemberFieldFlags : unsigned {
@@ -203,12 +223,20 @@ struct SGE_ENGINE_API MemberDesc {
 	TypeId inheritedForm;
 	unsigned int flags = 0;
 
-	bool isEditable() const { return (flags & MFF_NonEditable) == 0; }
+	bool isEditable() const {
+		return (flags & MFF_NonEditable) == 0;
+	}
 
-	bool isSaveable() const { return (flags & MFF_NonSaveable) == 0; }
+	bool isSaveable() const {
+		return (flags & MFF_NonSaveable) == 0;
+	}
 
-	bool isGettable() const { return getDataFn != nullptr; }
-	bool isSetable() const { return setDataFn != nullptr; }
+	bool isGettable() const {
+		return getDataFn != nullptr;
+	}
+	bool isSetable() const {
+		return setDataFn != nullptr;
+	}
 
 	void (*getDataFn)(void* object, void* dest) = nullptr;
 	void (*setDataFn)(void* object, const void* src) = nullptr;
@@ -225,8 +253,9 @@ struct SGE_ENGINE_API MemberDesc {
 		float max_float;
 	};
 
-	// The function will work only if the very 1st type is used for @T (basically the root of the hierarchy)
-	// Or if the same type of the owner of this member is used. No types in between.
+	/// Checks if the current member is the one passed a function argument.
+	/// The function will work only if the very 1st type is used for @T (basically the root of the hierarchy)
+	/// Or if the same type of the owner of this member is used. No types in between.
 	template <typename T, typename M>
 	bool is(M T::*memberPtr) const;
 };
@@ -450,11 +479,6 @@ struct SGE_ENGINE_API TypeDesc {
 		return *this;
 	}
 
-	TypeDesc& gameObjectCategory(const char* category) {
-		gameObjectDesc.category = category;
-		return *this;
-	}
-
 	/// Registers an enum value associated to with this type.
 	TypeDesc& addEnumMember(int member, const char* name);
 
@@ -499,7 +523,8 @@ struct SGE_ENGINE_API TypeDesc {
 		int byteOffset = 0;
 	};
 
-	std::vector<SuperClassData> superclasses; // Who are we inheriting from basically.
+	/// A list of all inherited types.
+	std::vector<SuperClassData> superclasses; 
 
 	void (*copyFn)(void* dest, const void* src) = nullptr;
 	bool (*equalsFn)(const void* a, const void* b) = nullptr;
@@ -508,7 +533,7 @@ struct SGE_ENGINE_API TypeDesc {
 	void* (*newFn)() = nullptr;
 	void (*deleteFn)(void* ptr) = nullptr;
 
-	// std::vector functions.
+	/// std::vector functions.
 	size_t (*stdVectorSize)(const void* vector) = nullptr;
 	void (*stdVectorEraseAtIndex)(void* vector, size_t index) = nullptr;
 	void (*stdVectorEmplaceBack)(void* vector, void* data) = nullptr;
@@ -516,16 +541,14 @@ struct SGE_ENGINE_API TypeDesc {
 	void* (*stdVectorGetElement)(void* vector, size_t index) = nullptr;
 	const void* (*stdVectorGetElementConst)(const void* vector, size_t index) = nullptr;
 
+	/// std::map functions
 	size_t (*stdMapSize)(void* umap) = nullptr;
 	void (*stdMapGetNthPair)(void* umap, size_t idx, void* outKey, void* outValue) = nullptr;
 	void (*stdMapGetPointerToValueByKey)(void* umap, const void* key, void* outValue) = nullptr;
 	void (*stdMapInsert)(void* umap, const void* key, const void* value) = nullptr;
 
-	// enums
+	/// Converts an enum value to string.
 	vector_map<int, const char*> enumValueToNameLUT;
-
-	// GameObject specific.
-	GameObjectTypeDesc gameObjectDesc;
 };
 
 } // namespace sge
@@ -634,14 +657,11 @@ struct SGE_ENGINE_API TypeLib {
 
 	MapTypes m_registeredTypes;
 
-	// Keep game specific things here.
-	std::set<TypeId> m_gameObjectTypes;
 	std::map<TypeId, bool> isCompleted;
 	std::vector<void (*)()> functionsToBeCalledThatWillRegisterTypes;
 };
 
 SGE_ENGINE_API int addFunctionThatDefinesTypesToTypeLibrary(void (*fnPtr)());
-
 
 /// typeLib() is a function used to access the global type register for the current binary.
 SGE_ENGINE_API TypeLib& typeLib();
@@ -665,7 +685,8 @@ struct MemberFieldChainKnot {
 	MemberFieldChainKnot() = default;
 	MemberFieldChainKnot(const MemberDesc* mfd, int arrayIdx = -1)
 	    : mfd(mfd)
-	    , arrayIdx(arrayIdx) {}
+	    , arrayIdx(arrayIdx) {
+	}
 
 	const MemberDesc* mfd = nullptr;
 
@@ -690,7 +711,9 @@ struct SGE_ENGINE_API MemberChain {
 		}
 	}
 
-	MemberChain(const MemberDesc* mfd, int arrayIdx = -1) { knots.emplace_back(MemberFieldChainKnot(mfd, arrayIdx)); }
+	MemberChain(const MemberDesc* mfd, int arrayIdx = -1) {
+		knots.emplace_back(MemberFieldChainKnot(mfd, arrayIdx));
+	}
 
 	const TypeDesc* getType() const {
 		if (knots.size() == 0)
@@ -715,7 +738,9 @@ struct SGE_ENGINE_API MemberChain {
 		return type->typeId;
 	}
 
-	bool add(const MemberDesc* mfd, int idx = -1) { return add(MemberFieldChainKnot(mfd, idx)); }
+	bool add(const MemberDesc* mfd, int idx = -1) {
+		return add(MemberFieldChainKnot(mfd, idx));
+	}
 	bool add(const MemberFieldChainKnot& knot);
 
 	const MemberDesc* getMemberDescIfNotIndexing() const {
@@ -769,6 +794,9 @@ struct SGE_ENGINE_API MemberChain {
 ///-------------------------------------------------------------------------------------------
 /// Other helper macros
 ///-------------------------------------------------------------------------------------------
+
+/// A macro that searches for a member in the specified type.
+/// This is just to reduce tying.
 #define sgeFindMember(Type, Member) typeLib().find<Type>()->findMember(&Type::Member)
 
 // The function will work only if the very 1st type is used for @T (basically the root of the hierarchy)

@@ -12,6 +12,7 @@
 #include "AssetSpriteAnim.h"
 #include "AssetText.h"
 #include "AssetTexture2D.h"
+#include "AssetMaterial.h"
 
 namespace sge {
 

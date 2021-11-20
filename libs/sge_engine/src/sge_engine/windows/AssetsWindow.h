@@ -20,7 +20,7 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 		/// The full path to the file we are about to import.
 		std::string fileToImportPath;
 		AssetIfaceType assetType;
-		
+
 		/// The directory where the imported file(s) will be.
 		std::string outputDir;
 		/// The filename with extension, of the output file.
@@ -35,9 +35,13 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 
   public:
 	AssetsWindow(std::string windowName, GameInspector& inspector);
-	bool isClosed() override { return !m_isOpened; }
+	bool isClosed() override {
+		return !m_isOpened;
+	}
 	void update(SGEContext* const sgecon, const InputState& is) override;
-	const char* getWindowName() const override { return m_windowName.c_str(); }
+	const char* getWindowName() const override {
+		return m_windowName.c_str();
+	}
 
 	void openAssetImport(const std::string& filename);
 
@@ -46,6 +50,11 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 
 	/// @brief Imports the specified asset with the specified settings.
 	bool importAsset(AssetImportData& aid);
+
+	void doPreviewAssetModel(const InputState& is, bool explorePreviewAssetChanged);
+	void doPreviewAssetTexture2D(AssetIface_Texture2D* texIface);
+	void doPreviewAssetMaterial(AssetIface_Material* texIface);
+
 
   private:
 	bool shouldOpenImportPopup = false;

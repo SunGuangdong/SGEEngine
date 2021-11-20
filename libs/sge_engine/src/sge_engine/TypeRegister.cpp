@@ -258,14 +258,6 @@ void TypeLib::performRegistration() {
 			break;
 		}
 	}
-
-	// Finally find all types that inherit Actor and cache them.
-	for (TypeLib::MapTypes::iterator itr = typeLib().m_registeredTypes.begin(); itr != typeLib().m_registeredTypes.end(); ++itr) {
-		// TODO: add that Object and Actor must be at 0 byte offset.
-		if (itr->second.doesInherits(sgeTypeId(GameObject)) && itr->second.newFn != nullptr) {
-			m_gameObjectTypes.insert(itr->first);
-		}
-	}
 }
 
 } // namespace sge

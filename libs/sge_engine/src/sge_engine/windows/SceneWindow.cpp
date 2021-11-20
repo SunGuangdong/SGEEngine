@@ -213,28 +213,25 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 			}
 
 			// Find everything that inherits GameObject and add a create function for it.
-			for (const TypeId& typeId : typeLib().m_gameObjectTypes) {
-				const TypeDesc* td = typeLib().find(typeId);
+			for (auto& typePair : typeLib().m_registeredTypes) {
+				if (typePair.second.doesInherits(sgeTypeId(GameObject)) && typePair.second.newFn != nullptr) {
+					const TypeDesc* typeDesc = &typePair.second;
 
-				if (td == nullptr) {
-					continue;
-				}
+					if (createActorFilter.PassFilter(typeDesc->name)) {
+						const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(
+						    getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId));
+						Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
-				if (createActorFilter.PassFilter(td->name)) {
-					const AssetIface_Texture2D* texIface =
-					    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(td->typeId));
-					Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
+						if (iconTexture) {
+							ImGui::Image(iconTexture, ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()));
+							ImGui::SameLine();
+						}
 
-
-					if (iconTexture) {
-						ImGui::Image(iconTexture, ImVec2(ImGui::GetFrameHeight(), ImGui::GetFrameHeight()));
-						ImGui::SameLine();
-					}
-
-					if (ImGui::MenuItem(td->name)) {
-						CmdObjectCreation* cmd = new CmdObjectCreation;
-						cmd->setup(td->typeId);
-						inspector->appendCommand(cmd, true);
+						if (ImGui::MenuItem(typeDesc->name)) {
+							CmdObjectCreation* cmd = new CmdObjectCreation;
+							cmd->setup(typeDesc->typeId);
+							inspector->appendCommand(cmd, true);
+						}
 					}
 				}
 			}

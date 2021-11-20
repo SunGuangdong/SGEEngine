@@ -319,34 +319,34 @@ SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, con
 			filter.Clear();
 		}
 
-		for (TypeId typeId : typeLib().m_gameObjectTypes) {
-			const TypeDesc* potentialType = typeLib().find(typeId);
-			if (potentialType == nullptr) {
-				continue;
-			}
+		for (auto& typePair : typeLib().m_registeredTypes) {
+			if (typePair.second.doesInherits(sgeTypeId(GameObject)) && typePair.second.newFn != nullptr) {
+				const TypeDesc* potentialType = &typePair.second;
 
-			if (!needsToInherit.isNull() && !potentialType->doesInherits(needsToInherit)) {
-				continue;
-			}
+				if (!needsToInherit.isNull() && !potentialType->doesInherits(needsToInherit)) {
+					continue;
+				}
 
 
-			if (!filter.PassFilter(potentialType->name)) {
-				continue;
-			}
+				if (!filter.PassFilter(potentialType->name)) {
+					continue;
+				}
 
-			const AssetIface_Texture2D* texIface =
-			    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
+				const AssetIface_Texture2D* texIface =
+				    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
 
-			Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
+				Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
-			ImGui::Image(iconTexture, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()));
-			ImGui::SameLine();
+				ImGui::Image(iconTexture, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()));
+				ImGui::SameLine();
 
-			if (ImGui::Selectable(potentialType->name)) {
-				ioValue = potentialType->typeId;
-				wasAssetPicked = true;
+				if (ImGui::Selectable(potentialType->name)) {
+					ioValue = potentialType->typeId;
+					wasAssetPicked = true;
+				}
 			}
 		}
+
 		ImGui::EndPopup();
 	}
 

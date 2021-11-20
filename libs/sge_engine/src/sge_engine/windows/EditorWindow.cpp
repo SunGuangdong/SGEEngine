@@ -628,9 +628,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGui::Separator();
 		ImGui::SameLine();
 
-
-
-		if (imageButton(m_assets.m_assetRebuildIcon)) {
+		if (imageButton(m_assets.m_orthoIcon)) {
 			getInspector().getWorld()->m_editorCamera.isOrthograhpic = !getInspector().getWorld()->m_editorCamera.isOrthograhpic;
 		}
 		ImGuiEx::TextTooltip("Toggle the orthographic/perspective mode of the preview camera.");

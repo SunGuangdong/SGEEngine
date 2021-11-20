@@ -258,7 +258,7 @@ void AssetsWindow::update_assetImport(SGEContext* const sgecon, const InputState
 	}
 }
 
-void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
+void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is) {
 	if (isClosed()) {
 		return;
 	}
@@ -613,143 +613,9 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 			ImGui::NextColumn();
 
 			if (AssetIface_Model3D* modelIface = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)) {
-				if (explorePreviewAssetChanged) {
-					AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
-					if (bboxModel.IsEmpty() == false) {
-						m_exploreModelPreviewWidget.camera.orbitPoint = bboxModel.center();
-						m_exploreModelPreviewWidget.camera.radius = bboxModel.diagonal().length() * 1.25f;
-						m_exploreModelPreviewWidget.camera.yaw = deg2rad(45.f);
-						m_exploreModelPreviewWidget.camera.pitch = deg2rad(45.f);
-					}
-				}
-
-				const Model& model = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getModel3D();
-				EvaluatedModel& staticEval = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval();
-
-				m_exploreModelPreviewWidget.doWidget(sgecon, is, staticEval);
-
-				ImGui::Text("Animation Count: %d", model.numAnimations());
-				for (int iAnim = 0; iAnim < model.numAnimations(); ++iAnim) {
-					ImGui::Text("\t%s", model.animationAt(iAnim)->animationName.c_str());
-				}
-
-				ImGui::Text("Node Count: %d", model.numNodes());
-				ImGui::Text("Mesh Count: %d", model.numMeshes());
-
-				for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
-					ImGui::Text("\t%s", model.meshAt(iMesh)->name.c_str());
-				}
-
-				ImGui::Text("Material Count: %d", model.numMaterials());
-				for (int iMtl = 0; iMtl < model.numMaterials(); ++iMtl) {
-					ImGui::Text("\t%s", model.materialAt(iMtl)->name.c_str());
-				}
-
+				doPreviewAssetModel(is, explorePreviewAssetChanged);
 			} else if (AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(explorePreviewAsset)) {
-				const Texture2DDesc& desc = texIface->getTexture()->getDesc().texture2D;
-				const ImVec2 availableContentSize = ImGui::GetContentRegionAvail();
-
-				const float imageSizeX = availableContentSize.x;
-				const float imageSizeY = desc.height * availableContentSize.x / float(desc.width);
-
-				ImGui::Image(texIface->getTexture(), ImVec2(imageSizeX, imageSizeY));
-
-
-
-				const auto getAddressModeName = [](TextureAddressMode::Enum mode) -> const char* {
-					switch (mode) {
-						case TextureAddressMode::Repeat:
-							return "Repeat";
-						case TextureAddressMode::ClampEdge:
-							return "Edge";
-						case TextureAddressMode::ClampBorder:
-							return "Border";
-
-						default:
-							return "Unknown";
-					}
-				};
-
-				const auto getFilterModeName = [](TextureFilter::Enum mode) -> const char* {
-					switch (mode) {
-						case TextureFilter::Min_Mag_Mip_Linear:
-							return "Linear (with mip mapping)";
-						case TextureFilter::Min_Mag_Mip_Point:
-							return "Point (with mip mapping)";
-						default:
-							return "Unknown";
-					}
-				};
-
-				const auto doAddressModeUI = [&getAddressModeName](const char* comboLabel, TextureAddressMode::Enum& mode) -> bool {
-					bool hadChange = false;
-					if (ImGui::BeginCombo(comboLabel, getAddressModeName(mode))) {
-						if (ImGui::Selectable(getAddressModeName(TextureAddressMode::Repeat))) {
-							mode = TextureAddressMode::Repeat;
-							hadChange = true;
-						}
-
-						if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampEdge))) {
-							mode = TextureAddressMode::ClampEdge;
-							hadChange = true;
-						}
-
-						if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampBorder))) {
-							mode = TextureAddressMode::ClampBorder;
-							hadChange = true;
-						}
-
-						ImGui::EndCombo();
-					}
-
-					return hadChange;
-				};
-
-				bool hadChange = false;
-
-				AssetTextureMeta texMeta = texIface->getTextureMeta();
-
-				ImGuiEx::Label("Semi-Transparent");
-				hadChange |= ImGui::Checkbox("##Semi Transparent", &texMeta.isSemiTransparent);
-
-				ImGuiEx::Label("Auto Generate MipMaps");
-				bool changedMipMapGen = ImGui::Checkbox("##Auto Generate MipMaps", &texMeta.shouldGenerateMips);
-				hadChange |= changedMipMapGen;
-				if (changedMipMapGen) {
-					getLog()->writeWarning("Auto MipMap generation will take effect after a restart!");
-				}
-
-				hadChange |= doAddressModeUI("Tiling X", texMeta.assetSamplerDesc.addressModes[0]);
-				hadChange |= doAddressModeUI("Tiling Y", texMeta.assetSamplerDesc.addressModes[1]);
-				hadChange |= doAddressModeUI("Tiling Z", texMeta.assetSamplerDesc.addressModes[2]);
-
-				if (ImGui::BeginCombo("Filtering", getFilterModeName(texMeta.assetSamplerDesc.filter))) {
-					if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Linear))) {
-						texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Linear;
-						hadChange = true;
-					}
-
-					if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Point))) {
-						texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Point;
-						hadChange = true;
-					}
-
-					ImGui::EndCombo();
-				}
-
-				if (hadChange) {
-					GpuHandle<SamplerState> sampler = getCore()->getDevice()->requestResource<SamplerState>();
-					sampler->create(texMeta.assetSamplerDesc);
-					texIface->setTextureMeta(texMeta);
-					texIface->getTexture()->setSamplerState(sampler);
-
-					// Save the modified settings to the *.info file of the texture.
-					if (AssetTexture2d* assetTex2d = dynamic_cast<AssetTexture2d*>(explorePreviewAsset.get())) {
-						assetTex2d->saveTextureSettingsToInfoFile();
-					} else {
-						sgeAssertFalse("It is expected that explorePreviewAsset is a AssetTexture2d");
-					}
-				}
+				doPreviewAssetTexture2D(texIface);
 			} else if (AssetIface_SpriteAnim* spriteIface = getAssetIface<AssetIface_SpriteAnim>(explorePreviewAsset)) {
 				if (AssetIface_Texture2D* spriteTexIface =
 				        getAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
@@ -772,6 +638,145 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 		}
 	}
 	ImGui::End();
+}
+
+void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreviewAssetChanged) {
+	if (explorePreviewAssetChanged) {
+		AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
+		if (bboxModel.IsEmpty() == false) {
+			m_exploreModelPreviewWidget.camera.orbitPoint = bboxModel.center();
+			m_exploreModelPreviewWidget.camera.radius = bboxModel.diagonal().length() * 1.25f;
+			m_exploreModelPreviewWidget.camera.yaw = deg2rad(45.f);
+			m_exploreModelPreviewWidget.camera.pitch = deg2rad(45.f);
+		}
+	}
+
+	const Model& model = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getModel3D();
+	EvaluatedModel& staticEval = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval();
+
+	m_exploreModelPreviewWidget.doWidget(getCore()->getDevice()->getContext(), is, staticEval);
+
+	ImGui::Text("Animation Count: %d", model.numAnimations());
+	for (int iAnim = 0; iAnim < model.numAnimations(); ++iAnim) {
+		ImGui::Text("\t%s", model.animationAt(iAnim)->animationName.c_str());
+	}
+
+	ImGui::Text("Node Count: %d", model.numNodes());
+	ImGui::Text("Mesh Count: %d", model.numMeshes());
+
+	for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
+		ImGui::Text("\t%s", model.meshAt(iMesh)->name.c_str());
+	}
+
+	ImGui::Text("Material Count: %d", model.numMaterials());
+	for (int iMtl = 0; iMtl < model.numMaterials(); ++iMtl) {
+		ImGui::Text("\t%s", model.materialAt(iMtl)->name.c_str());
+	}
+}
+
+void AssetsWindow::doPreviewAssetTexture2D(AssetIface_Texture2D* texIface) {
+	const Texture2DDesc& desc = texIface->getTexture()->getDesc().texture2D;
+	const ImVec2 availableContentSize = ImGui::GetContentRegionAvail();
+
+	const float imageSizeX = availableContentSize.x;
+	const float imageSizeY = desc.height * availableContentSize.x / float(desc.width);
+
+	ImGui::Image(texIface->getTexture(), ImVec2(imageSizeX, imageSizeY));
+
+	const auto getAddressModeName = [](TextureAddressMode::Enum mode) -> const char* {
+		switch (mode) {
+			case TextureAddressMode::Repeat:
+				return "Repeat";
+			case TextureAddressMode::ClampEdge:
+				return "Edge";
+			case TextureAddressMode::ClampBorder:
+				return "Border";
+
+			default:
+				return "Unknown";
+		}
+	};
+
+	const auto getFilterModeName = [](TextureFilter::Enum mode) -> const char* {
+		switch (mode) {
+			case TextureFilter::Min_Mag_Mip_Linear:
+				return "Linear (with mip mapping)";
+			case TextureFilter::Min_Mag_Mip_Point:
+				return "Point (with mip mapping)";
+			default:
+				return "Unknown";
+		}
+	};
+
+	const auto doAddressModeUI = [&getAddressModeName](const char* comboLabel, TextureAddressMode::Enum& mode) -> bool {
+		bool hadChange = false;
+		if (ImGui::BeginCombo(comboLabel, getAddressModeName(mode))) {
+			if (ImGui::Selectable(getAddressModeName(TextureAddressMode::Repeat))) {
+				mode = TextureAddressMode::Repeat;
+				hadChange = true;
+			}
+
+			if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampEdge))) {
+				mode = TextureAddressMode::ClampEdge;
+				hadChange = true;
+			}
+
+			if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampBorder))) {
+				mode = TextureAddressMode::ClampBorder;
+				hadChange = true;
+			}
+
+			ImGui::EndCombo();
+		}
+
+		return hadChange;
+	};
+
+	bool hadChange = false;
+
+	AssetTextureMeta texMeta = texIface->getTextureMeta();
+
+	ImGuiEx::Label("Semi-Transparent");
+	hadChange |= ImGui::Checkbox("##Semi Transparent", &texMeta.isSemiTransparent);
+
+	ImGuiEx::Label("Auto Generate MipMaps");
+	bool changedMipMapGen = ImGui::Checkbox("##Auto Generate MipMaps", &texMeta.shouldGenerateMips);
+	hadChange |= changedMipMapGen;
+	if (changedMipMapGen) {
+		getLog()->writeWarning("Auto MipMap generation will take effect after a restart!");
+	}
+
+	hadChange |= doAddressModeUI("Tiling X", texMeta.assetSamplerDesc.addressModes[0]);
+	hadChange |= doAddressModeUI("Tiling Y", texMeta.assetSamplerDesc.addressModes[1]);
+	hadChange |= doAddressModeUI("Tiling Z", texMeta.assetSamplerDesc.addressModes[2]);
+
+	if (ImGui::BeginCombo("Filtering", getFilterModeName(texMeta.assetSamplerDesc.filter))) {
+		if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Linear))) {
+			texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Linear;
+			hadChange = true;
+		}
+
+		if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Point))) {
+			texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Point;
+			hadChange = true;
+		}
+
+		ImGui::EndCombo();
+	}
+
+	if (hadChange) {
+		GpuHandle<SamplerState> sampler = getCore()->getDevice()->requestResource<SamplerState>();
+		sampler->create(texMeta.assetSamplerDesc);
+		texIface->setTextureMeta(texMeta);
+		texIface->getTexture()->setSamplerState(sampler);
+
+		// Save the modified settings to the *.info file of the texture.
+		if (AssetTexture2d* assetTex2d = dynamic_cast<AssetTexture2d*>(explorePreviewAsset.get())) {
+			assetTex2d->saveTextureSettingsToInfoFile();
+		} else {
+			sgeAssertFalse("It is expected that explorePreviewAsset is a AssetTexture2d");
+		}
+	}
 }
 
 } // namespace sge

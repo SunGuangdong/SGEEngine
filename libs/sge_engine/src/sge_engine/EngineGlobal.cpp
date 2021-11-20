@@ -27,14 +27,17 @@ void EngineGlobalAssets::initialize() {
 
 	unknownObjectIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/obj/UnknownObject.png");
 
-	sgeAssert(typeLib().m_gameObjectTypes.empty() == false && "Aren't you calling this too early?");
+	// Find each type that inherits GameObject and try to load an icon for it.
+	for (auto& typePair : typeLib().m_registeredTypes) {
+		if (typePair.second.doesInherits(sgeTypeId(GameObject)) && typePair.second.newFn != nullptr) {
+			TypeId typeId = typePair.first;
 
-	for (const auto& typeId : typeLib().m_gameObjectTypes) {
-		const TypeDesc* td = typeLib().find(typeId);
-		std::string assetName = "assets/editor/textures/icons/obj/" + std::string(td->name) + ".png";
-		AssetPtr asset = getCore()->getAssetLib()->getAssetFromFile(assetName.c_str());
-		if (isAssetLoaded(asset)) {
-			perObjectTypeIcon[typeId] = asset;
+			const TypeDesc* td = typeLib().find(typeId);
+			std::string assetName = "assets/editor/textures/icons/obj/" + std::string(td->name) + ".png";
+			AssetPtr asset = getCore()->getAssetLib()->getAssetFromFile(assetName.c_str());
+			if (isAssetLoaded(asset)) {
+				perObjectTypeIcon[typeId] = asset;
+			}
 		}
 	}
 }

@@ -186,7 +186,6 @@ struct SGE_CORE_API EvaluatedModel {
 
 	AABox3f aabox;
 
-
 	// Temporaries used to avoid allocating memory again and again for each evaluation.
 	std::vector<mat4f> bonesTransformTexDataForAllMeshes;
 };
