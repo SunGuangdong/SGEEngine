@@ -1,5 +1,5 @@
 #include "sge_engine/GameWorld.h"
-#include "sge_engine/TypeRegister.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_utils/utils/strings.h"
 
 #include "Actor.h"

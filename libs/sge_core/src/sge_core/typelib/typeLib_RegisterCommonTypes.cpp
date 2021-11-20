@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#include "TypeRegister.h"
+#include "typeLib.h"
 
 namespace sge {
 

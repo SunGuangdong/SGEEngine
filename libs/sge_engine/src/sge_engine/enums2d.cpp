@@ -1,5 +1,5 @@
 #include "enums2d.h"
-#include "sge_engine/TypeRegister.h"
+#include "sge_core/typelib/typeLib.h"
 
 namespace sge {
 

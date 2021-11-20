@@ -24,7 +24,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GamePlayerSettings.h"
 #include "sge_engine/IPlugin.h"
-#include "sge_engine/TypeRegister.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/setImGuiContextEngine.h"
 #include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"

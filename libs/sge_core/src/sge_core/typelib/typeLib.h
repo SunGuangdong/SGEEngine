@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_engine/sge_engine_api.h"
+#include "sge_core/sgecore_api.h"
 #include "sge_utils/utils/TypeTraits.h"
 #include "sge_utils/utils/hash_combine.h"
 #include "sge_utils/utils/vector_map.h"
@@ -133,17 +133,17 @@ TypeId sgeTypeIdFn() {
 		return TypeId(_id);               \
 	}
 
-#ifdef SGE_ENGINE_BUILDING_DLL
-#define RelfAddTypeId(T, _id)                \
-	template <>                              \
-	SGE_ENGINE_API TypeId sgeTypeIdFn<T>() { \
-		return TypeId(_id);                  \
+#ifdef SGE_CORE_BUILDING_DLL
+#define RelfAddTypeId(T, _id)              \
+	template <>                            \
+	SGE_CORE_API TypeId sgeTypeIdFn<T>() { \
+		return TypeId(_id);                \
 	}
 #else
-#define RelfAddTypeId(T, _id) \
-	template <>               \
-	TypeId sgeTypeIdFn<T>() { \
-		return TypeId(_id);   \
+#define RelfAddTypeId(T, _id)              \
+	template <>                            \
+	SGE_CORE_API TypeId sgeTypeIdFn<T>() { \
+		return TypeId(_id);                \
 	}
 #endif
 #else
@@ -153,11 +153,11 @@ TypeId sgeTypeIdFn() {
 
 // Mark that the type id already exists, this is used for situations were we
 #if 1
-#ifdef SGE_ENGINE_BUILDING_DLL
+#ifdef SGE_CORE_BUILDING_DLL
 #define RelfAddTypeIdExists(T) \
 	struct T;                  \
 	template <>                \
-	SGE_ENGINE_API TypeId sgeTypeIdFn<T>();
+	SGE_CORE_API TypeId sgeTypeIdFn<T>();
 #else
 #define RelfAddTypeIdExists(T) \
 	struct T;                  \
@@ -206,7 +206,7 @@ enum MemberFieldFlags : unsigned {
 	MFF_PrefabDontCopy = 1 << 5,
 };
 
-struct SGE_ENGINE_API MemberDesc {
+struct SGE_CORE_API MemberDesc {
 	MemberDesc() {
 		min_int = 0;
 		max_int = 0;
@@ -271,7 +271,7 @@ struct GameObjectTypeDesc {
 	const char* category = nullptr; // a category used in the interface for grouping of game objects in menus.
 };
 
-struct SGE_ENGINE_API TypeDesc {
+struct SGE_CORE_API TypeDesc {
 	static std::string computePrettyName(const char* const name);
 
 	template <typename T>
@@ -524,7 +524,7 @@ struct SGE_ENGINE_API TypeDesc {
 	};
 
 	/// A list of all inherited types.
-	std::vector<SuperClassData> superclasses; 
+	std::vector<SuperClassData> superclasses;
 
 	void (*copyFn)(void* dest, const void* src) = nullptr;
 	bool (*equalsFn)(const void* a, const void* b) = nullptr;
@@ -561,7 +561,7 @@ namespace sge {
 //-----------------------------------------------------
 //
 //-----------------------------------------------------
-struct SGE_ENGINE_API TypeLib {
+struct SGE_CORE_API TypeLib {
 	using MapTypes = std::map<TypeId, TypeDesc>;
 
 	template <typename T>
@@ -661,10 +661,10 @@ struct SGE_ENGINE_API TypeLib {
 	std::vector<void (*)()> functionsToBeCalledThatWillRegisterTypes;
 };
 
-SGE_ENGINE_API int addFunctionThatDefinesTypesToTypeLibrary(void (*fnPtr)());
+SGE_CORE_API int addFunctionThatDefinesTypesToTypeLibrary(void (*fnPtr)());
 
 /// typeLib() is a function used to access the global type register for the current binary.
-SGE_ENGINE_API TypeLib& typeLib();
+SGE_CORE_API TypeLib& typeLib();
 
 template <typename T, typename TParent>
 inline TypeDesc& TypeDesc::inherits() {
@@ -697,7 +697,7 @@ struct MemberFieldChainKnot {
 /// MemberChain
 /// Is a way to refer to a remote member (member of a member of a member ...)
 /// in some memory. The structure belives you that the chain start from the correct type.
-struct SGE_ENGINE_API MemberChain {
+struct SGE_CORE_API MemberChain {
 	MemberChain() = default;
 
 	MemberChain(std::initializer_list<MemberFieldChainKnot> l) {

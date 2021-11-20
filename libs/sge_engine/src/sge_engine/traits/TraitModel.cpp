@@ -7,7 +7,7 @@
 #include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
-#include "sge_engine/TypeRegister.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/actors/ALocator.h"
 #include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"

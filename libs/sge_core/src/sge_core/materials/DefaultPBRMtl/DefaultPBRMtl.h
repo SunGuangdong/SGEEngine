@@ -54,7 +54,6 @@ struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
 	virtual JsonValue* toJson(JsonValueBuffer& jvb) override;
 	virtual bool fromJson(const JsonValue* jMtlRoot) override;
 
-
   public:
 	AssetPtr texDiffuse;
 	AssetPtr texEmission;

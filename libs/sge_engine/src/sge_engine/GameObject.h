@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TypeRegister.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/typelibHelper.h"
 #include "sge_engine_api.h"
 #include "sge_utils/utils/basetypes.h"
