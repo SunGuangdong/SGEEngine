@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IImGuiWindow.h"
-#include "ModelPreviewWindow.h"
+#include "../IImGuiWindow.h"
+#include "../ModelPreviewWindow.h"
 #include "imgui/imgui.h"
 #include "sgeImportFBXFile.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"

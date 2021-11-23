@@ -10,7 +10,7 @@ namespace sge {
 //-----------------------------------------------------------
 // TraitRigidBody
 //-----------------------------------------------------------
-RelfAddTypeId(TraitRigidBody, 20'03'06'0001);
+ReflAddTypeId(TraitRigidBody, 20'03'06'0001);
 TraitRigidBody::~TraitRigidBody() {
 	if (m_rigidBody.isValid()) {
 		this->destroyRigidBody();

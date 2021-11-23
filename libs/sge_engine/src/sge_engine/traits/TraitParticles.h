@@ -162,7 +162,7 @@ struct SGE_ENGINE_API ParticleGroupState {
 //--------------------------------------------------------------
 // TraitParticlesSimple
 //--------------------------------------------------------------
-RelfAddTypeIdExists(TraitParticlesSimple);
+ReflAddTypeIdExists(TraitParticlesSimple);
 struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 	SGE_TraitDecl_Full(TraitParticlesSimple);
 
@@ -181,7 +181,7 @@ struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 //--------------------------------------------------------------
 // TraitParticlesProgrammable
 //--------------------------------------------------------------
-RelfAddTypeIdExists(TraitParticlesProgrammable);
+ReflAddTypeIdExists(TraitParticlesProgrammable);
 struct SGE_ENGINE_API TraitParticlesProgrammable : public Trait {
 	SGE_TraitDecl_BaseFamily(TraitParticlesProgrammable);
 

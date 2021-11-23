@@ -270,7 +270,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	paramsCb.uRoughness = mtlData.roughness;
 	paramsCb.uSkinningFirstBoneOffsetInTex = geometry.firstBoneOffset;
 	paramsCb.uPBRMtlFlags = pbrMtlFlags;
-	paramsCb.alphaMultiplier = mtlData.alphaMultiplier;
+	paramsCb.alphaMultiplier = mtlData.alphaMultipler;
+	paramsCb.uvwTransform = mtlData.uvwTransform;
 
 	if (mtlData.diffuseTexture) {
 		shaderPerm.bind<64>(uniforms, uTexDiffuse, (void*)mtlData.diffuseTexture);

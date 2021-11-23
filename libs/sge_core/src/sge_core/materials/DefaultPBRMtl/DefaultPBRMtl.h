@@ -24,26 +24,20 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 	mat4f uvwTransform = mat4f::getIdentity();
 
 	vec4f diffuseColor = vec4f(1.f, 1.f, 1.f, 1.f);
-	Texture* texNormalMap = nullptr;
-	Texture* diffuseTexture = nullptr;
-	Texture* diffuseTextureX = nullptr; // Triplanar x-axis texture.
-	Texture* diffuseTextureY = nullptr; // Triplanar y-axis texture.
-	Texture* diffuseTextureZ = nullptr; // Triplanar z-axis texture.
 
+	Texture* diffuseTexture = nullptr;
 	Texture* texMetalness = nullptr;
 	Texture* texRoughness = nullptr;
+
+	Texture* texNormalMap = nullptr;
 
 	vec3f diffuseTexXYZScaling = vec3f(1.f); // Triplanar scaling for each axis.
 
 	DiffuseColorSource diffuseColorSrc = diffuseColorSource_constantColor;
 	bool tintByVertexColor = false;
 
-	vec4f fluidColor0 = vec4f(1.f);
-	vec4f fluidColor1 = vec4f(1.f);
-
 	float metalness = 0.f;
-	float roughness = 0.30f;
-	float alphaMultiplier = 1.f;
+	float roughness = 1.f;
 
 	bool disableCulling = false;
 };
@@ -51,22 +45,31 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
 	virtual IMaterialData* getMaterialDataLocalStorage() override;
 
+	TypeId getTypeId() const override;
+
 	virtual JsonValue* toJson(JsonValueBuffer& jvb) override;
 	virtual bool fromJson(const JsonValue* jMtlRoot) override;
 
   public:
+	bool needsAlphaSorting = false;
+	float alphaMultiplier = 1.f;
+
 	AssetPtr texDiffuse;
 	AssetPtr texEmission;
 	AssetPtr texMetallic;
 	AssetPtr texRoughness;
 	AssetPtr texNormalMap;
 
-	vec4f diffuseColor = vec4f(1.f, 0.f, 1.f, 1.f);
+	vec4f diffuseColor = vec4f(1.f);
 	vec4f emissionColor = vec4f(0.f);
-	float metallic = 1.f;
+	float metallic = 0.f;
 	float roughness = 1.f;
-	bool needsAlphaSorting = false;
-	float alphaMultiplier = 1.f;
+
+	bool disableCulling = false;
+
+	vec2f uvShift = vec2f(0.f);
+	vec2f uvScale = vec2f(1.f);
+	float uvRotation = 0.f;
 
 	DefaultPBRMtlData mdlData;
 };

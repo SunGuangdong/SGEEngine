@@ -9,7 +9,7 @@ struct EvaluatedModel;
 
 /// @brief TraitRigidBody provides a trait for Actors to have a rigid body in the physics world.
 struct TraitRigidBody;
-RelfAddTypeIdExists(TraitRigidBody);
+ReflAddTypeIdExists(TraitRigidBody);
 struct SGE_ENGINE_API TraitRigidBody : public Trait {
 	SGE_TraitDecl_Full(TraitRigidBody);
 

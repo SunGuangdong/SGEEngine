@@ -32,7 +32,7 @@ struct TraitModelRenderItem;
 ///    In that way you have a generic actor type that could be configured to your desiers.
 ///    In order for the game object to take into account the change you need in your Actor::postUpdate to
 ///    to update the trait, see if the model has been changed and maybe update the rigid body for that actor.
-RelfAddTypeIdExists(TraitModel);
+ReflAddTypeIdExists(TraitModel);
 struct SGE_ENGINE_API TraitModel : public Trait {
 	SGE_TraitDecl_Full(TraitModel);
 

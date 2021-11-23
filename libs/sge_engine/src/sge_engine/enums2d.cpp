@@ -4,8 +4,8 @@
 namespace sge {
 
 // clang-format off
-RelfAddTypeId(Anchor, 20'03'01'0003);
-RelfAddTypeId(Billboarding, 20'03'01'0002);
+ReflAddTypeId(Anchor, 20'03'01'0003);
+ReflAddTypeId(Billboarding, 20'03'01'0002);
 
 ReflBlock() {
 	ReflAddType(Billboarding)

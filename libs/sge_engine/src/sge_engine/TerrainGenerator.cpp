@@ -4,7 +4,7 @@
 
 namespace sge {
 // clang-format off
-RelfAddTypeId(StairsDesc, 20'03'02'0009);
+ReflAddTypeId(StairsDesc, 20'03'02'0009);
 ReflBlock() {
 	ReflAddType(StairsDesc)
 		ReflMember(StairsDesc, numStairs)
@@ -14,7 +14,7 @@ ReflBlock() {
 	;
 }
 
-RelfAddTypeId(SlopeDesc, 20'03'02'0010);
+ReflAddTypeId(SlopeDesc, 20'03'02'0010);
 ReflBlock() {
 	ReflAddType(SlopeDesc)
 		ReflMember(SlopeDesc, width)
@@ -23,7 +23,7 @@ ReflBlock() {
 	;
 }
 
-RelfAddTypeId(SlantedBlockDesc, 20'10'27'0002);
+ReflAddTypeId(SlantedBlockDesc, 20'10'27'0002);
 ReflBlock() {
 	ReflAddType(SlantedBlockDesc)
 		ReflMember(SlantedBlockDesc, width)
@@ -33,7 +33,7 @@ ReflBlock() {
 	;
 }
 
-RelfAddTypeId(SimpleObstacleType, 20'03'02'0011);
+ReflAddTypeId(SimpleObstacleType, 20'03'02'0011);
 ReflBlock() {
 	ReflAddType(SimpleObstacleType)
 		ReflEnumVal((int)SimpleObstacleType::Stairs, "Stairs")
@@ -43,7 +43,7 @@ ReflBlock() {
 
 }
 
-RelfAddTypeId(SimpleObstacleDesc, 20'03'02'0012);
+ReflAddTypeId(SimpleObstacleDesc, 20'03'02'0012);
 ReflBlock() {
 	ReflAddType(SimpleObstacleDesc)
 		ReflMember(SimpleObstacleDesc, type)

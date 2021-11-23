@@ -5,7 +5,7 @@
 
 namespace sge {
 
-RelfAddTypeIdExists(Script);
+ReflAddTypeIdExists(Script);
 struct SGE_ENGINE_API Script : public GameObject {};
 
 } // namespace sge

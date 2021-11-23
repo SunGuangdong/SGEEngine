@@ -2,16 +2,19 @@
 
 #include "AssetsWindow.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
+#include "MaterialEditWindow.h"
 #include "ModelParseSettings.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/materials/MaterialFamilyList.h"
 #include "sge_core/model/ModelReader.h"
 #include "sge_core/model/ModelWriter.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/ui/ImGuiDragDrop.h"
+#include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/Path.h"
@@ -319,6 +322,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 				}
 
 				bool shouldOpenNewFolderPopup = false;
+				bool shouldOpenNewMaterialPopup = false;
 
 				std::string label;
 				fs::path pathToAssets = assetLib->getAssetsDirAbs();
@@ -405,6 +409,13 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 
 					if (ImGui::MenuItem(ICON_FK_FOLDER " New Folder")) {
 						shouldOpenNewFolderPopup = true;
+					}
+
+					if (ImGui::BeginMenu(ICON_FK_PLUS " Create")) {
+						if (ImGui::MenuItem(ICON_FK_PAINT_BRUSH " Material")) {
+							shouldOpenNewMaterialPopup = true;
+						}
+						ImGui::EndMenu();
 					}
 
 					if (!m_rightClickedPath.empty()) {
@@ -601,6 +612,58 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 						directoryTree.emplace_back(std::move(dirToAdd));
 					}
 				}
+
+				// Create Material Popup.
+				{
+					if (shouldOpenNewMaterialPopup) {
+						ImGui::OpenPopup("SGE Assets Window Create Material");
+					}
+
+					static char newMtlName[1024] = {0};
+					static std::string newMtlFamily = "DefaultPBR";
+					if (ImGui::BeginPopup("SGE Assets Window Create Material")) {
+						auto& allFamilies = getCore()->getMaterialLib()->getAllFamilies();
+
+						if (ImGui::BeginCombo("Family", newMtlFamily.c_str())) {
+							for (auto& family : allFamilies) {
+								if (ImGui::Selectable(family.second.familyDesc.displayName.c_str())) {
+									newMtlFamily = family.second.familyDesc.displayName;
+								}
+							}
+
+							ImGui::EndCombo();
+						}
+
+						ImGui::InputText(ICON_FK_FILE " Name", newMtlName, SGE_ARRSZ(newMtlName));
+
+						if (ImGui::Button(ICON_FK_CHECK " Create")) {
+							const MaterialFamilyLibrary::MaterialFamilyData* mtlFamData =
+							    getCore()->getMaterialLib()->findFamilyByName(newMtlFamily.c_str());
+
+							if (mtlFamData) {
+								std::shared_ptr<IMaterial> newMtl = mtlFamData->familyDesc.mtlAllocFn();
+
+								JsonValueBuffer jvb;
+								JsonValue* jMtlRoot = newMtl->toJson(jvb);
+
+								JsonWriter jw;
+								std::string mtlFilename = (pathToAssets.string() + "/" + std::string(newMtlName) + ".mtl").c_str();
+								jw.WriteInFile(mtlFilename.c_str(), jMtlRoot, true);
+								newMtlName[0] = '\0';
+							}
+
+							ImGui::CloseCurrentPopup();
+						}
+
+
+						if (ImGui::Button("Cancel")) {
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+				}
+
 			}
 
 
@@ -622,6 +685,19 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 					auto desc = spriteTexIface->getTexture()->getDesc().texture2D;
 					ImVec2 sz = ImGui::GetContentRegionAvail();
 					ImGui::Image(spriteTexIface->getTexture(), sz);
+				}
+			} else if (AssetIface_Material* mtlIface = getAssetIface<AssetIface_Material>(explorePreviewAsset)) {
+				if (ImGui::Button(ICON_FK_PICTURE_O " Edit Material")) {
+					std::shared_ptr<IMaterial> mtl = mtlIface->getMaterial();
+
+					MaterialEditWindow* mtlEditWnd =
+					    dynamic_cast<MaterialEditWindow*>(getEngineGlobal()->findWindowByName(ICON_FK_PICTURE_O " Material Edit"));
+					if (mtlEditWnd == nullptr) {
+						mtlEditWnd = new MaterialEditWindow(ICON_FK_PICTURE_O " Material Edit", m_inspector);
+						getEngineGlobal()->addWindow(mtlEditWnd);
+					}
+
+					mtlEditWnd->setAsset(mtl);
 				}
 			} else if (IAssetInterface_Audio* audioIface = getAssetIface<IAssetInterface_Audio>(explorePreviewAsset)) {
 				ImGui::Text("No Preview");

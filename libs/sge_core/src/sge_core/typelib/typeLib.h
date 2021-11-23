@@ -127,45 +127,45 @@ TypeId sgeTypeIdFn() {
 /// to use id same id in different libraries (dlls/so and so on) where
 /// the function specialization isn't acessible.
 #if 1
-#define RelfAddTypeIdInline(T, _id)       \
+#define ReflAddTypeIdInline(T, _id)       \
 	template <>                           \
 	inline TypeId sge::sgeTypeIdFn<T>() { \
 		return TypeId(_id);               \
 	}
 
 #ifdef SGE_CORE_BUILDING_DLL
-#define RelfAddTypeId(T, _id)              \
+#define ReflAddTypeId(T, _id)              \
 	template <>                            \
 	SGE_CORE_API TypeId sgeTypeIdFn<T>() { \
 		return TypeId(_id);                \
 	}
 #else
-#define RelfAddTypeId(T, _id)              \
+#define ReflAddTypeId(T, _id)              \
 	template <>                            \
 	SGE_CORE_API TypeId sgeTypeIdFn<T>() { \
 		return TypeId(_id);                \
 	}
 #endif
 #else
-#define RelfAddTypeIdInline(T, _id)
-#define RelfAddTypeId(T, _id)
+#define ReflAddTypeIdInline(T, _id)
+#define ReflAddTypeId(T, _id)
 #endif
 
 // Mark that the type id already exists, this is used for situations were we
 #if 1
 #ifdef SGE_CORE_BUILDING_DLL
-#define RelfAddTypeIdExists(T) \
+#define ReflAddTypeIdExists(T) \
 	struct T;                  \
 	template <>                \
 	SGE_CORE_API TypeId sgeTypeIdFn<T>();
 #else
-#define RelfAddTypeIdExists(T) \
+#define ReflAddTypeIdExists(T) \
 	struct T;                  \
 	template <>                \
 	TypeId sgeTypeIdFn<T>();
 #endif
 #else
-#define RelfAddTypeIdExists(T)
+#define ReflAddTypeIdExists(T)
 #endif
 
 /// A macros used to quckly obtain id for a particular type.

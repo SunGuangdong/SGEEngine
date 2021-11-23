@@ -5,9 +5,9 @@
 namespace sge {
 
 // clang-format off
-RelfAddTypeId(PerspectiveCameraSettings, 20'03'01'0018);
-RelfAddTypeId(CameraTraitCamera, 20'03'01'0019);
-RelfAddTypeId(ACamera, 20'03'01'0020);
+ReflAddTypeId(PerspectiveCameraSettings, 20'03'01'0018);
+ReflAddTypeId(CameraTraitCamera, 20'03'01'0019);
+ReflAddTypeId(ACamera, 20'03'01'0020);
 
 ReflBlock()
 {

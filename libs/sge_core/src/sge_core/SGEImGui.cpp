@@ -171,7 +171,7 @@ inline void Style() {
 	}
 #endif
 
-	// ImGui::StyleColorsLight(&style);
+	 ImGui::StyleColorsLight(&style);
 	// ImGui::StyleColorsDark(&style);
 	//StyleColorsLightGreen(&style);
 }

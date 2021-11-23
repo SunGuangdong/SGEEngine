@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sge_core/typelib/typeLib.h"
 #include "sge_log/Log.h"
 #include "sge_utils/sge_utils.h"
 #include "sge_utils/utils/FileStream.h"
@@ -338,5 +339,12 @@ bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type) {
 
 	return isAssetLoaded(*asset.get(), type);
 }
+
+// clang-format off
+ReflAddTypeId(AssetPtr, 10'11'21'0001)
+ReflBlock() {
+	ReflAddType(AssetPtr);
+}
+// clang-format on
 
 } // namespace sge

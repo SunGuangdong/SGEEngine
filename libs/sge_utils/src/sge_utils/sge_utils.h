@@ -4,13 +4,13 @@
 #include <signal.h>
 #endif
 
-#include <cstddef> // for size_t
+#include <cstddef>
 
 namespace sge {
 
-//------------------------------------------------------------------------
-// Warnings disable
-//------------------------------------------------------------------------
+/// A set of macros used to disable warnings (and therefore warnings as errors) in the
+/// code surronded by the macros below. Useful when we want to include 3rd party code
+/// that wasn't compiled with the same warnings as errors.
 #ifdef WIN32
 #define SGE_NO_WARN_BEGIN __pragma(warning(push, 0))
 #define SGE_NO_WARN_END __pragma(warning(pop))
@@ -19,9 +19,6 @@ namespace sge {
 #define SGE_NO_WARN_END
 #endif
 
-//------------------------------------------------------------------------
-// Types
-//------------------------------------------------------------------------
 typedef unsigned char ubyte;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
@@ -39,17 +36,6 @@ char (&SGE_TArrSize_Safe(T (&)[N]))[N];
 #define SGE_ARRSZ(A) (sizeof(SGE_TArrSize_Safe(A)))
 
 } // namespace sge
-
-////#ifndef SGE_FORCE_INLINE
-//	#ifdef _MSC_VER
-//			#define	SGE_FORCE_INLINE        __forceinline
-//	#elif __GNUC__
-//			#define SGE_FORCE_INLINE        __always_inline
-//	#else
-//		#warning "SGE_FORCE_INLINE is not implemented correctly. Please implement it for this platoform."
-//		SGE_FORCE_INLINE                  inline
-//	#endif
-////#endif
 
 #if defined(SGE_USE_DEBUG)
 #if defined(__EMSCRIPTEN__)
@@ -96,12 +82,10 @@ int assertAskDisable(const char* const file, const int line, const char* expr);
 #define SGE_MACRO_STR_IMPL(m) #m
 #define SGE_MACRO_STR(m) SGE_MACRO_STR_IMPL(m)
 
-//#if defined _MSC_VER
-//	#define SGE_EXTERN_CONST          __declspec(selectany) extern const
-//#else
-//	#define SGE_EXTERN_CONST          __attribute__((selectany)) extern const
-//#endif
-
+/// A macro aimed to be used around names of function arguments that aren't used in the function.
+/// As we have unused variables to be treated as errors, we need a solution for the cases where
+/// a function does not need an input argumnet. Just wrap the name of the unused variable with
+/// this macro to solve the error.
 #define UNUSED(x)
 
 #define SGE_CAT_IMPL(s1, s2) s1##s2

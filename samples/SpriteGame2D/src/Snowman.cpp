@@ -25,7 +25,7 @@ vec2f getIntersectionDepth(const AABox2f& rectA, const AABox2f& rectB) {
 }
 
 struct TraitCollisionRect2d;
-RelfAddTypeIdExists(TraitCollisionRect2d);
+ReflAddTypeIdExists(TraitCollisionRect2d);
 struct TraitCollisionRect2d : public Trait {
 	SGE_TraitDecl_Full(TraitCollisionRect2d);
 
@@ -38,7 +38,7 @@ struct TraitCollisionRect2d : public Trait {
 	}
 };
 
-RelfAddTypeId(TraitCollisionRect2d, 21'04'17'0003);
+ReflAddTypeId(TraitCollisionRect2d, 21'04'17'0003);
 
 struct Snowman : public Actor {
 	TraitModel ttModel;
@@ -187,7 +187,7 @@ struct Snowman : public Actor {
 	}
 };
 
-RelfAddTypeId(Snowman, 21'04'17'0001);
+ReflAddTypeId(Snowman, 21'04'17'0001);
 
 ReflBlock() {
 	ReflAddActor(Snowman);
@@ -209,7 +209,7 @@ struct IceBlock : public Actor {
 	}
 };
 
-RelfAddTypeId(IceBlock, 21'04'17'0002);
+ReflAddTypeId(IceBlock, 21'04'17'0002);
 
 ReflBlock() {
 	ReflAddActor(IceBlock);

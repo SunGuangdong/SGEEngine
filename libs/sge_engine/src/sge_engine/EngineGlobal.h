@@ -4,11 +4,11 @@
 #include <unordered_map>
 #include <vector>
 
+#include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_engine/IPlugin.h"
 #include "sge_engine/sge_engine_api.h"
 #include "sge_engine/typelibHelper.h"
 #include "sge_engine/windows/IImGuiWindow.h"
-#include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_utils/utils/Event.h"
 
 namespace sge {

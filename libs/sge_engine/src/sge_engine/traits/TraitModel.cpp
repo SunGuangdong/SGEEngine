@@ -21,9 +21,9 @@ namespace sge {
 // struct MDiffuseMaterial; // User for creating material overrides.
 
 // clang-format off
-RelfAddTypeId(TraitModel, 20'03'01'0004);
-RelfAddTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
-RelfAddTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
+ReflAddTypeId(TraitModel, 20'03'01'0004);
+ReflAddTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
+ReflAddTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
 ReflBlock() {
 	ReflAddType(TraitModel::PerModelSettings)
 		ReflMember(TraitModel::PerModelSettings, isRenderable)

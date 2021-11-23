@@ -82,7 +82,7 @@ namespace PathFollow {
 //-----------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------
-RelfAddTypeIdInline(TraitPath3D, 20'03'06'0000);
+ReflAddTypeIdInline(TraitPath3D, 20'03'06'0000);
 struct SGE_ENGINE_API TraitPath3D : public Trait {
 	SGE_TraitDecl_BaseFamily(TraitPath3D);
 

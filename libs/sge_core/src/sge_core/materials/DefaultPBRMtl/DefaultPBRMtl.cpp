@@ -2,9 +2,38 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/AssetLibrary/AssetTexture2D.h"
 #include "sge_core/ICore.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_utils/utils/json.h"
 
 namespace sge {
+
+// clang-format off
+ReflAddTypeId(DefaultPBRMtl, 10'11'21'0001);
+ReflBlock() {
+	ReflAddType(DefaultPBRMtl)
+		ReflMember(DefaultPBRMtl, needsAlphaSorting)
+		ReflMember(DefaultPBRMtl, alphaMultiplier).uiRange(0.f, 1.f, 0.01f)
+		ReflMember(DefaultPBRMtl, texDiffuse)
+		ReflMember(DefaultPBRMtl, texEmission)
+		ReflMember(DefaultPBRMtl, texMetallic)
+		ReflMember(DefaultPBRMtl, texRoughness)
+		ReflMember(DefaultPBRMtl, texNormalMap)
+		ReflMember(DefaultPBRMtl, diffuseColor).addMemberFlag(MFF_Vec4fAsColor)
+		ReflMember(DefaultPBRMtl, emissionColor).addMemberFlag(MFF_Vec4fAsColor)
+		ReflMember(DefaultPBRMtl, metallic).uiRange(0.f, 1.f, 0.01f)
+		ReflMember(DefaultPBRMtl, roughness).uiRange(0.f, 1.f, 0.01f)
+		ReflMember(DefaultPBRMtl, disableCulling)
+		ReflMember(DefaultPBRMtl, uvShift).uiRange(-FLT_MAX, FLT_MAX, 0.01f)
+		ReflMember(DefaultPBRMtl, uvScale).uiRange(-FLT_MAX, FLT_MAX, 0.01f)
+		ReflMember(DefaultPBRMtl, uvRotation).addMemberFlag(MFF_FloatAsDegrees)
+	;
+}
+// clang-format on
+
+TypeId DefaultPBRMtl::getTypeId() const {
+	return sgeTypeId(DefaultPBRMtl);
+}
+
 IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	mdlData = DefaultPBRMtlData();
 
@@ -29,6 +58,7 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	mdlData.texNormalMap = getTexFromAsset(texNormalMap);
 	mdlData.texMetalness = getTexFromAsset(texMetallic);
 	mdlData.texRoughness = getTexFromAsset(texRoughness);
+	mdlData.texNormalMap = getTexFromAsset(texNormalMap);
 
 	// TODO: this needs to be an option in the material.
 	if (mdlData.diffuseTexture != nullptr) {
@@ -37,8 +67,17 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 		mdlData.diffuseColorSrc = DefaultPBRMtlData::diffuseColorSource_vertexColor;
 	}
 
-	mdlData.needsAlphaSorting = isDiffuseSemiTransp;
 	mdlData.alphaMultipler = alphaMultiplier;
+
+	mdlData.needsAlphaSorting = needsAlphaSorting || isDiffuseSemiTransp || (alphaMultiplier < 1.f);
+
+
+	// clang-format off
+	mdlData.uvwTransform =
+	      mat4f::getRotationZ(uvRotation) 
+		* mat4f::getScaling(vec3f(uvScale, 0.f)) 
+		* mat4f::getTranslation(vec3f(uvShift, 0.f));
+	// clang-format on
 
 	return &mdlData;
 }

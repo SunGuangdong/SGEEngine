@@ -349,6 +349,10 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 						mesh->vbNormalOffsetBytes = (int)decl.byteOffset;
 					} else if (decl.semantic == "a_uv") {
 						mesh->vbUVOffsetBytes = (int)decl.byteOffset;
+					} else if (decl.semantic == "a_tangent") {
+						mesh->vbTangetOffsetBytes = (int)decl.byteOffset;
+					} else if (decl.semantic == "a_binormal") {
+						mesh->vbBinormalOffsetBytes = (int)decl.byteOffset;
 					}
 				}
 

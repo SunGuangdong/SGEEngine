@@ -1,9 +1,9 @@
 #pragma once
 
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_log/Log.h"
 #include "sge_utils/sge_utils.h"
-#include "sge_core/materials/IGeometryDrawer.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -65,6 +65,11 @@ struct MaterialFamilyLibrary {
 		}
 
 		return nullptr;
+	}
+
+
+	const std::unordered_map<uint32, MaterialFamilyData>& getAllFamilies() const {
+		return m_mtlFamilies;
 	}
 
 	std::shared_ptr<IMaterial> loadMaterialFromJson(const JsonValue* jRoot, const char* materialDirectory) const;

@@ -1,7 +1,7 @@
 #include <filesystem>
 
 #include "ActorCreateWindow.h"
-#include "AssetsWindow.h"
+#include "AssetsUI/AssetsWindow.h"
 #include "CreditsWindow.h"
 #include "EditorWindow.h"
 #include "GameInspectorWindow.h"

@@ -11,9 +11,9 @@ namespace sge {
 struct Script;
 
 // clang-format off
-RelfAddTypeId(TraitScriptSlot::ScriptSlot, 21'02'01'0001);
-RelfAddTypeId(std::vector<TraitScriptSlot::ScriptSlot>, 21'02'01'0002);
-RelfAddTypeId(TraitScriptSlot, 21'02'01'0003);
+ReflAddTypeId(TraitScriptSlot::ScriptSlot, 21'02'01'0001);
+ReflAddTypeId(std::vector<TraitScriptSlot::ScriptSlot>, 21'02'01'0002);
+ReflAddTypeId(TraitScriptSlot, 21'02'01'0003);
 
 ReflBlock()
 {

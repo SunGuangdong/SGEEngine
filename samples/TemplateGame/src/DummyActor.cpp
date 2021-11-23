@@ -37,7 +37,7 @@ struct DummyActor : public Actor {
 	}
 };
 
-RelfAddTypeId(DummyActor, 30'02'22'0001);
+ReflAddTypeId(DummyActor, 30'02'22'0001);
 ReflBlock() {
 	ReflAddActor(DummyActor);
 }

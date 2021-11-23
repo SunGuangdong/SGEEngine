@@ -2,7 +2,7 @@
 
 namespace sge {
 // clang-format off
-RelfAddTypeId(Script, 21'02'03'0001);
+ReflAddTypeId(Script, 21'02'03'0001);
 ReflBlock() {
 	ReflAddObject(Script);
 }

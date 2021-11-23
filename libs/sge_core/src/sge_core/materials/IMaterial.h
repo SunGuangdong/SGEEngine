@@ -9,6 +9,8 @@ namespace sge {
 struct JsonValueBuffer;
 struct JsonValue;
 
+struct TypeId;
+
 struct SGE_CORE_API IMaterialData {
 	IMaterialData(uint32 materialFamilyId)
 	    : materialFamilyId(materialFamilyId) {
@@ -25,6 +27,8 @@ struct SGE_CORE_API IMaterial {
 	virtual ~IMaterial() = default;
 
 	virtual IMaterialData* getMaterialDataLocalStorage() = 0;
+
+	virtual TypeId getTypeId() const = 0;
 
 	virtual JsonValue* toJson(JsonValueBuffer& jvb) = 0;
 	virtual bool fromJson(const JsonValue* jMtlRoot) = 0;
