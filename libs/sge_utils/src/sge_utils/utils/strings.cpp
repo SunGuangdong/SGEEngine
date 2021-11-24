@@ -92,3 +92,7 @@ int sge_stricmp(const char* a, const char* b) {
 	return strcasecmp(a, b);
 #endif
 }
+
+bool isStringEmpty(const char* const str) {
+	return str == nullptr || str[0] == '\0';
+}

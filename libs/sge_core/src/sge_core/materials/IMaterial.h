@@ -30,8 +30,8 @@ struct SGE_CORE_API IMaterial {
 
 	virtual TypeId getTypeId() const = 0;
 
-	virtual JsonValue* toJson(JsonValueBuffer& jvb) = 0;
-	virtual bool fromJson(const JsonValue* jMtlRoot) = 0;
+	virtual JsonValue* toJson(JsonValueBuffer& jvb, const char* localDir) = 0;
+	virtual bool fromJson(const JsonValue* jMtlRoot, const char* localDir) = 0;
 };
 
 } // namespace sge

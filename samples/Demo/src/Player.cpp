@@ -51,7 +51,7 @@ struct Player : public Actor {
 	void update(const GameUpdateSets& u) {
 		if (u.isGamePaused()) {
 			return;
-		}
+		} 
 
 		// Lock the cursor to the center of the screen and hide it
 		// as we want to control the camera with the mouse.
@@ -67,7 +67,7 @@ struct Player : public Actor {
 		Actor* const cameraActor = getWorld()->getActorById(cameraObject);
 
 		vec3f wsForward = vec3f(0.f, 0.f, -1.f);
-		vec3f wsRight = vec3f(1.f, 0.f, 0.f);
+		vec3f wsRight = vec3f(1.f, 0.f, 0.f); 
 
 		if (cameraActor) {
 			float motionCamera = u.is.isCursorRelative() ? -u.is.GetCursorMotion().x * 0.25f : 0.f;
@@ -96,12 +96,7 @@ struct Player : public Actor {
 		wobbleForce -= wobbleForce * u.dt * 2.f;
 		wobbleAmplitude += wobbleForce * u.dt;
 
-		// Fake touch screen input.
 		vec2f inputDir = u.is.GetArrowKeysDir(true, true, 0);
-		if (u.is.IsKeyDown(Key_MouseLeft)) {
-			inputDir.x = 2.f * u.is.getCursorPosUV().x - 1.f;
-			inputDir.y = -(2.f * u.is.getCursorPosUV().y - 1.f);
-		}
 
 		const vec3f inputDirWs = wsRight * inputDir.x + inputDir.y * wsForward;
 		const vec3f inputDirWsRight = vec3f(-inputDirWs.z, 0.f, inputDirWs.x);
@@ -110,7 +105,7 @@ struct Player : public Actor {
 			wobbleForce -= 16.f * u.dt;
 			jumpButtonHeldTime += u.dt;
 			jumpButtonHeldTime = clamp(kMaxJumpHeldTime, 0.f, kMaxJumpHeldTime);
-		}
+		} 
 
 		vec3f additionalForce = vec3f(0.f);
 		float dr = inputDirWsRight.dot(ttRigidbody.getRigidBody()->getLinearVel().x0z());

@@ -76,7 +76,9 @@ struct GameDrawSets {
 		this->gameDrawer = gameDrawer;
 	}
 
-	bool isValid() const { return quickDraw != nullptr && drawCamera != nullptr; }
+	bool isValid() const {
+		return quickDraw != nullptr && drawCamera != nullptr;
+	}
 
 	RenderDestination rdest;
 	QuickDraw* quickDraw = nullptr;
@@ -96,14 +98,19 @@ struct SGE_ENGINE_API IGameDrawer {
 	virtual void initialize(GameWorld* const world);
 
 	virtual void prepareForNewFrame() = 0;
-	/// TODO: should we embed this in @prepareForNewFrame()
+
+	/// TODO: Should we embed this in @prepareForNewFrame()?
 	virtual void updateShadowMaps(const GameDrawSets& drawSets) = 0;
 
 	virtual void drawItem(const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason) = 0;
 	virtual void drawWorld(const GameDrawSets& drawSets, const DrawReason drawReason) = 0;
-	
-	GameWorld* getWorld() { return m_world; }
-	const GameWorld* getWorld() const { return m_world; }
+
+	GameWorld* getWorld() {
+		return m_world;
+	}
+	const GameWorld* getWorld() const {
+		return m_world;
+	}
 
   private:
 	GameWorld* m_world = nullptr;

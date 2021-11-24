@@ -3,6 +3,7 @@
 #include "sge_core/AssetLibrary/AssetTexture2D.h"
 #include "sge_core/ICore.h"
 #include "sge_core/typelib/typeLib.h"
+#include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"
 
 namespace sge {
@@ -41,8 +42,8 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	mdlData.metalness = metallic;
 	mdlData.roughness = roughness;
 
-	const auto getTexFromAsset = [](const AssetPtr& asset, bool* pIsSemiTransparent = nullptr) -> Texture* {
-		if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+	const auto getTexFromAsset = [](const std::shared_ptr<AssetIface_Texture2D>& texIface, bool* pIsSemiTransparent = nullptr) -> Texture* {
+		if (texIface) {
 			if (pIsSemiTransparent) {
 				*pIsSemiTransparent |= texIface->getTextureMeta().isSemiTransparent;
 			}
@@ -83,7 +84,7 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 }
 
 
-JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb) {
+JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb, const char* localDir) {
 	JsonValue* jMaterial = jvb(JID_MAP);
 
 	jMaterial->setMember("family", jvb("DefaultPBR"));
@@ -98,25 +99,27 @@ JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb) {
 	jMaterial->setMember("roughness", jvb(roughness));
 
 
-	if (isAssetLoaded(texDiffuse))
-		jMaterial->setMember("texDiffuse", jvb(texDiffuse->getPath()));
+	auto setMemberFromTexIface = [&jvb, &jMaterial, &localDir](const char* memberName,
+	                                                           std::shared_ptr<AssetIface_Texture2D>& texIface) -> void {
+		sgeAssert(memberName);
+		if (texIface) {
+			AssetPtr asset = std::dynamic_pointer_cast<Asset>(texIface);
+			if (asset && isAssetLoaded(asset)) {
+				jMaterial->setMember(memberName, jvb(relativePathTo(asset->getPath().c_str(), localDir)));
+			}
+		}
+	};
 
-	if (isAssetLoaded(texEmission))
-		jMaterial->setMember("texEmission", jvb(texEmission->getPath()));
-
-	if (isAssetLoaded(texMetallic))
-		jMaterial->setMember("texMetallic", jvb(texMetallic->getPath()));
-
-	if (isAssetLoaded(texRoughness))
-		jMaterial->setMember("texRoughness", jvb(texRoughness->getPath()));
-
-	if (isAssetLoaded(texNormalMap))
-		jMaterial->setMember("texNormalMap", jvb(texNormalMap->getPath()));
+	setMemberFromTexIface("texDiffuse", texDiffuse);
+	setMemberFromTexIface("texEmission", texEmission);
+	setMemberFromTexIface("texMetallic", texMetallic);
+	setMemberFromTexIface("texRoughness", texRoughness);
+	setMemberFromTexIface("texNormalMap", texNormalMap);
 
 	return jMaterial;
 }
 
-bool DefaultPBRMtl::fromJson(const JsonValue* jMaterial) {
+bool DefaultPBRMtl::fromJson(const JsonValue* jMaterial, const char* localDir) {
 	if (jMaterial == nullptr) {
 		return false;
 	}
@@ -138,23 +141,28 @@ bool DefaultPBRMtl::fromJson(const JsonValue* jMaterial) {
 
 
 	if (const JsonValue* jTex = jMaterial->getMember("texDiffuse")) {
-		texDiffuse = getCore()->getAssetLib()->getAssetFromFile(jTex->GetString());
+		texDiffuse =
+		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 	if (const JsonValue* jTex = jMaterial->getMember("texEmission")) {
-		texEmission = getCore()->getAssetLib()->getAssetFromFile(jTex->GetString());
+		texEmission =
+		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 	if (const JsonValue* jTex = jMaterial->getMember("texMetallic")) {
-		texMetallic = getCore()->getAssetLib()->getAssetFromFile(jTex->GetString());
+		texMetallic =
+		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 	if (const JsonValue* jTex = jMaterial->getMember("texRoughness")) {
-		texRoughness = getCore()->getAssetLib()->getAssetFromFile(jTex->GetString());
+		texRoughness =
+		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 	if (const JsonValue* jTex = jMaterial->getMember("texNormalMap")) {
-		texNormalMap = getCore()->getAssetLib()->getAssetFromFile(jTex->GetString());
+		texNormalMap =
+		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 	return true;

@@ -229,6 +229,8 @@ struct SGEGameWindow : public WindowBase {
 		getCore()->setLastFrameStatistics(getCore()->getDevice()->getFrameStatistics());
 		getCore()->getDevice()->present();
 
+		getCore()->getAssetLib()->reloadAssets();
+
 		return;
 	}
 };

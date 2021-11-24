@@ -21,6 +21,17 @@ bool AssetMaterial::loadAssetFromFile(const char* const path) {
 	return m_material != nullptr;
 }
 
+bool AssetMaterial::saveAssetToFile(const char* const path) const {
+	if (m_material) {
+		JsonValueBuffer jvb;
+		JsonValue* jMtl = m_material->toJson(jvb, extractFileDir(path, true).c_str());
+
+		JsonWriter jw;
+		return jw.WriteInFile(path, jMtl, true);
+	}
+	return false;
+}
+
 
 
 } // namespace sge

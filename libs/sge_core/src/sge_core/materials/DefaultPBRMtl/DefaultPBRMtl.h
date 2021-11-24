@@ -9,6 +9,7 @@
 namespace sge {
 
 struct Texture;
+struct AssetIface_Texture2D;
 
 struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 	enum DiffuseColorSource {
@@ -47,18 +48,18 @@ struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
 
 	TypeId getTypeId() const override;
 
-	virtual JsonValue* toJson(JsonValueBuffer& jvb) override;
-	virtual bool fromJson(const JsonValue* jMtlRoot) override;
+	virtual JsonValue* toJson(JsonValueBuffer& jvb, const char* localDir) override;
+	virtual bool fromJson(const JsonValue* jMtlRoot, const char* localDir) override;
 
   public:
 	bool needsAlphaSorting = false;
 	float alphaMultiplier = 1.f;
 
-	AssetPtr texDiffuse;
-	AssetPtr texEmission;
-	AssetPtr texMetallic;
-	AssetPtr texRoughness;
-	AssetPtr texNormalMap;
+	std::shared_ptr<AssetIface_Texture2D> texDiffuse;
+	std::shared_ptr<AssetIface_Texture2D> texEmission;
+	std::shared_ptr<AssetIface_Texture2D> texMetallic;
+	std::shared_ptr<AssetIface_Texture2D> texRoughness;
+	std::shared_ptr<AssetIface_Texture2D> texNormalMap;
 
 	vec4f diffuseColor = vec4f(1.f);
 	vec4f emissionColor = vec4f(0.f);

@@ -21,10 +21,11 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/application.h"
 #include "sge_core/setImGuiContexCore.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/EngineGlobal.h"
+#include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_engine/GamePlayerSettings.h"
 #include "sge_engine/IPlugin.h"
-#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/setImGuiContextEngine.h"
 #include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
@@ -146,8 +147,7 @@ struct SGEGameWindow : public WindowBase {
 		loadPlugin();
 #endif
 
-		m_pGameDrawer = m_pluginInst->allocateGameDrawer();
-
+		m_pGameDrawer = new DefaultGameDrawer();
 		gameMode.create(m_pGameDrawer, g_playerSettings.initalLevel.c_str());
 	}
 

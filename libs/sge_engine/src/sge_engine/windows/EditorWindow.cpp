@@ -23,6 +23,7 @@
 #include "sge_core/application/input.h"
 #include "sge_core/ui/MultiCurve2DEditor.h"
 #include "sge_engine/EngineGlobal.h"
+#include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/GameSerialization.h"
 #include "sge_engine/actors/ACRSpline.h"
@@ -67,13 +68,10 @@ void EditorWindow::Assets::load() {
 }
 
 void EditorWindow::onGamePluginPreUnload() {
-	m_gameDrawer.reset(nullptr);
-	m_sceneWindow->setGameDrawer(nullptr);
 	m_sceneInstance.newScene(true);
 }
 
 void EditorWindow::onGamePluginChanged() {
-	m_gameDrawer.reset(getEngineGlobal()->getActivePlugin()->allocateGameDrawer());
 	m_gameDrawer->initialize(&m_sceneInstance.getWorld());
 	m_sceneWindow->setGameDrawer(m_gameDrawer.get());
 }
@@ -81,7 +79,7 @@ void EditorWindow::onGamePluginChanged() {
 EditorWindow::EditorWindow(WindowBase& nativeWindow, std::string windowName)
     : m_nativeWindow(nativeWindow)
     , m_windowName(std::move(windowName)) {
-	m_gameDrawer.reset(getEngineGlobal()->getActivePlugin()->allocateGameDrawer());
+	m_gameDrawer.reset(new DefaultGameDrawer());
 
 	getEngineGlobal()->subscribeOnPluginChange([this]() -> void { onGamePluginChanged(); }).abandon();
 

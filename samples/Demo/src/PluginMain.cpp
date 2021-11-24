@@ -6,8 +6,6 @@
 
 namespace sge {
 struct PluginGame final : public IPlugin {
-	virtual IGameDrawer* allocateGameDrawer() { return new DefaultGameDrawer(); }
-
 	void onLoaded(const SgeGlobalSingletons& sgeSingletons) override { sgeSingletons.applyGlobalState(); }
 
 	void onUnload() {}

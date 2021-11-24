@@ -644,7 +644,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 								std::shared_ptr<IMaterial> newMtl = mtlFamData->familyDesc.mtlAllocFn();
 
 								JsonValueBuffer jvb;
-								JsonValue* jMtlRoot = newMtl->toJson(jvb);
+								JsonValue* jMtlRoot = newMtl->toJson(jvb, pathToAssets.string().c_str());
 
 								JsonWriter jw;
 								std::string mtlFilename = (pathToAssets.string() + "/" + std::string(newMtlName) + ".mtl").c_str();
@@ -697,7 +697,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 						getEngineGlobal()->addWindow(mtlEditWnd);
 					}
 
-					mtlEditWnd->setAsset(mtl);
+					mtlEditWnd->setAsset(std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset));
 				}
 			} else if (IAssetInterface_Audio* audioIface = getAssetIface<IAssetInterface_Audio>(explorePreviewAsset)) {
 				ImGui::Text("No Preview");
@@ -849,6 +849,7 @@ void AssetsWindow::doPreviewAssetTexture2D(AssetIface_Texture2D* texIface) {
 		// Save the modified settings to the *.info file of the texture.
 		if (AssetTexture2d* assetTex2d = dynamic_cast<AssetTexture2d*>(explorePreviewAsset.get())) {
 			assetTex2d->saveTextureSettingsToInfoFile();
+			getCore()->getAssetLib()->queueAssetForReload(explorePreviewAsset);
 		} else {
 			sgeAssertFalse("It is expected that explorePreviewAsset is a AssetTexture2d");
 		}

@@ -1,9 +1,11 @@
 #pragma once
 
 #include <fbxsdk.h>
+#include <memory>
 
 #include "ModelParseSettings.h"
 #include "sge_core/model/Model.h"
+#include "sge_core/AssetLibrary/AssetMaterial.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/utils/optional.h"
 
@@ -12,6 +14,28 @@ namespace sge {
 struct IAssetRelocationPolicy;
 
 bool InitializeFBXSDK();
+
+struct ExternalMaterialDesc {
+	std::string fullAssetPath;
+
+	float alphaMultiplier = 1.f;
+	bool needsAlphaSorting = false;
+	vec4f diffuseColor = vec4f(1.f);
+	vec4f emissionColor = vec4f(0.f);
+	float metallic = 0.f;
+	float roughness = 1.f;
+
+	std::string diffuseTextureName;
+	std::string emissionTextureName;
+	std::string normalTextureName;
+	std::string metallicTextureName;
+	std::string roughnessTextureName;
+};
+
+struct MaterialsToCreate {
+	std::string filename; // Just the name not including the path.
+	std::shared_ptr<IMaterial> mtl;
+};
 
 /// @brief FBXSDKParser convers FBX/DAE/OBJ files to our own internal format by using FBX SDK.s
 struct FBXSDKParser {

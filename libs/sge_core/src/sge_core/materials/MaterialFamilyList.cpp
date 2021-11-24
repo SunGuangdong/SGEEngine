@@ -5,7 +5,7 @@
 namespace sge {
 
 std::shared_ptr<IMaterial> MaterialFamilyLibrary::loadMaterialFromJson(const JsonValue* jMtlRoot,
-                                                                       const char* UNUSED(materialDirectory)) const {
+                                                                       const char* materialDirectory) const {
 	if (jMtlRoot == nullptr) {
 		return std::shared_ptr<IMaterial>();
 	}
@@ -19,7 +19,7 @@ std::shared_ptr<IMaterial> MaterialFamilyLibrary::loadMaterialFromJson(const Jso
 		}
 
 		std::shared_ptr<IMaterial> newMtl = family->familyDesc.mtlAllocFn();
-		bool succeeded = newMtl && newMtl->fromJson(jMtlRoot);
+		bool succeeded = newMtl && newMtl->fromJson(jMtlRoot, materialDirectory);
 
 		if (succeeded) {
 			return newMtl;

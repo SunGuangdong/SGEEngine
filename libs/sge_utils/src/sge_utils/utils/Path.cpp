@@ -1,8 +1,8 @@
 #include <filesystem>
 
 #include "Path.h"
-
 #include "common.h"
+#include "strings.h"
 
 #ifdef WIN32
 #define NOMINMAX
@@ -52,7 +52,7 @@ std::string extractFileNameWithExt(const char* filepath) {
 
 
 std::string extractFileDir(const char* filepath, const bool includeSlashInResult) {
-	if (filepath == NULL) {
+	if (isStringEmpty(filepath)) {
 		sgeAssert(false);
 		return std::string();
 	}
@@ -209,6 +209,14 @@ bool isPathAbsolute(const char* const cpath) {
 }
 
 std::string relativePathTo(const char* path, const char* base) {
+	if (isStringEmpty(path)) {
+		return std::string();
+	}
+
+	if (isStringEmpty(base)) {
+		return std::string(path);
+	}
+
 	try {
 		std::error_code ec;
 		return std::filesystem::proximate(std::filesystem::path(path), std::filesystem::path(base)).string();
@@ -218,6 +226,10 @@ std::string relativePathTo(const char* path, const char* base) {
 }
 
 std::string relativePathToCwd(const char* path) {
+	if (isStringEmpty(path)) {
+		return std::string();
+	}
+
 	try {
 		std::error_code ec;
 		return std::filesystem::proximate(std::filesystem::path(path), std::filesystem::current_path()).string();
@@ -235,6 +247,10 @@ std::string relativePathToCwdCanoize(const std::string& path) {
 }
 
 std::string absoluteOf(const char* const path) {
+	if (isStringEmpty(path)) {
+		return std::string();
+	}
+
 	try {
 		return std::filesystem::absolute(std::filesystem::path(path)).string();
 	} catch (...) {
@@ -260,17 +276,22 @@ void createDirectory(const char* const path) {
 }
 
 void copyFile(const char* srcFile, const char* destFile) {
-#ifdef WIN32
-	[[maybe_unused]] BOOL succeeded = CopyFileA(srcFile, destFile, FALSE);
-	//sgeAssert(succeeded != 0);
-#else
-	// const std::string cmd = string_format("cp \"%s\" \"%s\"", srcFile, destFile);
-	// system(cmd.c_str());
-	try {
-		std::filesystem::copy(srcFile, destFile);
-	} catch (...) {
-	}
-#endif
+	//if (isStringEmpty(srcFile) || isStringEmpty(destFile)) {
+	//	return;
+	//}
+
+	//[[maybe_unused]] bool failed = std::filesystem::copy_file(srcFile, destFile);
+	#ifdef WIN32
+		[[maybe_unused]] BOOL succeeded = CopyFileA(srcFile, destFile, FALSE);
+		// sgeAssert(succeeded != 0);
+	#else
+		// const std::string cmd = string_format("cp \"%s\" \"%s\"", srcFile, destFile);
+		// system(cmd.c_str());
+		try {
+			std::filesystem::copy(srcFile, destFile);
+		} catch (...) {
+		}
+	#endif
 }
 
 } // namespace sge

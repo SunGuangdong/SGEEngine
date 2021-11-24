@@ -19,8 +19,8 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	m_shaderType = type;
 
 	// Just an interestiong flag to be remembered -> D3DCOMPILE_PACK_MATRIX_ROW_MAJOR
-	const DWORD compileFlags = D3DCOMPILE_SKIP_OPTIMIZATION;
-	// const DWORD compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0; // For exrternal shader debugging in RenderDoc or PIX
+	const DWORD compileFlags = 0;
+	//const DWORD compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0; // For exrternal shader debugging in RenderDoc or PIX
 	// and so on.
 
 	// Compile the shader.

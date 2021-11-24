@@ -19,14 +19,14 @@ struct SGE_ENGINE_API MaterialEditWindow : public IImGuiWindow {
 
 	void update(SGEContext* const sgecon, const InputState& is) override;
 
-	void setAsset(std::shared_ptr<IMaterial> newMtlAsset) {
-		mtlIfaceWeak = newMtlAsset;
+	void setAsset(std::shared_ptr<AssetIface_Material> newMtlAsset) {
+		mtlProvider = newMtlAsset;
 	}
 
   private:
 	bool m_isOpened = true;
 	std::string m_windowName;
-	std::weak_ptr<IMaterial> mtlIfaceWeak;
+	std::shared_ptr<AssetIface_Material> mtlProvider;
 };
 
 } // namespace sge

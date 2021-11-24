@@ -119,7 +119,7 @@ void AssetLibrary::scanForAvailableAssets(const char* const path) {
 					const AssetIfaceType guessedType = assetIface_guessFromExtension(extCStr, false);
 					if (guessedType != assetIface_unknown) {
 						// markThatAssetExists(entry.path().generic_u8string().c_str(), guessedType);
-						getAssetFromFile(entry.path().generic_u8string().c_str(), false);
+						getAssetFromFile(entry.path().generic_u8string().c_str(), nullptr, false);
 					}
 				}
 			}
@@ -187,13 +187,25 @@ std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const 
 	return std::move(pathToAsset);
 }
 
-AssetPtr AssetLibrary::getAssetFromFile(const char* path, bool loadIfMissing) {
+AssetPtr AssetLibrary::getAssetFromFile(const char* path, const char* localDirectory, bool loadIfMissing) {
+	if (path == nullptr || path[0] == '\0') {
+		return nullptr;
+	}
+
 	const double loadStartTime = Timer::now_seconds();
 
-	const std::string pathToAsset = resloveAssetPathToRelative(path);
+	std::string pathToAsset;
+	if (localDirectory) {
+		std::string localPath = std::string(localDirectory) + "/" + path;
+		pathToAsset = resloveAssetPathToRelative(localPath.c_str());
+	}
+
 	if (pathToAsset.empty()) {
-		// Because std::filesystem::canonical() returns empty string if the path doesn't exists
-		// we assume that the loading failed.
+		// If the local path failed, try just the path.
+		pathToAsset = resloveAssetPathToRelative(path);
+	}
+
+	if (pathToAsset.empty()) {
 		return nullptr;
 	}
 
@@ -342,8 +354,16 @@ bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type) {
 
 // clang-format off
 ReflAddTypeId(AssetPtr, 10'11'21'0001)
+ReflAddTypeId(std::shared_ptr<AssetIface_Texture2D>, 10'11'21'0002)
+ReflAddTypeId(std::shared_ptr<AssetIface_Model3D>, 10'11'21'0003)
+ReflAddTypeId(std::shared_ptr<AssetIface_SpriteAnim>, 10'11'21'0004)
+ReflAddTypeId(std::shared_ptr<AssetIface_Material>, 10'11'21'0006)
 ReflBlock() {
 	ReflAddType(AssetPtr);
+	ReflAddType(std::shared_ptr<AssetIface_Texture2D>);
+	ReflAddType(std::shared_ptr<AssetIface_Model3D>);
+	ReflAddType(std::shared_ptr<AssetIface_SpriteAnim>);
+	ReflAddType(std::shared_ptr<AssetIface_Material>);
 }
 // clang-format on
 

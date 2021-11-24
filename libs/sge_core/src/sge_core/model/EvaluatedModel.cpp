@@ -177,7 +177,7 @@ bool EvaluatedModel::evaluateMaterials() {
 
 	for (int iMaterial = 0; iMaterial < m_model->numMaterials(); ++iMaterial) {
 		std::shared_ptr<DefaultPBRMtl> evalMtl = std::make_shared<DefaultPBRMtl>();
-		
+
 		ModelMaterial* rawMaterial = m_model->materialAt(iMaterial);
 
 		evalMtl->diffuseColor = rawMaterial->diffuseColor;
@@ -186,29 +186,16 @@ bool EvaluatedModel::evaluateMaterials() {
 		evalMtl->needsAlphaSorting = rawMaterial->needsAlphaSorting;
 		evalMtl->alphaMultiplier = rawMaterial->alphaMultiplier;
 
-		// Check if there is a diffuse texture attached here.
-		if (rawMaterial->diffuseTextureName.empty() == false) {
-			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->diffuseTextureName;
-			evalMtl->texDiffuse = m_assetLibrary->getAssetFromFile(texPath.c_str());
-		}
-
-		// Normal map.
-		if (rawMaterial->normalTextureName.empty() == false) {
-			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->normalTextureName;
-			evalMtl->texNormalMap = m_assetLibrary->getAssetFromFile(texPath.c_str());
-		}
-
 		// Metallic map.
-		if (rawMaterial->metallicTextureName.empty() == false) {
-			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->metallicTextureName;
-			evalMtl->texMetallic = m_assetLibrary->getAssetFromFile(texPath.c_str());
-		}
+		evalMtl->texDiffuse = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->diffuseTextureName.c_str(),
+		                                                                          m_model->getModelLoadSetting().assetDir.c_str());
+		evalMtl->texMetallic = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->metallicTextureName.c_str(),
+		                                                                           m_model->getModelLoadSetting().assetDir.c_str());
+		evalMtl->texRoughness = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->roughnessTextureName.c_str(),
+		                                                                            m_model->getModelLoadSetting().assetDir.c_str());
+		evalMtl->texNormalMap = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->normalTextureName.c_str(),
+		                                                                            m_model->getModelLoadSetting().assetDir.c_str());
 
-		// Roughness map.
-		if (rawMaterial->roughnessTextureName.empty() == false) {
-			texPath = m_model->getModelLoadSetting().assetDir + rawMaterial->roughnessTextureName;
-			evalMtl->texRoughness = m_assetLibrary->getAssetFromFile(texPath.c_str());
-		}
 
 		m_evaluatedMaterials[iMaterial] = evalMtl;
 	}

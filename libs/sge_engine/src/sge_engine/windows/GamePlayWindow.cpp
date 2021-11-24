@@ -3,6 +3,7 @@
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_engine/EngineGlobal.h"
+#include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameSerialization.h"
 #include "sge_utils/utils/Wildcard.h"
@@ -16,7 +17,7 @@ namespace sge {
 GamePlayWindow::GamePlayWindow(std::string windowName, const char* const worldJsonString)
     : m_windowName(std::move(windowName))
     , m_isOpened(true) {
-	m_gameDrawer.reset(getEngineGlobal()->getActivePlugin()->allocateGameDrawer());
+	m_gameDrawer.reset(new DefaultGameDrawer());
 
 	m_sceneInstance.newScene();
 	m_gameDrawer->initialize(&m_sceneInstance.getWorld());

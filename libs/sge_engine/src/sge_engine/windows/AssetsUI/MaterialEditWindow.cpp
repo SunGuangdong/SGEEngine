@@ -20,38 +20,48 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened)) {
-		std::shared_ptr<IMaterial> mtl = mtlIfaceWeak.lock();
+		std::shared_ptr<IMaterial> mtl;
+		if (mtlProvider) {
+			mtl = mtlProvider->getMaterial();
+		}
+
+
 		if (mtl) {
 			if (const TypeDesc* mtlTypeDesc = typeLib().find(mtl->getTypeId())) {
 				MemberChain chain;
+
+				bool hadChange = false;
 
 				for (const MemberDesc& md : mtlTypeDesc->members) {
 					ImGuiEx::IDGuard idg(&md);
 
 					chain.add(&md);
-					if (md.typeId == sgeTypeId(AssetPtr)) {
-						AssetPtr* pAsset = (AssetPtr*)chain.follow(mtl.get());
-						AssetPtr& asset = *pAsset;
+					if (md.typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
+						std::shared_ptr<AssetIface_Texture2D>* pTexIface = (std::shared_ptr<AssetIface_Texture2D>*)chain.follow(mtl.get());
+						AssetPtr asset = pTexIface ? std::dynamic_pointer_cast<Asset>(*pTexIface) : nullptr;
 
-						AssetIfaceType assetTypes[] = {
-						    assetIface_texture2d,
-						};
+						if (asset) {
+							AssetIfaceType assetTypes[] = {
+							    assetIface_texture2d,
+							};
 
-						assetPicker(md.name, asset, getCore()->getAssetLib(), assetTypes, SGE_ARRSZ(assetTypes));
+							hadChange |= assetPicker(md.name, asset, getCore()->getAssetLib(), assetTypes, SGE_ARRSZ(assetTypes));
+						}
 
 					} else if (md.typeId == sgeTypeId(vec4f)) {
 						vec4f& v4 = *(vec4f*)chain.follow(mtl.get());
 						ImGuiEx::Label(md.name);
 						if (md.flags & MFF_Vec4fAsColor) {
-							ImGui::ColorEdit4("##colorEdit", v4.data, ImGuiColorEditFlags_InputRGB);
+							hadChange |= ImGui::ColorEdit4("##colorEdit", v4.data, ImGuiColorEditFlags_InputRGB);
 						} else {
-							SGEImGui::DragFloats("##v4Edit", v4.data, 4, nullptr, nullptr);
+							hadChange |= SGEImGui::DragFloats("##v4Edit", v4.data, 4, nullptr, nullptr);
 						}
 
 					} else if (md.typeId == sgeTypeId(vec2f)) {
 						vec2f& v2 = *(vec2f*)chain.follow(mtl.get());
 						ImGuiEx::Label(md.name);
-						SGEImGui::DragFloats("##edit", v2.data, 2, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float, md.max_float);
+						hadChange |= SGEImGui::DragFloats("##edit", v2.data, 2, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float,
+						                                  md.max_float);
 					} else if (md.typeId == sgeTypeId(float)) {
 						float& f = *(float*)chain.follow(mtl.get());
 
@@ -60,7 +70,8 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 						}
 
 						ImGuiEx::Label(md.name);
-						SGEImGui::DragFloats("##edit", &f, 1, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float, md.max_float);
+						hadChange |=
+						    SGEImGui::DragFloats("##edit", &f, 1, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float, md.max_float);
 
 						if (md.flags & MFF_FloatAsDegrees) {
 							f = deg2rad(f);
@@ -68,12 +79,20 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 					} else if (md.typeId == sgeTypeId(bool)) {
 						bool& b = *(bool*)chain.follow(mtl.get());
 						ImGuiEx::Label(md.name);
-						ImGui::Checkbox("##Edit", &b);
+						hadChange |= ImGui::Checkbox("##Edit", &b);
 					} else {
 						ImGui::LabelText("UI not written for member %s type.", md.name);
 					}
 
 					chain.pop();
+				}
+
+				if (hadChange) {
+					// If there was a change in the material save it.
+					std::shared_ptr<AssetMaterial> asset = std::dynamic_pointer_cast<AssetMaterial>(mtlProvider);
+					if (asset) {
+						asset->saveAssetToFile(asset->getPath().c_str());
+					}
 				}
 			}
 		}

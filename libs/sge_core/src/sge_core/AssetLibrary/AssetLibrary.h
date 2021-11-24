@@ -8,11 +8,11 @@
 #include "sge_utils/sge_utils.h"
 
 #include "AssetAudio.h"
+#include "AssetMaterial.h"
 #include "AssetModel3D.h"
 #include "AssetSpriteAnim.h"
 #include "AssetText.h"
 #include "AssetTexture2D.h"
-#include "AssetMaterial.h"
 
 namespace sge {
 
@@ -27,7 +27,6 @@ enum AssetIfaceType : int {
 	assetIface_audio,
 	assetIface_text,
 	assetIface_mtl,
-
 	assetIface_count,
 };
 
@@ -57,7 +56,19 @@ struct SGE_CORE_API AssetLibrary {
 	/// Returns the requested asset.
 	/// The input path will internally get converted to relative path to the current working directory.
 	/// This converted path will get used to identify the asset later.
-	AssetPtr getAssetFromFile(const char* path, bool loadIfMissing = true);
+	/// @localDirectory is specified, the asset would be attempted to get loaded from the local directory
+	/// (basically localDirectory + path), otherwise it would fallback to the currnet-working directory.
+	AssetPtr getAssetFromFile(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true);
+
+	template <typename TAssetIface>
+	std::shared_ptr<TAssetIface> getAssetIface(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true) {
+		AssetPtr assetPtr = getAssetFromFile(path, localDirectory, loadIfMissing);
+		if (assetPtr) {
+			return std::dynamic_pointer_cast<TAssetIface>(assetPtr);
+		}
+
+		return nullptr;
+	}
 
 	/// Returns true if an asset with the specified path is allocated.
 	bool hasAsset(const std::string& path) const;
@@ -86,6 +97,20 @@ struct SGE_CORE_API AssetLibrary {
 		return m_gameAssetsDir;
 	}
 
+	void queueAssetForReload(AssetPtr& a) {
+		if (a) {
+			m_assetsToReload.insert(a);
+		}
+	}
+
+	void reloadAssets() {
+		for (AssetPtr a : m_assetsToReload) {
+			a->loadAssetFromFile(a->getPath().c_str());
+		}
+
+		m_assetsToReload.clear();
+	}
+
   private:
 	/// Resolves a relative path to an asset to an relative to the current working dir.
 	/// This is needed as some assets might refer to other assets relativly to them,
@@ -98,6 +123,7 @@ struct SGE_CORE_API AssetLibrary {
   private:
 	std::string m_gameAssetsDir;
 	std::map<std::string, AssetPtr> m_allAssets;
+	std::set<AssetPtr> m_assetsToReload;
 };
 
 /// Returns true if the specified asset supports the specified interface.
