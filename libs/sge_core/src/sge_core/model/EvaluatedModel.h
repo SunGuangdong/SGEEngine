@@ -19,7 +19,7 @@ namespace sge {
 
 struct AssetLibrary;
 struct Asset;
-struct IMaterial;
+struct AssetIface_Material;
 
 // struct EvaluatedMaterial {
 //	AssetPtr diffuseTexture;
@@ -114,7 +114,7 @@ struct SGE_CORE_API EvaluatedModel {
 	int getNumEvalMaterial() const {
 		return int(m_evaluatedMaterials.size());
 	}
-	const std::shared_ptr<IMaterial>& getEvalMaterial(const int iMesh) const {
+	const std::shared_ptr<AssetIface_Material>& getEvalMaterial(const int iMesh) const {
 		return m_evaluatedMaterials[iMesh];
 	}
 
@@ -169,7 +169,7 @@ struct SGE_CORE_API EvaluatedModel {
 	/// @brief Since materials cannot be animated in any way,
 	/// and we cannot "accept" them from a donor they can be evaluated only once.
 	bool areMaterialsAlreadyEvaluated = false;
-	std::vector<std::shared_ptr<IMaterial>> m_evaluatedMaterials;
+	std::vector<std::shared_ptr<AssetIface_Material>> m_evaluatedMaterials;
 
 	std::vector<AnimationDonor> m_donors; // Caution: ckind of assumes that the AnimationDonor is moveable.
 

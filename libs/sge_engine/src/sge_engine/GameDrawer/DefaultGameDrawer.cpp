@@ -331,7 +331,8 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 	// vec4f selectionTint = useWireframe ? wireframeColor : vec4f(0.f);
 	// selectionTint.w = useWireframe ? 1.f : 0.f;
 
-	lighting.ambientLightColor = getWorld()->m_ambientLight;
+	lighting.ambientLightColor = getWorld()->m_ambientLight * getWorld()->m_ambientLightIntensity;
+	lighting.ambientFakeDetailBias = getWorld()->m_ambientLightFakeDetailAmount;
 	lighting.uRimLightColorWWidth = vec4f(getWorld()->m_rimLight, getWorld()->m_rimCosineWidth);
 
 	// Extract the alpha sorting plane.

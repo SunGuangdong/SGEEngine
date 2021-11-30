@@ -3,11 +3,11 @@
 #include "sge_core/AssetLibrary/AssetMaterial.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
-#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/actors/ALocator.h"
 #include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
@@ -221,7 +221,6 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 				const ModelNode* node = evalModel->m_model->nodeAt(iNode);
 				int numAttachments = int(node->meshAttachments.size());
 				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
-
 					int mtlIndex = node->meshAttachments[iAttach].attachedMaterialIndex;
 
 					IMaterial* mtl = nullptr;
@@ -235,7 +234,14 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 					}
 
 					if (mtl == nullptr) {
-						mtl = evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex).get();
+						const std::shared_ptr<AssetIface_Material>& mtlProvider =
+						    evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex);
+						if (mtlProvider) {
+							const std::shared_ptr<IMaterial>& mtlIface = mtlProvider->getMaterial();
+							if (mtlIface) {
+								mtl = mtlIface.get();
+							}
+						}
 					}
 
 					IMaterialData* imtlData = mtl->getMaterialDataLocalStorage();

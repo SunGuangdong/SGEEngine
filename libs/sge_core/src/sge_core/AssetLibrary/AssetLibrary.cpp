@@ -222,7 +222,17 @@ AssetPtr AssetLibrary::getAssetFromFile(const char* path, const char* localDirec
 	}
 
 	if (!loadIfMissing) {
-		return itrFindAssetByPath != m_allAssets.end() ? itrFindAssetByPath->second : nullptr;
+		if (itrFindAssetByPath == m_allAssets.end()) {
+			// If the asset has not been created, create one but do not load it.
+			// That way it will pop-up in the interface as being available.
+			AssetPtr newAssetToMarkExisting = newAsset(pathToAsset.c_str(), assetType);
+			m_allAssets[pathToAsset] = newAssetToMarkExisting;
+			return newAssetToMarkExisting;
+		} else {
+			// The asset is already allocated but not loaded.
+			// The user doesn't want us to load it, so just return it.
+			return itrFindAssetByPath->second;
+		}
 	}
 
 	AssetPtr assetToModify =

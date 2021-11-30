@@ -24,7 +24,7 @@ ReflBlock() {
 		ReflMember(LightDesc, color)
 	        .addMemberFlag(MFF_Vec3fAsColor) ReflMember(LightDesc, spotLightAngle)
 	        .addMemberFlag(MFF_FloatAsDegrees) ReflMember(LightDesc, hasShadows)
-		ReflMember(LightDesc, shadowMapRes)
+		ReflMember(LightDesc, shadowMapRes).uiRange(4, 24000, 1.f)
 		ReflMember(LightDesc, shadowMapBias).uiRange(0.f, 100.f, 0.0001f);
 	;
 

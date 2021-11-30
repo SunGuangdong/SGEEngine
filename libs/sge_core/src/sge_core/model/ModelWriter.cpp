@@ -184,31 +184,7 @@ void ModelWriter::writeMaterials() {
 		const ModelMaterial* mtl = model->materialAt(iMtl);
 
 		jMaterial->setMember("name", jvb(mtl->name));
-
-		static_assert(sizeof(mtl->diffuseColor) == sizeof(vec4f));
-		jMaterial->setMember("diffuseColor", jvb(mtl->diffuseColor.data, 4)); // An array of 4 floats rgba.
-		static_assert(sizeof(mtl->emissionColor) == sizeof(vec4f));
-		jMaterial->setMember("emissionColor", jvb(mtl->emissionColor.data, 4)); // An array of 4 floats rgba.
-		jMaterial->setMember("metallic", jvb(mtl->metallic));
-		jMaterial->setMember("roughness", jvb(mtl->roughness));
-
-		jMaterial->setMember("alphaMultiplier", jvb(mtl->alphaMultiplier));
-		jMaterial->setMember("needsAlphaSorting", jvb(mtl->needsAlphaSorting));
-
-		if (mtl->diffuseTextureName.empty() == false)
-			jMaterial->setMember("diffuseTextureName", jvb(mtl->diffuseTextureName));
-
-		if (mtl->emissionTextureName.empty() == false)
-			jMaterial->setMember("emissionTextureName", jvb(mtl->emissionTextureName));
-
-		if (mtl->metallicTextureName.empty() == false)
-			jMaterial->setMember("metallicTextureName", jvb(mtl->metallicTextureName));
-
-		if (mtl->roughnessTextureName.empty() == false)
-			jMaterial->setMember("roughnessTextureName", jvb(mtl->roughnessTextureName));
-
-		if (mtl->normalTextureName.empty() == false)
-			jMaterial->setMember("normalTextureName", jvb(mtl->normalTextureName));
+		jMaterial->setMember("asset", jvb(mtl->assetForThisMaterial));
 	}
 
 	return;

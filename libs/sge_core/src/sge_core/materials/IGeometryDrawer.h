@@ -41,6 +41,12 @@ struct ObjectLighting {
 	/// Usually this is the same as the one in the scene.
 	vec3f ambientLightColor = vec3f(1.f);
 
+	/// How much fake abient detail should be added (by using the normals).
+	/// 0 means no abient detail and unlit surfaces would look flat.
+	/// 1 means 100% fake detail, altering the ambient lighting 
+	/// where then normals chage.
+	float ambientFakeDetailBias = 0.f; 
+
 	/// The rim light in the scene.
 	vec4f uRimLightColorWWidth = vec4f(vec3f(0.1f), 0.7f);
 

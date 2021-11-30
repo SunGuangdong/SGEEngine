@@ -32,9 +32,11 @@ cbuffer ParamsCbFWDDefaultShading {
 
 	float4 uRimLightColorWWidth;
 	float3 uAmbientLightColor;
+	float uAmbientFakeDetailAmount;
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+	//int uSkinningFirstBoneOffsetInTex_padding[3];
 
 	ShaderLightData lights[kMaxLights];
 	int lightsCnt;
@@ -231,12 +233,27 @@ float4 psMain(StageVertexOut inVert) : SV_Target0 {
 		finalColor = mtlSample.albedo;
 	} else {
 		finalColor = float4(0.f, 0.f, 0.f, mtlSample.albedo.w);
+
 		for (int iLight = 0; iLight < lightsCnt; ++iLight) {
 			finalColor.xyz += Light_computeDirectLighting(lights[iLight], uLightShadowMap[iLight], mtlSample, cameraPositionWs);
 		}
-
+		
 		// Add ambient lighting.
+#if 0
+		// Regular ambient.
 		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor;
+#else
+		// Ambient varying with the normal dir.
+		float ambientLightingFake = 0.f;
+		ambientLightingFake += 0.25f;
+		ambientLightingFake += 0.25f * 0.5f * (mtlSample.shadeNormalWs.y + 1.f);
+		ambientLightingFake += 0.25f * abs(mtlSample.shadeNormalWs.x);
+		ambientLightingFake += 0.25f * abs(mtlSample.shadeNormalWs.z);
+
+		float ambientLightAmount = lerp(1.f, ambientLightingFake, uAmbientFakeDetailAmount);
+		
+		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor * ambientLightAmount;
+#endif
 	}
 
 	// Applt the alpha multiplier.

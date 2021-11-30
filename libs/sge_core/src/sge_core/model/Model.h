@@ -19,7 +19,8 @@ struct Model_CollisionShapeBox {
 	Model_CollisionShapeBox(std::string name, transf3d transform, vec3f halfDiagonal)
 	    : name(std::move(name))
 	    , transform(transform)
-	    , halfDiagonal(halfDiagonal) {}
+	    , halfDiagonal(halfDiagonal) {
+	}
 
 	std::string name;
 	transf3d transform = transf3d::getIdentity();
@@ -34,7 +35,8 @@ struct Model_CollisionShapeCapsule {
 	    : name(std::move(name))
 	    , transform(transform)
 	    , halfHeight(halfHeight)
-	    , radius(radius) {}
+	    , radius(radius) {
+	}
 
 	std::string name;
 	transf3d transform = transf3d::getIdentity();
@@ -47,7 +49,8 @@ struct Model_CollisionShapeCylinder {
 	Model_CollisionShapeCylinder(std::string name, transf3d transform, vec3f halfDiagonal)
 	    : name(std::move(name))
 	    , transform(transform)
-	    , halfDiagonal(halfDiagonal) {}
+	    , halfDiagonal(halfDiagonal) {
+	}
 
 	std::string name;
 	transf3d transform = transf3d::getIdentity();
@@ -59,7 +62,8 @@ struct Model_CollisionShapeSphere {
 	Model_CollisionShapeSphere(std::string name, transf3d transform, float radius)
 	    : name(std::move(name))
 	    , transform(transform)
-	    , radius(radius) {}
+	    , radius(radius) {
+	}
 
 	std::string name;
 	transf3d transform = transf3d::getIdentity();
@@ -74,7 +78,10 @@ struct ModelLoadSettings {
 
 struct ModelMaterial {
 	std::string name;
+	std::string assetForThisMaterial;
 
+#if 1
+	// Legacy settings for loading old models.
 	float alphaMultiplier = 1.f;
 	bool needsAlphaSorting = false;
 	vec4f diffuseColor = vec4f(1.f);
@@ -87,6 +94,7 @@ struct ModelMaterial {
 	std::string normalTextureName;
 	std::string metallicTextureName;
 	std::string roughnessTextureName;
+#endif
 };
 
 // Skinning bone.
@@ -94,7 +102,8 @@ struct ModelMeshBone {
 	ModelMeshBone() = default;
 	ModelMeshBone(const mat4f& offsetMatrix, int nodeIdx)
 	    : offsetMatrix(offsetMatrix)
-	    , nodeIdx(nodeIdx) {}
+	    , nodeIdx(nodeIdx) {
+	}
 
 	mat4f offsetMatrix = mat4f::getIdentity(); ///< The transformation matrix used for binding a bone to a mesh.
 	int nodeIdx = -1;                          ///< The index of the node representing this bone transformation.
@@ -141,7 +150,8 @@ struct MeshAttachment {
 
 	MeshAttachment(int attachedMeshIndex, int attachedMaterialIndex)
 	    : attachedMeshIndex(attachedMeshIndex)
-	    , attachedMaterialIndex(attachedMaterialIndex) {}
+	    , attachedMaterialIndex(attachedMaterialIndex) {
+	}
 
 	int attachedMeshIndex = -1;
 	int attachedMaterialIndex = -1;
@@ -161,7 +171,8 @@ struct ModelAnimation {
 	ModelAnimation(std::string animationName, float durationSec, std::map<int, KeyFrames> perNodeKeyFrames)
 	    : animationName(std::move(animationName))
 	    , durationSec(durationSec)
-	    , perNodeKeyFrames(std::move(perNodeKeyFrames)) {}
+	    , perNodeKeyFrames(std::move(perNodeKeyFrames)) {
+	}
 
 	bool evaluateForNode(transf3d& outTransform, const int nodeIndex, const float time) const {
 		auto itr = perNodeKeyFrames.find(nodeIndex);
@@ -191,7 +202,7 @@ struct ModelNode {
 	std::vector<MeshAttachment> meshAttachments;
 	std::vector<int> childNodes; ///< The indices of all child nodes.
 	float limbLength = 0.f; ///< If the node seemed to be used for skinning, this is the length of the bone in the interface. 0 otherwise.
-	std::string name; ///< The name of the node.
+	std::string name;       ///< The name of the node.
 };
 
 /// @brief Model hold a serialized/deserialized state of our internal 3D model file format,
@@ -210,35 +221,59 @@ struct SGE_CORE_API Model {
 	int makeNewAnim();
 	void setRootNodeIndex(const int newRootNodeIndex);
 
-	int getRootNodeIndex() const { return m_rootNodeIndex; }
-	ModelNode* getRootNode() { return nodeAt(getRootNodeIndex()); }
-	const ModelNode* getRootNode() const { return nodeAt(getRootNodeIndex()); }
+	int getRootNodeIndex() const {
+		return m_rootNodeIndex;
+	}
+	ModelNode* getRootNode() {
+		return nodeAt(getRootNodeIndex());
+	}
+	const ModelNode* getRootNode() const {
+		return nodeAt(getRootNodeIndex());
+	}
 
-	int numNodes() const { return int(m_nodes.size()); }
+	int numNodes() const {
+		return int(m_nodes.size());
+	}
 	ModelNode* nodeAt(int nodeIndex);
 	const ModelNode* nodeAt(int nodeIndex) const;
 	int findFistNodeIndexWithName(const std::string& name) const;
 
-	int numMaterials() const { return int(m_materials.size()); }
+	int numMaterials() const {
+		return int(m_materials.size());
+	}
 	ModelMaterial* materialAt(int materialIndex);
 	const ModelMaterial* materialAt(int materialIndex) const;
 
-	int numMeshes() const { return int(m_meshes.size()); }
+	int numMeshes() const {
+		return int(m_meshes.size());
+	}
 	ModelMesh* meshAt(int meshIndex);
 	const ModelMesh* meshAt(int meshIndex) const;
 
-	int numAnimations() const { return int(m_animations.size()); }
+	int numAnimations() const {
+		return int(m_animations.size());
+	}
 	const ModelAnimation* animationAt(int iAnim) const;
 	ModelAnimation* animationAt(int iAnim);
 	const ModelAnimation* getAnimationByName(const std::string& name) const;
 	int getAnimationIndexByName(const std::string& name) const;
 
-	const std::vector<ModelNode*>& getNodes() { return m_nodes; }
-	const std::vector<ModelMesh*>& getMeshes() { return m_meshes; }
-	const std::vector<ModelMaterial*>& getMatrials() { return m_materials; }
+	const std::vector<ModelNode*>& getNodes() {
+		return m_nodes;
+	}
+	const std::vector<ModelMesh*>& getMeshes() {
+		return m_meshes;
+	}
+	const std::vector<ModelMaterial*>& getMatrials() {
+		return m_materials;
+	}
 
-	void setModelLoadSettings(const ModelLoadSettings& loadSets) { m_loadSets = loadSets; }
-	const ModelLoadSettings& getModelLoadSetting() const { return m_loadSets; }
+	void setModelLoadSettings(const ModelLoadSettings& loadSets) {
+		m_loadSets = loadSets;
+	}
+	const ModelLoadSettings& getModelLoadSetting() const {
+		return m_loadSets;
+	}
 
   private:
 	int m_rootNodeIndex = -1;

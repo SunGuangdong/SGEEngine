@@ -10,7 +10,8 @@ namespace sge {
 
 struct ModelParseExcept : public std::logic_error {
 	ModelParseExcept(const char* msg)
-	    : std::logic_error(msg) {}
+	    : std::logic_error(msg) {
+	}
 };
 
 
@@ -264,34 +265,41 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				int newMaterialIndex = model.makeNewMaterial();
 				ModelMaterial* material = model.materialAt(newMaterialIndex);
 
+
 				material->name = jMaterial->getMember("name")->GetString();
-				jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->diffuseColor.data, 4);
-				jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->emissionColor.data, 4);
-				material->metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
-				material->roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
+				const JsonValue* jMtlAssetPath = jMaterial->getMember("asset");
 
-				if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("alphaMultiplier")) {
-					material->alphaMultiplier = jNeedsAlphaSorting->getNumberAs<float>();
-				}
+				if (jMtlAssetPath) {
+					material->assetForThisMaterial = jMtlAssetPath->GetString();
+				} else {
+					jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->diffuseColor.data, 4);
+					jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->emissionColor.data, 4);
+					material->metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
+					material->roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
 
-				if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("needsAlphaSorting")) {
-					material->needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
-				}
+					if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("alphaMultiplier")) {
+						material->alphaMultiplier = jNeedsAlphaSorting->getNumberAs<float>();
+					}
 
-				if (const JsonValue* jTex = jMaterial->getMember("diffuseTextureName")) {
-					material->diffuseTextureName = jTex->GetString();
-				}
+					if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("needsAlphaSorting")) {
+						material->needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
+					}
 
-				if (const JsonValue* jTex = jMaterial->getMember("emissionTextureName")) {
-					material->emissionTextureName = jTex->GetString();
-				}
+					if (const JsonValue* jTex = jMaterial->getMember("diffuseTextureName")) {
+						material->diffuseTextureName = jTex->GetString();
+					}
 
-				if (const JsonValue* jTex = jMaterial->getMember("metallicTextureName")) {
-					material->metallicTextureName = jTex->GetString();
-				}
+					if (const JsonValue* jTex = jMaterial->getMember("emissionTextureName")) {
+						material->emissionTextureName = jTex->GetString();
+					}
 
-				if (const JsonValue* jTex = jMaterial->getMember("roughnessTextureName")) {
-					material->roughnessTextureName = jTex->GetString();
+					if (const JsonValue* jTex = jMaterial->getMember("metallicTextureName")) {
+						material->metallicTextureName = jTex->GetString();
+					}
+
+					if (const JsonValue* jTex = jMaterial->getMember("roughnessTextureName")) {
+						material->roughnessTextureName = jTex->GetString();
+					}
 				}
 			}
 		}
@@ -425,7 +433,7 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 					node->limbLength = jlimbLength->getNumberAs<float>();
 				}
 
-				
+
 
 				// Read the mesh attachments.
 				if (auto jMeshes = jNode->getMember("meshes")) {

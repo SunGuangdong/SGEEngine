@@ -24,8 +24,7 @@ using namespace sge;
 
 extern "C" {
 
-SGE_MDLCONVLIB_API bool
-    sgeImportFBXFile(Model& result, const char* fbxFilename, std::vector<std::string>* pOutReferencedTextures) {
+SGE_MDLCONVLIB_API bool sgeImportFBXFile(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename) {
 	// Ensure that the typedef we provide in the header matches the actual function type.
 	static_assert(std::is_same<decltype(&sgeImportFBXFile), sgeImportFBXFileFn>::value);
 
@@ -46,8 +45,10 @@ SGE_MDLCONVLIB_API bool
 	NoneAssetRelocationPolicy relocationPolicy = NoneAssetRelocationPolicy();
 	mps.pRelocaionPolicy = &relocationPolicy;
 
+	std::string materialsAssetsNamePrefix = extractFileNameNoExt(fbxFilename);
+
 	FBXSDKParser fbxsdkParser;
-	if (!fbxsdkParser.parse(&result, pOutReferencedTextures, fbxScene, nullptr, mps)) {
+	if (!fbxsdkParser.parse(&result, additionalResult, materialsAssetsNamePrefix, fbxScene, nullptr, mps)) {
 		return false;
 	}
 
@@ -55,8 +56,8 @@ SGE_MDLCONVLIB_API bool
 }
 
 SGE_MDLCONVLIB_API bool sgeImportFBXFileAsMultiple(std::vector<MultiModelImportResult>& result,
-                                                     const char* fbxFilename,
-                                                     std::vector<std::string>* pOutReferencedTextures) {
+                                                   ModelImportAdditionalResult& additionalResult,
+                                                   const char* fbxFilename) {
 	// Ensure that the typedef we provide in the header matches the actual function type.
 	static_assert(std::is_same<decltype(&sgeImportFBXFileAsMultiple), sgeImportFBXFileAsMultipleFn>::value);
 
@@ -83,6 +84,8 @@ SGE_MDLCONVLIB_API bool sgeImportFBXFileAsMultiple(std::vector<MultiModelImportR
 	result.clear();
 	result.resize(fbxRoot->GetChildCount());
 
+	std::string materialsAssetsNamePrefix = extractFileNameNoExt(fbxFilename);
+
 	for (int t = 0; t < fbxRoot->GetChildCount(); ++t) {
 		FbxNode* const fbxChild = fbxRoot->GetChild(t);
 
@@ -91,9 +94,8 @@ SGE_MDLCONVLIB_API bool sgeImportFBXFileAsMultiple(std::vector<MultiModelImportR
 		const std::string newOutName = extractFileNameWithExt(replaceExtension(fbxFilename, newExt.c_str()).c_str());
 
 		FBXSDKParser fbxsdkParser;
-		Model importedModel;
 
-		if (fbxsdkParser.parse(&result[t].importedModel, pOutReferencedTextures, fbxScene, fbxChild, mps)) {
+		if (fbxsdkParser.parse(&result[t].importedModel, additionalResult, materialsAssetsNamePrefix, fbxScene, fbxChild, mps)) {
 			result[t].propsedFilename = newOutName;
 		} else {
 			printf("Something went wrong when converting %s!", fbxFilename);

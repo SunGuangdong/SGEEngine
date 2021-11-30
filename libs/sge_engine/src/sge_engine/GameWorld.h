@@ -296,6 +296,8 @@ struct SGE_ENGINE_API GameWorld {
 
 	// Scene default ambient lighting.
 	vec3f m_ambientLight = vec3f(0.25f);
+	float m_ambientLightIntensity = 1.f;
+	float m_ambientLightFakeDetailAmount = 1.f;
 	vec3f m_rimLight = vec3f(0.1f);
 	float m_rimCosineWidth = 0.3f;
 

@@ -1,6 +1,7 @@
 #include "IGeometryDrawer.h"
 #include "IMaterial.h"
 #include "MaterialFamilyList.h"
+#include "sge_core/AssetLibrary/AssetMaterial.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/shaders/LightDesc.h"
@@ -42,8 +43,8 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
 			mat4f const finalTrasform =
 			    (evalMesh.geometry.hasVertexSkinning()) ? geomWorldTransfrom : geomWorldTransfrom * evalNode.evalGlobalTransform;
 
-			const std::shared_ptr<IMaterial>& mtl = evalModel.getEvalMaterial(meshAttachment.attachedMaterialIndex);
-			IMaterialData* mdlData = mtl->getMaterialDataLocalStorage();
+			const std::shared_ptr<AssetIface_Material>& mtlIface = evalModel.getEvalMaterial(meshAttachment.attachedMaterialIndex);
+			IMaterialData* mdlData = mtlIface && mtlIface->getMaterial() ? mtlIface->getMaterial()->getMaterialDataLocalStorage() : nullptr;
 
 			if_checked(mdlData) {
 				const MaterialFamilyLibrary::MaterialFamilyData* family =

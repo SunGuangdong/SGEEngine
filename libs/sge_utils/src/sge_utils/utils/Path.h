@@ -12,6 +12,7 @@ namespace sge {
 
 /// Extracts the filename form the input path.
 std::string extractFileNameWithExt(const char* filepath);
+std::string extractFileNameNoExt(const char* filepath);
 
 /// Extracts the directroy of a given file.
 std::string extractFileDir(const char* filepath, const bool includeSlashInResult);

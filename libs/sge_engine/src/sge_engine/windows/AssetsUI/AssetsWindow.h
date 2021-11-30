@@ -11,6 +11,7 @@
 namespace sge {
 struct InputState;
 struct GameInspector;
+struct FrameTarget;
 
 /// AssetsWindow is a window in the engine interface for exploring and importing assets.
 struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
@@ -89,5 +90,8 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	sgeImportFBXFileFn m_sgeImportFBXFile = nullptr;
 	/// A pointer to the function from mdlconvlib (if available) for importing 3D files as multiple models (fbx, dae).
 	sgeImportFBXFileAsMultipleFn m_sgeImportFBXFileAsMultiple = nullptr;
+
+
+	std::map<std::string, GpuHandle<FrameTarget>> assetPreviewTex;
 };
 } // namespace sge

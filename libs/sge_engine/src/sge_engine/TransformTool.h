@@ -24,7 +24,7 @@ struct SGE_ENGINE_API TransformTool : IInspectorTool {
 	bool m_useSnapSettings = true;
 	bool m_localSpaceRotation = false;
 	GizmoSnapSets m_snapSettings = GizmoSnapSets(vec3f(0.5f), deg2rad(10.f), vec3f(0.5f));
-	TransformToolOrigin m_origin = transformToolOrigin_lastSelected;
+	TransformToolOrigin m_origin = transformToolOrigin_firstSelected;
 	Gizmo3D m_gizmo;
 
 	struct PerControlledItemData {

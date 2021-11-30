@@ -39,9 +39,11 @@ __declspec(align(4)) struct ParamsCbFWDDefaultShading {
 
 	vec4f uRimLightColorWWidth;
 	vec3f uAmbientLightColor;
+	float uAmbientFakeDetailAmount;
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+	int uSkinningFirstBoneOffsetInTex_padding[3];
 
 	ShaderLightData lights[kMaxLights];
 	int lightsCnt;
@@ -361,6 +363,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 
 	paramsCb.uAmbientLightColor = lighting.ambientLightColor;
+	paramsCb.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
 	paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 
 	if (instDrawMods.forceAdditiveBlending) {

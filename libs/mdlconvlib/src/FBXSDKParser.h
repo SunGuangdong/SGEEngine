@@ -4,8 +4,9 @@
 #include <memory>
 
 #include "ModelParseSettings.h"
-#include "sge_core/model/Model.h"
+#include "sgeImportFBXFile.h"
 #include "sge_core/AssetLibrary/AssetMaterial.h"
+#include "sge_core/model/Model.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/utils/optional.h"
 
@@ -15,35 +16,16 @@ struct IAssetRelocationPolicy;
 
 bool InitializeFBXSDK();
 
-struct ExternalMaterialDesc {
-	std::string fullAssetPath;
-
-	float alphaMultiplier = 1.f;
-	bool needsAlphaSorting = false;
-	vec4f diffuseColor = vec4f(1.f);
-	vec4f emissionColor = vec4f(0.f);
-	float metallic = 0.f;
-	float roughness = 1.f;
-
-	std::string diffuseTextureName;
-	std::string emissionTextureName;
-	std::string normalTextureName;
-	std::string metallicTextureName;
-	std::string roughnessTextureName;
-};
-
-struct MaterialsToCreate {
-	std::string filename; // Just the name not including the path.
-	std::shared_ptr<IMaterial> mtl;
-};
-
 /// @brief FBXSDKParser convers FBX/DAE/OBJ files to our own internal format by using FBX SDK.s
 struct FBXSDKParser {
-	// Prases the input FBX scene and produces a ready to save SGE model.
-	// @param enforcedRootNode is the node to be used as a root node insted of the actual one, if null, the regular root is going to be
-	// used.
+	/// Prases the input FBX scene and produces a ready to save SGE model.
+	/// @param [in] enforcedRootNode is the node to be used as a root node insted of the actual one, if null, the regular root is going to be
+	/// used.
+	/// @param [in] materialsPrefix is needed when additional assets should get imported alongside the model.
+	///             These are materials for example. Usually passing the fbx file filename is enough.
 	bool parse(Model* result,
-	           std::vector<std::string>* pReferencedTextures,
+	           ModelImportAdditionalResult& additionalResult,
+	           std::string& materialsPrefix,
 	           fbxsdk::FbxScene* scene,
 	           FbxNode* enforcedRootNode,
 	           const ModelParseSettings& parseSettings);
@@ -80,7 +62,8 @@ struct FBXSDKParser {
   private:
 	fbxsdk::FbxScene* m_fbxScene = nullptr; ///< The FBX scene to be imported.
 	ModelParseSettings m_parseSettings;
-	std::vector<std::string>* m_pReferencedTextures = nullptr;
+	ModelImportAdditionalResult* m_additionalResult;
+	std::string m_materialsPrefix;
 
 	std::map<FbxSurfaceMaterial*, int> m_fbxMtl2MtlIndex;
 	std::map<FbxMesh*, int> m_fbxMesh2MeshIndex;

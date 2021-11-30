@@ -112,7 +112,7 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc) {
 
 	DumpAllGLErrors();
 
-	[maybe_unused]] const GLubyte* glVersion = glGetString(GL_VERSION);
+	[[maybe_unused]] const GLubyte* glVersion = glGetString(GL_VERSION);
 	sgeLogInfo("OpenGL Version = %s\n", glVersion);
 
 	m_immContext = new SGEContextImmediate;

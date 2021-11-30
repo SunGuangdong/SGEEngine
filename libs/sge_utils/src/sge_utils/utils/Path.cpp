@@ -50,6 +50,47 @@ std::string extractFileNameWithExt(const char* filepath) {
 	return std::string(filepath + d + 1);
 }
 
+std::string extractFileNameNoExt(const char* filepath) {
+	if (filepath == NULL) {
+		sgeAssert(false);
+		return std::string();
+	}
+
+	int p = -1; // the position of the last point
+	int d = -1; // the position of the last slash
+
+	for (int t = 0; filepath[t] != '\0'; ++t) {
+		if (filepath[t] == '.')
+			p = t;
+		if (filepath[t] == '/' || filepath[t] == '\\')
+			d = t;
+	}
+
+	// Check if the input is actually a filename.
+	if (d == -1) {
+		return filepath;
+	}
+
+	// Only things with extension are counted as files here.
+	if (p < d) {
+		return std::string();
+	}
+
+	// Check if there is a file at all.
+	if (filepath[d + 1] == '\0') {
+		return std::string();
+	}
+
+	std::string filenameNoDot;
+	int itr = d + 1;
+	while (filepath[itr] != '.' && filepath[itr] != '\0') {
+		filenameNoDot.push_back(filepath[itr]);
+		itr++;
+	}
+
+	return filenameNoDot;
+}
+
 
 std::string extractFileDir(const char* filepath, const bool includeSlashInResult) {
 	if (isStringEmpty(filepath)) {
@@ -276,22 +317,22 @@ void createDirectory(const char* const path) {
 }
 
 void copyFile(const char* srcFile, const char* destFile) {
-	//if (isStringEmpty(srcFile) || isStringEmpty(destFile)) {
-	//	return;
-	//}
+// if (isStringEmpty(srcFile) || isStringEmpty(destFile)) {
+//	return;
+//}
 
-	//[[maybe_unused]] bool failed = std::filesystem::copy_file(srcFile, destFile);
-	#ifdef WIN32
-		[[maybe_unused]] BOOL succeeded = CopyFileA(srcFile, destFile, FALSE);
-		// sgeAssert(succeeded != 0);
-	#else
-		// const std::string cmd = string_format("cp \"%s\" \"%s\"", srcFile, destFile);
-		// system(cmd.c_str());
-		try {
-			std::filesystem::copy(srcFile, destFile);
-		} catch (...) {
-		}
-	#endif
+//[[maybe_unused]] bool failed = std::filesystem::copy_file(srcFile, destFile);
+#ifdef WIN32
+	[[maybe_unused]] BOOL succeeded = CopyFileA(srcFile, destFile, FALSE);
+	// sgeAssert(succeeded != 0);
+#else
+	// const std::string cmd = string_format("cp \"%s\" \"%s\"", srcFile, destFile);
+	// system(cmd.c_str());
+	try {
+		std::filesystem::copy(srcFile, destFile);
+	} catch (...) {
+	}
+#endif
 }
 
 } // namespace sge

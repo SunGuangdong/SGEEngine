@@ -65,7 +65,7 @@ bool assetPicker(const char* label,
 			}
 
 			for (auto& itr : assetLibrary->getAllAssets()) {
-				if (isAssetLoaded(itr.second, assetType)) {
+				if (!isAssetSupportingInteface(itr.second, assetType)) {
 					continue;
 				}
 

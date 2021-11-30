@@ -4,8 +4,27 @@
 #include <set>
 #include <string>
 #include <vector>
+#include "sge_utils/math/vec4.h"
 
 extern "C" {
+
+struct ExternalPBRMaterialSettings {
+	std::string diffuseTextureName;
+	std::string emissionTextureName;
+	std::string normalTextureName;
+	std::string metallicTextureName;
+	std::string roughnessTextureName;
+
+	sge::vec4f diffuseColor = sge::vec4f(1.f);
+	sge::vec4f emissionColor = sge::vec4f(0.f);
+	float metallic = 0.f;
+	float roughness = 1.f;
+};
+
+struct ModelImportAdditionalResult {
+	std::set<std::string> textureToCopy;
+	std::map<std::string, ExternalPBRMaterialSettings> mtlsToCreate;
+};
 
 /// @brief Load the fuunction symbol named "m_sgeImportFBXFile" and cast it to sgeImportFBXFileFn to call the function.
 ///
@@ -25,8 +44,7 @@ extern "C" {
 /// @param [in] fbxFilename is the filename to be loaded.
 /// @param [out] pOutReferencedTextures A list of referenced textures in the specified filename (used for dependancy tracking).
 /// @return true if the import was successful.
-typedef bool (*sgeImportFBXFileFn)(sge::Model& result, const char* fbxFilename, std::vector<std::string>* pOutReferencedTextures);
-
+typedef bool (*sgeImportFBXFileFn)(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename);
 
 struct MultiModelImportResult {
 	sge::Model importedModel;
@@ -35,7 +53,7 @@ struct MultiModelImportResult {
 };
 
 typedef bool (*sgeImportFBXFileAsMultipleFn)(std::vector<MultiModelImportResult>& result,
-                                             const char* fbxFilename,
-                                             std::vector<std::string>* pOutReferencedTextures);
+                                             ModelImportAdditionalResult& additionalResult,
+                                             const char* fbxFilename);
 
 } // extern "C"

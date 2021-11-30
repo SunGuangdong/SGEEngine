@@ -288,8 +288,8 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		const JsonValue* const jMember = jValue->getMember(mfd.name);
 
 		if (jMember == nullptr) {
-			sgeLogError("[SERIALIZATION] A member is missing %s::%s. This that is going to be skipped and left as it is.\n",
-			              typeDesc->name, mfd.name);
+			sgeLogError("[SERIALIZATION] A member is missing %s::%s. This that is going to be skipped and left as it is.\n", typeDesc->name,
+			            mfd.name);
 			// sgeAssert(false);
 			continue;
 		} else {
@@ -435,7 +435,9 @@ GameObject*
 				transf3d logicTransform;
 				succeeded = deserializeVariable((char*)&logicTransform, jMember, typeLib().find(mfd.typeId));
 				Actor* actor = object->getActor();
-				if_checked(actor) { actor->setTransform(logicTransform); }
+				if_checked(actor) {
+					actor->setTransform(logicTransform);
+				}
 			} else if (mfd.byteOffset >= 0) {
 				char* const memberData = (char*)(object) + mfd.byteOffset;
 				succeeded = deserializeVariable(memberData, jMember, typeLib().find(mfd.typeId));
@@ -494,6 +496,7 @@ JsonValue* serializeGameWorld(const GameWorld* world, JsonValueBuffer& jvb) {
 	jWorld->setMember("cameraProvider", jvb(world->m_cameraPovider.id));
 
 	jWorld->setMember("ambientLightColor", serializeVariableT(world->m_ambientLight, jvb));
+	jWorld->setMember("ambientLightIntensity", serializeVariableT(world->m_ambientLightIntensity, jvb));
 	jWorld->setMember("rimLightColor", serializeVariableT(world->m_rimLight, jvb));
 	jWorld->setMember("rimCosineWidth", serializeVariableT(world->m_rimCosineWidth, jvb));
 
@@ -595,6 +598,10 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* 
 
 	if (const JsonValue* const jAmbientLightColor = jWorld->getMember("ambientLightColor")) {
 		deserializeVariable((char*)&world->m_ambientLight, jAmbientLightColor, typeLib().find(sgeTypeId(vec3f)));
+	}
+
+	if (const JsonValue* const jAmbientLightColor = jWorld->getMember("ambientLightIntensity")) {
+		deserializeVariable((char*)&world->m_ambientLightIntensity, jAmbientLightColor, typeLib().find(sgeTypeId(float)));
 	}
 
 	if (const JsonValue* const jRimLightColor = jWorld->getMember("rimLightColor")) {

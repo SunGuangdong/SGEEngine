@@ -30,6 +30,42 @@
 
 namespace sge {
 
+///
+JsonValue* createDefaultPBRFromImportedMtl(ExternalPBRMaterialSettings& externalMaterial, JsonValueBuffer& jvb) {
+	JsonValue* jMaterial = jvb(JID_MAP);
+
+	jMaterial->setMember("family", jvb("DefaultPBR"));
+	jMaterial->setMember("alphaMultiplier", jvb(1.f));
+	jMaterial->setMember("needsAlphaSorting", jvb(false));
+
+	jMaterial->setMember("diffuseColor", jvb(externalMaterial.diffuseColor.data, 4));
+	jMaterial->setMember("emissionColor", jvb(externalMaterial.emissionColor.data, 4));
+	jMaterial->setMember("metallic", jvb(externalMaterial.metallic));
+	jMaterial->setMember("roughness", jvb(externalMaterial.roughness));
+
+	if (!externalMaterial.diffuseTextureName.empty()) {
+		jMaterial->setMember("texDiffuse", jvb(externalMaterial.diffuseTextureName));
+	}
+
+	if (!externalMaterial.emissionTextureName.empty()) {
+		jMaterial->setMember("texEmission", jvb(externalMaterial.emissionTextureName));
+	}
+
+	if (!externalMaterial.diffuseTextureName.empty()) {
+		jMaterial->setMember("texMetallic", jvb(externalMaterial.metallicTextureName));
+	}
+
+	if (!externalMaterial.roughnessTextureName.empty()) {
+		jMaterial->setMember("texRoughness", jvb(externalMaterial.roughnessTextureName));
+	}
+
+	if (!externalMaterial.normalTextureName.empty()) {
+		jMaterial->setMember("texNormalMap", jvb(externalMaterial.normalTextureName));
+	}
+
+	return jMaterial;
+}
+
 AssetsWindow::AssetsWindow(std::string windowName, GameInspector& inspector)
     : m_windowName(std::move(windowName))
     , m_inspector(inspector) {
@@ -62,24 +98,35 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 			sgeLogError("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
 		}
 
-		std::vector<std::string> referencedTextures;
-		if (m_sgeImportFBXFile && m_sgeImportFBXFile(importedModel, aid.fileToImportPath.c_str(), &referencedTextures)) {
+		ModelImportAdditionalResult modelImportAddRes;
+		if (m_sgeImportFBXFile && m_sgeImportFBXFile(importedModel, modelImportAddRes, aid.fileToImportPath.c_str())) {
+			// Make sure the import directory exists.
 			createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 
 			// Convert the 3d model to our internal type.
 			ModelWriter modelWriter;
 			const bool succeeded = modelWriter.write(importedModel, fullAssetPath.c_str());
 
-			AssetPtr assetModel = assetLib->getAssetFromFile(fullAssetPath.c_str());
-			assetLib->reloadAssetModified(assetModel);
+			
 
 			std::string notificationMsg = string_format("Imported %s", fullAssetPath.c_str());
 			sgeLogInfo(notificationMsg.c_str());
 			getEngineGlobal()->showNotification(notificationMsg);
 
+			// Create the needed materials.
+			JsonValueBuffer jvb;
+			for (auto mtlToCreate : modelImportAddRes.mtlsToCreate) {
+				JsonValue* jMaterial = createDefaultPBRFromImportedMtl(mtlToCreate.second, jvb);
+				if (jMaterial) {
+					const std::string mtlFilePath = aid.outputDir + "/" + mtlToCreate.first;
+					JsonWriter jw;
+					jw.WriteInFile(mtlFilePath.c_str(), jMaterial, true);
+				}
+			}
+
 			// Copy the referenced textures.
 			const std::string modelInputDir = extractFileDir(aid.fileToImportPath.c_str(), true);
-			for (const std::string& texturePathLocal : referencedTextures) {
+			for (const std::string& texturePathLocal : modelImportAddRes.textureToCopy) {
 				const std::string textureDestDir = aid.outputDir + "/" + extractFileDir(texturePathLocal.c_str(), true);
 				const std::string textureFilename = extractFileNameWithExt(texturePathLocal.c_str());
 
@@ -92,6 +139,9 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				AssetPtr assetTexture = assetLib->getAssetFromFile(textureDstPath.c_str());
 				assetLib->reloadAssetModified(assetTexture);
 			}
+
+			AssetPtr assetModel = assetLib->getAssetFromFile(fullAssetPath.c_str());
+			assetLib->reloadAssetModified(assetModel);
 
 			return true;
 		} else {
@@ -109,8 +159,8 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 		std::vector<std::string> referencedTextures;
 		std::vector<MultiModelImportResult> importedModels;
 
-		if (m_sgeImportFBXFileAsMultiple &&
-		    m_sgeImportFBXFileAsMultiple(importedModels, aid.fileToImportPath.c_str(), &referencedTextures)) {
+		ModelImportAdditionalResult modelImportAddRes;
+		if (m_sgeImportFBXFileAsMultiple && m_sgeImportFBXFileAsMultiple(importedModels, modelImportAddRes, aid.fileToImportPath.c_str())) {
 			createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 
 			for (MultiModelImportResult& model : importedModels) {
@@ -131,9 +181,20 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				getEngineGlobal()->showNotification(notificationMsg);
 			}
 
+			// Create the needed materials.
+			JsonValueBuffer jvb;
+			for (auto mtlToCreate : modelImportAddRes.mtlsToCreate) {
+				JsonValue* jMaterial = createDefaultPBRFromImportedMtl(mtlToCreate.second, jvb);
+				if (jMaterial) {
+					const std::string mtlFilePath = aid.outputDir + "/" + mtlToCreate.first;
+					JsonWriter jw;
+					jw.WriteInFile(mtlFilePath.c_str(), jMaterial, true);
+				}
+			}
+
 			// Copy the referenced textures.
 			const std::string modelInputDir = extractFileDir(aid.fileToImportPath.c_str(), true);
-			for (const std::string& texturePathLocal : referencedTextures) {
+			for (const std::string& texturePathLocal : modelImportAddRes.textureToCopy) {
 				const std::string textureDestDir = aid.outputDir + "/" + extractFileDir(texturePathLocal.c_str(), true);
 				const std::string textureFilename = extractFileNameWithExt(texturePathLocal.c_str());
 
@@ -359,6 +420,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 						    assetIface_guessFromExtension(extractFileExtension(entry.path().string().c_str()).c_str(), false);
 						if (assetType == assetIface_model3d) {
 							string_format(label, "%s %s", ICON_FK_CUBE, entry.path().filename().string().c_str());
+
 						} else if (assetType == assetIface_texture2d) {
 							string_format(label, "%s %s", ICON_FK_PICTURE_O, entry.path().filename().string().c_str());
 						} else if (assetType == assetIface_text) {
@@ -384,6 +446,46 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 								ImGui::Text(localAssetPath.c_str());
 								ImGui::EndDragDropSource();
 							}
+#if 0
+							if (assetPreviewTex[localAssetPath].IsResourceValid()) {
+								ImGui::Image(assetPreviewTex[localAssetPath]->getRenderTarget(0), ImVec2(64.f, 64.f));
+							} else {
+								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str(), nullptr, true);
+								if (isAssetLoaded(explorePreviewAsset, assetIface_model3d)) {
+									AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
+									if (bboxModel.IsEmpty() == false) {
+										orbit_camera camera;
+
+										camera.orbitPoint = bboxModel.center();
+										camera.radius = bboxModel.diagonal().length() * 1.25f;
+										camera.yaw = deg2rad(45.f);
+										camera.pitch = deg2rad(45.f);
+
+										RawCamera rawCamera = RawCamera(
+										    camera.eyePosition(), camera.GetViewMatrix(),
+										    mat4f::getPerspectiveFovRH(deg2rad(60.f), 1.f, 0.1f, 10000.f, 0.f, kIsTexcoordStyleD3D));
+
+										GpuHandle<FrameTarget> ft = getCore()->getDevice()->requestResource<FrameTarget>();
+										ft->create2D(64, 64);
+										getCore()->getDevice()->getContext()->clearDepth(ft, 1.f);
+
+										RenderDestination rdest;
+										rdest.frameTarget = ft;
+										rdest.viewport = ft->getViewport();
+										rdest.sgecon = getCore()->getDevice()->getContext();
+
+										InstanceDrawMods imods;
+										imods.forceNoLighting = true;
+										drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(),
+										              getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval(), imods);
+
+										assetPreviewTex[localAssetPath] = ft;
+									}
+								}
+							}
+#endif
+
+
 						} else {
 							ImGui::Selectable(label.c_str());
 						}
