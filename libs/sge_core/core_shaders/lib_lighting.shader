@@ -3,6 +3,7 @@
 
 #include "ShaderLightData.h"
 #include "lib_pbr.shader"
+#include "lib_textureMapping.shader"
 
 struct MaterialSample {
 	float3 hitPointWs;

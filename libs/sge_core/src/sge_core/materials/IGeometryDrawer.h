@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/math/mat4.h"
 #include "sge_utils/math/Box.h"
+#include "sge_utils/math/mat4.h"
 
 namespace sge {
 
@@ -11,11 +11,15 @@ struct Geometry;
 struct LightDesc;
 struct IMaterialData;
 
-//------------------------------------------------------------
-// ShadingLightData
-// Describes the light data in a converted form, suitable for
-// passing it toe shader
-//------------------------------------------------------------
+/// This structure is currently empty, but
+/// pre-material-as-assets it was used to override some settings
+/// like disabling culling/lighting and so on.
+/// Currently it is not used for anything and hopefully it will get deleted.
+/// However, I feel that I'll need to reintroduce it once more this is why I've kept it.
+struct InstanceDrawMods {};
+
+/// ShadingLightData describes a single light settings
+/// to be used by the @IGeometryDrawer when rendering a single geometry.
 struct ShadingLightData {
 	const LightDesc* pLightDesc = nullptr;
 	Texture* shadowMap = nullptr;
@@ -25,17 +29,9 @@ struct ShadingLightData {
 	vec3f lightDirectionWs = vec3f(0.f);
 };
 
-struct InstanceDrawMods {
-	mat4f uvwTransform = mat4f::getIdentity();
-	float gameTime = 0.f;
-	bool forceNoLighting = false;
-	bool forceAdditiveBlending = false;
-	bool forceNoCulling = false;
-};
-
-//------------------------------------------------------------
-// ObjectLighting
-//------------------------------------------------------------
+/// ObjectLighting describes all the lights that should be used
+/// when rendering a specific geomety. It is up to the @IGeometryDrawer that
+/// uses them to intepret the data whatever how it wants.
 struct ObjectLighting {
 	/// The ambient light color and intensity to be applied to the object.
 	/// Usually this is the same as the one in the scene.
@@ -43,9 +39,9 @@ struct ObjectLighting {
 
 	/// How much fake abient detail should be added (by using the normals).
 	/// 0 means no abient detail and unlit surfaces would look flat.
-	/// 1 means 100% fake detail, altering the ambient lighting 
+	/// 1 means 100% fake detail, altering the ambient lighting
 	/// where then normals chage.
-	float ambientFakeDetailBias = 0.f; 
+	float ambientFakeDetailBias = 0.f;
 
 	/// The rim light in the scene.
 	vec4f uRimLightColorWWidth = vec4f(vec3f(0.1f), 0.7f);
@@ -55,6 +51,15 @@ struct ObjectLighting {
 
 	/// An array of all lights that affect the object. The size of the array is @lightsCount.
 	const ShadingLightData** ppLightData = nullptr;
+
+	static ObjectLighting getAmbientLightOnly() {
+		ObjectLighting result;
+		// 4.f is used instead of one to compensate for the dimming of ambientFakeDetailBias.
+		result.ambientLightColor = vec3f(4.f);
+		result.ambientFakeDetailBias = 1.f;
+
+		return result;
+	}
 };
 
 struct ICamera;

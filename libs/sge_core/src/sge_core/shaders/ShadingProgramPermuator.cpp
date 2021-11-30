@@ -5,9 +5,6 @@
 
 namespace sge {
 
-//-----------------------------------------------------------------------------
-// ShadingProgramPermuator
-//-----------------------------------------------------------------------------
 bool ShadingProgramPermuator::createFromFile(SGEDevice* sgedev,
                                              const char* const filename,
                                              const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
@@ -48,6 +45,8 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 		return false;
 	}
 
+	bool hadErrors = false;
+
 	// Compile the shaders and cache the unforms LUT.
 	std::string shaderCodeFull;
 	perPermutationShadingProg.resize(numPerm);
@@ -55,6 +54,7 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 	for (int iPerm = 0; iPerm < compileTimeOptionsPermutator.getAllPermunations().size(); ++iPerm) {
 		const auto& perm = compileTimeOptionsPermutator.getAllPermunations()[iPerm];
 
+		// Construct a string setting the values for this permutation.
 		std::string macrosToPreapend;
 		for (int iOpt = 0; iOpt < compileTimeOptions.size(); ++iOpt) {
 			const OptionPermuataor::OptionDesc& desc = compileTimeOptions[iOpt];
@@ -67,23 +67,23 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 		shaderCodeFull += macrosToPreapend;
 		shaderCodeFull.append(shaderCode, shaderCodeSize);
 
+		// Compile the program and if succeeded, grab a reflection and cache the requested uniform locations.
 		const CreateShaderResult programCreateResult = perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
 		    shaderCodeFull.c_str(), shaderCodeFull.c_str(), outIncludedFiles);
 
 		if (programCreateResult.succeeded == false) {
 			sgeLogError("Shader Compilation Failed:\n%s", programCreateResult.errors.c_str());
-			*this = ShadingProgramPermuator();
-			return false;
-		}
-
-		const ShadingProgramRefl& refl = perPermutationShadingProg[iPerm].shadingProgram->getReflection();
-		perPermutationShadingProg[iPerm].uniformLUT.reserve(uniformsToCacheInLUT.size());
-		for (int t = 0; t < uniformsToCacheInLUT.size(); ++t) {
-			BindLocation bindLoc = refl.findUniform(uniformsToCacheInLUT[t].uniformName, uniformsToCacheInLUT[t].shaderStage);
-			perPermutationShadingProg[iPerm].uniformLUT.push_back(bindLoc);
+			hadErrors = true;
+		} else {
+			const ShadingProgramRefl& refl = perPermutationShadingProg[iPerm].shadingProgram->getReflection();
+			perPermutationShadingProg[iPerm].uniformLUT.reserve(uniformsToCacheInLUT.size());
+			for (int t = 0; t < uniformsToCacheInLUT.size(); ++t) {
+				BindLocation bindLoc = refl.findUniform(uniformsToCacheInLUT[t].uniformName, uniformsToCacheInLUT[t].shaderStage);
+				perPermutationShadingProg[iPerm].uniformLUT.push_back(bindLoc);
+			}
 		}
 	}
 
-	return true;
+	return !hadErrors;
 }
 } // namespace sge

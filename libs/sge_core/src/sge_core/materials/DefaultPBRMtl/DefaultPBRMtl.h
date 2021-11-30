@@ -41,6 +41,7 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 	float roughness = 1.f;
 
 	bool disableCulling = false;
+	bool forceNoLighting = false;
 };
 
 struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
@@ -52,6 +53,7 @@ struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
 	virtual bool fromJson(const JsonValue* jMtlRoot, const char* localDir) override;
 
   public:
+	bool forceNoLighting = false;
 	bool needsAlphaSorting = false;
 	float alphaMultiplier = 1.f;
 

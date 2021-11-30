@@ -12,6 +12,7 @@ namespace sge {
 ReflAddTypeId(DefaultPBRMtl, 10'11'21'0001);
 ReflBlock() {
 	ReflAddType(DefaultPBRMtl)
+		ReflMember(DefaultPBRMtl, forceNoLighting)
 		ReflMember(DefaultPBRMtl, needsAlphaSorting)
 		ReflMember(DefaultPBRMtl, alphaMultiplier).uiRange(0.f, 1.f, 0.01f)
 		ReflMember(DefaultPBRMtl, texDiffuse)
@@ -88,6 +89,8 @@ JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb, const char* localDir) {
 	JsonValue* jMaterial = jvb(JID_MAP);
 
 	jMaterial->setMember("family", jvb("DefaultPBR"));
+	jMaterial->setMember("forceNoLighting", jvb(forceNoLighting));
+	jMaterial->setMember("disableCulling", jvb(disableCulling));
 	jMaterial->setMember("alphaMultiplier", jvb(alphaMultiplier));
 	jMaterial->setMember("needsAlphaSorting", jvb(needsAlphaSorting));
 
@@ -132,6 +135,14 @@ bool DefaultPBRMtl::fromJson(const JsonValue* jMaterial, const char* localDir) {
 
 	if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("needsAlphaSorting")) {
 		needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
+	}
+
+	if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("forceNoLighting")) {
+		forceNoLighting = jNeedsAlphaSorting->getAsBool();
+	}
+
+	if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("disableCulling")) {
+		forceNoLighting = jNeedsAlphaSorting->getAsBool();
 	}
 
 	jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(diffuseColor.data, 4);

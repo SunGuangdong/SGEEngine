@@ -427,6 +427,7 @@ ParticleGroupState::SpriteRendData*
 	spriteRenderData->material.diffuseColorSrc = DefaultPBRMtlData::diffuseColorSource_diffuseMap;
 	spriteRenderData->material.diffuseTexture = sprite;
 	spriteRenderData->material.tintByVertexColor = true;
+	spriteRenderData->material.forceNoLighting = true;
 	return &spriteRenderData.get();
 }
 

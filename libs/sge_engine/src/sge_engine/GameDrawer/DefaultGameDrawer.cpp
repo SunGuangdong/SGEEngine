@@ -482,6 +482,7 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 	// Draw the render items.
 	drawCurrentRenderItems(drawSets, drawReason, true);
 
+	// Draw the physics debug draw if enabled.
 	if (getWorld()->inspector && getWorld()->inspector->m_physicsDebugDrawEnabled) {
 		drawSets.rdest.sgecon->clearDepth(drawSets.rdest.frameTarget, 1.f);
 
@@ -490,6 +491,7 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 		getWorld()->m_physicsDebugDraw.postDebugDraw();
 	}
 
+	// Call scripts onPostDraw. They might draw stuff themselves (like UI).
 	if (drawReason == drawReason_gameplay || drawReason == drawReason_editing) {
 		for (ObjectId scriptObj : getWorld()->m_scriptObjects) {
 			if (IWorldScript* script = dynamic_cast<IWorldScript*>(getWorld()->getObjectById(scriptObj))) {
@@ -500,7 +502,6 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 
 	// Draw the debug draw commands.
 	getCore()->getDebugDraw().draw(drawSets.rdest, drawSets.drawCamera->getProjView());
-
 
 #if 0
 	// This code here is something needed only for debugging shadow maps.
@@ -548,9 +549,7 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
                                                   DrawReason const drawReason) {
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
 	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
-
 	const mat4f n2w = ri.traitModel->getActor()->getTransformMtx();
-
 	ModelNode* node = ri.evalModel->m_model->nodeAt(ri.iEvalNode);
 
 	const MeshAttachment& meshAttachment = node->meshAttachments[ri.iEvalNodeMechAttachmentIndex];
@@ -562,17 +561,14 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 	mat4f finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? n2w : n2w * evalNode.evalGlobalTransform;
 	finalTrasform = finalTrasform * ri.traitModel->m_models[ri.iModel].m_additionalTransform;
 
-	if (!drawReason_IsVisualizeSelection(drawReason)) {
-		if (drawReason == drawReason_gameplayShadow) {
-			m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), finalTrasform,
-			                                *drawSets.shadowMapBuildInfo, geom, /* ri.mtl.diffuseTexture*/ nullptr, false);
-		} else {
-			drawGeometry(drawSets.rdest, *drawSets.drawCamera, finalTrasform, lighting, geom, ri.pMtlData,
-			             ri.traitModel->m_models[ri.iModel].instanceDrawMods);
-		}
-	} else {
+	if (drawReason_IsVisualizeSelection(drawReason)) {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), finalTrasform, geom,
 		                                   getSelectionTintColor(drawReason), false);
+	} else if (drawReason == drawReason_gameplayShadow) {
+		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), finalTrasform,
+		                                *drawSets.shadowMapBuildInfo, geom, /* ri.mtl.diffuseTexture*/ nullptr, false);
+	} else {
+		drawGeometry(drawSets.rdest, *drawSets.drawCamera, finalTrasform, lighting, geom, ri.pMtlData, InstanceDrawMods());
 	}
 }
 
@@ -603,14 +599,10 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 		texPlaneMtl.diffuseTexture = ri.spriteTexture;
 		texPlaneMtl.metalness = 0.f;
 		texPlaneMtl.roughness = 1.f;
+		texPlaneMtl.forceNoLighting = ri.forceNoLighting;
+		texPlaneMtl.forceNoLighting = ri.forceNoCulling;
 
-		InstanceDrawMods mods;
-		mods.gameTime = getWorld()->timeSpendPlaying;
-		mods.forceNoLighting = ri.forceNoLighting;
-		mods.forceNoCulling = ri.forceNoCulling;
-		mods.forceAdditiveBlending = ri.forceAlphaBlending;
-
-		drawGeometry(drawSets.rdest, *drawSets.drawCamera, ri.obj2world, lighting, texPlaneGeom, &texPlaneMtl, mods);
+		drawGeometry(drawSets.rdest, *drawSets.drawCamera, ri.obj2world, lighting, texPlaneGeom, &texPlaneMtl, InstanceDrawMods());
 	}
 }
 
@@ -662,11 +654,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 				ParticleGroupState::SpriteRendData* srd =
 				    pstate.computeSpriteRenderData(*drawSets.rdest.sgecon, pdesc, *drawSets.drawCamera);
 				if (srd != nullptr) {
-					InstanceDrawMods mods;
-					mods.forceNoLighting = true;
-					mods.forceAdditiveBlending = true;
-
-					drawGeometry(drawSets.rdest, *drawSets.drawCamera, n2w, lighting, srd->geometry, &srd->material, mods);
+					drawGeometry(drawSets.rdest, *drawSets.drawCamera, n2w, lighting, srd->geometry, &srd->material, InstanceDrawMods());
 				}
 			}
 		}
@@ -697,101 +685,13 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 			}
 		} else {
 			if (m_partRendDataGen.generate(*pgrp, *drawSets.rdest.sgecon, *drawSets.drawCamera, n2w)) {
-				InstanceDrawMods mods;
-				mods.forceNoLighting = true;
-				mods.forceAdditiveBlending = true;
-
 				const mat4f identity = mat4f::getIdentity();
 				drawGeometry(drawSets.rdest, *drawSets.drawCamera, identity, lighting, m_partRendDataGen.geometry,
-				             &m_partRendDataGen.material, mods);
+				             &m_partRendDataGen.material, InstanceDrawMods());
 			}
 		}
 	}
 }
-
-
-#if 0
-void DefaultGameDrawer::drawTraitModel(TraitModel* modelTrait,
-                                       const GameDrawSets& drawSets,
-                                       const ObjectLighting& lighting,
-                                       DrawReason const drawReason) {
-	if (modelTrait->isRenderable == false) {
-		return;
-	}
-
-	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
-	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
-	Actor* const actor = modelTrait->getActor();
-
-	AssetPtr const asset = modelTrait->getAssetProperty().getAsset();
-
-	if (isAssetLoaded(asset) && asset->getType() == assetIface_model3d) {
-		AssetModel* const model = modelTrait->getAssetProperty().getAssetModel();
-
-		std::vector<MaterialOverride> mtlOverrides;
-		for (auto& mtlOverride : modelTrait->m_materialOverrides) {
-			GameObject* const mtlProvider = getWorld()->getObjectById(mtlOverride.materialObjId);
-			OMaterial* mtl = dynamic_cast<OMaterial*>(mtlProvider);
-			if (mtl) {
-				MaterialOverride ovr;
-				ovr.name = mtlOverride.materialName;
-				ovr.mtl = mtl->getMaterial();
-
-				mtlOverrides.push_back(ovr);
-			}
-		}
-
-		if (!drawReason_IsVisualizeSelection(drawReason)) {
-			if (modelTrait->useSkeleton) {
-				if (model && model->sharedEval.isInitialized()) {
-					// Compute the overrdies.
-					std::vector<mat4f> boneOverrides;
-					modelTrait->computeSkeleton(boneOverrides);
-					// Draw
-					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					model->sharedEval.evaluateFromNodesGlobalTransform(boneOverrides);
-					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
-					                 model->sharedEval, modelTrait->instanceDrawMods, &mtlOverrides);
-				}
-			} else {
-				if (modelTrait->m_evalModel) {
-					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
-					                 *modelTrait->m_evalModel, modelTrait->instanceDrawMods, &mtlOverrides);
-				} else if (model && model->staticEval.isInitialized()) {
-					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					m_modeldraw.draw(drawSets.rdest, camPos, camLookDir, drawSets.drawCamera->getProjView(), n2w, lighting,
-					                 model->staticEval, modelTrait->instanceDrawMods, &mtlOverrides);
-				}
-			}
-		} else {
-			if (modelTrait->useSkeleton) {
-				if (model && model->sharedEval.isInitialized()) {
-					// Compute the overrdies.
-					std::vector<mat4f> boneOverrides;
-					modelTrait->computeSkeleton(boneOverrides);
-
-					// Draw
-					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					model->sharedEval.evaluateFromNodesGlobalTransform(boneOverrides);
-					m_constantColorShader.draw(drawSets.rdest, drawSets.drawCamera->getProjView(), n2w, model->sharedEval,
-					                           lighting.selectionTint);
-				}
-			} else {
-				if (modelTrait->m_evalModel) {
-					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					m_constantColorShader.draw(drawSets.rdest, drawSets.drawCamera->getProjView(), n2w, *modelTrait->m_evalModel,
-					                           lighting.selectionTint);
-				} else if (model && model->staticEval.isInitialized()) {
-					const mat4f n2w = actor->getTransformMtx() * modelTrait->m_additionalTransform;
-					m_constantColorShader.draw(drawSets.rdest, drawSets.drawCamera->getProjView(), n2w, model->staticEval,
-					                           lighting.selectionTint);
-				}
-			}
-		}
-	}
-}
-#endif
 
 void DefaultGameDrawer::drawHelperActor_drawANavMesh(ANavMesh& navMesh,
                                                      const GameDrawSets& drawSets,

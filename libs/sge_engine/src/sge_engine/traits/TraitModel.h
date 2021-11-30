@@ -86,13 +86,6 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 			nodeToBoneId.clear();
 		}
 
-		void setNoLighting(bool v) {
-			instanceDrawMods.forceNoLighting = v;
-		}
-		bool getNoLighting() const {
-			return instanceDrawMods.forceNoLighting;
-		}
-
 		void setModel(const char* assetPath, bool updateNow);
 		void setModel(AssetPtr& asset, bool updateNow);
 
@@ -110,7 +103,6 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 		// If null the static EvaluatedModel of the asset is going to get rendered.
 		Optional<EvaluatedModel> m_evalModel;
 		float alphaMultiplier = 1.f;
-		InstanceDrawMods instanceDrawMods;
 
 		std::vector<AssetPtr> mtlOverrides;
 

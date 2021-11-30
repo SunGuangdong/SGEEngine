@@ -474,10 +474,9 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 										rdest.viewport = ft->getViewport();
 										rdest.sgecon = getCore()->getDevice()->getContext();
 
-										InstanceDrawMods imods;
 										imods.forceNoLighting = true;
 										drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(),
-										              getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval(), imods);
+										              getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval(), InstanceDrawMods());
 
 										assetPreviewTex[localAssetPath] = ft;
 									}

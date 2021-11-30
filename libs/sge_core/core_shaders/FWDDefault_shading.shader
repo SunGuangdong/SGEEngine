@@ -239,8 +239,8 @@ float4 psMain(StageVertexOut inVert)
 		float ambientLightingFake = 0.f;
 		ambientLightingFake += 0.25f;
 		ambientLightingFake += 0.25f * 0.5f * (mtlSample.shadeNormalWs.y + 1.f);
-		ambientLightingFake += 0.25f * abs(mtlSample.shadeNormalWs.x);
-		ambientLightingFake += 0.25f * abs(mtlSample.shadeNormalWs.z);
+		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.x));
+		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.z));
 
 		float ambientLightAmount = lerp(1.f, ambientLightingFake, uAmbientFakeDetailAmount);
 

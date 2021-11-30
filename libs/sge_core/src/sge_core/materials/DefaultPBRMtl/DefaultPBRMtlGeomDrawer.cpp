@@ -59,7 +59,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
                                            const ObjectLighting& lighting,
                                            const Geometry& geometry,
                                            const IMaterialData* mtlDataBase,
-                                           const InstanceDrawMods& instDrawMods) {
+                                           const InstanceDrawMods& UNUSED(instDrawMods)) {
 	const DefaultPBRMtlData& mtlData = *dynamic_cast<const DefaultPBRMtlData*>(mtlDataBase);
 
 	SGEDevice* const sgedev = rdest.getDevice();
@@ -218,7 +218,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		pbrMtlFlags |= kPBRMtl_Flags_DiffuseTintByVertexColor;
 	}
 
-	if (instDrawMods.forceNoLighting) {
+	if (mtlData.forceNoLighting) {
 		pbrMtlFlags |= kPBRMtl_Flags_NoLighting;
 	}
 
@@ -246,10 +246,10 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	}
 
 	RasterizerState* rasterState = nullptr;
-	if (instDrawMods.forceNoCulling || mtlData.disableCulling) {
+	if (mtlData.disableCulling) {
 		rasterState = getCore()->getGraphicsResources().RS_noCulling;
 	} else {
-		// We are baking shadow maps and we want to render the backfaces
+		// We are baking a shadow map and we want to render the backfaces.
 		// *opposing to the regular rendering which uses front faces... duh).
 		// This is done to avoid the Shadow Acne artifacts caused by floating point
 		// innacuraties introduced by the depth texture.
@@ -259,7 +259,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 
 	StaticArray<BoundUniform, 64> uniforms;
 
-	mat4f combinedUVWTransform = instDrawMods.uvwTransform * mtlData.uvwTransform;
+	mat4f combinedUVWTransform = /* instDrawMods.uvwTransform * */ mtlData.uvwTransform;
 
 	paramsCb.world = geomWorldTransfrom;
 	paramsCb.cameraPositionWs = vec4f(camera.getCameraPosition(), 1.f);
@@ -366,13 +366,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	paramsCb.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
 	paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 
-	if (instDrawMods.forceAdditiveBlending) {
-		stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-		                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
-	} else {
-		stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-		                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
-	}
+	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
+	                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);
 	memcpy(paramsMappedData, &paramsCb, sizeof(paramsCb));
