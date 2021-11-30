@@ -272,33 +272,33 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				if (jMtlAssetPath) {
 					material->assetForThisMaterial = jMtlAssetPath->GetString();
 				} else {
-					jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->diffuseColor.data, 4);
-					jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->emissionColor.data, 4);
-					material->metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
-					material->roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
+					jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->oldInplaceMtl.diffuseColor.data, 4);
+					jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->oldInplaceMtl.emissionColor.data, 4);
+					material->oldInplaceMtl.metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
+					material->oldInplaceMtl.roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
 
 					if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("alphaMultiplier")) {
-						material->alphaMultiplier = jNeedsAlphaSorting->getNumberAs<float>();
+						material->oldInplaceMtl.alphaMultiplier = jNeedsAlphaSorting->getNumberAs<float>();
 					}
 
 					if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("needsAlphaSorting")) {
-						material->needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
+						material->oldInplaceMtl.needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
 					}
 
 					if (const JsonValue* jTex = jMaterial->getMember("diffuseTextureName")) {
-						material->diffuseTextureName = jTex->GetString();
+						material->oldInplaceMtl.diffuseTextureName = jTex->GetString();
 					}
 
 					if (const JsonValue* jTex = jMaterial->getMember("emissionTextureName")) {
-						material->emissionTextureName = jTex->GetString();
+						material->oldInplaceMtl.emissionTextureName = jTex->GetString();
 					}
 
 					if (const JsonValue* jTex = jMaterial->getMember("metallicTextureName")) {
-						material->metallicTextureName = jTex->GetString();
+						material->oldInplaceMtl.metallicTextureName = jTex->GetString();
 					}
 
 					if (const JsonValue* jTex = jMaterial->getMember("roughnessTextureName")) {
-						material->roughnessTextureName = jTex->GetString();
+						material->oldInplaceMtl.roughnessTextureName = jTex->GetString();
 					}
 				}
 			}

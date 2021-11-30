@@ -184,21 +184,21 @@ bool EvaluatedModel::evaluateMaterials() {
 		} else {
 			std::shared_ptr<DefaultPBRMtl> evalMtl = std::make_shared<DefaultPBRMtl>();
 			// Legacy material import where the materials weren't a separate asset.
-			evalMtl->diffuseColor = rawMaterial->diffuseColor;
-			evalMtl->roughness = rawMaterial->roughness;
-			evalMtl->metallic = rawMaterial->metallic;
-			evalMtl->needsAlphaSorting = rawMaterial->needsAlphaSorting;
-			evalMtl->alphaMultiplier = rawMaterial->alphaMultiplier;
+			evalMtl->diffuseColor = rawMaterial->oldInplaceMtl.diffuseColor;
+			evalMtl->roughness = rawMaterial->oldInplaceMtl.roughness;
+			evalMtl->metallic = rawMaterial->oldInplaceMtl.metallic;
+			evalMtl->needsAlphaSorting = rawMaterial->oldInplaceMtl.needsAlphaSorting;
+			evalMtl->alphaMultiplier = rawMaterial->oldInplaceMtl.alphaMultiplier;
 
 			// Metallic map.
-			evalMtl->texDiffuse = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->diffuseTextureName.c_str(),
+			evalMtl->texDiffuse = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.diffuseTextureName.c_str(),
 			                                                                          m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texMetallic = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->metallicTextureName.c_str(),
-			                                                                           m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texRoughness = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->roughnessTextureName.c_str(),
-			                                                                            m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texNormalMap = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->normalTextureName.c_str(),
-			                                                                            m_model->getModelLoadSetting().assetDir.c_str());
+			evalMtl->texMetallic = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(
+			    rawMaterial->oldInplaceMtl.metallicTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
+			evalMtl->texRoughness = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(
+			    rawMaterial->oldInplaceMtl.roughnessTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
+			evalMtl->texNormalMap = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(
+			    rawMaterial->oldInplaceMtl.normalTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
 
 			std::shared_ptr<AssetIface_Material_Simple> mtlProvider = std::make_shared<AssetIface_Material_Simple>();
 			mtlProvider->mtl = evalMtl;

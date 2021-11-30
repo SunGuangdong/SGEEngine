@@ -77,24 +77,28 @@ struct ModelLoadSettings {
 };
 
 struct ModelMaterial {
+	struct OldInplaceMaterial {
+		// Legacy settings for loading old models.
+		float alphaMultiplier = 1.f;
+		bool needsAlphaSorting = false;
+		vec4f diffuseColor = vec4f(1.f);
+		vec4f emissionColor = vec4f(0.f);
+		float metallic = 0.f;
+		float roughness = 1.f;
+
+		std::string diffuseTextureName;
+		std::string emissionTextureName;
+		std::string normalTextureName;
+		std::string metallicTextureName;
+		std::string roughnessTextureName;
+	};
+
 	std::string name;
 	std::string assetForThisMaterial;
 
-#if 1
-	// Legacy settings for loading old models.
-	float alphaMultiplier = 1.f;
-	bool needsAlphaSorting = false;
-	vec4f diffuseColor = vec4f(1.f);
-	vec4f emissionColor = vec4f(0.f);
-	float metallic = 0.f;
-	float roughness = 1.f;
-
-	std::string diffuseTextureName;
-	std::string emissionTextureName;
-	std::string normalTextureName;
-	std::string metallicTextureName;
-	std::string roughnessTextureName;
-#endif
+	/// Before materials were made assets each 3D model described its assets
+	/// by itself. This is kept to support these old 3D models.
+	OldInplaceMaterial oldInplaceMtl;
 };
 
 // Skinning bone.
