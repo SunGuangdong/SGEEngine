@@ -19,8 +19,9 @@ bool InitializeFBXSDK();
 /// @brief FBXSDKParser convers FBX/DAE/OBJ files to our own internal format by using FBX SDK.s
 struct FBXSDKParser {
 	/// Prases the input FBX scene and produces a ready to save SGE model.
-	/// @param [in] enforcedRootNode is the node to be used as a root node insted of the actual one, if null, the regular root is going to be
-	/// used.
+	/// For more details see the comments @sgeImportFBXFileFn @sgeImportFBXFileAsMultipleFn, this is called by them.
+	/// @param [in] enforcedRootNode is the node to be used as a root node insted of the actual one, if null, the regular root is going to
+	/// be used.
 	/// @param [in] materialsPrefix is needed when additional assets should get imported alongside the model.
 	///             These are materials for example. Usually passing the fbx file filename is enough.
 	bool parse(Model* result,

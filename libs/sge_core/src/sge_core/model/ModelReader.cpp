@@ -229,9 +229,7 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 						}
 					}
 
-
 					// Load the scaling keyframes.
-
 					if (const JsonValue* jKeyFramesScale = jKeyFrames->getMember("scalingKeyFrames_chunkId")) {
 						const int chunkId = jKeyFramesScale->getNumberAs<int>();
 						const DataChunkDesc& chunkDesc = FindDataChunkDesc(chunkId);
