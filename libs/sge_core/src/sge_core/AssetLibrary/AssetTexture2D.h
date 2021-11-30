@@ -32,13 +32,6 @@ struct SGE_CORE_API AssetIface_Texture2D : public IAssetInterface {
 	virtual void setTextureMeta(const AssetTextureMeta& newMeta) = 0;
 };
 
-struct SGE_CORE_API ImportAssetHelper_PathGetter {
-	ImportAssetHelper_PathGetter() = default;
-	~ImportAssetHelper_PathGetter() = default;
-
-	std::string filepath;
-};
-
 struct SGE_CORE_API AssetTexture2d : public Asset, public AssetIface_Texture2D {
 	AssetTexture2d(std::string assetPath, AssetLibrary& ownerAssetLib)
 	    : Asset(assetPath, ownerAssetLib) {

@@ -374,8 +374,8 @@ void FBXSDKParser::importMaterials() {
 		}
 #endif
 
+		/// A structure that is going to describe the material settings.
 		ExternalPBRMaterialSettings importedMtlSets;
-
 
 		// By reverse engineering the FBX file containing Stingray PBS material
 		// exported from Autodesk Maya it seems that the attributes for

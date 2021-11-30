@@ -2,6 +2,7 @@
 #define LIGHTING_SHADER
 
 #include "ShaderLightData.h"
+#include "lib_pbr.shader"
 
 struct MaterialSample {
 	float3 hitPointWs;

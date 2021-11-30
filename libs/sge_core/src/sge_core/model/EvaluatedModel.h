@@ -21,19 +21,6 @@ struct AssetLibrary;
 struct Asset;
 struct AssetIface_Material;
 
-// struct EvaluatedMaterial {
-//	AssetPtr diffuseTexture;
-//	AssetPtr texNormalMap;
-//	AssetPtr texMetallic;
-//	AssetPtr texRoughness;
-//
-//	vec4f diffuseColor = vec4f(1.f, 0.f, 1.f, 1.f);
-//	float metallic = 1.f;
-//	float roughness = 1.f;
-//	bool needsAlphaSorting = false;
-//	float alphaMultiplier = 1.f;
-//};
-
 struct EvaluatedNode {
 	mat4f evalLocalTransform = mat4f::getZero();
 	mat4f evalGlobalTransform = mat4f::getIdentity();
@@ -41,7 +28,6 @@ struct EvaluatedNode {
 };
 
 struct EvaluatedMesh {
-	// std::vector<mat4f> boneTransformMatrices;
 	Geometry geometry;
 };
 
@@ -186,7 +172,7 @@ struct SGE_CORE_API EvaluatedModel {
 
 	AABox3f aabox;
 
-	// Temporaries used to avoid allocating memory again and again for each evaluation.
+	/// Temporaries used to avoid allocating memory again and again for each evaluation.
 	std::vector<mat4f> bonesTransformTexDataForAllMeshes;
 };
 
