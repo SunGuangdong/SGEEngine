@@ -10,7 +10,7 @@ namespace sge {
 // ADynamicObstacle
 //-----------------------------------------------------
 // clang-format off
-RelfAddTypeId(ADynamicObstacle, 20'03'02'0007);
+ReflAddTypeId(ADynamicObstacle, 20'03'02'0007);
 ReflBlock() {
 	ReflAddActor(ADynamicObstacle) 
 		ReflMember(ADynamicObstacle, m_traitModel)

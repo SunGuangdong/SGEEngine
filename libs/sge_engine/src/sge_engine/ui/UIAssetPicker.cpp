@@ -3,7 +3,7 @@
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
-#include "sge_core/shaders/modeldraw.h"
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
@@ -18,8 +18,11 @@
 
 namespace sge {
 
-bool assetPicker(
-    const char* label, std::string& assetPath, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes) {
+bool assetPicker(const char* label,
+                 std::string& assetPath,
+                 AssetLibrary* const assetLibrary,
+                 const AssetIfaceType assetTypes[],
+                 const int numAssetIfaceTypes) {
 	ImGuiEx::IDGuard idGuard(label);
 	ImGuiEx::Label(label);
 
@@ -62,7 +65,7 @@ bool assetPicker(
 			}
 
 			for (auto& itr : assetLibrary->getAllAssets()) {
-				if (isAssetLoaded(itr.second, assetType)) {
+				if (!isAssetSupportingInteface(itr.second, assetType)) {
 					continue;
 				}
 
@@ -142,9 +145,11 @@ bool assetPicker(
 						const mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(90.f), 1.f, 0.01f, 10000.f, 0.f, kIsTexcoordStyleD3D);
 						const mat4f lookAt = mat4f::getLookAtRH(camPos, vec3f(0.f), vec3f(0.f, kIsTexcoordStyleD3D ? 1.f : -1.f, 0.f));
 
+						RawCamera camera = RawCamera(camPos, lookAt, proj);
+
 						RenderDestination rdest(getCore()->getDevice()->getContext(), frameTarget);
-						getCore()->getModelDraw().draw(rdest, camPos, -camPos.normalized0(), proj * lookAt, mat4f::getIdentity(),
-						                               ObjectLighting(), mdlIface->getStaticEval(), InstanceDrawMods());
+
+						drawEvalModel(rdest, camera, mat4f::getIdentity(), ObjectLighting(), mdlIface->getStaticEval(), InstanceDrawMods());
 
 						ImGui::Image(frameTarget->getRenderTarget(0), ImVec2(textureSize, textureSize));
 						ImGui::EndTooltip();
@@ -183,11 +188,8 @@ bool assetPicker(
 	return wasAssetPicked;
 }
 
-SGE_ENGINE_API bool assetPicker(const char* label,
-                                AssetPtr& asset,
-                                AssetLibrary* const assetLibrary,
-                                const AssetIfaceType assetTypes[],
-                                const int numAssetIfaceTypes) {
+SGE_ENGINE_API bool assetPicker(
+    const char* label, AssetPtr& asset, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes) {
 	std::string tempPath = isAssetLoaded(asset) ? asset->getPath() : "";
 
 	if (assetPicker(label, tempPath, assetLibrary, assetTypes, numAssetIfaceTypes)) {
@@ -303,7 +305,7 @@ SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, con
 			ioValue = pickedType->typeId;
 			wasAssetPicked = true;
 		} else {
-			SGE_DEBUG_ERR("The speicifed type cannot be found!");
+			sgeLogError("The speicifed type cannot be found!");
 		}
 	}
 
@@ -317,34 +319,34 @@ SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, con
 			filter.Clear();
 		}
 
-		for (TypeId typeId : typeLib().m_gameObjectTypes) {
-			const TypeDesc* potentialType = typeLib().find(typeId);
-			if (potentialType == nullptr) {
-				continue;
-			}
+		for (auto& typePair : typeLib().m_registeredTypes) {
+			if (typePair.second.doesInherits(sgeTypeId(GameObject)) && typePair.second.newFn != nullptr) {
+				const TypeDesc* potentialType = &typePair.second;
 
-			if (!needsToInherit.isNull() && !potentialType->doesInherits(needsToInherit)) {
-				continue;
-			}
+				if (!needsToInherit.isNull() && !potentialType->doesInherits(needsToInherit)) {
+					continue;
+				}
 
 
-			if (!filter.PassFilter(potentialType->name)) {
-				continue;
-			}
+				if (!filter.PassFilter(potentialType->name)) {
+					continue;
+				}
 
-			const AssetIface_Texture2D* texIface =
-			    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
+				const AssetIface_Texture2D* texIface =
+				    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
 
-			Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
+				Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
-			ImGui::Image(iconTexture, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()));
-			ImGui::SameLine();
+				ImGui::Image(iconTexture, ImVec2(ImGui::GetFontSize(), ImGui::GetFontSize()));
+				ImGui::SameLine();
 
-			if (ImGui::Selectable(potentialType->name)) {
-				ioValue = potentialType->typeId;
-				wasAssetPicked = true;
+				if (ImGui::Selectable(potentialType->name)) {
+					ioValue = potentialType->typeId;
+					wasAssetPicked = true;
+				}
 			}
 		}
+
 		ImGui::EndPopup();
 	}
 

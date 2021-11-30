@@ -5,17 +5,15 @@
 #include "sge_engine/GameDrawer/GameDrawer.h"
 
 #include "sge_core/model/EvaluatedModel.h"
-#include "sge_core/shaders/modeldraw.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/tiny/orbit_camera.h"
+#include "sge_utils/utils/optional.h"
 
 namespace sge {
 
 struct SGE_ENGINE_API ModelPreviewWidget {
 	orbit_camera camera;
 	GpuHandle<FrameTarget> m_frameTarget;
-
-
 
 	void doWidget(SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize = NullOptional());
 };
@@ -32,13 +30,20 @@ struct ModelPreviewWindow : public IImGuiWindow {
   public:
 	ModelPreviewWindow(std::string windowName, bool createAsChild = false)
 	    : m_windowName(std::move(windowName))
-	    , m_createAsChild(createAsChild) {}
+	    , m_createAsChild(createAsChild) {
+	}
 
-	bool isClosed() override { return !m_isOpened; }
+	bool isClosed() override {
+		return !m_isOpened;
+	}
 	void update(SGEContext* const sgecon, const InputState& is) override;
-	const char* getWindowName() const override { return m_windowName.c_str(); }
+	const char* getWindowName() const override {
+		return m_windowName.c_str();
+	}
 
-	AssetPtr& getModel() { return m_model; }
+	AssetPtr& getModel() {
+		return m_model;
+	}
 
   private:
 	std::string m_windowName;

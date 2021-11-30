@@ -46,9 +46,13 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_LIGHTBULB_O " Scene Default Lighting")) {
-			ImGui::ColorPicker3("Ambient Light", m_inspector.getWorld()->m_ambientLight.data);
-			ImGui::ColorPicker3("Rim Light", m_inspector.getWorld()->m_rimLight.data);
-			ImGui::DragFloat("Rim Width Cosine", &m_inspector.getWorld()->m_rimCosineWidth, 0.01f, 0.f, 1.f);
+			ImGui::ColorEdit3("Ambient Light", m_inspector.getWorld()->m_ambientLight.data);
+			ImGuiEx::Label("Ambient Intensity");
+			ImGui::DragFloat("##Ambient Intensity", &m_inspector.getWorld()->m_ambientLightIntensity, 0.01f, 0.f, 100.f);
+			ImGuiEx::Label("Ambient Fake Detail");
+			ImGui::DragFloat("##Ambient Fake Detail", &m_inspector.getWorld()->m_ambientLightFakeDetailAmount, 0.01f, 0.f, 1.f);
+			//ImGui::ColorEdit3("Rim Light", m_inspector.getWorld()->m_rimLight.data);
+			//ImGui::DragFloat("Rim Width Cosine", &m_inspector.getWorld()->m_rimCosineWidth, 0.01f, 0.f, 1.f);
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_CAMERA " Gameplay")) {

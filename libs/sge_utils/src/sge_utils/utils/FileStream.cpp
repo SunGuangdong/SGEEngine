@@ -249,7 +249,7 @@ bool FileWriteStream::open(const char* const filename) {
 
 	if (!m_file || ferror(m_file)) {
 		return false;
-		// SGE_DEBUG_WAR("fopen failed with errno = %d\n", errno);
+		// sgeLogWarn("fopen failed with errno = %d\n", errno);
 	}
 
 	return m_file != nullptr;

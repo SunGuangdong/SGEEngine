@@ -31,7 +31,7 @@
 //		//dead code elimination will do the job
 //		if(bool < 0)
 //		{
-//			if(function && debugMessage) SGE_DEBUG_LOG("%s: %s\n", function, debugMessage);
+//			if(function && debugMessage) sgeLogInfo("%s: %s\n", function, debugMessage);
 //			sgeAssert(false);
 //		}
 //	}

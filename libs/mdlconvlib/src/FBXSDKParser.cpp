@@ -10,7 +10,8 @@ namespace sge {
 
 struct FBXParseError : public std::logic_error {
 	FBXParseError(const char* const error = "Unknown FBXParseError")
-	    : std::logic_error(error) {}
+	    : std::logic_error(error) {
+	}
 };
 
 FbxManager* g_fbxManager = nullptr;
@@ -171,7 +172,8 @@ void readGeometryElement(TFBXLayerElement* const element, int const controlPoint
 // FBXSDKParser
 //---------------------------------------------------------------
 bool FBXSDKParser::parse(Model* result,
-                         std::vector<std::string>* pReferencedTextures,
+                         ModelImportAdditionalResult& additionalResult,
+                         std::string& materialsPrefix,
                          fbxsdk::FbxScene* scene,
                          FbxNode* enforcedRootNode,
                          const ModelParseSettings& parseSettings) {
@@ -182,13 +184,8 @@ bool FBXSDKParser::parse(Model* result,
 		m_model = result;
 		m_parseSettings = parseSettings;
 		m_fbxScene = scene;
-		m_pReferencedTextures = pReferencedTextures;
-
-		// Do not change the axis system, it is better to do it during the export of the FBX file in the DCC.
-#if 0
-		// Change the up Axis to Y.
-		FbxAxisSystem::OpenGL.ConvertScene(m_fbxScene);
-#endif
+		m_additionalResult = &additionalResult;
+		m_materialsPrefix = materialsPrefix;
 
 		// Make sure that each mesh has only 1 material attached and that it is triangulated.
 		fbxsdk::FbxGeometryConverter fbxGeomConv(g_fbxManager);
@@ -354,7 +351,18 @@ int FBXSDKParser::discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode) {
 void FBXSDKParser::importMaterials() {
 	for (auto& pair : m_fbxMtl2MtlIndex) {
 		FbxSurfaceMaterial* const fSurfMtl = pair.first;
+		std::string materialAssetName = m_materialsPrefix + "_" + std::string(fSurfMtl->GetName()) + ".mtl";
+
 		ModelMaterial* const material = m_model->materialAt(pair.second);
+
+		material->name = fSurfMtl->GetName();
+		material->assetForThisMaterial = materialAssetName;
+
+		// Check if the material is already parsed (in the case of importing single scene as multiple 3d models).
+		// if so do not import it again.
+		if (m_additionalResult->mtlsToCreate.count(materialAssetName)) {
+			continue;
+		}
 
 #if 0
 		// A loop useful for debugging while importing new types of materials.
@@ -366,7 +374,8 @@ void FBXSDKParser::importMaterials() {
 		}
 #endif
 
-		material->name = fSurfMtl->GetName();
+		/// A structure that is going to describe the material settings.
+		ExternalPBRMaterialSettings importedMtlSets;
 
 		// By reverse engineering the FBX file containing Stingray PBS material
 		// exported from Autodesk Maya it seems that the attributes for
@@ -387,8 +396,10 @@ void FBXSDKParser::importMaterials() {
 						const std::string requestPath =
 						    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
 
-						if (m_pReferencedTextures && !requestPath.empty()) {
-							m_pReferencedTextures->push_back(requestPath);
+						if (!requestPath.empty()) {
+							// Add the texture to the list of the files to get copied.
+							// the material needs this texture to wor
+							m_additionalResult->textureToCopy.insert(requestPath);
 						}
 
 						return requestPath;
@@ -400,31 +411,32 @@ void FBXSDKParser::importMaterials() {
 			};
 
 			// Check for existing attached textures to the material.
-			// If a texture is found, reset the numeric value to 1.f, as Maya doesn't use them to multiply the texture values as we do
-			// when textures as used.
-			material->diffuseTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_color_map");
-			material->normalTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_normal_map");
-			material->metallicTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_metallic_map");
-			material->roughnessTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_roughness_map");
+			// If a texture is found, reset the numeric value to 1.f, as Maya doesn't use them to multiply
+			// the texture values as we do when textures as used.
+			importedMtlSets.diffuseTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_color_map");
+			importedMtlSets.normalTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_normal_map");
+			importedMtlSets.metallicTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_metallic_map");
+			importedMtlSets.roughnessTextureName = loadTextureFromFbxPropertyByName(propMaya, "TEX_roughness_map");
 
 			// Write the numeric diffuse color.
-			if (material->diffuseTextureName.empty()) {
+			if (importedMtlSets.diffuseTextureName.empty()) {
 				fbxsdk::FbxDouble3 fBaseColor = propMaya.Find("base_color").Get<fbxsdk::FbxVector4>();
-				material->diffuseColor = vec4f((float)fBaseColor.mData[0], (float)fBaseColor.mData[1], (float)fBaseColor.mData[2], 1.f);
+				importedMtlSets.diffuseColor =
+				    vec4f((float)fBaseColor.mData[0], (float)fBaseColor.mData[1], (float)fBaseColor.mData[2], 1.f);
 			} else {
-				material->diffuseColor = vec4f(1.f);
+				importedMtlSets.diffuseColor = vec4f(1.f);
 			}
 
-			if (material->metallicTextureName.empty()) {
-				material->metallic = propMaya.Find("metallic").Get<float>();
+			if (importedMtlSets.metallicTextureName.empty()) {
+				importedMtlSets.metallic = propMaya.Find("metallic").Get<float>();
 			} else {
-				material->metallic = 1.f;
+				importedMtlSets.metallic = 1.f;
 			}
 
-			if (material->roughnessTextureName.empty()) {
-				material->roughness = propMaya.Find("roughness").Get<float>();
+			if (importedMtlSets.roughnessTextureName.empty()) {
+				importedMtlSets.roughness = propMaya.Find("roughness").Get<float>();
 			} else {
-				material->roughness = 1.f;
+				importedMtlSets.roughness = 1.f;
 			}
 		} else {
 			// Searches for the 1st texture in the specified property.
@@ -468,10 +480,8 @@ void FBXSDKParser::importMaterials() {
 				const char* const texFilename = fFileDiffuseTex->GetRelativeFileName();
 				const std::string requestPath =
 				    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
-				material->diffuseTextureName = requestPath;
-				if (m_pReferencedTextures) {
-					m_pReferencedTextures->push_back(requestPath);
-				}
+				importedMtlSets.diffuseTextureName = requestPath;
+				m_additionalResult->textureToCopy.insert(requestPath);
 			}
 
 			fbxsdk::FbxFileTexture* const fFileNormalTex = findTextureFromFbxProperty(propNormal);
@@ -479,10 +489,8 @@ void FBXSDKParser::importMaterials() {
 				const char* const texFilename = fFileNormalTex->GetRelativeFileName();
 				const std::string requestPath =
 				    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
-				material->normalTextureName = requestPath;
-				if (m_pReferencedTextures) {
-					m_pReferencedTextures->push_back(requestPath);
-				}
+				importedMtlSets.normalTextureName = requestPath;
+				m_additionalResult->textureToCopy.insert(requestPath);
 			} else {
 				// if there is no normal map, then most likely it is going to be reported as a bump map.
 				fbxsdk::FbxFileTexture* const fFileBumpTex = findTextureFromFbxProperty(propBump);
@@ -490,19 +498,20 @@ void FBXSDKParser::importMaterials() {
 					const char* const texFilename = fFileBumpTex->GetRelativeFileName();
 					const std::string requestPath =
 					    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
-					material->normalTextureName = requestPath;
-					if (m_pReferencedTextures) {
-						m_pReferencedTextures->push_back(requestPath);
-					}
+					importedMtlSets.normalTextureName = requestPath;
+					m_additionalResult->textureToCopy.insert(requestPath);
 				}
 			}
 
 			FbxProperty fbxDiffuseProp = fSurfMtl->FindProperty(FbxSurfaceMaterial::sDiffuse);
 			if (fbxDiffuseProp.IsValid()) {
 				FbxDouble3 const cd = fSurfMtl->FindProperty(FbxSurfaceMaterial::sDiffuse).Get<FbxDouble3>();
-				material->diffuseColor = vec4f((float)cd.mData[0], (float)cd.mData[1], (float)cd.mData[2], 1.f);
+				importedMtlSets.diffuseColor = vec4f((float)cd.mData[0], (float)cd.mData[1], (float)cd.mData[2], 1.f);
 			}
 		}
+
+		// Finally add the material to the list of the imported materials.
+		m_additionalResult->mtlsToCreate[materialAssetName] = importedMtlSets;
 	}
 }
 
@@ -631,7 +640,8 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 		BoneInfluence() = default;
 		BoneInfluence(int boneIndex, float boneWeight)
 		    : boneIndex(boneIndex)
-		    , boneWeight(boneWeight) {}
+		    , boneWeight(boneWeight) {
+		}
 
 		int boneIndex = -1;
 		float boneWeight = 0.f;
@@ -1129,10 +1139,14 @@ void FBXSDKParser::importAnimations() {
 		fbxsdk::FbxAnimStack* const fbxAnimStack = m_fbxScene->GetSrcObject<fbxsdk::FbxAnimStack>(iStack);
 		const char* const animationName = fbxAnimStack->GetName();
 
+		const fbxsdk::FbxTakeInfo* const takeInfo = m_fbxScene->GetTakeInfo(animationName);
+		if (takeInfo == nullptr) {
+			// I've encoutered a DAE file that had this nullptr.
+			continue;
+		}
+
 		// Set this to current animation stack so our evaluator could use it.
 		m_fbxScene->SetCurrentAnimationStack(fbxAnimStack);
-
-		const fbxsdk::FbxTakeInfo* const takeInfo = m_fbxScene->GetTakeInfo(animationName);
 
 		// Take the start and end time of the animation. Offset the keyframes so in the imported animation
 		// the animation starts from 0 seconds.
@@ -1312,7 +1326,9 @@ void FBXSDKParser::importCollisionGeometry() {
 		float halfHeight = ssides[0];
 		float const radius = maxOf(ssides[1], ssides[2]);
 
-		if_checked(2.f * radius <= halfHeight) { printf("ERROR: Invalid capsule buonding box.\n"); }
+		if_checked(2.f * radius <= halfHeight) {
+			printf("ERROR: Invalid capsule buonding box.\n");
+		}
 
 		halfHeight -= radius;
 

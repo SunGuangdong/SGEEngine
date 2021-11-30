@@ -1,8 +1,8 @@
 #include <filesystem>
 
 #include "Path.h"
-
 #include "common.h"
+#include "strings.h"
 
 #ifdef WIN32
 #define NOMINMAX
@@ -50,9 +50,50 @@ std::string extractFileNameWithExt(const char* filepath) {
 	return std::string(filepath + d + 1);
 }
 
+std::string extractFileNameNoExt(const char* filepath) {
+	if (filepath == NULL) {
+		sgeAssert(false);
+		return std::string();
+	}
+
+	int p = -1; // the position of the last point
+	int d = -1; // the position of the last slash
+
+	for (int t = 0; filepath[t] != '\0'; ++t) {
+		if (filepath[t] == '.')
+			p = t;
+		if (filepath[t] == '/' || filepath[t] == '\\')
+			d = t;
+	}
+
+	// Check if the input is actually a filename.
+	if (d == -1) {
+		return filepath;
+	}
+
+	// Only things with extension are counted as files here.
+	if (p < d) {
+		return std::string();
+	}
+
+	// Check if there is a file at all.
+	if (filepath[d + 1] == '\0') {
+		return std::string();
+	}
+
+	std::string filenameNoDot;
+	int itr = d + 1;
+	while (filepath[itr] != '.' && filepath[itr] != '\0') {
+		filenameNoDot.push_back(filepath[itr]);
+		itr++;
+	}
+
+	return filenameNoDot;
+}
+
 
 std::string extractFileDir(const char* filepath, const bool includeSlashInResult) {
-	if (filepath == NULL) {
+	if (isStringEmpty(filepath)) {
 		sgeAssert(false);
 		return std::string();
 	}
@@ -209,6 +250,14 @@ bool isPathAbsolute(const char* const cpath) {
 }
 
 std::string relativePathTo(const char* path, const char* base) {
+	if (isStringEmpty(path)) {
+		return std::string();
+	}
+
+	if (isStringEmpty(base)) {
+		return std::string(path);
+	}
+
 	try {
 		std::error_code ec;
 		return std::filesystem::proximate(std::filesystem::path(path), std::filesystem::path(base)).string();
@@ -218,6 +267,10 @@ std::string relativePathTo(const char* path, const char* base) {
 }
 
 std::string relativePathToCwd(const char* path) {
+	if (isStringEmpty(path)) {
+		return std::string();
+	}
+
 	try {
 		std::error_code ec;
 		return std::filesystem::proximate(std::filesystem::path(path), std::filesystem::current_path()).string();
@@ -235,6 +288,10 @@ std::string relativePathToCwdCanoize(const std::string& path) {
 }
 
 std::string absoluteOf(const char* const path) {
+	if (isStringEmpty(path)) {
+		return std::string();
+	}
+
 	try {
 		return std::filesystem::absolute(std::filesystem::path(path)).string();
 	} catch (...) {
@@ -260,9 +317,14 @@ void createDirectory(const char* const path) {
 }
 
 void copyFile(const char* srcFile, const char* destFile) {
+// if (isStringEmpty(srcFile) || isStringEmpty(destFile)) {
+//	return;
+//}
+
+//[[maybe_unused]] bool failed = std::filesystem::copy_file(srcFile, destFile);
 #ifdef WIN32
 	[[maybe_unused]] BOOL succeeded = CopyFileA(srcFile, destFile, FALSE);
-	//sgeAssert(succeeded != 0);
+	// sgeAssert(succeeded != 0);
 #else
 	// const std::string cmd = string_format("cp \"%s\" \"%s\"", srcFile, destFile);
 	// system(cmd.c_str());

@@ -38,7 +38,7 @@ void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon), const Input
 					pickedLevel = canonizePathRespectOS(std::filesystem::proximate(pickedLevel).string());
 					m_gamePlayerSetting.initalLevel = pickedLevel;
 				} catch (...) {
-					SGE_DEBUG_ERR("Failed to convert initial level path to relative!");
+					sgeLogError("Failed to convert initial level path to relative!");
 				}
 			}
 		}

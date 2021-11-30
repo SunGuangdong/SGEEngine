@@ -8,66 +8,66 @@
 #include <string>
 #include <vector>
 
-#include "TypeRegister.h"
+#include "typeLib.h"
 
 namespace sge {
 
 // clang-format off
-RelfAddTypeId(bool,                       1);
-RelfAddTypeId(char,                       2);
-RelfAddTypeId(int,                        3);
-RelfAddTypeId(unsigned,                   4);
-RelfAddTypeId(float,                      5);
-RelfAddTypeId(double,                     6);
+ReflAddTypeId(bool,                       1);
+ReflAddTypeId(char,                       2);
+ReflAddTypeId(int,                        3);
+ReflAddTypeId(unsigned,                   4);
+ReflAddTypeId(float,                      5);
+ReflAddTypeId(double,                     6);
 
-//RelfAddTypeId(std::vector<bool>,        7);
-RelfAddTypeId(std::vector<char>,          8);
-RelfAddTypeId(std::vector<int>,           9);
-RelfAddTypeId(std::vector<unsigned>,     10);
-RelfAddTypeId(std::vector<float>,        11);
-RelfAddTypeId(std::vector<double>,       12);
+//ReflAddTypeId(std::vector<bool>,        7);
+ReflAddTypeId(std::vector<char>,          8);
+ReflAddTypeId(std::vector<int>,           9);
+ReflAddTypeId(std::vector<unsigned>,     10);
+ReflAddTypeId(std::vector<float>,        11);
+ReflAddTypeId(std::vector<double>,       12);
 
-RelfAddTypeId(std::string,               13);
+ReflAddTypeId(std::string,               13);
 
-RelfAddTypeId(vec2i,                     14);
-RelfAddTypeId(vec3i,                     15);
-RelfAddTypeId(vec4i,                     16);
+ReflAddTypeId(vec2i,                     14);
+ReflAddTypeId(vec3i,                     15);
+ReflAddTypeId(vec4i,                     16);
 
-RelfAddTypeId(vec2f,                     17);
-RelfAddTypeId(vec3f,                     18);
-RelfAddTypeId(vec4f,                     19);
-RelfAddTypeId(quatf,                     20);
+ReflAddTypeId(vec2f,                     17);
+ReflAddTypeId(vec3f,                     18);
+ReflAddTypeId(vec4f,                     19);
+ReflAddTypeId(quatf,                     20);
 
-RelfAddTypeId(mat4f,                     21);
-RelfAddTypeId(transf3d,                  22);
+ReflAddTypeId(mat4f,                     21);
+ReflAddTypeId(transf3d,                  22);
 
-RelfAddTypeId(AABox3f,                   23);
+ReflAddTypeId(AABox3f,                   23);
 
-RelfAddTypeId(Rangef,                    24);
+ReflAddTypeId(Rangef,                    24);
 
-RelfAddTypeId(MultiCurve2D::PointType,                25);
-RelfAddTypeId(MultiCurve2D::Point,                    26);
-RelfAddTypeId(std::vector<MultiCurve2D::Point>,       27);
-RelfAddTypeId(MultiCurve2D,                           28);
+ReflAddTypeId(MultiCurve2D::PointType,                25);
+ReflAddTypeId(MultiCurve2D::Point,                    26);
+ReflAddTypeId(std::vector<MultiCurve2D::Point>,       27);
+ReflAddTypeId(MultiCurve2D,                           28);
 
-RelfAddTypeId(std::vector<vec2i>,                     29);
-RelfAddTypeId(std::vector<vec3i>,                     30);
-RelfAddTypeId(std::vector<vec4i>,                     31);
+ReflAddTypeId(std::vector<vec2i>,                     29);
+ReflAddTypeId(std::vector<vec3i>,                     30);
+ReflAddTypeId(std::vector<vec4i>,                     31);
 
-RelfAddTypeId(std::vector<vec2f>,                     32);
-RelfAddTypeId(std::vector<vec3f>,                     33);
-RelfAddTypeId(std::vector<vec4f>,                     34);
-RelfAddTypeId(std::vector<quatf>,                     35);
+ReflAddTypeId(std::vector<vec2f>,                     32);
+ReflAddTypeId(std::vector<vec3f>,                     33);
+ReflAddTypeId(std::vector<vec4f>,                     34);
+ReflAddTypeId(std::vector<quatf>,                     35);
 
-RelfAddTypeId(Axis,                                   40);
+ReflAddTypeId(Axis,                                   40);
 
-RelfAddTypeId(std::vector<transf3d>,                  41);
+ReflAddTypeId(std::vector<transf3d>,                  41);
 
-RelfAddTypeId(short,                                  42);
-RelfAddTypeId(unsigned short,                         43);
+ReflAddTypeId(short,                                  42);
+ReflAddTypeId(unsigned short,                         43);
 
-RelfAddTypeId(TypeId,                                 44);
-RelfAddTypeId(std::vector<TypeId>,                    45);
+ReflAddTypeId(TypeId,                                 44);
+ReflAddTypeId(std::vector<TypeId>,                    45);
 
 ReflBlock() {
 	ReflAddType(bool);

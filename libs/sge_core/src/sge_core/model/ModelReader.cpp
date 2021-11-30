@@ -10,7 +10,8 @@ namespace sge {
 
 struct ModelParseExcept : public std::logic_error {
 	ModelParseExcept(const char* msg)
-	    : std::logic_error(msg) {}
+	    : std::logic_error(msg) {
+	}
 };
 
 
@@ -228,9 +229,7 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 						}
 					}
 
-
 					// Load the scaling keyframes.
-
 					if (const JsonValue* jKeyFramesScale = jKeyFrames->getMember("scalingKeyFrames_chunkId")) {
 						const int chunkId = jKeyFramesScale->getNumberAs<int>();
 						const DataChunkDesc& chunkDesc = FindDataChunkDesc(chunkId);
@@ -264,34 +263,41 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				int newMaterialIndex = model.makeNewMaterial();
 				ModelMaterial* material = model.materialAt(newMaterialIndex);
 
+
 				material->name = jMaterial->getMember("name")->GetString();
-				jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->diffuseColor.data, 4);
-				jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->emissionColor.data, 4);
-				material->metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
-				material->roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
+				const JsonValue* jMtlAssetPath = jMaterial->getMember("asset");
 
-				if (const JsonValue* jTex = jMaterial->getMember("diffuseTextureName")) {
-					material->diffuseTextureName = jTex->GetString();
-				}
+				if (jMtlAssetPath) {
+					material->assetForThisMaterial = jMtlAssetPath->GetString();
+				} else {
+					jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->oldInplaceMtl.diffuseColor.data, 4);
+					jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->oldInplaceMtl.emissionColor.data, 4);
+					material->oldInplaceMtl.metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
+					material->oldInplaceMtl.roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
 
-				if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("alphaMultiplier")) {
-					material->alphaMultiplier = jNeedsAlphaSorting->getNumberAs<float>();
-				}
+					if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("alphaMultiplier")) {
+						material->oldInplaceMtl.alphaMultiplier = jNeedsAlphaSorting->getNumberAs<float>();
+					}
 
-				if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("needsAlphaSorting")) {
-					material->needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
-				}
+					if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("needsAlphaSorting")) {
+						material->oldInplaceMtl.needsAlphaSorting = jNeedsAlphaSorting->getAsBool();
+					}
 
-				if (const JsonValue* jTex = jMaterial->getMember("emissionTextureName")) {
-					material->emissionTextureName = jTex->GetString();
-				}
+					if (const JsonValue* jTex = jMaterial->getMember("diffuseTextureName")) {
+						material->oldInplaceMtl.diffuseTextureName = jTex->GetString();
+					}
 
-				if (const JsonValue* jTex = jMaterial->getMember("metallicTextureName")) {
-					material->metallicTextureName = jTex->GetString();
-				}
+					if (const JsonValue* jTex = jMaterial->getMember("emissionTextureName")) {
+						material->oldInplaceMtl.emissionTextureName = jTex->GetString();
+					}
 
-				if (const JsonValue* jTex = jMaterial->getMember("roughnessTextureName")) {
-					material->roughnessTextureName = jTex->GetString();
+					if (const JsonValue* jTex = jMaterial->getMember("metallicTextureName")) {
+						material->oldInplaceMtl.metallicTextureName = jTex->GetString();
+					}
+
+					if (const JsonValue* jTex = jMaterial->getMember("roughnessTextureName")) {
+						material->oldInplaceMtl.roughnessTextureName = jTex->GetString();
+					}
 				}
 			}
 		}
@@ -349,6 +355,10 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 						mesh->vbNormalOffsetBytes = (int)decl.byteOffset;
 					} else if (decl.semantic == "a_uv") {
 						mesh->vbUVOffsetBytes = (int)decl.byteOffset;
+					} else if (decl.semantic == "a_tangent") {
+						mesh->vbTangetOffsetBytes = (int)decl.byteOffset;
+					} else if (decl.semantic == "a_binormal") {
+						mesh->vbBinormalOffsetBytes = (int)decl.byteOffset;
 					}
 				}
 
@@ -420,8 +430,6 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				if (auto jlimbLength = jNode->getMember("limbLength")) {
 					node->limbLength = jlimbLength->getNumberAs<float>();
 				}
-
-				
 
 				// Read the mesh attachments.
 				if (auto jMeshes = jNode->getMember("meshes")) {
@@ -566,12 +574,12 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 			}
 		}
 	} catch (const ModelParseExcept& UNUSED(except)) {
-		// SGE_DEBUG_ERR("%s: Failed with exception:\n", __func__);
-		// SGE_DEBUG_ERR(except.what());
+		// sgeLogError("%s: Failed with exception:\n", __func__);
+		// sgeLogError(except.what());
 
 		return false;
 	} catch (...) {
-		// SGE_DEBUG_ERR("%s: Failed with unknown exception:\n", __func__);
+		// sgeLogError("%s: Failed with unknown exception:\n", __func__);
 		return false;
 	}
 

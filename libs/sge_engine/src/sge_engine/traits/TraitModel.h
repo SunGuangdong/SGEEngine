@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_core/Animator.h"
-#include "sge_core/shaders/modeldraw.h"
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/GameDrawer/IRenderItem.h"
@@ -32,7 +32,7 @@ struct TraitModelRenderItem;
 ///    In that way you have a generic actor type that could be configured to your desiers.
 ///    In order for the game object to take into account the change you need in your Actor::postUpdate to
 ///    to update the trait, see if the model has been changed and maybe update the rigid body for that actor.
-RelfAddTypeIdExists(TraitModel);
+ReflAddTypeIdExists(TraitModel);
 struct SGE_ENGINE_API TraitModel : public Trait {
 	SGE_TraitDecl_Full(TraitModel);
 
@@ -47,7 +47,9 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	/// Not called automatically see the class comment above.
 	/// Updates the working models.
 	/// Returns true if a model has been changed (no matter if it is valid or not).
-	bool postUpdate() { return updateAssetProperties(); }
+	bool postUpdate() {
+		return updateAssetProperties();
+	}
 
 	AABox3f getBBoxOS() const;
 
@@ -60,17 +62,15 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	bool updateAssetProperties();
 
   public:
-	struct MaterialOverride {
-		std::string materialName;
-		ObjectId materialObjId;
-	};
-
 	struct PerModelSettings {
 		PerModelSettings()
-		    : m_assetProperty(assetIface_model3d) {}
+		    : m_assetProperty(assetIface_model3d) {
+		}
 
 		/// Invalidates the asset property focing an update.
-		void invalidateCachedAssets() { m_assetProperty.clear(); }
+		void invalidateCachedAssets() {
+			m_assetProperty.clear();
+		}
 
 		bool updateAssetProperty() {
 			if (m_assetProperty.update()) {
@@ -85,9 +85,6 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 			rootSkeletonId = ObjectId();
 			nodeToBoneId.clear();
 		}
-
-		void setNoLighting(bool v) { instanceDrawMods.forceNoLighting = v; }
-		bool getNoLighting() const { return instanceDrawMods.forceNoLighting; }
 
 		void setModel(const char* assetPath, bool updateNow);
 		void setModel(AssetPtr& asset, bool updateNow);
@@ -106,9 +103,8 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 		// If null the static EvaluatedModel of the asset is going to get rendered.
 		Optional<EvaluatedModel> m_evalModel;
 		float alphaMultiplier = 1.f;
-		InstanceDrawMods instanceDrawMods;
 
-		std::vector<MaterialOverride> m_materialOverrides;
+		std::vector<AssetPtr> mtlOverrides;
 
 		// External skeleton, useful for IK. Not sure for regular skinned meshes.
 		bool useSkeleton = false;

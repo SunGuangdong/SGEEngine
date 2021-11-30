@@ -8,10 +8,12 @@
 
 namespace sge {
 
+struct Script;
+
 // clang-format off
-RelfAddTypeId(TraitScriptSlot::ScriptSlot, 21'02'01'0001);
-RelfAddTypeId(std::vector<TraitScriptSlot::ScriptSlot>, 21'02'01'0002);
-RelfAddTypeId(TraitScriptSlot, 21'02'01'0003);
+ReflAddTypeId(TraitScriptSlot::ScriptSlot, 21'02'01'0001);
+ReflAddTypeId(std::vector<TraitScriptSlot::ScriptSlot>, 21'02'01'0002);
+ReflAddTypeId(TraitScriptSlot, 21'02'01'0003);
 
 ReflBlock()
 {
@@ -68,35 +70,33 @@ void TraitScriptSlot_doProperyEditor(GameInspector& inspector, GameObject* const
 			}
 
 			if (ImGui::BeginPopup(popUpMenuName.c_str())) {
-				for (TypeId scriptType : typeLib().m_gameObjectTypes) {
-					TypeDesc* scriptTd = typeLib().find(scriptType);
+				for (auto& typePair : typeLib().m_registeredTypes) {
+					if (typePair.second.doesInherits(sgeTypeId(Script)) && typePair.second.newFn != nullptr) {
+						const TypeId scriptType = typePair.first;
+						const TypeDesc* scriptTd = &typePair.second;
 
-					// Check if this is a script.
-					if (scriptTd && scriptTd->doesInherits(sgeTypeId(Script)) == false) {
-						continue;
-					}
+						for (TypeId possibleType : slot.possibleTypesIncludeList) {
+							if (scriptType == possibleType || scriptTd->doesInherits(possibleType)) {
+								if (ImGui::MenuItem(scriptTd->name)) {
+									CmdObjectCreation* cmdScriptCreate = new CmdObjectCreation();
+									cmdScriptCreate->setup(scriptType);
+									cmdScriptCreate->apply(&inspector);
 
-					for (TypeId possibleType : slot.possibleTypesIncludeList) {
-						if (scriptType == possibleType || scriptTd->doesInherits(possibleType)) {
-							if (ImGui::MenuItem(scriptTd->name)) {
-								CmdObjectCreation* cmdScriptCreate = new CmdObjectCreation();
-								cmdScriptCreate->setup(scriptType);
-								cmdScriptCreate->apply(&inspector);
+									CmdMemberChange* cmdAssign = new CmdMemberChange();
+									ObjectId originalValue = ObjectId();
+									ObjectId createdMaterialId = cmdScriptCreate->getCreatedObjectId();
+									cmdAssign->setup(gameObject, chain, &originalValue, &createdMaterialId, nullptr);
+									cmdAssign->apply(&inspector);
 
-								CmdMemberChange* cmdAssign = new CmdMemberChange();
-								ObjectId originalValue = ObjectId();
-								ObjectId createdMaterialId = cmdScriptCreate->getCreatedObjectId();
-								cmdAssign->setup(gameObject, chain, &originalValue, &createdMaterialId, nullptr);
-								cmdAssign->apply(&inspector);
+									CmdCompound* cmdCompound = new CmdCompound();
+									cmdCompound->addCommand(cmdScriptCreate);
+									cmdCompound->addCommand(cmdAssign);
+									inspector.appendCommand(cmdCompound, false);
+								}
 
-								CmdCompound* cmdCompound = new CmdCompound();
-								cmdCompound->addCommand(cmdScriptCreate);
-								cmdCompound->addCommand(cmdAssign);
-								inspector.appendCommand(cmdCompound, false);
+								// If we rach here, the current script passes the requierments no no need to display it agian.
+								break;
 							}
-
-							// If we rach here, the current script passes the requierments no no need to display it agian.
-							break;
 						}
 					}
 				}

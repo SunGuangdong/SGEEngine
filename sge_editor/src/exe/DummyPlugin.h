@@ -5,7 +5,6 @@
 
 namespace sge {
 struct DummyPlugin final : public IPlugin {
-	IGameDrawer* allocateGameDrawer() override;
 	void onLoaded(const SgeGlobalSingletons& UNUSED(sgeSingletons)) override {}
 	void onUnload() override {}
 	void run() override {}

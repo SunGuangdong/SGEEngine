@@ -6,7 +6,9 @@
 
 namespace sge {
 
-RelfAddTypeIdExists(TraitRenderGeometry);
+struct DefaultPBRMtlData;
+
+ReflAddTypeIdExists(TraitRenderGeometry);
 /// Represents a custom made geometry that is going to be rendered with
 /// the default shaders. (TODO: custom shaders and materials).
 struct SGE_ENGINE_API TraitRenderGeometry : public Trait {
@@ -15,7 +17,7 @@ struct SGE_ENGINE_API TraitRenderGeometry : public Trait {
 	/// @brief A Single geometry to be rendered.
 	struct Element {
 		const Geometry* pGeom = nullptr; ///< The geometry to be rendered. The pointer must be managed manually.
-		const PBRMaterial* pMtl = nullptr; ///< The material to be used. The pointer must be managed manually.
+		const DefaultPBRMtlData* pMtl = nullptr; ///< The material to be used. The pointer must be managed manually. todo, this needs to be a generic material not a PBR one.
 		mat4f tform = mat4f::getIdentity();
 		/// If true @tform should be used as if it specified the world space
 		/// Ignoring the owning actor transform.

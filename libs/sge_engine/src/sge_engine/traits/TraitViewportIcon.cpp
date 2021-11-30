@@ -5,7 +5,7 @@
 #include "sge_core/AssetLibrary/AssetTexture2D.h"
 
 namespace sge {
-RelfAddTypeId(TraitViewportIcon, 20'05'22'0001);
+ReflAddTypeId(TraitViewportIcon, 20'05'22'0001);
 
 ReflBlock() {
 	ReflAddType(TraitViewportIcon);

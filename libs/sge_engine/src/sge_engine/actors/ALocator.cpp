@@ -7,7 +7,7 @@ namespace sge {
 // ALocator
 //--------------------------------------------------------------------
 // clang-format off
-RelfAddTypeId(ALocator, 20'03'01'0012);
+ReflAddTypeId(ALocator, 20'03'01'0012);
 
 ReflBlock()
 {
@@ -19,7 +19,7 @@ ReflBlock()
 // ABone
 //--------------------------------------------------------------------
 // clang-format off
-RelfAddTypeId(ABone, 21'01'08'0001);
+ReflAddTypeId(ABone, 21'01'08'0001);
 
 ReflBlock()
 {

@@ -1,4 +1,4 @@
-#include "modeldraw.h"
+#include "DefaultPBRMtlGeomDrawer.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
@@ -14,6 +14,8 @@
 #include "../core_shaders/FWDDefault_buildShadowMaps.h"
 #include "../core_shaders/ShadeCommon.h"
 #include "../core_shaders/ShaderLightData.h"
+
+#include "DefaultPBRMtl.h"
 
 using namespace sge;
 
@@ -37,9 +39,11 @@ __declspec(align(4)) struct ParamsCbFWDDefaultShading {
 
 	vec4f uRimLightColorWWidth;
 	vec3f uAmbientLightColor;
+	float uAmbientFakeDetailAmount;
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+	int uSkinningFirstBoneOffsetInTex_padding[3];
 
 	ShaderLightData lights[kMaxLights];
 	int lightsCnt;
@@ -49,29 +53,15 @@ __declspec(align(4)) struct ParamsCbFWDDefaultShading {
 //-----------------------------------------------------------------------------
 // BasicModelDraw
 //-----------------------------------------------------------------------------
-void BasicModelDraw::drawGeometry(const RenderDestination& rdest,
-                                  const vec3f& camPos,
-                                  const vec3f& camLookDir,
-                                  const mat4f& projView,
-                                  const mat4f& world,
-                                  const ObjectLighting& lighting,
-                                  const Geometry* geometry,
-                                  const PBRMaterial& material,
-                                  const InstanceDrawMods& mods) {
-	drawGeometry_FWDShading(rdest, camPos, camLookDir, projView, world, lighting, geometry, material, mods);
-}
+void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
+                                           const ICamera& camera,
+                                           const mat4f& geomWorldTransfrom,
+                                           const ObjectLighting& lighting,
+                                           const Geometry& geometry,
+                                           const IMaterialData* mtlDataBase,
+                                           const InstanceDrawMods& UNUSED(instDrawMods)) {
+	const DefaultPBRMtlData& mtlData = *dynamic_cast<const DefaultPBRMtlData*>(mtlDataBase);
 
-
-
-void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
-                                             const vec3f& camPos,
-                                             const vec3f& camLookDir,
-                                             const mat4f& projView,
-                                             const mat4f& world,
-                                             const ObjectLighting& lighting,
-                                             const Geometry* geometry,
-                                             const PBRMaterial& material,
-                                             const InstanceDrawMods& mods) {
 	SGEDevice* const sgedev = rdest.getDevice();
 	if (!paramsBuffer.IsResourceValid()) {
 		BufferDesc bd = BufferDesc::GetDefaultConstantBuffer(4096, ResourceUsage::Dynamic);
@@ -176,44 +166,44 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 
 	// Find the values of the shader options that are going to be used.
 	// This is needed for find the permutation of the shader compilation flags that we need.
-	const int OPT_HasVertexColor_choice = geometry->vertexDeclHasVertexColor ? kHasVertexColor_Yes : kHasVertexColor_No;
-	const int OPT_HasUV_choice = geometry->vertexDeclHasUv ? kHasUV_Yes : kHasUV_No;
+	const int OPT_HasVertexColor_choice = geometry.vertexDeclHasVertexColor ? kHasVertexColor_Yes : kHasVertexColor_No;
+	const int OPT_HasUV_choice = geometry.vertexDeclHasUv ? kHasUV_Yes : kHasUV_No;
 	int OPT_HasNormals_choice = kHasTangetSpace_No;
-	if (geometry->vertexDeclHasNormals) {
-		if (geometry->vertexDeclHasTangentSpace) {
+	if (geometry.vertexDeclHasNormals) {
+		if (geometry.vertexDeclHasTangentSpace) {
 			OPT_HasNormals_choice = kHasTangetSpace_Yes;
 		}
 	}
-	const int OPT_HasVertexSkinning_choice = geometry->hasVertexSkinning() ? kHasVertexColor_Yes : kHasVertexColor_No;
+	const int OPT_HasVertexSkinning_choice = geometry.hasVertexSkinning() ? kHasVertexColor_Yes : kHasVertexColor_No;
 
 	// Compute the shader material flags.
 	// Depending on the shader settings we might turn off some options as we would not need them.
 	int pbrMtlFlags = 0;
 
-	if (OPT_HasUV_choice != kHasUV_No && OPT_HasNormals_choice == kHasTangetSpace_Yes && material.texNormalMap != nullptr) {
+	if (OPT_HasUV_choice != kHasUV_No && OPT_HasNormals_choice == kHasTangetSpace_Yes && mtlData.texNormalMap != nullptr) {
 		pbrMtlFlags |= kPBRMtl_Flags_HasNormalMap;
 	}
 
-	if (OPT_HasUV_choice != kHasUV_No && material.texMetalness != nullptr) {
+	if (OPT_HasUV_choice != kHasUV_No && mtlData.texMetalness != nullptr) {
 		pbrMtlFlags |= kPBRMtl_Flags_HasMetalnessMap;
 	}
 
-	if (OPT_HasUV_choice != kHasUV_No && material.texRoughness != nullptr) {
+	if (OPT_HasUV_choice != kHasUV_No && mtlData.texRoughness != nullptr) {
 		pbrMtlFlags |= kPBRMtl_Flags_HasRoughnessMap;
 	}
 
-	switch (material.diffuseColorSrc) {
-		case PBRMaterial::diffuseColorSource_vertexColor: {
+	switch (mtlData.diffuseColorSrc) {
+		case DefaultPBRMtlData::diffuseColorSource_vertexColor: {
 			if (OPT_HasVertexColor_choice == kHasVertexColor_Yes) {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromVertexColor;
 			} else {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
 			}
 		} break;
-		case PBRMaterial::diffuseColorSource_constantColor: {
+		case DefaultPBRMtlData::diffuseColorSource_constantColor: {
 			pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
 		} break;
-		case PBRMaterial::diffuseColorSource_diffuseMap: {
+		case DefaultPBRMtlData::diffuseColorSource_diffuseMap: {
 			if (OPT_HasUV_choice != kHasUV_No) {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromTexture;
 			}
@@ -224,11 +214,11 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 			break;
 	}
 
-	if (material.tintByVertexColor) {
+	if (mtlData.tintByVertexColor) {
 		pbrMtlFlags |= kPBRMtl_Flags_DiffuseTintByVertexColor;
 	}
 
-	if (mods.forceNoLighting) {
+	if (mtlData.forceNoLighting) {
 		pbrMtlFlags |= kPBRMtl_Flags_NoLighting;
 	}
 
@@ -246,85 +236,86 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	DrawCall dc;
 
 	stateGroup.setProgram(shaderPerm.shadingProgram.GetPtr());
-	stateGroup.setVBDeclIndex(geometry->vertexDeclIndex);
-	stateGroup.setVB(0, geometry->vertexBuffer, uint32(geometry->vbByteOffset), geometry->stride);
-	stateGroup.setPrimitiveTopology(geometry->topology);
-	if (geometry->ibFmt != UniformType::Unknown) {
-		stateGroup.setIB(geometry->indexBuffer, geometry->ibFmt, geometry->ibByteOffset);
+	stateGroup.setVBDeclIndex(geometry.vertexDeclIndex);
+	stateGroup.setVB(0, geometry.vertexBuffer, uint32(geometry.vbByteOffset), geometry.stride);
+	stateGroup.setPrimitiveTopology(geometry.topology);
+	if (geometry.ibFmt != UniformType::Unknown) {
+		stateGroup.setIB(geometry.indexBuffer, geometry.ibFmt, geometry.ibByteOffset);
 	} else {
 		stateGroup.setIB(nullptr, UniformType::Unknown, 0);
 	}
 
 	RasterizerState* rasterState = nullptr;
-	if (mods.forceNoCulling || material.disableCulling) {
+	if (mtlData.disableCulling) {
 		rasterState = getCore()->getGraphicsResources().RS_noCulling;
 	} else {
-		// We are baking shadow maps and we want to render the backfaces
+		// We are baking a shadow map and we want to render the backfaces.
 		// *opposing to the regular rendering which uses front faces... duh).
 		// This is done to avoid the Shadow Acne artifacts caused by floating point
 		// innacuraties introduced by the depth texture.
-		bool flipCulling = determinant(world) > 0.f;
+		bool flipCulling = determinant(geomWorldTransfrom) > 0.f;
 		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
 	}
 
 	StaticArray<BoundUniform, 64> uniforms;
 
-	mat4f combinedUVWTransform = mods.uvwTransform * material.uvwTransform;
+	mat4f combinedUVWTransform = /* instDrawMods.uvwTransform * */ mtlData.uvwTransform;
 
-	paramsCb.world = world;
-	paramsCb.cameraPositionWs = vec4f(camPos, 1.f);
-	paramsCb.uCameraLookDirWs = vec4f(camLookDir, 0.f);
-	paramsCb.projView = projView;
-	paramsCb.uDiffuseColorTint = material.diffuseColor;
+	paramsCb.world = geomWorldTransfrom;
+	paramsCb.cameraPositionWs = vec4f(camera.getCameraPosition(), 1.f);
+	paramsCb.uCameraLookDirWs = vec4f(camera.getCameraLookDir(), 0.f);
+	paramsCb.projView = camera.getProjView();
+	paramsCb.uDiffuseColorTint = mtlData.diffuseColor;
 	paramsCb.uvwTransform = combinedUVWTransform;
-	paramsCb.texDiffuseXYZScaling = material.diffuseTexXYZScaling;
-	paramsCb.uMetalness = material.metalness;
-	paramsCb.uRoughness = material.roughness;
-	paramsCb.uSkinningFirstBoneOffsetInTex = geometry->firstBoneOffset;
+	paramsCb.texDiffuseXYZScaling = mtlData.diffuseTexXYZScaling;
+	paramsCb.uMetalness = mtlData.metalness;
+	paramsCb.uRoughness = mtlData.roughness;
+	paramsCb.uSkinningFirstBoneOffsetInTex = geometry.firstBoneOffset;
 	paramsCb.uPBRMtlFlags = pbrMtlFlags;
-	paramsCb.alphaMultiplier = material.alphaMultiplier;
+	paramsCb.alphaMultiplier = mtlData.alphaMultipler;
+	paramsCb.uvwTransform = mtlData.uvwTransform;
 
-	if (material.diffuseTexture) {
-		shaderPerm.bind<64>(uniforms, uTexDiffuse, (void*)material.diffuseTexture);
+	if (mtlData.diffuseTexture) {
+		shaderPerm.bind<64>(uniforms, uTexDiffuse, (void*)mtlData.diffuseTexture);
 #ifdef SGE_RENDERER_D3D11
-		shaderPerm.bind<64>(uniforms, uTexDiffuseSampler, (void*)material.diffuseTexture->getSamplerState());
+		shaderPerm.bind<64>(uniforms, uTexDiffuseSampler, (void*)mtlData.diffuseTexture->getSamplerState());
 #endif
 	}
 
 	// TRIPLANAR LEGACY
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseX, (void*)material.diffuseTextureX);
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseY, (void*)material.diffuseTextureY);
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZ, (void*)material.diffuseTextureZ);
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseX, (void*)mtlData.diffuseTextureX);
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseY, (void*)mtlData.diffuseTextureY);
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZ, (void*)mtlData.diffuseTextureZ);
 	//#ifdef SGE_RENDERER_D3D11
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXSampler, (void*)material.diffuseTextureX->getSamplerState());
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseYSampler, (void*)material.diffuseTextureY->getSamplerState());
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZSampler, (void*)material.diffuseTextureZ->getSamplerState());
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXSampler, (void*)mtlData.diffuseTextureX->getSamplerState());
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseYSampler, (void*)mtlData.diffuseTextureY->getSamplerState());
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZSampler, (void*)mtlData.diffuseTextureZ->getSamplerState());
 	//#endif
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXYZScaling, (void*)&material.diffuseTexXYZScaling);
+	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXYZScaling, (void*)&mtlData.diffuseTexXYZScaling);
 
-	if (material.texMetalness != nullptr) {
-		shaderPerm.bind<64>(uniforms, uTexMetalness, (void*)material.texMetalness);
+	if (mtlData.texMetalness != nullptr) {
+		shaderPerm.bind<64>(uniforms, uTexMetalness, (void*)mtlData.texMetalness);
 #ifdef SGE_RENDERER_D3D11
-		shaderPerm.bind<64>(uniforms, uTexMetalnessSampler, (void*)material.texMetalness->getSamplerState());
+		shaderPerm.bind<64>(uniforms, uTexMetalnessSampler, (void*)mtlData.texMetalness->getSamplerState());
 #endif
 	}
 
-	if (material.texRoughness != nullptr) {
-		shaderPerm.bind<64>(uniforms, uTexRoughness, (void*)material.texRoughness);
+	if (mtlData.texRoughness != nullptr) {
+		shaderPerm.bind<64>(uniforms, uTexRoughness, (void*)mtlData.texRoughness);
 #ifdef SGE_RENDERER_D3D11
-		shaderPerm.bind<64>(uniforms, uTexRoughnessSampler, (void*)material.texRoughness->getSamplerState());
+		shaderPerm.bind<64>(uniforms, uTexRoughnessSampler, (void*)mtlData.texRoughness->getSamplerState());
 #endif
 	}
 
-	if (material.texNormalMap) {
-		shaderPerm.bind<64>(uniforms, uTexNormalMap, (void*)material.texNormalMap);
+	if (mtlData.texNormalMap) {
+		shaderPerm.bind<64>(uniforms, uTexNormalMap, (void*)mtlData.texNormalMap);
 #ifdef SGE_RENDERER_D3D11
-		shaderPerm.bind<64>(uniforms, uTexNormalMapSampler, (void*)material.texNormalMap->getSamplerState());
+		shaderPerm.bind<64>(uniforms, uTexNormalMapSampler, (void*)mtlData.texNormalMap->getSamplerState());
 #endif
 	}
 
 	if (OPT_HasVertexSkinning_choice == kHasVertexSkinning_Yes) {
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uTexSkinningBones], (geometry->skinningBoneTransforms)));
+		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uTexSkinningBones], (geometry.skinningBoneTransforms)));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
 
@@ -372,15 +363,11 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 
 	paramsCb.uAmbientLightColor = lighting.ambientLightColor;
+	paramsCb.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
 	paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 
-	if (mods.forceAdditiveBlending) {
-		stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-		                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
-	} else {
-		stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-		                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
-	}
+	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
+	                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);
 	memcpy(paramsMappedData, &paramsCb, sizeof(paramsCb));
@@ -392,67 +379,11 @@ void BasicModelDraw::drawGeometry_FWDShading(const RenderDestination& rdest,
 	dc.setUniforms(uniforms.data(), uniforms.size());
 	dc.setStateGroup(&stateGroup);
 
-	if (geometry->ibFmt != UniformType::Unknown) {
-		dc.drawIndexed(geometry->numElements, 0, 0);
+	if (geometry.ibFmt != UniformType::Unknown) {
+		dc.drawIndexed(geometry.numElements, 0, 0);
 	} else {
-		dc.draw(geometry->numElements, 0);
+		dc.draw(geometry.numElements, 0);
 	}
 
 	rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
-}
-
-void BasicModelDraw::draw(const RenderDestination& rdest,
-                          const vec3f& camPos,
-                          const vec3f& camLookDir,
-                          const mat4f& projView,
-                          const mat4f& preRoot,
-                          const ObjectLighting& lighting,
-                          const EvaluatedModel& evalModel,
-                          const InstanceDrawMods& mods,
-                          const std::vector<MaterialOverride>* mtlOverrides) {
-	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
-		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
-		const ModelNode* rawNode = evalModel.m_model->nodeAt(iNode);
-
-		for (int iMesh = 0; iMesh < rawNode->meshAttachments.size(); ++iMesh) {
-			const MeshAttachment& meshAttachment = rawNode->meshAttachments[iMesh];
-			const EvaluatedMesh& evalMesh = evalModel.getEvalMesh(meshAttachment.attachedMeshIndex);
-			mat4f const finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? preRoot : preRoot * evalNode.evalGlobalTransform;
-
-			PBRMaterial material;
-
-			if (meshAttachment.attachedMaterialIndex >= 0) {
-				const EvaluatedMaterial& mtl = evalModel.getEvalMaterial(meshAttachment.attachedMaterialIndex);
-				const std::string mtlName = evalModel.m_model->materialAt(meshAttachment.attachedMaterialIndex)->name;
-
-				auto itr = mtlOverrides ? std::find_if(mtlOverrides->begin(), mtlOverrides->end(),
-				                                       [&mtlName](const MaterialOverride& v) -> bool { return v.name == mtlName; })
-				                        : std::vector<MaterialOverride>::iterator();
-
-				if (!mtlOverrides || itr == mtlOverrides->end()) {
-					material.diffuseColor = mtl.diffuseColor;
-					material.metalness = mtl.metallic;
-					material.roughness = mtl.roughness;
-
-					const auto getTexFromAsset = [](const AssetPtr& asset) -> Texture* {
-						if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
-							return texIface->getTexture();
-						}
-
-						return nullptr;
-					};
-
-					material.diffuseTexture = getTexFromAsset(mtl.diffuseTexture);
-					material.texNormalMap = getTexFromAsset(mtl.texNormalMap);
-					material.texMetalness = getTexFromAsset(mtl.texMetallic);
-					material.texRoughness = getTexFromAsset(mtl.texRoughness);
-
-				} else {
-					material = itr->mtl;
-				}
-			}
-
-			drawGeometry(rdest, camPos, camLookDir, projView, finalTrasform, lighting, &evalMesh.geometry, material, mods);
-		}
-	}
 }

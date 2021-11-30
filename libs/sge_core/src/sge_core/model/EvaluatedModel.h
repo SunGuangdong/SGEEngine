@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
+#include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_core/Geometry.h"
 #include "sge_core/model/Model.h"
-#include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/Box.h"
@@ -13,23 +13,13 @@
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/utils/vector_map.h"
 
+#include "sge_core/materials/IMaterial.h"
+
 namespace sge {
 
 struct AssetLibrary;
 struct Asset;
-
-struct EvaluatedMaterial {
-	AssetPtr diffuseTexture;
-	AssetPtr texNormalMap;
-	AssetPtr texMetallic;
-	AssetPtr texRoughness;
-
-	vec4f diffuseColor = vec4f(1.f, 0.f, 1.f, 1.f);
-	float metallic = 1.f;
-	float roughness = 1.f;
-	bool needsAlphaSorting = false;
-	float alphaMultiplier = 1.f;
-};
+struct AssetIface_Material;
 
 struct EvaluatedNode {
 	mat4f evalLocalTransform = mat4f::getZero();
@@ -38,7 +28,6 @@ struct EvaluatedNode {
 };
 
 struct EvaluatedMesh {
-	//std::vector<mat4f> boneTransformMatrices;
 	Geometry geometry;
 };
 
@@ -47,7 +36,8 @@ struct EvalMomentSets {
 	    : donorIndex(donorIndex)
 	    , animationIndex(animationIndex)
 	    , time(time)
-	    , weight(weight) {}
+	    , weight(weight) {
+	}
 
 	/// The donor index specified which animation donor should be used,
 	/// if -1 than then no model should be used and @animationIndex point to an animation in
@@ -72,10 +62,13 @@ struct EvalMomentSets {
 struct SGE_CORE_API EvaluatedModel {
 	EvaluatedModel()
 	    : m_assetLibrary(NULL)
-	    , m_model(NULL) {}
+	    , m_model(NULL) {
+	}
 
 	void initialize(AssetLibrary* const assetLibrary, Model* model);
-	bool isInitialized() const { return m_model && m_assetLibrary; }
+	bool isInitialized() const {
+		return m_model && m_assetLibrary;
+	}
 
 	/// Adds an animation that can be specified to the evaluate function.
 	/// Returns the index of the donor.
@@ -83,7 +76,9 @@ struct SGE_CORE_API EvaluatedModel {
 	int addAnimationDonor(const AssetPtr& donorAsset);
 
 	/// Evaluates the model at the specified momemnt.
-	bool evaluateStatic() { return evaluateFromMoments(nullptr, 0); }
+	bool evaluateStatic() {
+		return evaluateFromMoments(nullptr, 0);
+	}
 
 	/// @brief Evaluates the model with the specified animations at the specified time.
 	/// If you want to evaluate the model with no animation, just pass @evalMoments nullptr and numMoments 0.
@@ -95,18 +90,32 @@ struct SGE_CORE_API EvaluatedModel {
 	/// be used.
 	bool evaluateFromNodesGlobalTransform(const std::vector<mat4f>& boneGlobalTrasnformOverrides);
 
-	int getNumEvalMeshes() const { return int(m_evaluatedMeshes.size()); }
-	const EvaluatedMesh& getEvalMesh(const int iMesh) const { return m_evaluatedMeshes[iMesh]; }
+	int getNumEvalMeshes() const {
+		return int(m_evaluatedMeshes.size());
+	}
+	const EvaluatedMesh& getEvalMesh(const int iMesh) const {
+		return m_evaluatedMeshes[iMesh];
+	}
 
-	int getNumEvalMaterial() const { return int(m_evaluatedMaterials.size()); }
-	const EvaluatedMaterial& getEvalMaterial(const int iMesh) const { return m_evaluatedMaterials[iMesh]; }
+	int getNumEvalMaterial() const {
+		return int(m_evaluatedMaterials.size());
+	}
+	const std::shared_ptr<AssetIface_Material>& getEvalMaterial(const int iMesh) const {
+		return m_evaluatedMaterials[iMesh];
+	}
 
-	int getNumEvalNodes() const { return int(m_evaluatedNodes.size()); }
-	const EvaluatedNode& getEvalNode(const int iNode) const { return m_evaluatedNodes[iNode]; }
+	int getNumEvalNodes() const {
+		return int(m_evaluatedNodes.size());
+	}
+	const EvaluatedNode& getEvalNode(const int iNode) const {
+		return m_evaluatedNodes[iNode];
+	}
 
 	const ModelAnimation* findAnimation(const int idxDonor, const int animIndex) const;
 
-	Texture* getSkinningBonesTexture() const { return m_skinningBoneTransfsTex.GetPtr(); }
+	Texture* getSkinningBonesTexture() const {
+		return m_skinningBoneTransfsTex.GetPtr();
+	}
 
 	int getMeshBonesOffsetInSkinningBonesTexture(const int iMesh) const {
 		if (iMesh >= 0 && iMesh < m_perMeshSkinningBonesTransformOFfsetInTex.size()) {
@@ -118,7 +127,6 @@ struct SGE_CORE_API EvaluatedModel {
 	}
 
   private:
-
 	bool evaluateNodes_common();
 	bool evaluateFromMomentsInternal(const EvalMomentSets evalMoments[], int numMoments);
 	bool evaluateNodesFromExternalBones(const std::vector<mat4f>& boneGlobalTrasnformOverrides);
@@ -147,7 +155,7 @@ struct SGE_CORE_API EvaluatedModel {
 	/// @brief Since materials cannot be animated in any way,
 	/// and we cannot "accept" them from a donor they can be evaluated only once.
 	bool areMaterialsAlreadyEvaluated = false;
-	std::vector<EvaluatedMaterial> m_evaluatedMaterials;
+	std::vector<std::shared_ptr<AssetIface_Material>> m_evaluatedMaterials;
 
 	std::vector<AnimationDonor> m_donors; // Caution: ckind of assumes that the AnimationDonor is moveable.
 
@@ -164,8 +172,7 @@ struct SGE_CORE_API EvaluatedModel {
 
 	AABox3f aabox;
 
-
-	// Temporaries used to avoid allocating memory again and again for each evaluation.
+	/// Temporaries used to avoid allocating memory again and again for each evaluation.
 	std::vector<mat4f> bonesTransformTexDataForAllMeshes;
 };
 

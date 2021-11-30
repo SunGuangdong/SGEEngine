@@ -6,10 +6,8 @@
 #include "lib_skinning.shader"
 #endif
 
-#include "lib_pbr.shader"
-#include "lib_textureMapping.shader"
 #include "lib_lighting.shader"
-
+#include "lib_textureMapping.shader"
 
 //--------------------------------------------------------------------
 // Uniforms
@@ -32,6 +30,7 @@ cbuffer ParamsCbFWDDefaultShading {
 
 	float4 uRimLightColorWWidth;
 	float3 uAmbientLightColor;
+	float uAmbientFakeDetailAmount;
 
 	// Skinning.
 	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
@@ -130,7 +129,7 @@ StageVertexOut vsMain(IAVertex vsin) {
 	// Pass the varyings to the next shader.
 	float4 worldPos = mul(world, float4(vertexPosOs, 1.0));
 	const float4 worldNormal = mul(world, float4(normalOs, 0.0)); // TODO: Proper normal transfrom by inverse transpose.
-	
+
 	float4 worldPosNonDistorted = worldPos;
 
 	res.v_posWS = worldPosNonDistorted.xyz;
@@ -157,28 +156,26 @@ StageVertexOut vsMain(IAVertex vsin) {
 // Pixel Shader
 //--------------------------------------------------------------------
 #ifdef SGE_PIXEL_SHADER
-float4 psMain(StageVertexOut inVert) : SV_Target0 {
-
+float4 psMain(StageVertexOut inVert)
+    : SV_Target0 {
 	MaterialSample mtlSample;
 
 	mtlSample.albedo = uDiffuseColorTint;
 
 	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromConstantColor) {
 		// We already use uDiffuseColorTint. So nothing to do here.
-	} 
-	else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
-	#if (OPT_HasUV == kHasUV_Yes)
+	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
+#if (OPT_HasUV == kHasUV_Yes)
 		mtlSample.albedo *= tex2D(texDiffuse, inVert.v_uv); // TODO: srgb to linear.
-	#else // Should never happen.
+#else                                                       // Should never happen.
 		return float4(1.f, 0.f, 1.f, 1.f);
-	#endif
-	} 
-	else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromVertexColor) {
-	#if OPT_HasVertexColor == kHasVertexColor_Yes
+#endif
+	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromVertexColor) {
+#if OPT_HasVertexColor == kHasVertexColor_Yes
 		mtlSample.albedo = inVert.v_vertexDiffuse;
-	#else // Should never happen.
+#else // Should never happen.
 		return float4(1.f, 0.f, 1.f, 1.f);
-	#endif
+#endif
 	}
 
 #if OPT_HasVertexColor == kHasVertexColor_Yes
@@ -190,10 +187,8 @@ float4 psMain(StageVertexOut inVert) : SV_Target0 {
 	if (uPBRMtlFlags & kPBRMtl_Flags_HasNormalMap) {
 #if (OPT_HasUV == kHasUV_Yes) && (OPT_HasTangentSpace == kHasTangetSpace_Yes)
 		const float3 normalMapNorm = 2.f * tex2D(uTexNormalMap, inVert.v_uv).xyz - float3(1.f, 1.f, 1.f);
-		const float3 normalFromNormalMap = 
-			  normalMapNorm.x * normalize(inVert.v_tangent) 
-			+ normalMapNorm.y * normalize(inVert.v_binormal) 
-			+ normalMapNorm.z * normalize(inVert.v_normal);
+		const float3 normalFromNormalMap = normalMapNorm.x * normalize(inVert.v_tangent) + normalMapNorm.y * normalize(inVert.v_binormal) +
+		                                   normalMapNorm.z * normalize(inVert.v_normal);
 
 		mtlSample.shadeNormalWs = normalize(normalFromNormalMap);
 #else
@@ -203,7 +198,7 @@ float4 psMain(StageVertexOut inVert) : SV_Target0 {
 		mtlSample.shadeNormalWs = normalize(inVert.v_normal);
 	}
 
-	
+
 	// If the fragment is going to be fully transparent discard the sample.
 	if (mtlSample.albedo.w <= 0.f || alphaMultiplier <= 0.f) {
 		discard;
@@ -231,12 +226,25 @@ float4 psMain(StageVertexOut inVert) : SV_Target0 {
 		finalColor = mtlSample.albedo;
 	} else {
 		finalColor = float4(0.f, 0.f, 0.f, mtlSample.albedo.w);
+
 		for (int iLight = 0; iLight < lightsCnt; ++iLight) {
 			finalColor.xyz += Light_computeDirectLighting(lights[iLight], uLightShadowMap[iLight], mtlSample, cameraPositionWs);
 		}
 
 		// Add ambient lighting.
-		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor;
+		// @ambientLightingFake describes the fake detailed ambient lighting,
+		// it produces some good results where the geometry is not lit by anything.
+		// the amount of how much regular and fake-detailed ambient light we want
+		// is controlled by @uAmbientFakeDetailAmount.
+		float ambientLightingFake = 0.f;
+		ambientLightingFake += 0.25f;
+		ambientLightingFake += 0.25f * 0.5f * (mtlSample.shadeNormalWs.y + 1.f);
+		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.x));
+		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.z));
+
+		float ambientLightAmount = lerp(1.f, ambientLightingFake, uAmbientFakeDetailAmount);
+
+		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor * ambientLightAmount;
 	}
 
 	// Applt the alpha multiplier.

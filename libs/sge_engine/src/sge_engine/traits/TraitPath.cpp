@@ -5,7 +5,7 @@
 
 namespace sge {
 
-RelfAddTypeId(BounceType, 20'03'02'0029);
+ReflAddTypeId(BounceType, 20'03'02'0029);
 // clang-format off
 
 ReflBlock() {
@@ -22,7 +22,7 @@ ReflBlock() {
 //-----------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------
-RelfAddTypeId(PathLengthFollow::Settings, 20'03'02'0030);
+ReflAddTypeId(PathLengthFollow::Settings, 20'03'02'0030);
 // clang-format off
 
 ReflBlock() {
@@ -136,8 +136,8 @@ PathLengthFollow::State PathLengthFollow::compute(const float pathLength,
 //-----------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------
-RelfAddTypeId(PathFollow::Settings, 20'03'02'0031);
-RelfAddTypeId(PathFollow::State, 20'03'02'0033);
+ReflAddTypeId(PathFollow::Settings, 20'03'02'0031);
+ReflAddTypeId(PathFollow::State, 20'03'02'0033);
 // clang-format off
 
 ReflBlock() {

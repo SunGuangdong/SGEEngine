@@ -1,4 +1,5 @@
 #include "GraphicsCommon_gl.h"
+#include "sge_log/Log.h"
 #include <algorithm>
 #include <stdio.h>
 
@@ -114,6 +115,8 @@ CreateShaderResult ShaderGL::createNative(const ShaderType::Enum type, const cha
 			GLint temp;
 			log.resize(logLenght + 1);
 			glGetShaderInfoLog(m_glShader, logLenght, &temp, log.data());
+			sgeLogError(log.data());
+
 			sgeAssert(false);
 		}
 

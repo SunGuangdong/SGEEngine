@@ -3,7 +3,7 @@
 
 namespace sge {
 // clang-format off
-RelfAddTypeId(AInfinitePlaneObstacle, 21'02'27'0001);
+ReflAddTypeId(AInfinitePlaneObstacle, 21'02'27'0001);
 ReflBlock()
 {
 	ReflAddActor(AInfinitePlaneObstacle)

@@ -9,7 +9,7 @@ int sge_fopen(FILE** ppFile, const char* filename, const char* mode) {
 #else
 	*ppFile = fopen(filename, mode);
 	if (*ppFile == nullptr) {
-		// SGE_DEBUG_ERR("fopen failed on '%s' with mode '%s'\n", filename, mode);
+		// sgeLogError("fopen failed on '%s' with mode '%s'\n", filename, mode);
 		return 1;
 	}
 	return 0;

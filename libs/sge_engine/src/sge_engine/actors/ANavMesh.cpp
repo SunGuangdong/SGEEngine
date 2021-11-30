@@ -19,8 +19,8 @@ struct ABlockingObstacle;
 struct AStaticObstacle;
 
 // clang-format off
-RelfAddTypeId(NavMeshBuildSets, 20'05'10'0001);
-RelfAddTypeId(ANavMesh, 20'05'10'0002);
+ReflAddTypeId(NavMeshBuildSets, 20'05'10'0001);
+ReflAddTypeId(ANavMesh, 20'05'10'0002);
 
 ReflBlock() {
 	ReflAddType(NavMeshBuildSets)
@@ -162,7 +162,7 @@ void ANavMesh::build() {
 	const int numTriangles = int(trianglesIndices.size()) / 3;
 
 	if (numTriangles == 0) {
-		SGE_DEBUG_WAR("NavMesh did not find any triangles to be used for building the navmesh!");
+		sgeLogWarn("NavMesh did not find any triangles to be used for building the navmesh!");
 		return;
 	}
 

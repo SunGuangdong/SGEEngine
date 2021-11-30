@@ -1,7 +1,7 @@
 #include <filesystem>
 
 #include "ActorCreateWindow.h"
-#include "AssetsWindow.h"
+#include "AssetsUI/AssetsWindow.h"
 #include "CreditsWindow.h"
 #include "EditorWindow.h"
 #include "GameInspectorWindow.h"
@@ -23,6 +23,7 @@
 #include "sge_core/application/input.h"
 #include "sge_core/ui/MultiCurve2DEditor.h"
 #include "sge_engine/EngineGlobal.h"
+#include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/GameSerialization.h"
 #include "sge_engine/actors/ACRSpline.h"
@@ -67,13 +68,10 @@ void EditorWindow::Assets::load() {
 }
 
 void EditorWindow::onGamePluginPreUnload() {
-	m_gameDrawer.reset(nullptr);
-	m_sceneWindow->setGameDrawer(nullptr);
 	m_sceneInstance.newScene(true);
 }
 
 void EditorWindow::onGamePluginChanged() {
-	m_gameDrawer.reset(getEngineGlobal()->getActivePlugin()->allocateGameDrawer());
 	m_gameDrawer->initialize(&m_sceneInstance.getWorld());
 	m_sceneWindow->setGameDrawer(m_gameDrawer.get());
 }
@@ -81,7 +79,7 @@ void EditorWindow::onGamePluginChanged() {
 EditorWindow::EditorWindow(WindowBase& nativeWindow, std::string windowName)
     : m_nativeWindow(nativeWindow)
     , m_windowName(std::move(windowName)) {
-	m_gameDrawer.reset(getEngineGlobal()->getActivePlugin()->allocateGameDrawer());
+	m_gameDrawer.reset(new DefaultGameDrawer());
 
 	getEngineGlobal()->subscribeOnPluginChange([this]() -> void { onGamePluginChanged(); }).abandon();
 
@@ -255,13 +253,13 @@ void EditorWindow::saveWorldToSpecificFile(const char* filename) {
 
 	if (succeeded) {
 		getEngineGlobal()->showNotification(string_format("SUCCEEDED saving '%s'", filename));
-		SGE_DEBUG_LOG("[SAVE_LEVEL] Saving game level succeeded. File is %s\n", filename);
+		sgeLogInfo("[SAVE_LEVEL] Saving game level succeeded. File is %s\n", filename);
 		m_sceneInstance.getWorld().m_workingFilePath = filename;
 
 		addReasecentScene(filename);
 	} else {
 		getEngineGlobal()->showNotification(string_format("FAILED saving level '%s'", filename));
-		SGE_DEBUG_WAR("[SAVE_LEVEL] Saving game level failed or canceled!\n");
+		sgeLogWarn("[SAVE_LEVEL] Saving game level failed or canceled!\n");
 	}
 }
 
@@ -628,9 +626,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGui::Separator();
 		ImGui::SameLine();
 
-
-
-		if (imageButton(m_assets.m_assetRebuildIcon)) {
+		if (imageButton(m_assets.m_orthoIcon)) {
 			getInspector().getWorld()->m_editorCamera.isOrthograhpic = !getInspector().getWorld()->m_editorCamera.isOrthograhpic;
 		}
 		ImGuiEx::TextTooltip("Toggle the orthographic/perspective mode of the preview camera.");

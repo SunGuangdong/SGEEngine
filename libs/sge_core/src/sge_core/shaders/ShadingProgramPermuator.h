@@ -55,8 +55,12 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	            std::set<std::string>* outIncludedFiles = nullptr);
 
 
-	const OptionPermuataor getCompileTimeOptionsPerm() const { return compileTimeOptionsPermutator; }
-	const std::vector<Permutation>& getShadersPerPerm() const { return perPermutationShadingProg; }
+	const OptionPermuataor getCompileTimeOptionsPerm() const {
+		return compileTimeOptionsPermutator;
+	}
+	const std::vector<Permutation>& getShadersPerPerm() const {
+		return perPermutationShadingProg;
+	}
 
   private:
 	OptionPermuataor compileTimeOptionsPermutator;

@@ -23,7 +23,7 @@ void BulletPhysicsDebugDraw::postDebugDraw() {
 }
 
 void BulletPhysicsDebugDraw::reportErrorWarning([[maybe_unused]] const char* warningString) {
-	SGE_DEBUG_WAR("[PS][BT]%s\n", warningString);
+	sgeLogWarn("[PS][BT]%s\n", warningString);
 }
 
 void BulletPhysicsDebugDraw::drawLine(const btVector3& from, const btVector3& to, const btVector3& color) {

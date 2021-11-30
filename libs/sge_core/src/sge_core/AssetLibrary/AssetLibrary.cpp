@@ -1,5 +1,6 @@
 #pragma once
 
+#include "sge_core/typelib/typeLib.h"
 #include "sge_log/Log.h"
 #include "sge_utils/sge_utils.h"
 #include "sge_utils/utils/FileStream.h"
@@ -9,6 +10,7 @@
 
 #include "AssetAudio.h"
 #include "AssetLibrary.h"
+#include "AssetMaterial.h"
 #include "AssetModel3D.h"
 #include "AssetSpriteAnim.h"
 #include "AssetText.h"
@@ -16,11 +18,9 @@
 #include "IAsset.h"
 #include "IAssetInterface.h"
 
-
 #include <filesystem>
 
 namespace sge {
-
 
 const char* assetIface_getName(const AssetIfaceType type) {
 	switch (type) {
@@ -34,6 +34,8 @@ const char* assetIface_getName(const AssetIfaceType type) {
 			return "Sprite Animation";
 		case assetIface_audio:
 			return "Audio";
+		case assetIface_mtl:
+			return "Material";
 		default:
 			sgeAssertFalse("Not implemented");
 			return "NotImplemented";
@@ -78,6 +80,9 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 		return assetIface_audio;
 	}
 
+	if (sge_stricmp(ext, "mtl") == 0) {
+		return assetIface_mtl;
+	}
 
 	return assetIface_unknown;
 }
@@ -114,7 +119,7 @@ void AssetLibrary::scanForAvailableAssets(const char* const path) {
 					const AssetIfaceType guessedType = assetIface_guessFromExtension(extCStr, false);
 					if (guessedType != assetIface_unknown) {
 						// markThatAssetExists(entry.path().generic_u8string().c_str(), guessedType);
-						getAssetFromFile(entry.path().generic_u8string().c_str(), false);
+						getAssetFromFile(entry.path().generic_u8string().c_str(), nullptr, false);
 					}
 				}
 			}
@@ -144,6 +149,10 @@ AssetPtr AssetLibrary::newAsset(std::string assetPath, AssetIfaceType type) {
 		} break;
 		case sge::assetIface_text: {
 			auto assetTyped = newAsset<AssetText>(assetPath.c_str());
+			newlyLoadedAsset = assetTyped;
+		} break;
+		case sge::assetIface_mtl: {
+			auto assetTyped = newAsset<AssetMaterial>(assetPath.c_str());
 			newlyLoadedAsset = assetTyped;
 		} break;
 		default:
@@ -178,13 +187,25 @@ std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const 
 	return std::move(pathToAsset);
 }
 
-AssetPtr AssetLibrary::getAssetFromFile(const char* path, bool loadIfMissing) {
+AssetPtr AssetLibrary::getAssetFromFile(const char* path, const char* localDirectory, bool loadIfMissing) {
+	if (path == nullptr || path[0] == '\0') {
+		return nullptr;
+	}
+
 	const double loadStartTime = Timer::now_seconds();
 
-	const std::string pathToAsset = resloveAssetPathToRelative(path);
+	std::string pathToAsset;
+	if (localDirectory) {
+		std::string localPath = std::string(localDirectory) + "/" + path;
+		pathToAsset = resloveAssetPathToRelative(localPath.c_str());
+	}
+
 	if (pathToAsset.empty()) {
-		// Because std::filesystem::canonical() returns empty string if the path doesn't exists
-		// we assume that the loading failed.
+		// If the local path failed, try just the path.
+		pathToAsset = resloveAssetPathToRelative(path);
+	}
+
+	if (pathToAsset.empty()) {
 		return nullptr;
 	}
 
@@ -201,7 +222,17 @@ AssetPtr AssetLibrary::getAssetFromFile(const char* path, bool loadIfMissing) {
 	}
 
 	if (!loadIfMissing) {
-		return itrFindAssetByPath != m_allAssets.end() ? itrFindAssetByPath->second : nullptr;
+		if (itrFindAssetByPath == m_allAssets.end()) {
+			// If the asset has not been created, create one but do not load it.
+			// That way it will pop-up in the interface as being available.
+			AssetPtr newAssetToMarkExisting = newAsset(pathToAsset.c_str(), assetType);
+			m_allAssets[pathToAsset] = newAssetToMarkExisting;
+			return newAssetToMarkExisting;
+		} else {
+			// The asset is already allocated but not loaded.
+			// The user doesn't want us to load it, so just return it.
+			return itrFindAssetByPath->second;
+		}
 	}
 
 	AssetPtr assetToModify =
@@ -214,7 +245,7 @@ AssetPtr AssetLibrary::getAssetFromFile(const char* path, bool loadIfMissing) {
 
 	// Measure the loading time.
 	const float loadEndTime = Timer::now_seconds();
-	SGE_DEBUG_LOG("Asset '%s' loaded in %f seconds.\n", pathToAsset.c_str(), loadEndTime - loadStartTime);
+	sgeLogInfo("Asset '%s' loaded in %f seconds.\n", pathToAsset.c_str(), loadEndTime - loadStartTime);
 
 	return assetToModify;
 }
@@ -248,7 +279,7 @@ bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify) {
 
 	// Measure the loading time.
 	const float reloadEndTime = Timer::now_seconds();
-	SGE_DEBUG_LOG("Asset '%s' reloaded in %f seconds.\n", assetToModify->getPath().c_str(), reloadEndTime - reloadStartTime);
+	sgeLogInfo("Asset '%s' reloaded in %f seconds.\n", assetToModify->getPath().c_str(), reloadEndTime - reloadStartTime);
 
 	return true;
 }
@@ -272,6 +303,9 @@ SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType t
 			break;
 		case sge::assetIface_text:
 			return dynamic_cast<const IAssetInterface_Text*>(&asset) != nullptr;
+			break;
+		case sge::assetIface_mtl:
+			return dynamic_cast<const AssetIface_Material*>(&asset) != nullptr;
 			break;
 		default:
 			sgeAssert(false && "Not implemented asset interface type");
@@ -308,6 +342,9 @@ SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetIfaceType type) {
 		case sge::assetIface_text:
 			return dynamic_cast<IAssetInterface_Text*>(&asset) != nullptr;
 			break;
+		case sge::assetIface_mtl:
+			return dynamic_cast<AssetIface_Material*>(&asset) != nullptr;
+			break;
 		default:
 			break;
 	}
@@ -324,5 +361,20 @@ bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type) {
 
 	return isAssetLoaded(*asset.get(), type);
 }
+
+// clang-format off
+ReflAddTypeId(AssetPtr, 10'11'21'0001)
+ReflAddTypeId(std::shared_ptr<AssetIface_Texture2D>, 10'11'21'0002)
+ReflAddTypeId(std::shared_ptr<AssetIface_Model3D>, 10'11'21'0003)
+ReflAddTypeId(std::shared_ptr<AssetIface_SpriteAnim>, 10'11'21'0004)
+ReflAddTypeId(std::shared_ptr<AssetIface_Material>, 10'11'21'0006)
+ReflBlock() {
+	ReflAddType(AssetPtr);
+	ReflAddType(std::shared_ptr<AssetIface_Texture2D>);
+	ReflAddType(std::shared_ptr<AssetIface_Model3D>);
+	ReflAddType(std::shared_ptr<AssetIface_SpriteAnim>);
+	ReflAddType(std::shared_ptr<AssetIface_Material>);
+}
+// clang-format on
 
 } // namespace sge

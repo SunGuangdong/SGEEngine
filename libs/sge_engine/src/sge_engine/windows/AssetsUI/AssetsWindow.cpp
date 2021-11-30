@@ -2,16 +2,19 @@
 
 #include "AssetsWindow.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
+#include "MaterialEditWindow.h"
 #include "ModelParseSettings.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/materials/MaterialFamilyList.h"
 #include "sge_core/model/ModelReader.h"
 #include "sge_core/model/ModelWriter.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/ui/ImGuiDragDrop.h"
+#include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/Path.h"
@@ -27,6 +30,42 @@
 
 namespace sge {
 
+///
+JsonValue* createDefaultPBRFromImportedMtl(ExternalPBRMaterialSettings& externalMaterial, JsonValueBuffer& jvb) {
+	JsonValue* jMaterial = jvb(JID_MAP);
+
+	jMaterial->setMember("family", jvb("DefaultPBR"));
+	jMaterial->setMember("alphaMultiplier", jvb(1.f));
+	jMaterial->setMember("needsAlphaSorting", jvb(false));
+
+	jMaterial->setMember("diffuseColor", jvb(externalMaterial.diffuseColor.data, 4));
+	jMaterial->setMember("emissionColor", jvb(externalMaterial.emissionColor.data, 4));
+	jMaterial->setMember("metallic", jvb(externalMaterial.metallic));
+	jMaterial->setMember("roughness", jvb(externalMaterial.roughness));
+
+	if (!externalMaterial.diffuseTextureName.empty()) {
+		jMaterial->setMember("texDiffuse", jvb(externalMaterial.diffuseTextureName));
+	}
+
+	if (!externalMaterial.emissionTextureName.empty()) {
+		jMaterial->setMember("texEmission", jvb(externalMaterial.emissionTextureName));
+	}
+
+	if (!externalMaterial.diffuseTextureName.empty()) {
+		jMaterial->setMember("texMetallic", jvb(externalMaterial.metallicTextureName));
+	}
+
+	if (!externalMaterial.roughnessTextureName.empty()) {
+		jMaterial->setMember("texRoughness", jvb(externalMaterial.roughnessTextureName));
+	}
+
+	if (!externalMaterial.normalTextureName.empty()) {
+		jMaterial->setMember("texNormalMap", jvb(externalMaterial.normalTextureName));
+	}
+
+	return jMaterial;
+}
+
 AssetsWindow::AssetsWindow(std::string windowName, GameInspector& inspector)
     : m_windowName(std::move(windowName))
     , m_inspector(inspector) {
@@ -38,7 +77,7 @@ AssetsWindow::AssetsWindow(std::string windowName, GameInspector& inspector)
 	}
 
 	if (m_sgeImportFBXFile == nullptr || m_sgeImportFBXFileAsMultiple == nullptr) {
-		SGE_DEBUG_WAR("Failed to load dynamic library mdlconvlib. Importing FBX files would not be possible without it!");
+		sgeLogWarn("Failed to load dynamic library mdlconvlib. Importing FBX files would not be possible without it!");
 	}
 }
 
@@ -56,27 +95,38 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 		Model importedModel;
 
 		if (m_sgeImportFBXFile == nullptr) {
-			SGE_DEBUG_ERR("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
+			sgeLogError("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
 		}
 
-		std::vector<std::string> referencedTextures;
-		if (m_sgeImportFBXFile && m_sgeImportFBXFile(importedModel, aid.fileToImportPath.c_str(), &referencedTextures)) {
+		ModelImportAdditionalResult modelImportAddRes;
+		if (m_sgeImportFBXFile && m_sgeImportFBXFile(importedModel, modelImportAddRes, aid.fileToImportPath.c_str())) {
+			// Make sure the import directory exists.
 			createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 
 			// Convert the 3d model to our internal type.
 			ModelWriter modelWriter;
 			const bool succeeded = modelWriter.write(importedModel, fullAssetPath.c_str());
 
-			AssetPtr assetModel = assetLib->getAssetFromFile(fullAssetPath.c_str());
-			assetLib->reloadAssetModified(assetModel);
+			
 
 			std::string notificationMsg = string_format("Imported %s", fullAssetPath.c_str());
-			SGE_DEBUG_LOG(notificationMsg.c_str());
+			sgeLogInfo(notificationMsg.c_str());
 			getEngineGlobal()->showNotification(notificationMsg);
+
+			// Create the needed materials.
+			JsonValueBuffer jvb;
+			for (auto mtlToCreate : modelImportAddRes.mtlsToCreate) {
+				JsonValue* jMaterial = createDefaultPBRFromImportedMtl(mtlToCreate.second, jvb);
+				if (jMaterial) {
+					const std::string mtlFilePath = aid.outputDir + "/" + mtlToCreate.first;
+					JsonWriter jw;
+					jw.WriteInFile(mtlFilePath.c_str(), jMaterial, true);
+				}
+			}
 
 			// Copy the referenced textures.
 			const std::string modelInputDir = extractFileDir(aid.fileToImportPath.c_str(), true);
-			for (const std::string& texturePathLocal : referencedTextures) {
+			for (const std::string& texturePathLocal : modelImportAddRes.textureToCopy) {
 				const std::string textureDestDir = aid.outputDir + "/" + extractFileDir(texturePathLocal.c_str(), true);
 				const std::string textureFilename = extractFileNameWithExt(texturePathLocal.c_str());
 
@@ -90,24 +140,27 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				assetLib->reloadAssetModified(assetTexture);
 			}
 
+			AssetPtr assetModel = assetLib->getAssetFromFile(fullAssetPath.c_str());
+			assetLib->reloadAssetModified(assetModel);
+
 			return true;
 		} else {
 			std::string notificationMsg = string_format("Failed to import %s", fullAssetPath.c_str());
-			SGE_DEBUG_ERR(notificationMsg.c_str());
+			sgeLogError(notificationMsg.c_str());
 			getEngineGlobal()->showNotification(notificationMsg);
 
 			return false;
 		}
 	} else if (aid.assetType == assetIface_model3d && aid.importModelsAsMultipleFiles == true) {
 		if (m_sgeImportFBXFileAsMultiple == nullptr) {
-			SGE_DEBUG_ERR("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
+			sgeLogError("mdlconvlib dynamic library is not loaded. We cannot import FBX files without it!");
 		}
 
 		std::vector<std::string> referencedTextures;
 		std::vector<MultiModelImportResult> importedModels;
 
-		if (m_sgeImportFBXFileAsMultiple &&
-		    m_sgeImportFBXFileAsMultiple(importedModels, aid.fileToImportPath.c_str(), &referencedTextures)) {
+		ModelImportAdditionalResult modelImportAddRes;
+		if (m_sgeImportFBXFileAsMultiple && m_sgeImportFBXFileAsMultiple(importedModels, modelImportAddRes, aid.fileToImportPath.c_str())) {
 			createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 
 			for (MultiModelImportResult& model : importedModels) {
@@ -124,13 +177,24 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				assetLib->reloadAssetModified(assetModel);
 
 				std::string notificationMsg = string_format("Imported %s", path.c_str());
-				SGE_DEBUG_LOG(notificationMsg.c_str());
+				sgeLogInfo(notificationMsg.c_str());
 				getEngineGlobal()->showNotification(notificationMsg);
+			}
+
+			// Create the needed materials.
+			JsonValueBuffer jvb;
+			for (auto mtlToCreate : modelImportAddRes.mtlsToCreate) {
+				JsonValue* jMaterial = createDefaultPBRFromImportedMtl(mtlToCreate.second, jvb);
+				if (jMaterial) {
+					const std::string mtlFilePath = aid.outputDir + "/" + mtlToCreate.first;
+					JsonWriter jw;
+					jw.WriteInFile(mtlFilePath.c_str(), jMaterial, true);
+				}
 			}
 
 			// Copy the referenced textures.
 			const std::string modelInputDir = extractFileDir(aid.fileToImportPath.c_str(), true);
-			for (const std::string& texturePathLocal : referencedTextures) {
+			for (const std::string& texturePathLocal : modelImportAddRes.textureToCopy) {
 				const std::string textureDestDir = aid.outputDir + "/" + extractFileDir(texturePathLocal.c_str(), true);
 				const std::string textureFilename = extractFileNameWithExt(texturePathLocal.c_str());
 
@@ -147,7 +211,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 			return true;
 		} else {
 			std::string notificationMsg = string_format("Failed to import %s", fullAssetPath.c_str());
-			SGE_DEBUG_ERR(notificationMsg.c_str());
+			sgeLogError(notificationMsg.c_str());
 			getEngineGlobal()->showNotification(notificationMsg);
 
 			return false;
@@ -175,7 +239,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 
 			return tempSpriteAnimation.saveSpriteToFile(fullAssetPath.c_str());
 		} else {
-			SGE_DEBUG_ERR("Failed to import %s as a Sprite!", aid.fileToImportPath.c_str());
+			sgeLogError("Failed to import %s as a Sprite!", aid.fileToImportPath.c_str());
 		}
 	} else if (aid.assetType == assetIface_text) {
 		createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
@@ -188,8 +252,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 	} else {
 		createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 		copyFile(aid.fileToImportPath.c_str(), fullAssetPath.c_str());
-		SGE_DEBUG_WAR("Imported a files by just copying it as it is not recognized asset type!")
-		return true;
+		sgeLogWarn("Imported a files by just copying it as it is not recognized asset type!") return true;
 	}
 
 	return false;
@@ -259,7 +322,7 @@ void AssetsWindow::update_assetImport(SGEContext* const sgecon, const InputState
 	}
 }
 
-void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
+void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is) {
 	if (isClosed()) {
 		return;
 	}
@@ -320,6 +383,7 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 				}
 
 				bool shouldOpenNewFolderPopup = false;
+				bool shouldOpenNewMaterialPopup = false;
 
 				std::string label;
 				fs::path pathToAssets = assetLib->getAssetsDirAbs();
@@ -356,6 +420,7 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						    assetIface_guessFromExtension(extractFileExtension(entry.path().string().c_str()).c_str(), false);
 						if (assetType == assetIface_model3d) {
 							string_format(label, "%s %s", ICON_FK_CUBE, entry.path().filename().string().c_str());
+
 						} else if (assetType == assetIface_texture2d) {
 							string_format(label, "%s %s", ICON_FK_PICTURE_O, entry.path().filename().string().c_str());
 						} else if (assetType == assetIface_text) {
@@ -363,21 +428,65 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						} else if (assetType == assetIface_audio) {
 							string_format(label, "%s %s", ICON_FK_FILE_AUDIO_O, entry.path().filename().string().c_str());
 						} else {
-							string_format(label, "%s %s", ICON_FK_FILE_TEXT_O, entry.path().filename().string().c_str());
+							// Not implemented asset interface.
+							string_format(label, "%s %s", ICON_FK_QUESTION_CIRCLE, entry.path().filename().string().c_str());
 						}
 
-						if (ImGui::Selectable(label.c_str())) {
-							explorePreviewAssetChanged = true;
-							explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str());
-						}
-						if (ImGui::IsItemClicked(1)) {
-							rightClickedPath = entry.path();
-						}
+						if (assetType != assetIface_unknown) {
+							if (ImGui::Selectable(label.c_str())) {
+								explorePreviewAssetChanged = true;
+								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str());
+							}
+							if (ImGui::IsItemClicked(1)) {
+								rightClickedPath = entry.path();
+							}
 
-						if (ImGui::BeginDragDropSource()) {
-							DragDropPayloadAsset::setPayload(localAssetPath);
-							ImGui::Text(localAssetPath.c_str());
-							ImGui::EndDragDropSource();
+							if (ImGui::BeginDragDropSource()) {
+								DragDropPayloadAsset::setPayload(localAssetPath);
+								ImGui::Text(localAssetPath.c_str());
+								ImGui::EndDragDropSource();
+							}
+#if 0
+							if (assetPreviewTex[localAssetPath].IsResourceValid()) {
+								ImGui::Image(assetPreviewTex[localAssetPath]->getRenderTarget(0), ImVec2(64.f, 64.f));
+							} else {
+								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str(), nullptr, true);
+								if (isAssetLoaded(explorePreviewAsset, assetIface_model3d)) {
+									AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
+									if (bboxModel.IsEmpty() == false) {
+										orbit_camera camera;
+
+										camera.orbitPoint = bboxModel.center();
+										camera.radius = bboxModel.diagonal().length() * 1.25f;
+										camera.yaw = deg2rad(45.f);
+										camera.pitch = deg2rad(45.f);
+
+										RawCamera rawCamera = RawCamera(
+										    camera.eyePosition(), camera.GetViewMatrix(),
+										    mat4f::getPerspectiveFovRH(deg2rad(60.f), 1.f, 0.1f, 10000.f, 0.f, kIsTexcoordStyleD3D));
+
+										GpuHandle<FrameTarget> ft = getCore()->getDevice()->requestResource<FrameTarget>();
+										ft->create2D(64, 64);
+										getCore()->getDevice()->getContext()->clearDepth(ft, 1.f);
+
+										RenderDestination rdest;
+										rdest.frameTarget = ft;
+										rdest.viewport = ft->getViewport();
+										rdest.sgecon = getCore()->getDevice()->getContext();
+
+										imods.forceNoLighting = true;
+										drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(),
+										              getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval(), InstanceDrawMods());
+
+										assetPreviewTex[localAssetPath] = ft;
+									}
+								}
+							}
+#endif
+
+
+						} else {
+							ImGui::Selectable(label.c_str());
 						}
 					}
 				}
@@ -401,6 +510,13 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 					if (ImGui::MenuItem(ICON_FK_FOLDER " New Folder")) {
 						shouldOpenNewFolderPopup = true;
+					}
+
+					if (ImGui::BeginMenu(ICON_FK_PLUS " Create")) {
+						if (ImGui::MenuItem(ICON_FK_PAINT_BRUSH " Material")) {
+							shouldOpenNewMaterialPopup = true;
+						}
+						ImGui::EndMenu();
 					}
 
 					if (!m_rightClickedPath.empty()) {
@@ -511,6 +627,8 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						ImGui::Text(ICON_FK_FILE " Text");
 					} else if (m_importAssetToImportInPopup.assetType == assetIface_spriteAnim) {
 						ImGui::Text(ICON_FK_FILM " Sprite");
+					} else if (m_importAssetToImportInPopup.assetType == assetIface_mtl) {
+						ImGui::Text(ICON_FK_FLASK " Material");
 					} else {
 						ImGui::Text(ICON_FK_FILE_TEXT_O " Unknown, the file is going to be copyied!");
 						ImGui::Text("If you know the type of the asset you can override it below.");
@@ -521,6 +639,7 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						assetTypeNames[int(assetIface_texture2d)] = ICON_FK_PICTURE_O " Texture";
 						assetTypeNames[int(assetIface_text)] = ICON_FK_FILE " Text";
 						assetTypeNames[int(assetIface_spriteAnim)] = ICON_FK_FILM " Sprite";
+						assetTypeNames[int(assetIface_mtl)] = ICON_FK_FLASK " Material";
 
 						ImGuiEx::Label("Import As:");
 						if (ImGui::BeginCombo("##Import As: ", assetTypeNames[int(m_importAssetToImportInPopup.assetType)])) {
@@ -594,6 +713,58 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 						directoryTree.emplace_back(std::move(dirToAdd));
 					}
 				}
+
+				// Create Material Popup.
+				{
+					if (shouldOpenNewMaterialPopup) {
+						ImGui::OpenPopup("SGE Assets Window Create Material");
+					}
+
+					static char newMtlName[1024] = {0};
+					static std::string newMtlFamily = "DefaultPBR";
+					if (ImGui::BeginPopup("SGE Assets Window Create Material")) {
+						auto& allFamilies = getCore()->getMaterialLib()->getAllFamilies();
+
+						if (ImGui::BeginCombo("Family", newMtlFamily.c_str())) {
+							for (auto& family : allFamilies) {
+								if (ImGui::Selectable(family.second.familyDesc.displayName.c_str())) {
+									newMtlFamily = family.second.familyDesc.displayName;
+								}
+							}
+
+							ImGui::EndCombo();
+						}
+
+						ImGui::InputText(ICON_FK_FILE " Name", newMtlName, SGE_ARRSZ(newMtlName));
+
+						if (ImGui::Button(ICON_FK_CHECK " Create")) {
+							const MaterialFamilyLibrary::MaterialFamilyData* mtlFamData =
+							    getCore()->getMaterialLib()->findFamilyByName(newMtlFamily.c_str());
+
+							if (mtlFamData) {
+								std::shared_ptr<IMaterial> newMtl = mtlFamData->familyDesc.mtlAllocFn();
+
+								JsonValueBuffer jvb;
+								JsonValue* jMtlRoot = newMtl->toJson(jvb, pathToAssets.string().c_str());
+
+								JsonWriter jw;
+								std::string mtlFilename = (pathToAssets.string() + "/" + std::string(newMtlName) + ".mtl").c_str();
+								jw.WriteInFile(mtlFilename.c_str(), jMtlRoot, true);
+								newMtlName[0] = '\0';
+							}
+
+							ImGui::CloseCurrentPopup();
+						}
+
+
+						if (ImGui::Button("Cancel")) {
+							ImGui::CloseCurrentPopup();
+						}
+
+						ImGui::EndPopup();
+					}
+				}
+
 			}
 
 
@@ -606,149 +777,28 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 			ImGui::NextColumn();
 
 			if (AssetIface_Model3D* modelIface = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)) {
-				if (explorePreviewAssetChanged) {
-					AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
-					if (bboxModel.IsEmpty() == false) {
-						m_exploreModelPreviewWidget.camera.orbitPoint = bboxModel.center();
-						m_exploreModelPreviewWidget.camera.radius = bboxModel.diagonal().length() * 1.25f;
-						m_exploreModelPreviewWidget.camera.yaw = deg2rad(45.f);
-						m_exploreModelPreviewWidget.camera.pitch = deg2rad(45.f);
-					}
-				}
-
-				const Model& model = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getModel3D();
-				EvaluatedModel& staticEval = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval();
-
-				m_exploreModelPreviewWidget.doWidget(sgecon, is, staticEval);
-
-				ImGui::Text("Animation Count: %d", model.numAnimations());
-				for (int iAnim = 0; iAnim < model.numAnimations(); ++iAnim) {
-					ImGui::Text("\t%s", model.animationAt(iAnim)->animationName.c_str());
-				}
-
-				ImGui::Text("Node Count: %d", model.numNodes());
-				ImGui::Text("Mesh Count: %d", model.numMeshes());
-
-				for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
-					ImGui::Text("\t%s", model.meshAt(iMesh)->name.c_str());
-				}
-
-				ImGui::Text("Material Count: %d", model.numMaterials());
-				for (int iMtl = 0; iMtl < model.numMaterials(); ++iMtl) {
-					ImGui::Text("\t%s", model.materialAt(iMtl)->name.c_str());
-				}
-
+				doPreviewAssetModel(is, explorePreviewAssetChanged);
 			} else if (AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(explorePreviewAsset)) {
-				const Texture2DDesc& desc = texIface->getTexture()->getDesc().texture2D;
-				const ImVec2 availableContentSize = ImGui::GetContentRegionAvail();
-
-				const float imageSizeX = availableContentSize.x;
-				const float imageSizeY = desc.height * availableContentSize.x / float(desc.width);
-
-				ImGui::Image(texIface->getTexture(), ImVec2(imageSizeX, imageSizeY));
-
-
-
-				const auto getAddressModeName = [](TextureAddressMode::Enum mode) -> const char* {
-					switch (mode) {
-						case TextureAddressMode::Repeat:
-							return "Repeat";
-						case TextureAddressMode::ClampEdge:
-							return "Edge";
-						case TextureAddressMode::ClampBorder:
-							return "Border";
-
-						default:
-							return "Unknown";
-					}
-				};
-
-				const auto getFilterModeName = [](TextureFilter::Enum mode) -> const char* {
-					switch (mode) {
-						case TextureFilter::Min_Mag_Mip_Linear:
-							return "Linear (with mip mapping)";
-						case TextureFilter::Min_Mag_Mip_Point:
-							return "Point (with mip mapping)";
-						default:
-							return "Unknown";
-					}
-				};
-
-				const auto doAddressModeUI = [&getAddressModeName](const char* comboLabel, TextureAddressMode::Enum& mode) -> bool {
-					bool hadChange = false;
-					if (ImGui::BeginCombo(comboLabel, getAddressModeName(mode))) {
-						if (ImGui::Selectable(getAddressModeName(TextureAddressMode::Repeat))) {
-							mode = TextureAddressMode::Repeat;
-							hadChange = true;
-						}
-
-						if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampEdge))) {
-							mode = TextureAddressMode::ClampEdge;
-							hadChange = true;
-						}
-
-						if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampBorder))) {
-							mode = TextureAddressMode::ClampBorder;
-							hadChange = true;
-						}
-
-						ImGui::EndCombo();
-					}
-
-					return hadChange;
-				};
-
-				bool hadChange = false;
-
-				AssetTextureMeta texMeta = texIface->getTextureMeta();
-
-				ImGuiEx::Label("Semi-Transparent");
-				hadChange |= ImGui::Checkbox("##Semi Transparent", &texMeta.isSemiTransparent);
-
-				ImGuiEx::Label("Auto Generate MipMaps");
-				bool changedMipMapGen = ImGui::Checkbox("##Auto Generate MipMaps", &texMeta.shouldGenerateMips);
-				hadChange |= changedMipMapGen;
-				if (changedMipMapGen) {
-					getLog()->writeWarning("Auto MipMap generation will take effect after a restart!");
-				}
-
-				hadChange |= doAddressModeUI("Tiling X", texMeta.assetSamplerDesc.addressModes[0]);
-				hadChange |= doAddressModeUI("Tiling Y", texMeta.assetSamplerDesc.addressModes[1]);
-				hadChange |= doAddressModeUI("Tiling Z", texMeta.assetSamplerDesc.addressModes[2]);
-
-				if (ImGui::BeginCombo("Filtering", getFilterModeName(texMeta.assetSamplerDesc.filter))) {
-					if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Linear))) {
-						texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Linear;
-						hadChange = true;
-					}
-
-					if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Point))) {
-						texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Point;
-						hadChange = true;
-					}
-
-					ImGui::EndCombo();
-				}
-
-				if (hadChange) {
-					GpuHandle<SamplerState> sampler = getCore()->getDevice()->requestResource<SamplerState>();
-					sampler->create(texMeta.assetSamplerDesc);
-					texIface->setTextureMeta(texMeta);
-					texIface->getTexture()->setSamplerState(sampler);
-
-					// Save the modified settings to the *.info file of the texture.
-					if (AssetTexture2d* assetTex2d = dynamic_cast<AssetTexture2d*>(explorePreviewAsset.get())) {
-						assetTex2d->saveTextureSettingsToInfoFile();
-					} else {
-						sgeAssertFalse("It is expected that explorePreviewAsset is a AssetTexture2d");
-					}
-				}
+				doPreviewAssetTexture2D(texIface);
 			} else if (AssetIface_SpriteAnim* spriteIface = getAssetIface<AssetIface_SpriteAnim>(explorePreviewAsset)) {
 				if (AssetIface_Texture2D* spriteTexIface =
 				        getAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
 					auto desc = spriteTexIface->getTexture()->getDesc().texture2D;
 					ImVec2 sz = ImGui::GetContentRegionAvail();
 					ImGui::Image(spriteTexIface->getTexture(), sz);
+				}
+			} else if (AssetIface_Material* mtlIface = getAssetIface<AssetIface_Material>(explorePreviewAsset)) {
+				if (ImGui::Button(ICON_FK_PICTURE_O " Edit Material")) {
+					std::shared_ptr<IMaterial> mtl = mtlIface->getMaterial();
+
+					MaterialEditWindow* mtlEditWnd =
+					    dynamic_cast<MaterialEditWindow*>(getEngineGlobal()->findWindowByName(ICON_FK_PICTURE_O " Material Edit"));
+					if (mtlEditWnd == nullptr) {
+						mtlEditWnd = new MaterialEditWindow(ICON_FK_PICTURE_O " Material Edit", m_inspector);
+						getEngineGlobal()->addWindow(mtlEditWnd);
+					}
+
+					mtlEditWnd->setAsset(std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset));
 				}
 			} else if (IAssetInterface_Audio* audioIface = getAssetIface<IAssetInterface_Audio>(explorePreviewAsset)) {
 				ImGui::Text("No Preview");
@@ -765,6 +815,146 @@ void AssetsWindow::update(SGEContext* const sgecon, const InputState& is) {
 		}
 	}
 	ImGui::End();
+}
+
+void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreviewAssetChanged) {
+	if (explorePreviewAssetChanged) {
+		AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
+		if (bboxModel.IsEmpty() == false) {
+			m_exploreModelPreviewWidget.camera.orbitPoint = bboxModel.center();
+			m_exploreModelPreviewWidget.camera.radius = bboxModel.diagonal().length() * 1.25f;
+			m_exploreModelPreviewWidget.camera.yaw = deg2rad(45.f);
+			m_exploreModelPreviewWidget.camera.pitch = deg2rad(45.f);
+		}
+	}
+
+	const Model& model = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getModel3D();
+	EvaluatedModel& staticEval = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval();
+
+	m_exploreModelPreviewWidget.doWidget(getCore()->getDevice()->getContext(), is, staticEval);
+
+	ImGui::Text("Animation Count: %d", model.numAnimations());
+	for (int iAnim = 0; iAnim < model.numAnimations(); ++iAnim) {
+		ImGui::Text("\t%s", model.animationAt(iAnim)->animationName.c_str());
+	}
+
+	ImGui::Text("Node Count: %d", model.numNodes());
+	ImGui::Text("Mesh Count: %d", model.numMeshes());
+
+	for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
+		ImGui::Text("\t%s", model.meshAt(iMesh)->name.c_str());
+	}
+
+	ImGui::Text("Material Count: %d", model.numMaterials());
+	for (int iMtl = 0; iMtl < model.numMaterials(); ++iMtl) {
+		ImGui::Text("\t%s", model.materialAt(iMtl)->name.c_str());
+	}
+}
+
+void AssetsWindow::doPreviewAssetTexture2D(AssetIface_Texture2D* texIface) {
+	const Texture2DDesc& desc = texIface->getTexture()->getDesc().texture2D;
+	const ImVec2 availableContentSize = ImGui::GetContentRegionAvail();
+
+	const float imageSizeX = availableContentSize.x;
+	const float imageSizeY = desc.height * availableContentSize.x / float(desc.width);
+
+	ImGui::Image(texIface->getTexture(), ImVec2(imageSizeX, imageSizeY));
+
+	const auto getAddressModeName = [](TextureAddressMode::Enum mode) -> const char* {
+		switch (mode) {
+			case TextureAddressMode::Repeat:
+				return "Repeat";
+			case TextureAddressMode::ClampEdge:
+				return "Edge";
+			case TextureAddressMode::ClampBorder:
+				return "Border";
+
+			default:
+				return "Unknown";
+		}
+	};
+
+	const auto getFilterModeName = [](TextureFilter::Enum mode) -> const char* {
+		switch (mode) {
+			case TextureFilter::Min_Mag_Mip_Linear:
+				return "Linear (with mip mapping)";
+			case TextureFilter::Min_Mag_Mip_Point:
+				return "Point (with mip mapping)";
+			default:
+				return "Unknown";
+		}
+	};
+
+	const auto doAddressModeUI = [&getAddressModeName](const char* comboLabel, TextureAddressMode::Enum& mode) -> bool {
+		bool hadChange = false;
+		if (ImGui::BeginCombo(comboLabel, getAddressModeName(mode))) {
+			if (ImGui::Selectable(getAddressModeName(TextureAddressMode::Repeat))) {
+				mode = TextureAddressMode::Repeat;
+				hadChange = true;
+			}
+
+			if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampEdge))) {
+				mode = TextureAddressMode::ClampEdge;
+				hadChange = true;
+			}
+
+			if (ImGui::Selectable(getAddressModeName(TextureAddressMode::ClampBorder))) {
+				mode = TextureAddressMode::ClampBorder;
+				hadChange = true;
+			}
+
+			ImGui::EndCombo();
+		}
+
+		return hadChange;
+	};
+
+	bool hadChange = false;
+
+	AssetTextureMeta texMeta = texIface->getTextureMeta();
+
+	ImGuiEx::Label("Semi-Transparent");
+	hadChange |= ImGui::Checkbox("##Semi Transparent", &texMeta.isSemiTransparent);
+
+	ImGuiEx::Label("Auto Generate MipMaps");
+	bool changedMipMapGen = ImGui::Checkbox("##Auto Generate MipMaps", &texMeta.shouldGenerateMips);
+	hadChange |= changedMipMapGen;
+	if (changedMipMapGen) {
+		getLog()->writeWarning("Auto MipMap generation will take effect after a restart!");
+	}
+
+	hadChange |= doAddressModeUI("Tiling X", texMeta.assetSamplerDesc.addressModes[0]);
+	hadChange |= doAddressModeUI("Tiling Y", texMeta.assetSamplerDesc.addressModes[1]);
+	hadChange |= doAddressModeUI("Tiling Z", texMeta.assetSamplerDesc.addressModes[2]);
+
+	if (ImGui::BeginCombo("Filtering", getFilterModeName(texMeta.assetSamplerDesc.filter))) {
+		if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Linear))) {
+			texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Linear;
+			hadChange = true;
+		}
+
+		if (ImGui::Selectable(getFilterModeName(TextureFilter::Min_Mag_Mip_Point))) {
+			texMeta.assetSamplerDesc.filter = TextureFilter::Min_Mag_Mip_Point;
+			hadChange = true;
+		}
+
+		ImGui::EndCombo();
+	}
+
+	if (hadChange) {
+		GpuHandle<SamplerState> sampler = getCore()->getDevice()->requestResource<SamplerState>();
+		sampler->create(texMeta.assetSamplerDesc);
+		texIface->setTextureMeta(texMeta);
+		texIface->getTexture()->setSamplerState(sampler);
+
+		// Save the modified settings to the *.info file of the texture.
+		if (AssetTexture2d* assetTex2d = dynamic_cast<AssetTexture2d*>(explorePreviewAsset.get())) {
+			assetTex2d->saveTextureSettingsToInfoFile();
+			getCore()->getAssetLib()->queueAssetForReload(explorePreviewAsset);
+		} else {
+			sgeAssertFalse("It is expected that explorePreviewAsset is a AssetTexture2d");
+		}
+	}
 }
 
 } // namespace sge

@@ -10,7 +10,7 @@
 namespace sge {
 
 // clang-format off
-RelfAddTypeId(AIKNode, 21'18'11'0001);
+ReflAddTypeId(AIKNode, 21'18'11'0001);
 ReflBlock() {
 	ReflAddActor(AIKNode)
 		ReflMember(AIKNode, isEnabled)

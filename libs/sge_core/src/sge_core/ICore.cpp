@@ -4,8 +4,10 @@
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtlGeomDrawer.h"
+#include "sge_core/materials/MaterialFamilyList.h"
 #include "sge_core/sgecore_api.h"
-#include "sge_core/shaders/modeldraw.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/common.h"
 
@@ -32,32 +34,60 @@ struct Core : public ICore {
 	void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, const mat4f& projView) final;
 	void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolume& gizmo, const mat4f& projView) final;
 
-	AssetLibrary* getAssetLib() final { return m_assetLibrary.get(); }
-	QuickDraw& getQuickDraw() final { return m_quickDraw; }
-	DebugDraw& getDebugDraw() final { return m_debugDraw; }
-	BasicModelDraw& getModelDraw() final { return m_modelDraw; }
+	AssetLibrary* getAssetLib() final {
+		return m_assetLibrary.get();
+	}
 
-	SGEDevice* getDevice() final { return m_sgedev; }
-	AudioDevice* getAudioDevice() final { return m_audioDevice; }
+	MaterialFamilyLibrary* getMaterialLib() final {
+		return m_materialFamilyLib.get();
+	}
 
-	GraphicsResources& getGraphicsResources() final { return m_graphicsResources; }
+	QuickDraw& getQuickDraw() final {
+		return m_quickDraw;
+	}
 
-	void setInputState(const InputState& is) final { m_inputState = is; }
-	const InputState& getInputState() const final { return m_inputState; }
-	const FrameStatistics& getLastFrameStatistics() const final { return lastFrameStatistics; }
-	void setLastFrameStatistics(const FrameStatistics& stats) final { lastFrameStatistics = stats; }
+	DebugDraw& getDebugDraw() final {
+		return m_debugDraw;
+	}
+
+	SGEDevice* getDevice() final {
+		return m_sgedev;
+	}
+
+	AudioDevice* getAudioDevice() final {
+		return m_audioDevice;
+	}
+
+	GraphicsResources& getGraphicsResources() final {
+		return m_graphicsResources;
+	}
+
+	void setInputState(const InputState& is) final {
+		m_inputState = is;
+	}
+
+	const InputState& getInputState() const final {
+		return m_inputState;
+	}
+
+	const FrameStatistics& getLastFrameStatistics() const final {
+		return lastFrameStatistics;
+	}
+
+	void setLastFrameStatistics(const FrameStatistics& stats) final {
+		lastFrameStatistics = stats;
+	}
 
   public:
-
 	SGEDevice* m_sgedev = nullptr;  // The sge device attached to the main window.
 	SGEContext* m_sgecon = nullptr; // The context attached to the m_sgedev.
 
 	std::unique_ptr<AssetLibrary> m_assetLibrary;
+	std::unique_ptr<MaterialFamilyLibrary> m_materialFamilyLib;
 	GraphicsResources m_graphicsResources; // A set of commonly used graphics resources.
 
 	QuickDraw m_quickDraw;
 	DebugDraw m_debugDraw;
-	BasicModelDraw m_modelDraw;
 
 	InputState m_inputState;
 
@@ -79,6 +109,7 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) {
 	m_audioDevice = sgeAudioDevice;
 
 	m_assetLibrary = std::make_unique<AssetLibrary>();
+	m_materialFamilyLib = std::make_unique<MaterialFamilyLibrary>();
 
 	// Uniform string indices.
 	m_graphicsResources.projViewWorld_strIdx = sgedev->getStringIndex("projViewWorld");
@@ -162,6 +193,14 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) {
 
 	m_quickDraw.initialize(sgedev->getContext());
 	m_debugDraw.initialze(sgedev);
+
+	// Register the DefaultPBR material family.
+	{
+		MaterialFamilyDesc pbrFd = {1001, "DefaultPBR", []() -> IGeometryDrawer* { return new DefaultPBRMtlGeomDrawer(); },
+		                            []() -> std::shared_ptr<IMaterial> { return std::make_shared<DefaultPBRMtl>(); }};
+		getMaterialLib()->registerFamily(pbrFd);
+	}
+
 	return;
 }
 

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "sge_core/shaders/modeldraw.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/GameDrawer/IRenderItem.h"
@@ -12,7 +11,7 @@ struct ICamera;
 struct TraitModel;
 struct TraitSpriteRenderItem;
 
-RelfAddTypeIdExists(TraitSprite);
+ReflAddTypeIdExists(TraitSprite);
 struct SGE_ENGINE_API TraitSprite : public Trait {
 	/// @brief A struct holding the rendering options of a sprite or a texture in 3D.
 	struct ImageSettings {

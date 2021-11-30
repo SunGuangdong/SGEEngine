@@ -45,6 +45,6 @@ struct DynamicProperties {
 	std::unordered_map<std::string, Property> m_properties;
 };
 
-RelfAddTypeIdInline(DynamicProperties, 21'06'21'0001);
+ReflAddTypeIdInline(DynamicProperties, 21'06'21'0001);
 
 } // namespace sge

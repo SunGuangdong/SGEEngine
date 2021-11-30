@@ -345,7 +345,7 @@ void D3D11ContextStateCache::ResolveBindRTVorDSVHazzard(ID3D11Resource* const* r
 					m_boundResources[iStage].srvs[iSlot]->GetResource(&srvResource);
 
 				if (srvResource == resources[iResource]) {
-					SGE_DEBUG_WAR(
+					sgeLogWarn(
 					    "[RES-HAZZARD][D3D11]Trying to bind resource(stage:%d, slot:%d) as RTV/DSV while it's already bound as SRV."
 					    "SRV will be unbound! The D3D11 warrning will be silenced by this action!\n",
 					    iStage, iSlot);

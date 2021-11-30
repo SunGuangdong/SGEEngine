@@ -157,9 +157,6 @@ AssetTextureMeta loadAssetTextureMeta2(const std::string& baseAssetPath) {
 	return AssetTextureMeta();
 }
 
-
-
-
 AssetTexture2d::DDSLoadCode AssetTexture2d::loadDDS(const char* const rawPath) {
 	std::string const ddsPath = (extractFileExtension(rawPath) == "dds") ? rawPath : std::string(rawPath) + ".dds";
 
@@ -200,7 +197,7 @@ bool AssetTexture2d::loadAssetFromFile(const char* path) {
 	if (ddsLoadStatus == ddsLoadCode_fine) {
 		return true;
 	} else if (ddsLoadStatus == ddsLoadCode_importOrCreationFailed) {
-		SGE_DEBUG_WAR("Failed to load the DDS equivalent to '%s'!\n", path);
+		sgeLogWarn("Failed to load the DDS equivalent to '%s'!\n", path);
 		return false;
 	}
 #endif
@@ -208,7 +205,7 @@ bool AssetTexture2d::loadAssetFromFile(const char* path) {
 	// Now check for the actual asset that is requested.
 	FileReadStream frs(path);
 	if (!frs.isOpened()) {
-		SGE_DEBUG_ERR("Unable to find texture2d asset: '%s'!\n", path);
+		sgeLogError("Unable to find texture2d asset: '%s'!\n", path);
 		return false;
 	}
 

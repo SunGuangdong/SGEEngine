@@ -8,10 +8,10 @@
 
 namespace sge {
 // clang-format off
-RelfAddTypeId(TraitSprite, 20'07'11'0001);
-RelfAddTypeId(TraitSprite::ImageSettings, 21'04'04'0001);
-RelfAddTypeId(TraitSprite::Element, 21'10'11'0001);
-RelfAddTypeId(std::vector<TraitSprite::Element>, 21'10'11'0002);
+ReflAddTypeId(TraitSprite, 20'07'11'0001);
+ReflAddTypeId(TraitSprite::ImageSettings, 21'04'04'0001);
+ReflAddTypeId(TraitSprite::Element, 21'10'11'0001);
+ReflAddTypeId(std::vector<TraitSprite::Element>, 21'10'11'0002);
 
 ReflBlock() {
 	ReflAddType(TraitSprite::ImageSettings)

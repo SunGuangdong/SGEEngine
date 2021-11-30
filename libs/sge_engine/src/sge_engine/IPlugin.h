@@ -50,8 +50,6 @@ struct SgeGlobalSingletons {
 struct SGE_ENGINE_API IPlugin {
 	virtual ~IPlugin() {}
 
-	virtual IGameDrawer* allocateGameDrawer();
-
 	virtual void onLoaded(const SgeGlobalSingletons& sgeSingletons) = 0;
 	virtual void onUnload() = 0;
 	virtual void run() = 0;

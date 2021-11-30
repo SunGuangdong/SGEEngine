@@ -5,8 +5,8 @@
 namespace sge {
 
 // clang-format off
-RelfAddTypeId(SkyShaderSettings::Mode, 21'06'23'0001);
-RelfAddTypeId(ASky, 21'06'23'0002);
+ReflAddTypeId(SkyShaderSettings::Mode, 21'06'23'0001);
+ReflAddTypeId(ASky, 21'06'23'0002);
 
 ReflBlock() {
 	ReflAddType(SkyShaderSettings::Mode)

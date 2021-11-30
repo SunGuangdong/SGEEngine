@@ -18,13 +18,13 @@ enum SceneVersion {
 
 JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const data, JsonValueBuffer& jvb) {
 	if (typeDesc == NULL) {
-		SGE_DEBUG_ERR("[SERIALIZATION] No TypeDesc was specified to %s\n", __func__);
+		sgeLogError("[SERIALIZATION] No TypeDesc was specified to %s\n", __func__);
 		sgeAssert(false);
 		return nullptr;
 	}
 
 	if (data == NULL) {
-		SGE_DEBUG_ERR("[SERIALIZATION] No data was specified to %s for type %s\n", __func__, typeDesc->name);
+		sgeLogError("[SERIALIZATION] No data was specified to %s for type %s\n", __func__, typeDesc->name);
 		sgeAssert(false);
 		return nullptr;
 	}
@@ -122,7 +122,7 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 
 	// Assume that this is a struct.
 	if (typeDesc->members.size() == 0) {
-		SGE_DEBUG_ERR("[SERIALIZATION] Unknown type type %s\n", typeDesc->name);
+		sgeLogError("[SERIALIZATION] Unknown type type %s\n", typeDesc->name);
 		sgeAssert(false);
 		return nullptr;
 	}
@@ -141,7 +141,7 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 					if (serializedMember) {
 						jResult->setMember(mfd.name, serializedMember);
 					} else {
-						SGE_DEBUG_ERR("[SERIALIZATION] Failed to serialize member %s::%s\n", typeDesc->name, mfd.name);
+						sgeLogError("[SERIALIZATION] Failed to serialize member %s::%s\n", typeDesc->name, mfd.name);
 						sgeAssert(false);
 					}
 				} else if (mfd.getDataFn != nullptr) {
@@ -154,13 +154,13 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 					if (serializedMember) {
 						jResult->setMember(mfd.name, serializedMember);
 					} else {
-						SGE_DEBUG_ERR("[SERIALIZATION] Failed to serialize member %s::%s\n", typeDesc->name, mfd.name);
+						sgeLogError("[SERIALIZATION] Failed to serialize member %s::%s\n", typeDesc->name, mfd.name);
 						sgeAssert(false);
 					}
 				}
 
 			} else {
-				SGE_DEBUG_ERR("[SERIALIZATION] Found a member without TypeDesc in type %s\n", typeDesc->name);
+				sgeLogError("[SERIALIZATION] Found a member without TypeDesc in type %s\n", typeDesc->name);
 				sgeAssert(false);
 			}
 		}
@@ -288,8 +288,8 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		const JsonValue* const jMember = jValue->getMember(mfd.name);
 
 		if (jMember == nullptr) {
-			SGE_DEBUG_ERR("[SERIALIZATION] A member is missing %s::%s. This that is going to be skipped and left as it is.\n",
-			              typeDesc->name, mfd.name);
+			sgeLogError("[SERIALIZATION] A member is missing %s::%s. This that is going to be skipped and left as it is.\n", typeDesc->name,
+			            mfd.name);
 			// sgeAssert(false);
 			continue;
 		} else {
@@ -309,7 +309,7 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 			}
 
 			if (!succeeded) {
-				SGE_DEBUG_ERR("[SERIALIZATION] Failed to deserialize %s::%s\n", typeDesc->name, mfd.name);
+				sgeLogError("[SERIALIZATION] Failed to deserialize %s::%s\n", typeDesc->name, mfd.name);
 				return false;
 			}
 		}
@@ -322,7 +322,7 @@ JsonValue* serializeObject(const GameObject* object, JsonValueBuffer& jvb) {
 	const TypeDesc* const typeDesc = typeLib().find(object->getType());
 
 	if (!typeDesc) {
-		SGE_DEBUG_ERR("GameObject of unregistered type!\n");
+		sgeLogError("GameObject of unregistered type!\n");
 		sgeAssert(false);
 		return nullptr;
 	}
@@ -435,7 +435,9 @@ GameObject*
 				transf3d logicTransform;
 				succeeded = deserializeVariable((char*)&logicTransform, jMember, typeLib().find(mfd.typeId));
 				Actor* actor = object->getActor();
-				if_checked(actor) { actor->setTransform(logicTransform); }
+				if_checked(actor) {
+					actor->setTransform(logicTransform);
+				}
 			} else if (mfd.byteOffset >= 0) {
 				char* const memberData = (char*)(object) + mfd.byteOffset;
 				succeeded = deserializeVariable(memberData, jMember, typeLib().find(mfd.typeId));
@@ -456,7 +458,7 @@ GameObject*
 				return nullptr;
 			}
 		} else {
-			SGE_DEBUG_ERR("[SERIALIZATION] Member not found %s::%s. The member is skipped.\n", actorTypeDesc->name, mfd.name);
+			sgeLogError("[SERIALIZATION] Member not found %s::%s. The member is skipped.\n", actorTypeDesc->name, mfd.name);
 		}
 	}
 
@@ -494,6 +496,7 @@ JsonValue* serializeGameWorld(const GameWorld* world, JsonValueBuffer& jvb) {
 	jWorld->setMember("cameraProvider", jvb(world->m_cameraPovider.id));
 
 	jWorld->setMember("ambientLightColor", serializeVariableT(world->m_ambientLight, jvb));
+	jWorld->setMember("ambientLightIntensity", serializeVariableT(world->m_ambientLightIntensity, jvb));
 	jWorld->setMember("rimLightColor", serializeVariableT(world->m_rimLight, jvb));
 	jWorld->setMember("rimCosineWidth", serializeVariableT(world->m_rimCosineWidth, jvb));
 
@@ -597,6 +600,10 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* 
 		deserializeVariable((char*)&world->m_ambientLight, jAmbientLightColor, typeLib().find(sgeTypeId(vec3f)));
 	}
 
+	if (const JsonValue* const jAmbientLightColor = jWorld->getMember("ambientLightIntensity")) {
+		deserializeVariable((char*)&world->m_ambientLightIntensity, jAmbientLightColor, typeLib().find(sgeTypeId(float)));
+	}
+
 	if (const JsonValue* const jRimLightColor = jWorld->getMember("rimLightColor")) {
 		deserializeVariable((char*)&world->m_rimLight, jRimLightColor, typeLib().find(sgeTypeId(vec3f)));
 	}
@@ -675,7 +682,7 @@ bool loadGameWorldFromFile(GameWorld* world, const char* const filename) {
 	// Load and parse the json.
 	FileReadStream frs;
 	if (!frs.open(filename)) {
-		SGE_DEBUG_ERR("Unable to open world file '%s'\n", filename);
+		sgeLogError("Unable to open world file '%s'\n", filename);
 		sgeAssert(false);
 		return false;
 	}

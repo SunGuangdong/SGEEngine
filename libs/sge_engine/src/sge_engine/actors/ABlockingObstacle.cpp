@@ -11,7 +11,7 @@
 namespace sge {
 
 // clang-format off
-RelfAddTypeId(ABlockingObstacle, 20'03'02'0013);
+ReflAddTypeId(ABlockingObstacle, 20'03'02'0013);
 ReflBlock() {
 	ReflAddActor(ABlockingObstacle)
 		ReflMember(ABlockingObstacle, targetDesc)
@@ -159,7 +159,7 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 		                    PrimitiveTopology::TriangleList, 0, 0, sizeof(vec3f) * 2, UniformType::Uint, numIndices);
 	}
 
-	material = PBRMaterial();
+	material = DefaultPBRMtlData();
 
 	//material.diffuseTextureX = m_textureX.getAssetTexture() ? m_textureX.getAssetTexture()->tex.GetPtr() : nullptr;
 	//material.diffuseTextureY = m_textureY.getAssetTexture() ? m_textureY.getAssetTexture()->tex.GetPtr() : nullptr;

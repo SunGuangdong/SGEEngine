@@ -42,14 +42,14 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 		                                  &includedFilesByShaders)) {
 			shadingPermut = std::move(tempPermutator);
 		} else {
-			SGE_DEBUG_ERR("SkyShader failed to compile shaders!");
+			sgeLogError("SkyShader failed to compile shaders!");
 			if (!shadingPermut) {
 				shadingPermut = ShadingProgramPermuator();
 			}
 		}
 
 		shaderFilesWatcher.initialize(includedFilesByShaders, 1.f);
-		SGE_DEBUG_CHECK("Reloaded SkyShader\n");
+		sgeLogCheck("Reloaded SkyShader\n");
 	}
 
 	if (!cbParms.IsResourceValid()) {

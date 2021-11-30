@@ -10,14 +10,14 @@ namespace sge {
 //--------------------------------------------------------------------
 
 // clang-format off
-RelfAddTypeId(CollisionShapeSource, 20'03'02'0005);
+ReflAddTypeId(CollisionShapeSource, 20'03'02'0005);
 ReflBlock() {
 	ReflAddType(CollisionShapeSource) ReflEnumVal((int)CollisionShapeSource::FromBoundingBox, "FromBoundingBox")
 	ReflEnumVal((int)CollisionShapeSource::FromConcaveHulls, "FromConcaveHulls")
 	ReflEnumVal((int)CollisionShapeSource::FromConvexHulls, "FromConvexHulls");
 }
 
-RelfAddTypeId(AStaticObstacle, 20'03'02'0006);
+ReflAddTypeId(AStaticObstacle, 20'03'02'0006);
 ReflBlock() {
 	ReflAddActor(AStaticObstacle)
 		ReflMember(AStaticObstacle, m_traitModel)
@@ -61,7 +61,7 @@ void AStaticObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 			setTransform(getTransform(), true);
 			getWorld()->physicsWorld.addPhysicsObject(*m_traitRB.getRigidBody());
 		} else {
-			SGE_DEBUG_ERR("Static obstacle failed to create rigid body, the shape isn't valid!\n");
+			sgeLogError("Static obstacle failed to create rigid body, the shape isn't valid!\n");
 		}
 	}
 }

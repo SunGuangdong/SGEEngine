@@ -1,16 +1,18 @@
 #include "ModelPreviewWindow.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
+#include "sge_core/Camera.h"
+#include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
+#include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include <imgui/imgui.h>
 
-#include "sge_core/ICore.h"
-
 namespace sge {
 
+/// Opens a file-open dialog asking the user to pik a mdl file.
 static bool promptForModel(AssetPtr& asset) {
 	AssetLibrary* const assetLib = getCore()->getAssetLib();
 
@@ -68,12 +70,8 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	debugDraw.drawWiredAdd_Grid(vec3f(0), vec3f::getAxis(0), vec3f::getAxis(2), 5, 5, 0xFF333733);
 	debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
-	ObjectLighting mods;
-	InstanceDrawMods imods;
-	imods.forceNoLighting = true;
-
-	getCore()->getModelDraw().draw(rdest, camera.eyePosition(), -camera.orbitPoint.normalized0(), proj * lookAt, mat4f::getIdentity(),
-	                               ObjectLighting(), m_eval, imods);
+	RawCamera rawCamera = RawCamera(camera.eyePosition(), lookAt, proj);
+	drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting::getAmbientLightOnly(), m_eval, InstanceDrawMods());
 
 	if (kIsTexcoordStyleD3D) {
 		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y));
@@ -225,8 +223,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			debugDraw.drawWiredAdd_Grid(vec3f(0), vec3f::getAxis(0), vec3f::getAxis(2), 5, 5, 0xFF333733);
 			debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
-			getCore()->getModelDraw().draw(rdest, camera.eyePosition(), -camera.orbitPoint.normalized0(), proj * lookAt,
-			                               mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods());
+			RawCamera rawCamera = RawCamera(camera.eyePosition(), lookAt, proj);
+			drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods());
 
 			ImGui::InvisibleButton("TextureCanvasIB", canvas_size);
 

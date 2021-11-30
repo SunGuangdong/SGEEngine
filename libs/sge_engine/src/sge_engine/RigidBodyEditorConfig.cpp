@@ -11,9 +11,9 @@
 
 namespace sge {
 // clang-format off
-RelfAddTypeId(RigidBodyPropertiesConfigurator,    21'02'28'0006);
-RelfAddTypeId(RigidBodyConfigurator::ShapeSource, 21'02'28'0007);
-RelfAddTypeId(RigidBodyConfigurator,              21'02'28'0008);
+ReflAddTypeId(RigidBodyPropertiesConfigurator,    21'02'28'0006);
+ReflAddTypeId(RigidBodyConfigurator::ShapeSource, 21'02'28'0007);
+ReflAddTypeId(RigidBodyConfigurator,              21'02'28'0008);
 
 ReflBlock()
 {

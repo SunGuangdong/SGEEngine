@@ -23,12 +23,12 @@ typedef vector_map<ObjectId, transf3d> vector_map_ObjectId_transf3d;
 typedef vector_map<int, vector_map_ObjectId_transf3d> vector_map_int_KeyFrames;
 
 // clang-format off
-RelfAddTypeId(vector_map_ObjectId_transf3d, 21'04'11'0001);
-RelfAddTypeId(vector_map_int_KeyFrames, 21'04'11'0002);
-RelfAddTypeId(std::vector<vector_map_ObjectId_transf3d>, 21'04'11'0003);
+ReflAddTypeId(vector_map_ObjectId_transf3d, 21'04'11'0001);
+ReflAddTypeId(vector_map_int_KeyFrames, 21'04'11'0002);
+ReflAddTypeId(std::vector<vector_map_ObjectId_transf3d>, 21'04'11'0003);
 
-RelfAddTypeId(ATimeline, 20'03'01'0014);
-RelfAddTypeId(ATimeline::PlaybackMethod, 21'03'07'0001);
+ReflAddTypeId(ATimeline, 20'03'01'0014);
+ReflAddTypeId(ATimeline::PlaybackMethod, 21'03'07'0001);
 
 
 ReflBlock() {

@@ -354,7 +354,7 @@ GameObject* duplicateGameObjectIncompleate(const GameObject* const srcObject) {
 				// Usual member.
 				memberTypeDesc->copyFn(destMemberBytes, srcMemberBytes);
 			} else {
-				SGE_DEBUG_ERR("Cannot duplicate game object! Field %s::%s is not copyable!\n", objTypeDesc->name, mfd.name);
+				sgeLogError("Cannot duplicate game object! Field %s::%s is not copyable!\n", objTypeDesc->name, mfd.name);
 				sgeAssert(false);
 			}
 		}
