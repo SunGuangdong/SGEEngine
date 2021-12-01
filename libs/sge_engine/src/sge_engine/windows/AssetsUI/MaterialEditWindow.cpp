@@ -37,15 +37,28 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 
 					chain.add(&md);
 					if (md.typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
+						AssetIfaceType assetTypes[] = {
+						    assetIface_texture2d,
+						};
+
 						std::shared_ptr<AssetIface_Texture2D>* pTexIface = (std::shared_ptr<AssetIface_Texture2D>*)chain.follow(mtl.get());
 						AssetPtr asset = pTexIface ? std::dynamic_pointer_cast<Asset>(*pTexIface) : nullptr;
 
 						if (asset) {
-							AssetIfaceType assetTypes[] = {
-							    assetIface_texture2d,
-							};
-
 							hadChange |= assetPicker(md.name, asset, getCore()->getAssetLib(), assetTypes, SGE_ARRSZ(assetTypes));
+							if (hadChange) {
+								*pTexIface = std::dynamic_pointer_cast<AssetIface_Texture2D>(asset);
+							}
+						} else {
+							// If nothing is attached, or the attached thing is not an asset,
+							// we want to offer to use to attach an asset.
+							std::string newAssetPathToAttach;
+							hadChange |=
+							    assetPicker(md.name, newAssetPathToAttach, getCore()->getAssetLib(), assetTypes, SGE_ARRSZ(assetTypes));
+							if (hadChange) {
+								*pTexIface = std::dynamic_pointer_cast<AssetIface_Texture2D>(
+								    getCore()->getAssetLib()->getAssetFromFile(newAssetPathToAttach.c_str(), nullptr, true));
+							}
 						}
 
 					} else if (md.typeId == sgeTypeId(vec4f)) {

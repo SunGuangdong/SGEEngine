@@ -36,7 +36,6 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	                                            0,                                                                      // flags2
 	                                            &m_compiledBlob, &compilationErrorBlob);
 	t.tick();
-	sgeLogInfo("Compile time = %f", t.diff_seconds());
 
 	if (FAILED(compilatonResult)) {
 		[[maybe_unused]] const char* const errors = (char*)compilationErrorBlob->GetBufferPointer();

@@ -39,6 +39,9 @@ TypeId DefaultPBRMtl::getTypeId() const {
 IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	mdlData = DefaultPBRMtlData();
 
+	mdlData.disableCulling = disableCulling;
+	mdlData.forceNoLighting = forceNoLighting;
+
 	mdlData.diffuseColor = diffuseColor;
 	mdlData.metalness = metallic;
 	mdlData.roughness = roughness;

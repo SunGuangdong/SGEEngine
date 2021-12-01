@@ -20,6 +20,8 @@ struct SGE_ENGINE_API LogWindow : public IImGuiWindow {
 
   private:
 	bool m_isOpened = true;
+	bool m_showOldMessages = false;
+	bool m_showInfoMessages = true;
 	std::string m_windowName;
 	int prevUpdateMessageCount = 0;
 };

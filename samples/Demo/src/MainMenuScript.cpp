@@ -28,7 +28,6 @@ struct MainMenuScript final : public IWorldScript {
 
 		rootMenuWidget = std::make_shared<gamegui::InvisibleWidget>(uiContext, Pos(0_f, 0_f), Size(1_f, 1_f));
 
-
 		mainMenuButtonsWidget =
 		    std::make_shared<gamegui::InvisibleWidget>(uiContext, Pos(0.5_f, 0.75_f, vec2f(0.5f)), Size(0.30_hf, 0.20_hf));
 		rootMenuWidget->addChild(mainMenuButtonsWidget);
@@ -36,9 +35,17 @@ struct MainMenuScript final : public IWorldScript {
 		std::shared_ptr<ButtonWidget> btn = std::make_shared<ButtonWidget>(uiContext, Pos(0_f, 0_f), Size(1_f, 0.333_f));
 		btn->setText("New Game");
 		eventSubs.push_back(btn->subscribe_onRelease(
-		    [&] { getWorld()->addPostSceneTask(new PostSceneUpdateTaskLoadWorldFormFile("assets/levels/level0.lvl", true)); }));
+		    [&] { 
+				sgeLogCheck("PRessed!");
+				return;
+				getWorld()->addPostSceneTask(new PostSceneUpdateTaskLoadWorldFormFile("assets/levels/level0.lvl", true)); 
+			}));
 
 		mainMenuButtonsWidget->addChild(btn);
+
+		std::shared_ptr<ButtonWidget> btn2 = std::make_shared<ButtonWidget>(uiContext, Pos(0_f, 0.333_f), Size(1_f, 0.333_f));
+		btn2->setText("Settings");
+		mainMenuButtonsWidget->addChild(btn2);
 
 		uiContext.addRootWidget(rootMenuWidget);
 	}

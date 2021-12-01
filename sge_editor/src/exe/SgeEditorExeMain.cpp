@@ -144,9 +144,9 @@ struct SGEGameWindow : public WindowBase {
 		const sint64 modtime = FileReadStream::getFileModTime(pluginName.c_str());
 
 		if (!pluginName.empty() && (modtime > m_workingDLLModTime || m_workingDLLModTime == 0)) {
-			if (m_workingDLLModTime != 0) {
-				// DialogYesNo("Realod DLL", "Game DLL is about to be reloaded!");
-			}
+			//if (m_workingDLLModTime != 0) {
+			//	DialogYesNo("Realod DLL", "Game DLL is about to be reloaded!");
+			//}
 
 			// Save the current world into a file and then reloaded it.
 			// Do not do this if this is the 1st time we are loading the plugin (basically the engine start-up).
@@ -161,6 +161,10 @@ struct SGEGameWindow : public WindowBase {
 			// Notify that we are about to unload the plugin.
 			getEngineGlobal()->notifyOnPluginPreUnload();
 			if (m_pluginInst) {
+				// Unload all game worlds as they contain memory allocated by the game plugin 
+				// as we want to unload all game owned data as all virtual pointers to it will get invalid.
+				getEngineGlobal()->getEditorWindow()->newScene();
+
 				m_pluginInst->onUnload();
 				delete m_pluginInst;
 				m_pluginInst = nullptr;
@@ -178,6 +182,9 @@ struct SGEGameWindow : public WindowBase {
 			sgeAssert(interopGetter != nullptr && "The loaded game dll does not have a getInterop()!\n");
 			if (interopGetter) {
 				m_pluginInst = interopGetter();
+			} else {
+				sgeAssert(false);
+				sgeLogError("The loaded game dll does not have a getInterop()!");
 			}
 			getEngineGlobal()->changeActivePlugin(m_pluginInst);
 
