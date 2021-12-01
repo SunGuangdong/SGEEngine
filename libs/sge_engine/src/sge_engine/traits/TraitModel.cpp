@@ -18,21 +18,16 @@
 
 namespace sge {
 
-// struct MDiffuseMaterial; // User for creating material overrides.
-
 // clang-format off
 ReflAddTypeId(TraitModel, 20'03'01'0004);
-ReflAddTypeId(TraitModel::PerModelSettings, 21'07'11'0002);
-ReflAddTypeId(std::vector<TraitModel::PerModelSettings>, 21'07'11'0003);
+ReflAddTypeId(ModelEntry, 21'07'11'0002);
+ReflAddTypeId(std::vector<ModelEntry>, 21'07'11'0003);
 ReflBlock() {
-	ReflAddType(TraitModel::PerModelSettings)
-		ReflMember(TraitModel::PerModelSettings, isRenderable)
-		ReflMember(TraitModel::PerModelSettings, alphaMultiplier).uiRange(0.f, 1.f, 0.01f)
-		ReflMember(TraitModel::PerModelSettings, m_assetProperty)
-		ReflMember(TraitModel::PerModelSettings, useSkeleton)
-		ReflMember(TraitModel::PerModelSettings, rootSkeletonId)
+	ReflAddType(ModelEntry)
+		ReflMember(ModelEntry, isRenderable)
+		ReflMember(ModelEntry, m_assetProperty)
 	;
-	ReflAddType(std::vector<TraitModel::PerModelSettings>);
+	ReflAddType(std::vector<ModelEntry>);
 
 	ReflAddType(TraitModel)
 		ReflMember(TraitModel, isRenderable)
@@ -41,25 +36,28 @@ ReflBlock() {
 }
 // clang-format on
 
-void TraitModel::PerModelSettings::setModel(const char* assetPath, bool updateNow) {
+//-----------------------------------------------------------------
+// TraitModel::ModelEntry
+//-----------------------------------------------------------------
+void ModelEntry::setModel(const char* assetPath) {
 	m_assetProperty.setTargetAsset(assetPath);
-	if (updateNow) {
-		updateAssetProperty();
-	}
+	updateAssetProperty();
 }
 
-void TraitModel::PerModelSettings::setModel(AssetPtr& asset, bool updateNow) {
+void ModelEntry::setModel(AssetPtr& asset) {
 	m_assetProperty.setAsset(asset);
 	m_evalModel = NullOptional();
-	if (updateNow) {
-		updateAssetProperty();
-	}
+	updateAssetProperty();
 }
 
-//-----------------------------------------------------------------
-// TraitModel::PerModelSettings
-//-----------------------------------------------------------------
-AABox3f TraitModel::PerModelSettings::getBBoxOS() const {
+void ModelEntry::onAssetModelChanged() {
+	m_evalModel = NullOptional();
+
+	getAssetIface<AssetIface_Model3D>(m_assetProperty.getAsset());
+	mtlOverrides.clear();
+}
+
+AABox3f ModelEntry::getBBoxOS() const {
 	// If the attached asset is a model use it to compute the bounding box.
 	const AssetIface_Model3D* const modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 	if (modelIface) {
@@ -70,120 +68,23 @@ AABox3f TraitModel::PerModelSettings::getBBoxOS() const {
 	return AABox3f();
 }
 
-void TraitModel::PerModelSettings::computeNodeToBoneIds(TraitModel& ownerTraitModel) {
-	if (nodeToBoneId.empty() == false) {
-		return;
-	}
-
-	nodeToBoneId.clear();
-
-	if (useSkeleton == false) {
-		return;
-	}
-
-	AssetIface_Model3D* modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
-	if (modelIface == nullptr) {
-		return;
-	}
-
-	GameWorld* world = ownerTraitModel.getWorld();
-	vector_set<ObjectId> boneActorIds;
-	world->getAllChildren(boneActorIds, rootSkeletonId);
-	boneActorIds.insert(rootSkeletonId);
-
-	vector_set<Actor*> boneActors;
-	for (ObjectId boneId : boneActorIds) {
-		Actor* bone = world->getActorById(boneId);
-		if (bone == nullptr) {
-			nodeToBoneId.clear();
-			sgeAssert("Could not find a bone for the actor!");
-			return;
-		}
-
-		boneActors.insert(bone);
-	}
-
-	for (const int iNode : rng_int(modelIface->getModel3D().numNodes())) {
-		const ModelNode* node = modelIface->getModel3D().nodeAt(iNode);
-		for (Actor* boneActor : boneActors) {
-			if (node->name == boneActor->getDisplayName()) {
-				nodeToBoneId[iNode] = boneActor->getId();
-				break;
-			}
-		}
-	}
-}
-
-void TraitModel::PerModelSettings::computeSkeleton(TraitModel& ownerTraitModel, std::vector<mat4f>& boneOverrides) {
-	AssetIface_Model3D* modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
-	if (modelIface == nullptr) {
-		return;
-	}
-
-	boneOverrides.resize(modelIface->getModel3D().numNodes());
-
-	if (useSkeleton == false) {
-		return;
-	}
-
-	computeNodeToBoneIds(ownerTraitModel);
-	Actor* root = ownerTraitModel.getWorld()->getActorById(rootSkeletonId);
-	if (root == nullptr) {
-		return;
-	}
-
-	mat4f rootInv = root ? root->getTransformMtx().inverse() : mat4f::getIdentity();
-
-	for (auto pair : nodeToBoneId) {
-		mat4f& boneGobalTForm = boneOverrides[pair.first];
-
-		Actor* const boneActor = ownerTraitModel.getWorld()->getActorById(pair.second);
-		if (boneActor) {
-			boneGobalTForm = rootInv * boneActor->getTransformMtx();
-		} else {
-			sgeAssert(false && "Expected alive object");
-			boneGobalTForm = mat4f::getIdentity();
-		}
-	}
-}
-
-void TraitModel::setModel(const char* assetPath, bool updateNow) {
-	m_models.resize(1);
-
-	m_models[0].m_evalModel = NullOptional();
-	m_models[0].m_assetProperty.setTargetAsset(assetPath);
-	if (updateNow) {
-		postUpdate();
-	}
-}
-
-void TraitModel::setModel(AssetPtr& asset, bool updateNow) {
-	m_models.resize(1);
-
-	m_models[0].m_assetProperty.setAsset(asset);
-	m_models[0].m_evalModel = NullOptional();
-	if (updateNow) {
-		postUpdate();
-	}
-}
-
-void TraitModel::addModel(const char* assetPath, bool updateNow) {
-	m_models.push_back(PerModelSettings());
-	m_models.back().setModel(assetPath, updateNow);
-}
-
-void TraitModel::addModel(AssetPtr& asset, bool updateNow) {
-	m_models.push_back(PerModelSettings());
-	m_models.back().setModel(asset, updateNow);
-}
-
 //-----------------------------------------------------------------
 // TraitModel
 //-----------------------------------------------------------------
+void TraitModel::addModel(const char* assetPath) {
+	m_models.push_back(ModelEntry());
+	m_models.back().setModel(assetPath);
+}
+
+void TraitModel::addModel(AssetPtr& asset) {
+	m_models.push_back(ModelEntry());
+	m_models.back().setModel(asset);
+}
+
 AABox3f TraitModel::getBBoxOS() const {
 	AABox3f bbox;
 
-	for (const PerModelSettings& mdl : m_models) {
+	for (const ModelEntry& mdl : m_models) {
 		bbox.expand(mdl.getBBoxOS());
 	}
 
@@ -196,7 +97,7 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 	}
 
 	for (int iModel = 0; iModel < int(m_models.size()); iModel++) {
-		PerModelSettings& modelSets = m_models[iModel];
+		ModelEntry& modelSets = m_models[iModel];
 		if (!modelSets.isRenderable) {
 			continue;
 		}
@@ -263,25 +164,28 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 }
 
 void TraitModel::invalidateCachedAssets() {
-	for (PerModelSettings& modelSets : m_models) {
+	for (ModelEntry& modelSets : m_models) {
 		modelSets.invalidateCachedAssets();
 	}
 }
 
 bool TraitModel::updateAssetProperties() {
 	bool hasChange = false;
-	for (PerModelSettings& model : m_models) {
+	for (ModelEntry& model : m_models) {
 		hasChange |= model.updateAssetProperty();
 	}
 
 	return hasChange;
 }
 
-/// TraitModel Attribute Editor.
-void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain chain) {
+/// TraitModel user interface that appears in the property editor.
+void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberChain chain) {
 	TraitModel& traitModel = *(TraitModel*)chain.follow(actor);
 
-	if (ImGui::CollapsingHeader(ICON_FK_CUBE " Model Trait", ImGuiTreeNodeFlags_DefaultOpen)) {
+	if (ImGui::CollapsingHeader(ICON_FK_CUBE " 3d ModelS", ImGuiTreeNodeFlags_DefaultOpen)) {
+
+		// Set to a valid index if the user has clicked the "Delete" button on
+		// any entry. If so we need to delete it once the UI has been built.
 		int deleteModelIndex = -1;
 
 		chain.add(sgeFindMember(TraitModel, isRenderable));
@@ -293,47 +197,26 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 			std::string label = string_format("Model %d", iModel);
 
 			chain.add(sgeFindMember(TraitModel, m_models), iModel);
-			TraitModel::PerModelSettings& modelSets = traitModel.m_models[iModel];
+			ModelEntry& modelSets = traitModel.m_models[iModel];
 
 			const ImGuiEx::IDGuard idGuardImGui(&modelSets);
 			ImGuiEx::BeginGroupPanel(label.c_str());
 			if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
-				chain.add(sgeFindMember(TraitModel::PerModelSettings, isRenderable));
+				chain.add(sgeFindMember(ModelEntry, isRenderable));
 				ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 				chain.pop();
 
-				chain.add(sgeFindMember(TraitModel::PerModelSettings, alphaMultiplier));
-				ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
-				chain.pop();
-
-				chain.add(sgeFindMember(TraitModel::PerModelSettings, m_assetProperty));
+				chain.add(sgeFindMember(ModelEntry, m_assetProperty));
 				ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 				chain.pop();
 
 				// Material and Skeleton overrides interface.
 				AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 				if (loadedModelIface) {
-#if 0
-				 for (ModelMaterial* mtl : loadedModelIface->getModel3D().getMatrials()) {
-					// Check if override for this material already exists.
-					auto itrExisting = find_if(modelSets.m_materialOverrides, [&](const TraitModel::MaterialOverride& ovr) -> bool {
-						return ovr.materialName == mtl->name;
-					});
-
-					if (itrExisting == std::end(modelSets.m_materialOverrides)) {
-						TraitModel::MaterialOverride ovr;
-						ovr.materialName = mtl->name;
-						modelSets.m_materialOverrides.emplace_back(ovr);
-					}
-				}
-#endif
-
-// Now do the UI for each available slot (keep in mind that we are keeping old slots (from previous models still
-// available).
-#if 1
+					// Now do the UI for each available material slot.
 					modelSets.mtlOverrides.resize(loadedModelIface->getModel3D().numMaterials());
 
-					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Material Override")) {
+					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Material Overrides")) {
 						for (int iMtl : rng_int(loadedModelIface->getModel3D().numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
 
@@ -341,127 +224,12 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 
 							AssetIfaceType types[] = {assetIface_mtl};
 							assetPicker(mtl->name.c_str(), modelSets.mtlOverrides[iMtl], getCore()->getAssetLib(), types, 1);
-
-
-#if 0
-							// ImGui::Text(loadedAsset->model.m_materials[t]->name.c_str());
-							// Check if override for this material already exists.
-							auto itrExisting = find_if(modelSets.m_materialOverrides, [&](const TraitModel::MaterialOverride& ovr) -> bool {
-								return ovr.materialName == mtl->name;
-							});
-
-							if (itrExisting != std::end(modelSets.m_materialOverrides)) {
-								ImGuiEx::BeginGroupPanel(itrExisting->materialName.c_str(), ImVec2(-1.f, 0.f));
-								{
-									const int slotIndex = int(itrExisting - modelSets.m_materialOverrides.begin());
-									chain.add(sgeFindMember(TraitModel::PerModelSettings, m_materialOverrides), slotIndex);
-									chain.add(sgeFindMember(TraitModel::MaterialOverride, materialObjId));
-									ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
-
-									if (modelSets.m_materialOverrides[slotIndex].materialObjId.isNull()) {
-										if (ImGui::Button("Create New Material")) {
-											CmdObjectCreation* cmdMtlCreate = new CmdObjectCreation();
-											// cmdMtlCreate->setup(sgeTypeId(MDiffuseMaterial));
-											cmdMtlCreate->apply(&inspector);
-
-											CmdMemberChange* const cmdAssignMaterial = new CmdMemberChange();
-											const ObjectId originalValue = ObjectId();
-											const ObjectId createdMaterialId = cmdMtlCreate->getCreatedObjectId();
-											cmdAssignMaterial->setup(actor, chain, &originalValue, &createdMaterialId, nullptr);
-											cmdAssignMaterial->apply(&inspector);
-
-											CmdCompound* cmdCompound = new CmdCompound();
-											cmdCompound->addCommand(cmdMtlCreate);
-											cmdCompound->addCommand(cmdAssignMaterial);
-											inspector.appendCommand(cmdCompound, false);
-										}
-									}
-
-									chain.pop();
-									chain.pop();
-
-									if (GameObject* const materialObject =
-									        inspector.getWorld()->getObjectById(itrExisting->materialObjId)) {
-										ImGui::PushID(materialObject);
-										ImGuiEx::BeginGroupPanel("", ImVec2(-1.f, 0.f));
-										if (ImGui::CollapsingHeader("Material")) {
-											ProperyEditorUIGen::doGameObjectUI(inspector, materialObject);
-										}
-										ImGuiEx::EndGroupPanel();
-										ImGui::PopID();
-									}
-								}
-								ImGuiEx::EndGroupPanel();
-							} else {
-								sgeAssert(false && "The slot should have been created above.");
-							}
-#endif
 						}
-					}
-#endif
-					// Skeletion UI
-					if (ImGui::CollapsingHeader(ICON_FK_WRENCH " Skeleton (WIP)")) {
-						if (ImGui::Button("Extract Skeleton")) {
-							GameWorld* world = inspector.getWorld();
-							ALocator* allBonesParent = world->allocObjectT<ALocator>();
-							allBonesParent->setTransform(traitModel.getActor()->getTransform());
-
-							struct NodeRemapEl {
-								transf3d localTransform;
-								ABone* boneActor = nullptr;
-							};
-							vector_map<int, NodeRemapEl> nodeRemap;
-
-							transf3d n2w = actor->getActor()->getTransform();
-
-							// AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
-							Model& loadedModel = loadedModelIface->getModel3D();
-							for (int iNode : rng_int(loadedModel.numNodes())) {
-								const ModelNode* node = loadedModel.nodeAt(iNode);
-
-								const float boneLengthAuto = 0.1f;
-								const float boneLength = node->limbLength > 0.f ? node->limbLength : boneLengthAuto;
-
-								nodeRemap[iNode].localTransform = node->staticLocalTransform;
-								nodeRemap[iNode].boneActor = inspector.getWorld()->allocObjectT<ABone>(ObjectId(), node->name.c_str());
-								nodeRemap[iNode].boneActor->boneLength = boneLength;
-							}
-
-							std::function<void(int nodeIndex, NodeRemapEl* parent)> traverseGlobalTransform;
-							traverseGlobalTransform = [&](int nodeIndex, NodeRemapEl* parent) -> void {
-								const ModelNode* node = loadedModel.nodeAt(nodeIndex);
-
-								NodeRemapEl* const remapNode = nodeRemap.find_element(nodeIndex);
-								if (parent) {
-									remapNode->boneActor->setTransform(parent->boneActor->getTransform() * remapNode->localTransform);
-									inspector.getWorld()->setParentOf(remapNode->boneActor->getId(), parent->boneActor->getId());
-								} else {
-									remapNode->localTransform = allBonesParent->getTransform() * remapNode->localTransform;
-									remapNode->boneActor->setTransform(remapNode->localTransform);
-									world->setParentOf(remapNode->boneActor->getId(), allBonesParent->getId());
-								}
-
-								for (const int childNode : node->childNodes) {
-									traverseGlobalTransform(childNode, remapNode);
-								}
-							};
-
-							traverseGlobalTransform(loadedModel.getRootNodeIndex(), nullptr);
-						}
-
-
-						chain.add(sgeFindMember(TraitModel::PerModelSettings, useSkeleton));
-						ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
-						chain.pop();
-
-						chain.add(sgeFindMember(TraitModel::PerModelSettings, rootSkeletonId));
-						ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
-						chain.pop();
 					}
 				}
 
 				// A button deleting the current model.
-				if (traitModel.isFixedModelsSize == false) {
+				if (traitModel.uiDontOfferResizingModelCount == false) {
 					if (ImGui::Button(ICON_FK_TRASH " Remove Model")) {
 						deleteModelIndex = iModel;
 					}
@@ -474,10 +242,10 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 		}
 
 		// Handle adding/removing models.
-		if (traitModel.isFixedModelsSize == false) {
+		if (traitModel.uiDontOfferResizingModelCount == false) {
 			if (deleteModelIndex >= 0) {
-				std::vector<TraitModel::PerModelSettings> oldModels = traitModel.m_models;
-				std::vector<TraitModel::PerModelSettings> newModels = traitModel.m_models;
+				std::vector<ModelEntry> oldModels = traitModel.m_models;
+				std::vector<ModelEntry> newModels = traitModel.m_models;
 				newModels.erase(newModels.begin() + deleteModelIndex);
 
 				chain.add(sgeFindMember(TraitModel, m_models));
@@ -492,9 +260,9 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 		}
 
 		if (ImGui::Button(ICON_FK_PLUS " Add Model")) {
-			std::vector<TraitModel::PerModelSettings> oldModels = traitModel.m_models;
-			std::vector<TraitModel::PerModelSettings> newModels = traitModel.m_models;
-			newModels.push_back(TraitModel::PerModelSettings());
+			std::vector<ModelEntry> oldModels = traitModel.m_models;
+			std::vector<ModelEntry> newModels = traitModel.m_models;
+			newModels.push_back(ModelEntry());
 
 			chain.add(sgeFindMember(TraitModel, m_models));
 
@@ -508,9 +276,8 @@ void editTraitModel(GameInspector& inspector, GameObject* actor, MemberChain cha
 	}
 }
 
-
 SgePluginOnLoad() {
-	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitModel), editTraitModel);
+	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitModel), editUI_for_TraitModel);
 }
 
 } // namespace sge

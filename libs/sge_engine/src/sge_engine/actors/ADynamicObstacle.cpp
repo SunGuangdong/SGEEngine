@@ -20,7 +20,7 @@ ReflBlock() {
 // clang-format on
 
 void ADynamicObstacle::create() {
-	m_traitModel.setModel("assets/editor/models/box.mdl", false);
+	m_traitModel.addModel("assets/editor/models/box.mdl");
 
 	registerTrait(m_traitRB);
 	registerTrait(m_traitModel);

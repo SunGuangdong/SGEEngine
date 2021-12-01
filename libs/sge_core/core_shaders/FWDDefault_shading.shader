@@ -227,6 +227,7 @@ float4 psMain(StageVertexOut inVert)
 	} else {
 		finalColor = float4(0.f, 0.f, 0.f, mtlSample.albedo.w);
 
+		[unroll]
 		for (int iLight = 0; iLight < lightsCnt; ++iLight) {
 			finalColor.xyz += Light_computeDirectLighting(lights[iLight], uLightShadowMap[iLight], mtlSample, cameraPositionWs);
 		}

@@ -1,9 +1,7 @@
 #pragma once
 
 #include <string>
-
 #include "IImGuiWindow.h"
-#include "imgui/imgui.h"
 
 namespace sge {
 
@@ -12,15 +10,21 @@ struct GameInspector;
 struct GameObject;
 struct MemberChain;
 
-struct CollsionShapeDesc;
-
 enum AssetIfaceType : int;
 
 /// A set of functions that generate the User Interface for the specified member of game object.
 /// The functions could be called anywhere.
 namespace ProperyEditorUIGen {
+	/// Does the user interface specified game object.
 	SGE_ENGINE_API void doGameObjectUI(GameInspector& inspector, GameObject* const gameObject);
+
+	/// Does the user interface for the speicfied member of the @gameObject.
+	/// Useful if we want to have custom UI for some type,
+	/// but we still want to use the auto generated UI for its members.
+	/// @param [in, out] gameObject is the owner of the member that we are doing UI for.
+	/// @param [in] chain points to the member (starting form @gameObject) that we are going to generate  UI for.
 	SGE_ENGINE_API void doMemberUI(GameInspector& inspector, GameObject* const gameObject, MemberChain chain);
+
 	SGE_ENGINE_API void editFloat(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
 	SGE_ENGINE_API void editInt(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
 	SGE_ENGINE_API void editString(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
@@ -34,25 +38,32 @@ namespace ProperyEditorUIGen {
 	SGE_ENGINE_API void editDynamicProperties(GameInspector& inspector, GameObject* gameObject, MemberChain chain);
 } // namespace ProperyEditorUIGen
 
-//----------------------------------------------------------
-// PropertyEditorWindow
-//----------------------------------------------------------
+
+/// PropertyEditorWindow enables the user to edit values on game objects.
+/// These edits generate undo/redo commands (command history).
 struct SGE_ENGINE_API PropertyEditorWindow : public IImGuiWindow {
 	PropertyEditorWindow(std::string windowName, GameInspector& inspector)
 	    : m_windowName(std::move(windowName))
-	    , m_inspector(inspector) {}
+	    , m_inspector(inspector) {
+	}
 
-	bool isClosed() override { return !m_isOpened; }
+	bool isClosed() override {
+		return !m_isOpened;
+	}
+
+	const char* getWindowName() const override {
+		return m_windowName.c_str();
+	}
+
 	void update(SGEContext* const sgecon, const InputState& is) override;
-	const char* getWindowName() const override { return m_windowName.c_str(); }
-
 
   private:
-	char m_outlinerFilter[512] = {'*', '\0'};
-
 	bool m_isOpened = true;
 	GameInspector& m_inspector;
 	std::string m_windowName;
+
+	/// The filter string for the search box.
+	char m_outlinerFilter[512] = {'*', '\0'};
 
 	bool m_showLogicTransformInLocalSpace = false;
 };

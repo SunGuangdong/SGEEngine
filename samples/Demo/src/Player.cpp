@@ -31,7 +31,7 @@ struct Player : public Actor {
 		registerTrait(ttRigidbody);
 		registerTrait(ttModel);
 
-		ttModel.setModel("assets/models/catBall.mdl", true);
+		ttModel.addModel("assets/models/catBall.mdl");
 		ttRigidbody.getRigidBody()->create(this, CollsionShapeDesc::createSphere(1.f), 1.f, false);
 		ttRigidbody.getRigidBody()->setRollingFriction(0.025f);
 		ttRigidbody.getRigidBody()->setSpinningFriction(0.025f);

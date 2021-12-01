@@ -61,7 +61,9 @@ float Light_computeShadowMultipler(
 		const int pcfWidth = 2;
 		const int pcfTotalSampleCnt = (2 * pcfWidth + 1) * (2 * pcfWidth + 1);
 		int pcfTotalSampleCnt2 = 0;
+		[unroll]
 		for (int ix = -pcfWidth; ix <= pcfWidth; ix += 1) {
+			[unroll]
 			for (int iy = -pcfWidth; iy <= pcfWidth; iy += 1) {
 				const float2 sampleUv =
 					shadowMapSampleLocation + float2(float(ix) * pixelSizeUVShadow.x, float(iy) * pixelSizeUVShadow.y);

@@ -12,6 +12,48 @@ struct ICamera;
 struct TraitModel;
 struct TraitModelRenderItem;
 
+struct ModelEntry {
+	ModelEntry()
+	    : m_assetProperty(assetIface_model3d) {
+	}
+
+	/// Invalidates the asset property focing an update.
+	void invalidateCachedAssets() {
+		m_assetProperty.clear();
+	}
+
+	bool updateAssetProperty() {
+		if (m_assetProperty.update()) {
+			onAssetModelChanged();
+			return true;
+		}
+		return false;
+	}
+
+	void setModel(const char* assetPath);
+	void setModel(AssetPtr& asset);
+
+	/// Computes the bounding box of the attached 3D model.
+	/// Including the m_additionalTransform
+	AABox3f getBBoxOS() const;
+
+  private:
+	/// Called when the asset model has been changed.
+	void onAssetModelChanged();
+
+  public:
+	bool isRenderable = true;
+	AssetProperty m_assetProperty;
+	mat4f m_additionalTransform = mat4f::getIdentity();
+	std::vector<AssetPtr> mtlOverrides;
+
+	// Used when the trait is going to render an animated model.
+	// This holds the evaluated 3D model to be rendered.
+	// If null the static EvaluatedModel of the asset is going to get rendered.
+	Optional<EvaluatedModel> m_evalModel;
+};
+
+
 /// @brief TraitModel is a trait designed to be attached in an Actor.
 /// It provides a simple way to assign a renderable 3D Model to the game object (both animated and static).
 /// The trait is not automatically updateable, the user needs to manually call @postUpdate() method in their objects.
@@ -38,19 +80,18 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	TraitModel() = default;
 
-	void setModel(const char* assetPath, bool updateNow);
-	void setModel(AssetPtr& asset, bool updateNow);
-
-	void addModel(const char* assetPath, bool updateNow);
-	void addModel(AssetPtr& asset, bool updateNow);
+	void addModel(const char* assetPath);
+	void addModel(AssetPtr& asset);
 
 	/// Not called automatically see the class comment above.
 	/// Updates the working models.
-	/// Returns true if a model has been changed (no matter if it is valid or not).
+	/// Returns true if a model has been changed (no matter if it is valid or not),
+	/// useful if other sytems might depend on it.
 	bool postUpdate() {
 		return updateAssetProperties();
 	}
 
+	/// Returns the bounding box of all models.
 	AABox3f getBBoxOS() const;
 
 	void getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems);
@@ -62,60 +103,9 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	bool updateAssetProperties();
 
   public:
-	struct PerModelSettings {
-		PerModelSettings()
-		    : m_assetProperty(assetIface_model3d) {
-		}
-
-		/// Invalidates the asset property focing an update.
-		void invalidateCachedAssets() {
-			m_assetProperty.clear();
-		}
-
-		bool updateAssetProperty() {
-			if (m_assetProperty.update()) {
-				m_evalModel = NullOptional();
-				return true;
-			}
-			return false;
-		}
-
-		void onModelChanged() {
-			useSkeleton = false;
-			rootSkeletonId = ObjectId();
-			nodeToBoneId.clear();
-		}
-
-		void setModel(const char* assetPath, bool updateNow);
-		void setModel(AssetPtr& asset, bool updateNow);
-
-		AABox3f getBBoxOS() const;
-
-		void computeNodeToBoneIds(TraitModel& ownerTraitModel);
-		void computeSkeleton(TraitModel& ownerTraitModel, std::vector<mat4f>& boneOverrides);
-
-		bool isRenderable = true;
-		AssetProperty m_assetProperty;
-		mat4f m_additionalTransform = mat4f::getIdentity();
-
-		// Used when the trait is going to render an animated model.
-		// This holds the evaluated 3D model to be rendered.
-		// If null the static EvaluatedModel of the asset is going to get rendered.
-		Optional<EvaluatedModel> m_evalModel;
-		float alphaMultiplier = 1.f;
-
-		std::vector<AssetPtr> mtlOverrides;
-
-		// External skeleton, useful for IK. Not sure for regular skinned meshes.
-		bool useSkeleton = false;
-		ObjectId rootSkeletonId;
-		std::unordered_map<int, ObjectId> nodeToBoneId;
-	};
-
-  public:
-	bool isRenderable = true;               ///< True if the whole trait is renderable.
-	bool isFixedModelsSize = true;          ///< if true the interface will not offer adding/removing more models to the trait.
-	std::vector<PerModelSettings> m_models; ///< A list of all models in their settings to rendered by the trait.
+	std::vector<ModelEntry> m_models;          ///< A list of all models in their settings to rendered by the trait.
+	bool isRenderable = true;                  ///< True if the whole trait is renderable.
+	bool uiDontOfferResizingModelCount = true; ///< if true the interface will not offer adding/removing more models to the trait.
 	bool forceNoShadows = false;
 };
 

@@ -21,12 +21,15 @@ struct SGE_ENGINE_API TraitRigidBody : public Trait {
 	const RigidBody* getRigidBody() const { return &m_rigidBody; }
 
 	bool isValid() const { return m_rigidBody.isValid(); }
+
+	/// Returns true if the attached rigid body is currently in the game world.
 	bool isInWorld() const;
 
 	// Destroys and removes the rigid body from the physics world.
 	void destroyRigidBody();
 
 	// Create a rigid body by using the collision shapes described by the 3d model.
+	// It is not mandatory to use these functions to create a rigid body. You can get it from @getRigidBody and configure it yourself.
 	// @addToWorldNow - will not prevent adding the object to the world in onPlayStateChanged() callback, it means if the object should be
 	// added now or not. Use it when the rigid body has changed during an update.
 	bool createBasedOnModel(const char* modelPath, float mass, bool noResponse, bool addToWorldNow);

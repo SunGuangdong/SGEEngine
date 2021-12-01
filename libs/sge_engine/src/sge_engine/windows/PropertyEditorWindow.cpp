@@ -12,8 +12,8 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/Physics.h"
-#include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_engine/traits/TraitCustomAE.h"
+#include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_utils/math/EulerAngles.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"
@@ -23,7 +23,7 @@
 #include "sge_engine/traits/TraitScriptSlot.h"
 
 namespace sge {
-//struct MDiffuseMaterial;
+// struct MDiffuseMaterial;
 struct TraitModel;
 
 //----------------------------------------------------------
@@ -523,8 +523,11 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			ImGui::Text("%s is of type enum %s with unknown value", memberName, typeLib().find(memberTypeDesc->enumUnderlayingType)->name);
 		}
 	} else if (memberTypeDesc->members.size() != 0) {
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{40, 40});
+
 		char headerName[256];
 		sge_snprintf(headerName, SGE_ARRSZ(headerName), "%s of %s", memberName, memberTypeDesc->name);
+
 		if (ImGui::CollapsingHeader(headerName, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding)) {
 			// ImGui::BeginChild(memberTypeDesc->name, ImVec2(0.f, 0.f), true, ImGuiWindowFlags_AlwaysAutoResize |
 			// ImGuiWindowFlags_NoSavedSettings);
@@ -538,6 +541,7 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			// ImGui::EndChild();
 			ImGui::Separator();
 		}
+		ImGui::PopStyleVar();
 	} else if (memberTypeDesc->stdVectorUnderlayingType.isValid()) {
 		char headerName[256];
 		sge_snprintf(headerName, SGE_ARRSZ(headerName), "%s of %s", memberName, memberTypeDesc->name);
@@ -683,7 +687,6 @@ void ProperyEditorUIGen::editStringAsAssetPath(GameInspector& inspector,
                                                const AssetIfaceType possibleAssetIfaceTypes[],
                                                const int numPossibleAssetIfaceTypes) {
 	std::string& srcString = *(std::string*)chain.follow(gameObject);
-
 	std::string stringEdit = srcString;
 
 	bool const change = assetPicker(label, stringEdit, getCore()->getAssetLib(), possibleAssetIfaceTypes, numPossibleAssetIfaceTypes);

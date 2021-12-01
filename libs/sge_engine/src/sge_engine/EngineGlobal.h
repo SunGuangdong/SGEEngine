@@ -22,7 +22,6 @@ struct MemberChain;
 
 using PropertyEditorGeneratorForTypeFn = void (*)(GameInspector& inspector, GameObject* actor, MemberChain chain);
 
-
 /// EngineGlobalAssets holds assets that are used by the interface and across multiple GameWorlds.
 struct SGE_ENGINE_API EngineGlobalAssets {
 	void initialize();
@@ -66,17 +65,8 @@ struct IEngineGlobal {
 	/// @brief Finds the first window with the specified name.
 	virtual IImGuiWindow* findWindowByName(const char* const name) = 0;
 
-	template <typename T>
-	T* findFirstWindowOfType() {
-		for (auto& wnd : getAllWindows()) {
-			T* const wndTyped = dynamic_cast<T*>(wnd.get());
-			if (wndTyped != nullptr) {
-				return wndTyped;
-			}
-		}
-
-		return nullptr;
-	}
+	template <typename TWindowType>
+	TWindowType* findFirstWindowOfType();
 
 	virtual void showNotification(std::string text) = 0;
 	virtual const char* getNotificationText(const int iNotification) const = 0;
@@ -84,11 +74,12 @@ struct IEngineGlobal {
 
 	virtual EngineGlobalAssets& getEngineAssets() = 0;
 
-	/// @brief  When creating a game you do not need to modify this. This is intended
-	/// for the editor to restrict the usage of a relative cursor (a hidden cursor useful for FPS like games).
-	/// This function sets if relative cursors are allowed or not. They migth not be allowed when we are
-	/// in the editor editing the game.
+	/// @brief  When creating a game you do not need to modify this.
 	/// If you want to use relative cursor in the game use @setNeedForRelativeCursorThisFrame.
+	/// This is intended for the editor to restrict the usage
+	/// of a relative cursor (a hidden cursor useful for FPS like games).
+	/// This function sets if relative cursors are allowed or not.
+	/// They might not be allowed when we are in the editor editing the game.
 	virtual void setEngineAllowingRelativeCursor(bool isRelativeCursorAllowed) = 0;
 
 	/// @brief Returns true if relative cursor is allowed, not that it is relative.
@@ -99,6 +90,18 @@ struct IEngineGlobal {
 	virtual void clearAnyoneNeedForRelativeCursorThisFrame() = 0;
 };
 
+template <typename TWindowType>
+TWindowType* IEngineGlobal::findFirstWindowOfType() {
+	for (auto& wnd : getAllWindows()) {
+		TWindowType* const wndTyped = dynamic_cast<TWindowType*>(wnd.get());
+		if (wndTyped != nullptr) {
+			return wndTyped;
+		}
+	}
+
+	return nullptr;
+}
+
 SGE_ENGINE_API int addPluginRegisterFunction(void (*fnPtr)());
 SGE_ENGINE_API const std::vector<void (*)()>& getPluginRegisterFunctions();
 
@@ -106,6 +109,8 @@ SGE_ENGINE_API IEngineGlobal* createAndInitializeEngineGlobal();
 SGE_ENGINE_API IEngineGlobal* getEngineGlobal();
 SGE_ENGINE_API void setEngineGlobal(IEngineGlobal* global);
 
+/// A macro that if followed by a block of statements (like a normal function basically)
+/// that is going to get called when the game plugin gets loaded.
 #define SgePluginOnLoad() PluginRegisterBlock_Impl(SGE_ANONYMOUS(_SGE_ENGINE_BLOCK_ANON__FUNC))
 
 #define PluginRegisterBlock_Impl(fnName)                                                   \

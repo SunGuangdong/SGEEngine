@@ -50,10 +50,7 @@ void PhysicsWorld::create() {
 	dispatcher.reset(new btCollisionDispatcher(collisionConfiguration.get()));
 	solver.reset(new btSequentialImpulseConstraintSolver());
 
-	// dispatcher->setNearCallback(dispacherNearCallback);
-
 	dynamicsWorld.reset(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
-
 	dynamicsWorld->setForceUpdateAllAabbs(false);
 }
 

@@ -143,6 +143,17 @@ void GameWorld::iterateOverPlayingObjects(const std::function<bool(const GameObj
 	}
 }
 
+/// @brief Retrieves a list of all playing object of the specified type. May be nullptr.
+
+const std::vector<GameObject*>* GameWorld::getObjects(TypeId type) const {
+	const auto itr = playingObjects.find(type);
+	if (itr == playingObjects.end()) {
+		return nullptr;
+	}
+
+	return &itr->second;
+}
+
 GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId, const char* name) {
 	// If a specific id is desiered first check if this id is available for use.
 	if (!specificId.isNull()) {

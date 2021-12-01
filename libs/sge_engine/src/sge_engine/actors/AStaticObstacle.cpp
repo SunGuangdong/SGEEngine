@@ -37,7 +37,7 @@ void AStaticObstacle::create() {
 	registerTrait(m_traitModel);
 	registerTrait(m_traitSprite);
 
-	m_traitModel.isFixedModelsSize = false;
+	m_traitModel.uiDontOfferResizingModelCount = false;
 	m_traitModel.m_models.resize(1);
 	m_traitModel.m_models[0].m_assetProperty.setTargetAsset("assets/editor/models/box.mdl");
 }

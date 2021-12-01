@@ -79,7 +79,7 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 
 bool addCollisionShapeBasedOnTraitModel(std::vector<CollsionShapeDesc>& shapeDescs, TraitModel& traitModel) {
 	bool hadShapes = false;
-	for (TraitModel::PerModelSettings& mdlSets : traitModel.m_models) {
+	for (ModelEntry& mdlSets : traitModel.m_models) {
 		if (AssetIface_Model3D* mdlIface = mdlSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>()) {
 			hadShapes |= addCollisionShapeBasedOnModel(shapeDescs, mdlIface->getStaticEval());
 		}

@@ -5,6 +5,7 @@
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "Recast.h"
 #include "RecastDetourWrapper.h"
+#include "imgui/imgui.h"
 #include "sge_core/ICore.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/traits/TraitRigidBody.h"

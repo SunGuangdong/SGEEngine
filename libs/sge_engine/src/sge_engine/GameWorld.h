@@ -36,7 +36,8 @@ struct SGE_ENGINE_API PostSceneUpdateTaskSetWorldState final : public IPostScene
 	PostSceneUpdateTaskSetWorldState() = default;
 	PostSceneUpdateTaskSetWorldState(std::string json, bool noPauseNoEditorCamera)
 	    : newWorldStateJson(std::move(json))
-	    , noPauseNoEditorCamera(noPauseNoEditorCamera) {}
+	    , noPauseNoEditorCamera(noPauseNoEditorCamera) {
+	}
 
 	std::string newWorldStateJson;
 	bool noPauseNoEditorCamera = false;
@@ -46,7 +47,8 @@ struct SGE_ENGINE_API PostSceneUpdateTaskLoadWorldFormFile final : public IPostS
 	PostSceneUpdateTaskLoadWorldFormFile() = default;
 	PostSceneUpdateTaskLoadWorldFormFile(std::string filename, bool noPauseNoEditorCamera)
 	    : filename(std::move(filename))
-	    , noPauseNoEditorCamera(noPauseNoEditorCamera) {}
+	    , noPauseNoEditorCamera(noPauseNoEditorCamera) {
+	}
 
 	std::string filename;
 	bool noPauseNoEditorCamera = false;
@@ -60,13 +62,18 @@ struct GameUpdateSets {
 	GameUpdateSets(float const dt, bool const isPaused, InputState const is /*, SGEContext* const sgecon*/)
 	    : dt(dt)
 	    , isPaused(isPaused)
-	    , is(is) {}
+	    , is(is) {
+	}
 
 	/// @brief Returns true if the game is paused for some reason.
-	bool isGamePaused() const { return isPaused; }
+	bool isGamePaused() const {
+		return isPaused;
+	}
 
 	/// @brief Returns true if the game is not paused.
-	bool isPlaying() const { return !isGamePaused(); }
+	bool isPlaying() const {
+		return !isGamePaused();
+	}
 
 	float dt = 0.f;       ///< The delta time to be used when updateing.
 	bool isPaused = true; ///< True if the game is paused for any reason (usually we are in the editor and the game is paused there).
@@ -83,7 +90,9 @@ struct SGE_ENGINE_API GameWorld {
 		userProjectionSettings.far = 10000.f;
 	}
 
-	~GameWorld() { clear(); }
+	~GameWorld() {
+		clear();
+	}
 
 	void create();
 
@@ -138,49 +147,20 @@ struct SGE_ENGINE_API GameWorld {
 	void iterateOverPlayingObjects(const std::function<bool(const GameObject*)>& lambda, bool includeAwaitCreationObject) const;
 
 	/// @brief Retrieves a list of all playing object of the specified type. May be nullptr.
-	const std::vector<GameObject*>* getObjects(TypeId type) const {
-		const auto itr = playingObjects.find(type);
-		if (itr == playingObjects.end()) {
-			return nullptr;
-		}
+	const std::vector<GameObject*>* getObjects(TypeId type) const;
 
-		return &itr->second;
-	}
-
+	/// Returns the 1st found object of type T.
 	template <typename T>
-	T* getFistObject() {
-		const std::vector<GameObject*>* objs = getObjects(sgeTypeId(T));
-
-		if (objs && !objs->empty()) {
-			return static_cast<T*>(objs->at(0));
-		}
-
-		return nullptr;
-	}
+	T* getFistObject();
 
 	/// @brief Retrieves an object with the specified id.
 	template <typename T>
-	T* getObject(const ObjectId& id) {
-		GameObject* const go = getActorById(id);
-		if (!go || go->getType() != sgeTypeId(T)) {
-			return nullptr;
-		}
-
-		return static_cast<T*>(go);
-	}
+	T* getObject(const ObjectId& id);
 
 	/// @brief Retrieves an actor with the specified id.
 	/// If the object exists but if it is not actor the function will return nullptr.
 	template <typename T>
-	T* getActor(const ObjectId& id) {
-		Actor* const actor = getActorById(id);
-		if (!actor || actor->getType() != sgeTypeId(T)) {
-			return nullptr;
-		}
-
-		return static_cast<T*>(actor);
-	}
-
+	T* getActor(const ObjectId& id);
 
 	/// Sets the parent of the specified actor.
 	/// @param [in] child the id of the child object
@@ -255,15 +235,23 @@ struct SGE_ENGINE_API GameWorld {
 	int getNextNameIndex();
 
 	/// @brief Returns the attached inspector (if any).
-	GameInspector* getInspector() { return inspector; }
+	GameInspector* getInspector() {
+		return inspector;
+	}
 
 	/// @brief Retrieves the amount of time passed while not being paused.
-	float getGameTime() const { return timeSpendPlaying; }
+	float getGameTime() const {
+		return timeSpendPlaying;
+	}
 
 	/// @brief Returns true if the scene is in edit mode. Could be true only in the SGEEditor.
-	bool isInEditMode() const { return isEdited; }
+	bool isInEditMode() const {
+		return isEdited;
+	}
 
-	void toggleEditMode() { isEdited = !isEdited; }
+	void toggleEditMode() {
+		isEdited = !isEdited;
+	}
 
 	/// @brief Adds a task to be executed after the scene update has finished.
 	/// @param task A pointer to DYNAMICALLY allocated with new to task to be executed.
@@ -304,17 +292,22 @@ struct SGE_ENGINE_API GameWorld {
 	/// A pointer to the attached inspector(if any).
 	GameInspector* inspector = nullptr;
 
-	std::vector<GameObject*> objectsAwaitingCreation; // A set of object ready to start playing at the beginning of the next step.
-	std::unordered_map<TypeId, std::vector<GameObject*>> playingObjects; // All playing game object sorted by type.
-	vector_set<ObjectId> objectsWantingPermanentKill; // A set of actors that are going to be compleatley deleted for the game world.
-	std::unordered_map<ObjectId, GameObject*> m_gameObjectByIdLUT; // A look up table for fast searching for an object with a specific id.
+	/// A set of object ready to start playing at the beginning of the next step.
+	std::vector<GameObject*> objectsAwaitingCreation; 
+	// All playing game object sorted by type.
+	std::unordered_map<TypeId, std::vector<GameObject*>> playingObjects; 
+	/// A set of actors that are going to be compleatley deleted for the game world.
+	vector_set<ObjectId> objectsWantingPermanentKill; 
+
+	/// A look up table for fast searching for an object with a specific id.
+	std::unordered_map<ObjectId, GameObject*> m_gameObjectByIdLUT; 
 
 	/// Hierarchical relationship between actors.
 	/// These two are deeply connected to one another!
 	std::unordered_map<ObjectId, vector_set<ObjectId>> m_childernOf;
 	std::unordered_map<ObjectId, ObjectId> m_parentOf;
 
-	/// Physics
+	// Physics
 	PhysicsWorld physicsWorld;
 	BulletPhysicsDebugDraw m_physicsDebugDraw;
 
@@ -359,5 +352,36 @@ struct SGE_ENGINE_API GameWorld {
 		int forceSleepMs = 0;
 	} debug;
 };
+
+template <typename T>
+T* GameWorld::getFistObject() {
+	const std::vector<GameObject*>* objs = getObjects(sgeTypeId(T));
+
+	if (objs && !objs->empty()) {
+		return static_cast<T*>(objs->at(0));
+	}
+
+	return nullptr;
+}
+
+template <typename T>
+T* GameWorld::getObject(const ObjectId& id) {
+	GameObject* const go = getActorById(id);
+	if (!go || go->getType() != sgeTypeId(T)) {
+		return nullptr;
+	}
+
+	return static_cast<T*>(go);
+}
+
+template <typename T>
+T* GameWorld::getActor(const ObjectId& id) {
+	Actor* const actor = getActorById(id);
+	if (!actor || actor->getType() != sgeTypeId(T)) {
+		return nullptr;
+	}
+
+	return static_cast<T*>(actor);
+}
 
 } // namespace sge
