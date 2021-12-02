@@ -18,11 +18,11 @@ ReflAddTypeId(RigidBodyConfigurator,              21'02'28'0008);
 ReflBlock()
 {
 	ReflAddType(RigidBodyPropertiesConfigurator)
-		ReflMember(RigidBodyConfigurator, mass)
-		ReflMember(RigidBodyPropertiesConfigurator, friction)
-		ReflMember(RigidBodyPropertiesConfigurator, rollingFriction)
-		ReflMember(RigidBodyPropertiesConfigurator, spinningFriction)
-		ReflMember(RigidBodyPropertiesConfigurator, bounciness)
+		ReflMember(RigidBodyConfigurator, mass).uiRange(0.f, 100000.f, 0.1f)
+		ReflMember(RigidBodyPropertiesConfigurator, friction).uiRange(0.f, 1.f, 0.01f)
+		ReflMember(RigidBodyPropertiesConfigurator, rollingFriction).uiRange(0.f, 1.f, 0.01f)
+		ReflMember(RigidBodyPropertiesConfigurator, spinningFriction).uiRange(0.f, 1.f, 0.01f)
+		ReflMember(RigidBodyPropertiesConfigurator, bounciness).uiRange(0.f, 1.f, 0.01f)
 		ReflMember(RigidBodyPropertiesConfigurator, noMoveX).setPrettyName("No X Movement")
 		ReflMember(RigidBodyPropertiesConfigurator, noMoveY).setPrettyName("No Y Movement")
 		ReflMember(RigidBodyPropertiesConfigurator, noMoveZ).setPrettyName("No Z Movement")
@@ -38,6 +38,8 @@ ReflBlock()
 	ReflAddType(RigidBodyConfigurator::ShapeSource)
 		ReflEnumVal(RigidBodyConfigurator::shapeSource_fromTraitModel, "From TraitModel")
 		ReflEnumVal(RigidBodyConfigurator::shapeSource_manuallySpecify, "Manually Specify Shapes")
+		ReflEnumVal(RigidBodyConfigurator::shapeSource_fromModel, "From Model 3D Collision Shapes")
+		ReflEnumVal(RigidBodyConfigurator::shapeSource_fromModelRenderGeometry, "From Model 3D Renderable Geometry (Static Only)")
 	;
 
 	ReflAddType(RigidBodyConfigurator)
@@ -45,6 +47,7 @@ ReflBlock()
 		ReflMember(RigidBodyConfigurator, shapeSource)
 		ReflMember(RigidBodyConfigurator, assetPropery)
 		ReflMember(RigidBodyConfigurator, collisionShapes)
+		ReflMember(RigidBodyConfigurator, m_sourceModel)
 	;	
 }
 // clang-format on
@@ -129,15 +132,35 @@ bool RigidBodyConfigurator::apply(Actor& actor, bool addToWorldNow) const {
 			traitRb->destroyRigidBody();
 			traitRb->getRigidBody()->create(&actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
 		} break;
+		case shapeSource_fromModel: {
+			traitRb->destroyRigidBody();
+			const AssetIface_Model3D* modelIface = m_sourceModel.getAssetInterface<AssetIface_Model3D>();
+			if (modelIface) {
+				std::vector<CollsionShapeDesc> collisionShapes;
+				addCollisionShapeBasedOnModel(collisionShapes, modelIface->getStaticEval());
+				traitRb->getRigidBody()->create(&actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
+			}
+		} break;
+		case shapeSource_fromModelRenderGeometry: {
+			traitRb->destroyRigidBody();
+			const AssetIface_Model3D* modelIface = m_sourceModel.getAssetInterface<AssetIface_Model3D>();
+			if (modelIface) {
+				std::vector<CollsionShapeDesc> collisionShapes;
+				addCollisionShapeBasedOnModelRenderGeom(collisionShapes, modelIface->getStaticEval());
+				traitRb->getRigidBody()->create(&actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
+			}
+		} break;
 		default: {
+			traitRb->destroyRigidBody();
 			sgeAssert(false && "Not Implemented ShapeSource");
 		} break;
 	}
 
-	traitRb->getRigidBody()->setTransformAndScaling(transformOfActor, true);
-
-	// Apply the properties.
-	applyProperties(*traitRb->getRigidBody());
+	if (traitRb->getRigidBody()) {
+		traitRb->getRigidBody()->setTransformAndScaling(transformOfActor, true);
+		// Apply the properties.
+		applyProperties(*traitRb->getRigidBody());
+	}
 
 	if (addToWorldNow) {
 		traitRb->addToWorld();
@@ -283,11 +306,17 @@ SGE_ENGINE_API void edit_RigidBodyConfigurator(GameInspector& inspector, GameObj
 
 	if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_fromTraitModel) {
 		if (gameObject->findTraitByFamily(sgeTypeId(TraitModel)) == nullptr) {
-			ImGui::TextEx("The current objects needs to have TraitModel for this option to work");
+			ImGui::TextEx("The current objects needs to have TraitModel for this option to work.");
 		}
 	} else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_manuallySpecify) {
 		ImGui::Text("Manually specify the shapes that will form the rigid body below!");
 		doMemberUIFn(sgeFindMember(RigidBodyConfigurator, collisionShapes));
+	} else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_fromModel) {
+		ImGui::Text("Model to be the source of collision geometry.");
+		doMemberUIFn(sgeFindMember(RigidBodyConfigurator, m_sourceModel));
+	} else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_fromModelRenderGeometry) {
+		ImGui::Text("Model to be the source of collision geometry. Usable of Static Objects only");
+		doMemberUIFn(sgeFindMember(RigidBodyConfigurator, m_sourceModel));
 	}
 
 	if (ImGui::Button(ICON_FK_CHECK " Apply")) {

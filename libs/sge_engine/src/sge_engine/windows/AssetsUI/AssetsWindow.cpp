@@ -292,7 +292,7 @@ void AssetsWindow::update_assetImport(SGEContext* const sgecon, const InputState
 				ImGui::Checkbox("Preview", &aid.preview);
 				if (aid.preview) {
 					if (aid.assetType == assetIface_model3d) {
-						aid.modelPreviewWidget.doWidget(sgecon, is, getAssetIface<AssetIface_Model3D>(aid.tempAsset)->getStaticEval(),
+						aid.modelPreviewWidget.doWidget(sgecon, is, getLoadedAssetIface<AssetIface_Model3D>(aid.tempAsset)->getStaticEval(),
 						                                vec2f(-1.f, 256.f));
 					}
 				}
@@ -452,7 +452,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 							} else {
 								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str(), nullptr, true);
 								if (isAssetLoaded(explorePreviewAsset, assetIface_model3d)) {
-									AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
+									AABox3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
 									if (bboxModel.IsEmpty() == false) {
 										orbit_camera camera;
 
@@ -476,7 +476,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 
 										imods.forceNoLighting = true;
 										drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(),
-										              getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval(), InstanceDrawMods());
+										              getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval(), InstanceDrawMods());
 
 										assetPreviewTex[localAssetPath] = ft;
 									}
@@ -776,18 +776,18 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 		if (isAssetLoaded(explorePreviewAsset)) {
 			ImGui::NextColumn();
 
-			if (AssetIface_Model3D* modelIface = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)) {
+			if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)) {
 				doPreviewAssetModel(is, explorePreviewAssetChanged);
-			} else if (AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(explorePreviewAsset)) {
+			} else if (AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(explorePreviewAsset)) {
 				doPreviewAssetTexture2D(texIface);
-			} else if (AssetIface_SpriteAnim* spriteIface = getAssetIface<AssetIface_SpriteAnim>(explorePreviewAsset)) {
+			} else if (AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(explorePreviewAsset)) {
 				if (AssetIface_Texture2D* spriteTexIface =
-				        getAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
+				        getLoadedAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
 					auto desc = spriteTexIface->getTexture()->getDesc().texture2D;
 					ImVec2 sz = ImGui::GetContentRegionAvail();
 					ImGui::Image(spriteTexIface->getTexture(), sz);
 				}
-			} else if (AssetIface_Material* mtlIface = getAssetIface<AssetIface_Material>(explorePreviewAsset)) {
+			} else if (AssetIface_Material* mtlIface = getLoadedAssetIface<AssetIface_Material>(explorePreviewAsset)) {
 				if (ImGui::Button(ICON_FK_PICTURE_O " Edit Material")) {
 					std::shared_ptr<IMaterial> mtl = mtlIface->getMaterial();
 
@@ -800,7 +800,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 
 					mtlEditWnd->setAsset(std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset));
 				}
-			} else if (IAssetInterface_Audio* audioIface = getAssetIface<IAssetInterface_Audio>(explorePreviewAsset)) {
+			} else if (IAssetInterface_Audio* audioIface = getLoadedAssetIface<IAssetInterface_Audio>(explorePreviewAsset)) {
 				ImGui::Text("No Preview");
 				if (auto audioDataPtr = audioIface->getAudioData()) {
 					// auto audioData = explorePreviewAsset->asAudio();
@@ -819,7 +819,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 
 void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreviewAssetChanged) {
 	if (explorePreviewAssetChanged) {
-		AABox3f bboxModel = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
+		AABox3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
 		if (bboxModel.IsEmpty() == false) {
 			m_exploreModelPreviewWidget.camera.orbitPoint = bboxModel.center();
 			m_exploreModelPreviewWidget.camera.radius = bboxModel.diagonal().length() * 1.25f;
@@ -828,8 +828,8 @@ void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreview
 		}
 	}
 
-	const Model& model = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getModel3D();
-	EvaluatedModel& staticEval = getAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval();
+	const Model& model = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getModel3D();
+	EvaluatedModel& staticEval = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval();
 
 	m_exploreModelPreviewWidget.doWidget(getCore()->getDevice()->getContext(), is, staticEval);
 

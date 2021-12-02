@@ -38,7 +38,7 @@ struct AnimatorTrack {
 
 		const ModelAnimation* getAnimation() const {
 			if (isAssetLoaded(modelAnimationDonor, assetIface_model3d)) {
-				return getAssetIface<AssetIface_Model3D>(modelAnimationDonor)->getModel3D().animationAt(animationIndexInDonor);
+				return getLoadedAssetIface<AssetIface_Model3D>(modelAnimationDonor)->getModel3D().animationAt(animationIndexInDonor);
 			}
 
 			return nullptr;

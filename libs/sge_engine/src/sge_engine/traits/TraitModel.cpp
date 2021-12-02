@@ -26,6 +26,7 @@ ReflBlock() {
 	ReflAddType(ModelEntry)
 		ReflMember(ModelEntry, isRenderable)
 		ReflMember(ModelEntry, m_assetProperty)
+		ReflMember(ModelEntry, mtlOverrides)
 	;
 	ReflAddType(std::vector<ModelEntry>);
 
@@ -53,8 +54,9 @@ void ModelEntry::setModel(AssetPtr& asset) {
 void ModelEntry::onAssetModelChanged() {
 	m_evalModel = NullOptional();
 
-	getAssetIface<AssetIface_Model3D>(m_assetProperty.getAsset());
-	mtlOverrides.clear();
+	if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(m_assetProperty.getAsset())) {
+		mtlOverrides.resize(modelIface->getModel3D().numMaterials());
+	}
 }
 
 AABox3f ModelEntry::getBBoxOS() const {
@@ -127,9 +129,8 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 					IMaterial* mtl = nullptr;
 					if (mtlIndex < modelSets.mtlOverrides.size()) {
 						if (modelSets.mtlOverrides[mtlIndex]) {
-							const AssetIface_Material* mtlIfaceAsset = getAssetIface<AssetIface_Material>(modelSets.mtlOverrides[mtlIndex]);
-							if (mtlIfaceAsset) {
-								mtl = mtlIfaceAsset->getMaterial().get();
+							if (modelSets.mtlOverrides[mtlIndex]) {
+								mtl = modelSets.mtlOverrides[mtlIndex]->getMaterial().get();
 							}
 						}
 					}
@@ -182,8 +183,7 @@ bool TraitModel::updateAssetProperties() {
 void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberChain chain) {
 	TraitModel& traitModel = *(TraitModel*)chain.follow(actor);
 
-	if (ImGui::CollapsingHeader(ICON_FK_CUBE " 3d ModelS", ImGuiTreeNodeFlags_DefaultOpen)) {
-
+	if (ImGui::CollapsingHeader(ICON_FK_CUBE " 3D Models", ImGuiTreeNodeFlags_DefaultOpen)) {
 		// Set to a valid index if the user has clicked the "Delete" button on
 		// any entry. If so we need to delete it once the UI has been built.
 		int deleteModelIndex = -1;
@@ -210,20 +210,28 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 				ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 				chain.pop();
 
-				// Material and Skeleton overrides interface.
+				// Material overrides interface.
+				// TODO: Add undo/redo command history.
 				AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 				if (loadedModelIface) {
 					// Now do the UI for each available material slot.
 					modelSets.mtlOverrides.resize(loadedModelIface->getModel3D().numMaterials());
 
-					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Material Overrides")) {
+					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Materials")) {
 						for (int iMtl : rng_int(loadedModelIface->getModel3D().numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
 
 							const ModelMaterial* mtl = loadedModelIface->getModel3D().materialAt(iMtl);
 
 							AssetIfaceType types[] = {assetIface_mtl};
-							assetPicker(mtl->name.c_str(), modelSets.mtlOverrides[iMtl], getCore()->getAssetLib(), types, 1);
+							AssetPtr currentAsset = std::dynamic_pointer_cast<Asset>(modelSets.mtlOverrides[iMtl]);
+
+							if (currentAsset == nullptr) {
+								ImGui::Text(ICON_FK_EXCLAMATION_TRIANGLE " %s has non-asset attached!", mtl->name.c_str());
+							}
+							if (assetPicker(mtl->name.c_str(), currentAsset, getCore()->getAssetLib(), types, 1)) {
+								modelSets.mtlOverrides[iMtl] = std::dynamic_pointer_cast<AssetIface_Material>(currentAsset);
+							}
 						}
 					}
 				}

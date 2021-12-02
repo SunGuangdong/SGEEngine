@@ -110,7 +110,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			previewAimationTime = 0.f;
 			autoPlayAnimation = true;
 			if (isAssetLoaded(m_model, assetIface_model3d)) {
-				m_eval.initialize(assetLib, &getAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
+				m_eval.initialize(assetLib, &getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
 			}
 		}
 
@@ -152,7 +152,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 				}
 
 				for (int iDonor = 0; iDonor < animationDonors.size(); ++iDonor) {
-					const Model& donorModel = getAssetIface<AssetIface_Model3D>(animationDonors[iDonor])->getModel3D();
+					const Model& donorModel = getLoadedAssetIface<AssetIface_Model3D>(animationDonors[iDonor])->getModel3D();
 					for (int t = 0; t < donorModel.numAnimations(); ++t) {
 						const ModelAnimation* anim = donorModel.animationAt(t);
 						if (ImGui::Selectable((animationDonors[iDonor]->getPath() + " | " + anim->animationName).c_str())) {

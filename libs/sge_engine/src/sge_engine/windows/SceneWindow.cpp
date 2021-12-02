@@ -218,7 +218,7 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 					const TypeDesc* typeDesc = &typePair.second;
 
 					if (createActorFilter.PassFilter(typeDesc->name)) {
-						const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(
+						const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(
 						    getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId));
 						Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 

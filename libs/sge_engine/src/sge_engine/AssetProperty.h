@@ -62,12 +62,12 @@ struct SGE_ENGINE_API AssetProperty {
 
 	template <typename TAssetIface>
 	TAssetIface* getAssetInterface() {
-		return getAssetIface<TAssetIface>(m_asset);
+		return getLoadedAssetIface<TAssetIface>(m_asset);
 	}
 
 	template <typename TAssetIface>
 	const TAssetIface* getAssetInterface() const {
-		return getAssetIface<TAssetIface>(m_asset);
+		return getLoadedAssetIface<TAssetIface>(m_asset);
 	}
 
 	AssetProperty& operator=(const AssetProperty& ref) {

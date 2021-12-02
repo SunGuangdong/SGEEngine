@@ -16,7 +16,7 @@
 namespace sge {
 
 struct TypeId {
-#if 1
+#if 1 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
 	int id;
 
 	explicit TypeId(int const id = 0)
@@ -81,7 +81,7 @@ struct TypeId {
 
 /// Definition of std::hash<TypeId>
 namespace std {
-#if 1
+#if 1 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
 template <>
 struct hash<sge::TypeId> {
 	int operator()(const sge::TypeId& k) const {
@@ -109,14 +109,14 @@ namespace sge {
 ///
 /// A good nomenclature for assigning ids is:
 /// yy'mm'dd'nnnn where nnnn is the number of type registered on this day.
-#if 1
+#if 1 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
 template <typename T>
 TypeId sgeTypeIdFn();
 #else
 template <typename T>
 TypeId sgeTypeIdFn() {
 #ifdef WIN32
-	return TypeId(__FUNCSIG__); // TODO: make this cross-compiler safe.
+	return TypeId(__PRETTY_FUNCTION__); // TODO: make this cross-compiler safe.
 #else
 	return TypeId(__PRETTY_FUNCTION__);
 #endif
@@ -126,7 +126,7 @@ TypeId sgeTypeIdFn() {
 /// Don't use in header definition it will bloat the cpps unless you need
 /// to use id same id in different libraries (dlls/so and so on) where
 /// the function specialization isn't acessible.
-#if 1
+#if 1 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
 #define ReflAddTypeIdInline(T, _id)       \
 	template <>                           \
 	inline TypeId sge::sgeTypeIdFn<T>() { \
@@ -152,7 +152,7 @@ TypeId sgeTypeIdFn() {
 #endif
 
 // Mark that the type id already exists, this is used for situations were we
-#if 1
+#if 1 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
 #ifdef SGE_CORE_BUILDING_DLL
 #define ReflAddTypeIdExists(T) \
 	struct T;                  \

@@ -363,17 +363,27 @@ bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type) {
 }
 
 // clang-format off
-ReflAddTypeId(AssetPtr, 10'11'21'0001)
-ReflAddTypeId(std::shared_ptr<AssetIface_Texture2D>, 10'11'21'0002)
-ReflAddTypeId(std::shared_ptr<AssetIface_Model3D>, 10'11'21'0003)
-ReflAddTypeId(std::shared_ptr<AssetIface_SpriteAnim>, 10'11'21'0004)
-ReflAddTypeId(std::shared_ptr<AssetIface_Material>, 10'11'21'0006)
+ReflAddTypeId(AssetPtr,                                             10'11'21'0001);
+ReflAddTypeId(std::vector<AssetPtr>,                                10'11'21'0002);
+ReflAddTypeId(std::shared_ptr<AssetIface_Texture2D>,                10'11'21'0003);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Texture2D>>,   10'11'21'0004);
+ReflAddTypeId(std::shared_ptr<AssetIface_Model3D>,                  10'11'21'0005);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Model3D>>,     10'11'21'0006);
+ReflAddTypeId(std::shared_ptr<AssetIface_SpriteAnim>,               10'11'21'0007);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_SpriteAnim>>,  10'11'21'0008);
+ReflAddTypeId(std::shared_ptr<AssetIface_Material>,                 10'11'21'0009);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Material>>,    10'11'21'0010);
 ReflBlock() {
 	ReflAddType(AssetPtr);
+	ReflAddType(std::vector<AssetPtr>);
 	ReflAddType(std::shared_ptr<AssetIface_Texture2D>);
+	ReflAddType(std::vector<std::shared_ptr<AssetIface_Texture2D>>);
 	ReflAddType(std::shared_ptr<AssetIface_Model3D>);
+	ReflAddType(std::vector<std::shared_ptr<AssetIface_Model3D>>);
 	ReflAddType(std::shared_ptr<AssetIface_SpriteAnim>);
+	ReflAddType(std::vector<std::shared_ptr<AssetIface_SpriteAnim>>);
 	ReflAddType(std::shared_ptr<AssetIface_Material>);
+	ReflAddType(std::vector<std::shared_ptr<AssetIface_Material>>);
 }
 // clang-format on
 

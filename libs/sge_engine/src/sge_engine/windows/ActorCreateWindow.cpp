@@ -58,7 +58,7 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), const InputStat
 					}
 
 					const AssetIface_Texture2D* texIface =
-					    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId));
+					    getLoadedAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId));
 					Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
 					ImGui::BeginChildFrame(ImHashStr(typeDesc->name), kWidgetSize, ImGuiWindowFlags_NoBackground);

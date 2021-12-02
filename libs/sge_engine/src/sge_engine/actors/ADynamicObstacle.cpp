@@ -41,7 +41,9 @@ void ADynamicObstacle::onDuplocationComplete() {
 }
 
 void ADynamicObstacle::postUpdate(const GameUpdateSets& UNUSED(u)) {
-	if (m_traitModel.postUpdate()) {
+	// Update the rigid body config if the attached model changes or if the model
+	// for rigid body has changed as these could affect the rigid body collition shape.
+	if (m_traitModel.postUpdate() || m_rbConfig.m_sourceModel.update()) {
 		m_rbConfig.apply(*this, true);
 	}
 }

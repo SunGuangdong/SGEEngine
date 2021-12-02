@@ -40,10 +40,27 @@ bool assetPicker(const char* label,
 		wasAssetPicked = true;
 	}
 
+	// Handle accepting drops from drag and drop.
 	if (ImGui::BeginDragDropTarget()) {
 		if (Optional<std::string> droppedAssetPath = DragDropPayloadAsset::accept()) {
-			assetPath = *droppedAssetPath;
-			wasAssetPicked = true;
+			AssetPtr droppedAsset = getCore()->getAssetLib()->getAssetFromFile(droppedAssetPath->c_str(), nullptr, false);
+			if (droppedAsset) {
+				// Check if the dropped asset is of correct interface type.
+				bool isOfAcceptedInterfaces = false;
+				for (int iType = 0; iType < numAssetIfaceTypes; ++iType) {
+					if (isAssetSupportingInteface(droppedAsset, assetTypes[iType])) {
+						isOfAcceptedInterfaces = true;
+						break;
+					}
+				}
+
+				if (isOfAcceptedInterfaces) {
+					assetPath = *droppedAssetPath;
+					wasAssetPicked = true;
+				} else {
+					sgeLogWarn("The asset '%s' is not of accepted types!", droppedAssetPath->c_str());
+				}
+			}
 		}
 
 		ImGui::EndDragDropTarget();
@@ -81,7 +98,7 @@ bool assetPicker(const char* label,
 								getCore()->getAssetLib()->getAssetFromFile(asset->getPath().c_str());
 							}
 						} else if (isAssetLoaded(asset, assetIface_texture2d)) {
-							Texture* texture = getAssetIface<AssetIface_Texture2D>(asset)->getTexture();
+							Texture* texture = getLoadedAssetIface<AssetIface_Texture2D>(asset)->getTexture();
 							if (texture && ImGui::ImageButton(texture, ImVec2(48, 48))) {
 								assetPath = itr.first;
 								wasAssetPicked = true;
@@ -134,7 +151,7 @@ bool assetPicker(const char* label,
 							frameTarget->create2D(textureSize, textureSize);
 						}
 
-						const AssetIface_Model3D* mdlIface = getAssetIface<AssetIface_Model3D>(asset);
+						const AssetIface_Model3D* mdlIface = getLoadedAssetIface<AssetIface_Model3D>(asset);
 
 						getCore()->getDevice()->getContext()->clearColor(frameTarget, 0, vec4f(0.f).data);
 						getCore()->getDevice()->getContext()->clearDepth(frameTarget, 1.f);
@@ -333,7 +350,7 @@ SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, con
 				}
 
 				const AssetIface_Texture2D* texIface =
-				    getAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
+				    getLoadedAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
 
 				Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 

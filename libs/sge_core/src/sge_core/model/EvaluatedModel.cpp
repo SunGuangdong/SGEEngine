@@ -42,7 +42,7 @@ int EvaluatedModel::addAnimationDonor(const AssetPtr& donorAsset) {
 	for (const int iOrigNode : range_int(m_model->numNodes())) {
 		const std::string& originalNodeName = m_model->nodeAt(iOrigNode)->name;
 		animDonor.originalNodeId_to_donorNodeId[iOrigNode] =
-		    getAssetIface<AssetIface_Model3D>(animDonor.donorModel)->getModel3D().findFistNodeIndexWithName(originalNodeName);
+		    getLoadedAssetIface<AssetIface_Model3D>(animDonor.donorModel)->getModel3D().findFistNodeIndexWithName(originalNodeName);
 	}
 
 	m_donors.emplace_back(std::move(animDonor));
@@ -104,7 +104,7 @@ bool EvaluatedModel::evaluateFromMomentsInternal(const EvalMomentSets evalMoment
 			}
 		}
 
-		const Model& donorModel = (donor != nullptr) ? getAssetIface<AssetIface_Model3D>(donor->donorModel)->getModel3D() : *m_model;
+		const Model& donorModel = (donor != nullptr) ? getLoadedAssetIface<AssetIface_Model3D>(donor->donorModel)->getModel3D() : *m_model;
 		const ModelAnimation* const donorAnimation = donorModel.animationAt(moment.animationIndex);
 
 		const float evalTime = moment.time;
@@ -179,7 +179,7 @@ bool EvaluatedModel::evaluateMaterials() {
 		const ModelMaterial* const rawMaterial = m_model->materialAt(iMaterial);
 
 		if (!rawMaterial->assetForThisMaterial.empty()) {
-			m_evaluatedMaterials[iMaterial] = m_assetLibrary->getAssetIface<AssetIface_Material>(
+			m_evaluatedMaterials[iMaterial] = m_assetLibrary->getLoadedAssetIface<AssetIface_Material>(
 			    rawMaterial->assetForThisMaterial.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
 		} else {
 			std::shared_ptr<DefaultPBRMtl> evalMtl = std::make_shared<DefaultPBRMtl>();
@@ -191,13 +191,13 @@ bool EvaluatedModel::evaluateMaterials() {
 			evalMtl->alphaMultiplier = rawMaterial->oldInplaceMtl.alphaMultiplier;
 
 			// Metallic map.
-			evalMtl->texDiffuse = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.diffuseTextureName.c_str(),
+			evalMtl->texDiffuse = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.diffuseTextureName.c_str(),
 			                                                                          m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texMetallic = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(
+			evalMtl->texMetallic = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(
 			    rawMaterial->oldInplaceMtl.metallicTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texRoughness = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(
+			evalMtl->texRoughness = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(
 			    rawMaterial->oldInplaceMtl.roughnessTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texNormalMap = m_assetLibrary->getAssetIface<AssetIface_Texture2D>(
+			evalMtl->texNormalMap = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(
 			    rawMaterial->oldInplaceMtl.normalTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
 
 			std::shared_ptr<AssetIface_Material_Simple> mtlProvider = std::make_shared<AssetIface_Material_Simple>();
@@ -307,7 +307,7 @@ const ModelAnimation* EvaluatedModel::findAnimation(const int idxDonor, const in
 	}
 
 	if (idxDonor >= 0 && idxDonor < m_donors.size()) {
-		return getAssetIface<AssetIface_Model3D>(m_donors[idxDonor].donorModel)->getModel3D().animationAt(animIndex);
+		return getLoadedAssetIface<AssetIface_Model3D>(m_donors[idxDonor].donorModel)->getModel3D().animationAt(animIndex);
 	}
 
 	return nullptr;

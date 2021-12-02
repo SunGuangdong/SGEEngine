@@ -282,17 +282,6 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 #endif
 	}
 
-	// TRIPLANAR LEGACY
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseX, (void*)mtlData.diffuseTextureX);
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseY, (void*)mtlData.diffuseTextureY);
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZ, (void*)mtlData.diffuseTextureZ);
-	//#ifdef SGE_RENDERER_D3D11
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXSampler, (void*)mtlData.diffuseTextureX->getSamplerState());
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseYSampler, (void*)mtlData.diffuseTextureY->getSamplerState());
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseZSampler, (void*)mtlData.diffuseTextureZ->getSamplerState());
-	//#endif
-	//		shaderPerm.bind<64>(uniforms, uTexDiffuseXYZScaling, (void*)&mtlData.diffuseTexXYZScaling);
-
 	if (mtlData.texMetalness != nullptr) {
 		shaderPerm.bind<64>(uniforms, uTexMetalness, (void*)mtlData.texMetalness);
 #ifdef SGE_RENDERER_D3D11

@@ -680,6 +680,11 @@ bool operator!=(const btQuaternion& b, const quatf& s) {
 }
 
 void RigidBody::setTransformAndScaling(const transf3d& tr, bool killVelocity) {
+
+	if (m_collisionObject == nullptr) {
+		return;
+	}
+
 	const btTransform& currentWorldTransform = m_collisionObject->getWorldTransform();
 
 	if (currentWorldTransform.getOrigin() != tr.p || currentWorldTransform.getRotation() != tr.r) {

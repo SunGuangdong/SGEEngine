@@ -530,7 +530,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 	sgecon->clearDepth(getCore()->getDevice()->getWindowFrameTarget(), 1.f);
 
 	const auto imageButton = [](const AssetPtr& asset) -> bool {
-		const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset);
+		const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(asset);
 		if (texIface && texIface->getTexture()) {
 			bool isPressed = ImGui::ImageButton(texIface->getTexture(), ImVec2(24, 24));
 			return isPressed;

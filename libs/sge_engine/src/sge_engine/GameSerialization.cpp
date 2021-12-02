@@ -1,11 +1,13 @@
 #include "GameSerialization.h"
 #include "GameInspector.h"
 #include "GameWorld.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_log/Log.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/json.h"
+#include "sge_utils/utils/strings.h"
 
 namespace sge {
 
@@ -15,6 +17,29 @@ enum SceneVersion {
 	sceneVersion_enumEnd,
 	sceneVersion_count = sceneVersion_enumEnd,
 };
+
+/// @T needs to be somethings that inherits IAssetInterface.
+template <typename TAssetIface>
+JsonValue* serializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, JsonValueBuffer& jvb) {
+	AssetPtr asset = std::dynamic_pointer_cast<Asset>(assetIface);
+	if (isAssetLoaded(asset)) {
+		return jvb(asset->getPath());
+	}
+	// An empty string means no asset is specified. Or the <TAssetIface> does not inherit Asset so we canot just save a path.
+	return jvb("");
+}
+
+/// @T needs to be somethings that inherits IAssetInterface.
+template <typename TAssetIface>
+void deserializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, const JsonValue* jValue) {
+	if (jValue->isString()) {
+		const char* const assetPath = jValue->GetString();
+		if (!isStringEmpty(assetPath)) {
+			AssetPtr assets = getCore()->getAssetLib()->getAssetFromFile(assetPath, nullptr, true);
+			assetIface = std::dynamic_pointer_cast<TAssetIface>(assets);
+		}
+	}
+}
 
 JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const data, JsonValueBuffer& jvb) {
 	if (typeDesc == NULL) {
@@ -61,6 +86,22 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 		}
 
 		return jTransform;
+	} else if (typeDesc->typeId == sgeTypeId(AssetPtr)) {
+		AssetPtr& asset = *(AssetPtr*)data;
+		if (asset) {
+			return jvb(asset->getPath());
+		} else {
+			return jvb("");
+		}
+	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Material>)) {
+		std::shared_ptr<AssetIface_Material>* pAssetIface = (std::shared_ptr<AssetIface_Material>*)data;
+		return serializeAssetInterface<AssetIface_Material>(*pAssetIface, jvb);
+	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Model3D>)) {
+		std::shared_ptr<AssetIface_Model3D>* pAssetIface = (std::shared_ptr<AssetIface_Model3D>*)data;
+		return serializeAssetInterface<AssetIface_Model3D>(*pAssetIface, jvb);
+	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
+		std::shared_ptr<AssetIface_Texture2D>* pAssetIface = (std::shared_ptr<AssetIface_Texture2D>*)data;
+		return serializeAssetInterface<AssetIface_Texture2D>(*pAssetIface, jvb);
 	} else if (typeDesc->enumUnderlayingType.isValid()) {
 		// This is an enum. Pass this to be serailized as its underlying type.
 		// TODO: Concider adding the text in some way.
@@ -202,7 +243,7 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		const JsonValue* jRotation = jValue->getMember("r");
 		const JsonValue* jScale = jValue->getMember("s");
 
-		const transf3d& transf = *reinterpret_cast<const transf3d*>(valueData);
+		transf3d& transf = *reinterpret_cast<transf3d*>(valueData);
 		bool succeeded = true;
 		if (jPosition != nullptr) {
 			succeeded &= deserializeVariable((char*)&transf.p, jPosition, typeLib().find(sgeTypeId(decltype(transf.p))));
@@ -215,6 +256,25 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		}
 
 		return succeeded;
+	} else if (typeDesc->typeId == sgeTypeId(AssetPtr)) {
+		AssetPtr& asset = *reinterpret_cast<AssetPtr*>(valueData);
+
+		if (jValue->isString()) {
+			asset = getCore()->getAssetLib()->getAssetFromFile(jValue->GetString());
+		}
+		return true;
+	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Material>)) {
+		std::shared_ptr<AssetIface_Material>& assetIface = *reinterpret_cast<std::shared_ptr<AssetIface_Material>*>(valueData);
+		deserializeAssetInterface<AssetIface_Material>(assetIface, jValue);
+		return true;
+	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Model3D>)) {
+		std::shared_ptr<AssetIface_Model3D>& assetIface = *reinterpret_cast<std::shared_ptr<AssetIface_Model3D>*>(valueData);
+		deserializeAssetInterface<AssetIface_Model3D>(assetIface, jValue);
+		return true;
+	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
+		std::shared_ptr<AssetIface_Texture2D>& assetIface = *reinterpret_cast<std::shared_ptr<AssetIface_Texture2D>*>(valueData);
+		deserializeAssetInterface<AssetIface_Texture2D>(assetIface, jValue);
+		return true;
 	} else if (typeDesc->enumUnderlayingType.isValid()) {
 		// This is an enum. Pass this to be deserialized as its underlying type.
 		// TODO: Concider adding the text in some way.

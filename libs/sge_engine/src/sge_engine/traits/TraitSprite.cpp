@@ -55,12 +55,12 @@ mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
                                                           const mat4f& additionaTransform) const {
 	vec2f imageSize = vec2f(0.f);
 	bool hasValidImageToRender = false;
-	if (const AssetIface_SpriteAnim* spriteIface = getAssetIface<AssetIface_SpriteAnim>(asset)) {
+	if (const AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(asset)) {
 		const SpriteAnimationWithTextures* sprite = &spriteIface->getSpriteAnimation();
 		const SpriteAnimation::Frame* frame = sprite->spriteAnimation.getFrameForTime(spriteFrameTime);
 		imageSize = vec2f(float(frame->wh.x), float(frame->wh.y));
 		hasValidImageToRender = true;
-	} else if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+	} else if (const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(asset)) {
 		if (Texture* tex = texIface->getTexture()) {
 			imageSize = vec2f(float(tex->getDesc().texture2D.width), float(tex->getDesc().texture2D.height));
 			hasValidImageToRender = true;
@@ -224,7 +224,7 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 
 		const AssetPtr& asset = image.m_assetProperty.getAsset();
 
-		if (const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(asset)) {
+		if (const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(asset)) {
 			if (Texture* const texture = texIface->getTexture()) {
 				renderItem.spriteTexture = texture;
 
@@ -237,9 +237,9 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 				renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent || renderItem.colorTint.w < 0.999f ||
 				                               image.imageSettings.forceAlphaBlending;
 			}
-		} else if (const AssetIface_SpriteAnim* spriteIface = getAssetIface<AssetIface_SpriteAnim>(asset)) {
+		} else if (const AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(asset)) {
 			if (const AssetIface_Texture2D* texIfaceSprite =
-			        getAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
+			        getLoadedAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
 				// Get the frame of the sprite to be rendered.
 				const SpriteAnimation::Frame* const frame =
 				    spriteIface->getSpriteAnimation().spriteAnimation.getFrameForTime(image.imageSettings.spriteFrameTime);

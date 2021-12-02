@@ -25,7 +25,7 @@ void ModelAnimator::addAnimationToTrack(int newTrackId, const char* const donorM
 		donor.modelAnimationDonor = donorModel;
 		donor.donorIndex = m_modelToBeAnimated->addAnimationDonor(donorModel);
 		donor.animationIndexInDonor =
-		    getAssetIface<AssetIface_Model3D>(donorModel)->getModel3D().getAnimationIndexByName(donorAnimationName);
+		    getLoadedAssetIface<AssetIface_Model3D>(donorModel)->getModel3D().getAnimationIndexByName(donorAnimationName);
 
 		track.animations.push_back(donor);
 	}

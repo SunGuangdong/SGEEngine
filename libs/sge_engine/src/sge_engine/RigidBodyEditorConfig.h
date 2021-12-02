@@ -53,14 +53,18 @@ struct SGE_ENGINE_API RigidBodyPropertiesConfigurator {
 /// The properties of the rigid body (mass, friction etc.) and the collision shape as well.
 /// It is intended to have this as a member in an Actor (however it is not limited to that used) to
 /// provide user editable values in the PropertyEditorWindow.
-/// In order to embed this class properly make sure that the @apply method is called (when the Actor play state changes).
+/// In order to embed this class properly make sure that the @apply method is called when the Actor play state changes.
 struct SGE_ENGINE_API RigidBodyConfigurator : public RigidBodyPropertiesConfigurator {
-	RigidBodyConfigurator() = default;
+	RigidBodyConfigurator()
+	    : m_sourceModel(assetIface_model3d) {
+	}
 	~RigidBodyConfigurator() = default;
 
 	enum ShapeSource {
 		/// @brief The attached model to the specified actor should be used to extract the collision shape.
 		shapeSource_fromTraitModel,
+		shapeSource_fromModel,
+		shapeSource_fromModelRenderGeometry,
 		/// @brief The user specifies a list of shapes to be used.
 		shapeSource_manuallySpecify,
 	};
@@ -69,11 +73,12 @@ struct SGE_ENGINE_API RigidBodyConfigurator : public RigidBodyPropertiesConfigur
 	/// @return true if the rigid body has been updated.
 	bool apply(Actor& actor, bool addToWorldNow = false) const;
 
-
   public:
 	ShapeSource shapeSource = shapeSource_fromTraitModel;
 	AssetProperty assetPropery = AssetProperty(assetIface_model3d);
 	std::vector<CollsionShapeDesc> collisionShapes;
+	/// The model to be used when @shapeSource_fromModel or @shapeSource_fromModelRenderGeometry are used.
+	AssetProperty m_sourceModel;
 };
 
 SGE_ENGINE_API void edit_CollisionShapeDesc(GameInspector& inspector, GameObject* gameObject, MemberChain chain);

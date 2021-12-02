@@ -53,8 +53,10 @@ using AssetWeak = std::weak_ptr<Asset>;
 
 /// If the specified asset is loaded, the function
 /// retrieves the specified asset interface if available.
+/// If you just want to cast this to the interface type without caring 
+/// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-TAssetInterface* getAssetIface(AssetPtr& asset) {
+TAssetInterface* getLoadedAssetIface(AssetPtr& asset) {
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<TAssetInterface*>(asset.get());
 	}
@@ -64,8 +66,10 @@ TAssetInterface* getAssetIface(AssetPtr& asset) {
 
 /// If the specified asset is loaded, the function
 /// retrieves the specified asset interface if available.
+/// If you just want to cast this to the interface type without caring
+/// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-const TAssetInterface* getAssetIface(const AssetPtr& asset) {
+const TAssetInterface* getLoadedAssetIface(const AssetPtr& asset) {
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<const TAssetInterface*>(asset.get());
 	}
@@ -75,8 +79,10 @@ const TAssetInterface* getAssetIface(const AssetPtr& asset) {
 
 /// If the specified asset is loaded, the function
 /// retrieves the specified asset interface if available.
+/// If you just want to cast this to the interface type without caring
+/// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-TAssetInterface* getAssetIface(Asset& asset) {
+TAssetInterface* getLoadedAssetIface(Asset& asset) {
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<TAssetInterface*>(&asset);
 	}
@@ -86,8 +92,10 @@ TAssetInterface* getAssetIface(Asset& asset) {
 
 /// If the specified asset is loaded, the function
 /// retrieves the specified asset interface if available.
+/// If you just want to cast this to the interface type without caring
+/// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-const TAssetInterface* getAssetIface(const Asset& asset) {
+const TAssetInterface* getLoadedAssetIface(const Asset& asset) {
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<const TAssetInterface*>(&asset);
 	}

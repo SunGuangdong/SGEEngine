@@ -57,7 +57,9 @@ inline transf3d fromBullet(const btTransform& btTr) {
 /// CAUTION: Do not forget to update the destroy() method!!!
 struct SGE_ENGINE_API PhysicsWorld {
 	PhysicsWorld() = default;
-	~PhysicsWorld() { destroy(); }
+	~PhysicsWorld() {
+		destroy();
+	}
 
 	void create();
 	void destroy();
@@ -144,7 +146,9 @@ struct SGE_ENGINE_API CollsionShapeDesc {
 /// Do not share it between multiple rigid bodies, as this is possible but not supported by our wrappers yet!
 struct SGE_ENGINE_API CollisionShape {
 	CollisionShape() = default;
-	~CollisionShape() { destroy(); }
+	~CollisionShape() {
+		destroy();
+	}
 
 	void create(const CollsionShapeDesc* desc, const int numDesc);
 	void destroy() {
@@ -153,8 +157,12 @@ struct SGE_ENGINE_API CollisionShape {
 		m_desc.clear();
 	}
 
-	btCollisionShape* getBulletShape() { return m_btShape.get(); }
-	const btCollisionShape* getBulletShape() const { return m_btShape.get(); }
+	btCollisionShape* getBulletShape() {
+		return m_btShape.get();
+	}
+	const btCollisionShape* getBulletShape() const {
+		return m_btShape.get();
+	}
 
   private:
 	std::vector<CollsionShapeDesc> m_desc;
@@ -171,7 +179,8 @@ struct SGE_ENGINE_API CollisionShape {
 struct RigidBody;
 struct SGE_ENGINE_API SgeCustomMoutionState : public btMotionState {
 	SgeCustomMoutionState(RigidBody* rbTrait)
-	    : m_pRigidBody(rbTrait) {}
+	    : m_pRigidBody(rbTrait) {
+	}
 
 	/// synchronizes world transform from user to physics
 	void getWorldTransform(btTransform& centerOfMassWorldTrans) const override;
@@ -189,8 +198,11 @@ struct SGE_ENGINE_API SgeCustomMoutionState : public btMotionState {
 /// This class represents our own wrapper around bullet rigid bodies.
 struct SGE_ENGINE_API RigidBody {
 	RigidBody()
-	    : m_motionState(this) {}
-	~RigidBody() { destroy(); }
+	    : m_motionState(this) {
+	}
+	~RigidBody() {
+		destroy();
+	}
 
 	void destroy();
 
@@ -214,7 +226,9 @@ struct SGE_ENGINE_API RigidBody {
 	bool hasNoCollisionResponse() const;
 
 	/// @brief Returns true if the RigidBody is properly created.
-	bool isValid() const { return m_collisionObject.get() != nullptr && actor != nullptr; }
+	bool isValid() const {
+		return m_collisionObject.get() != nullptr;
+	}
 
 	/// @brief Retrieves the mass of the body.
 	float getMass() const;
@@ -275,7 +289,9 @@ struct SGE_ENGINE_API RigidBody {
 	void applyLinearVelocity(const vec3f& v);
 
 	/// @brief Retrieves the linear velocity of the rigid body.
-	vec3f getLinearVel() const { return getBulletRigidBody() ? fromBullet(getBulletRigidBody()->getLinearVelocity()) : vec3f(0.f); }
+	vec3f getLinearVel() const {
+		return getBulletRigidBody() ? fromBullet(getBulletRigidBody()->getLinearVelocity()) : vec3f(0.f);
+	}
 
 	/// @brief Forces the velocity for the rigid body to be the specified value.
 	void setLinearVelocity(const vec3f& v);
@@ -306,10 +322,14 @@ struct SGE_ENGINE_API RigidBody {
 	void setTransformAndScaling(const transf3d& tr, bool killVelocity);
 
 	/// @brief Retrieves the Bullet Physics representation of the rigid body.
-	btRigidBody* getBulletRigidBody() { return static_cast<btRigidBody*>(m_collisionObject.get()); }
+	btRigidBody* getBulletRigidBody() {
+		return static_cast<btRigidBody*>(m_collisionObject.get());
+	}
 
 	/// @brief Retrieves the Bullet Physics representation of the rigid body.
-	const btRigidBody* getBulletRigidBody() const { return static_cast<btRigidBody*>(m_collisionObject.get()); }
+	const btRigidBody* getBulletRigidBody() const {
+		return static_cast<btRigidBody*>(m_collisionObject.get());
+	}
 
 	/// @brief Retrurns true if the rigid body participates in a physics world.
 	bool isInWorld() const;

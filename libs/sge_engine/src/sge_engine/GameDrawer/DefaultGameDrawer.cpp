@@ -681,7 +681,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 				    mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) * mat4f::getScaling(particle.scale);
 
 				drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting,
-				              getAssetIface<AssetIface_Model3D>(pgrp->spriteTexture)->getStaticEval(), InstanceDrawMods());
+				              getLoadedAssetIface<AssetIface_Model3D>(pgrp->spriteTexture)->getStaticEval(), InstanceDrawMods());
 			}
 		} else {
 			if (m_partRendDataGen.generate(*pgrp, *drawSets.rdest.sgecon, *drawSets.drawCamera, n2w)) {

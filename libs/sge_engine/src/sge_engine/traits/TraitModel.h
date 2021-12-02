@@ -45,7 +45,7 @@ struct ModelEntry {
 	bool isRenderable = true;
 	AssetProperty m_assetProperty;
 	mat4f m_additionalTransform = mat4f::getIdentity();
-	std::vector<AssetPtr> mtlOverrides;
+	std::vector<std::shared_ptr<AssetIface_Material>> mtlOverrides;
 
 	// Used when the trait is going to render an animated model.
 	// This holds the evaluated 3D model to be rendered.
@@ -97,7 +97,6 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	void getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems);
 
 	void invalidateCachedAssets();
-
 
   private:
 	bool updateAssetProperties();

@@ -82,7 +82,7 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 				}
 
 				// Add the GUI elements itself.
-				const AssetIface_Texture2D* texIface = getAssetIface<AssetIface_Texture2D>(
+				const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(
 				    getEngineGlobal()->getEngineAssets().getIconForObjectType(currentEntity->getType()));
 				Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
