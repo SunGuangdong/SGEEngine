@@ -94,6 +94,11 @@ AABox3f TraitModel::getBBoxOS() const {
 }
 
 void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems) {
+
+	if (isRenderable == false) {
+		return;
+	}
+
 	if (drawReason == drawReason_gameplayShadow && forceNoShadows) {
 		return;
 	}
@@ -184,6 +189,8 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 	TraitModel& traitModel = *(TraitModel*)chain.follow(actor);
 
 	if (ImGui::CollapsingHeader(ICON_FK_CUBE " 3D Models", ImGuiTreeNodeFlags_DefaultOpen)) {
+		ImGuiEx::IndentGuard indent3DModels;
+
 		// Set to a valid index if the user has clicked the "Delete" button on
 		// any entry. If so we need to delete it once the UI has been built.
 		int deleteModelIndex = -1;
@@ -202,6 +209,7 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 			const ImGuiEx::IDGuard idGuardImGui(&modelSets);
 			ImGuiEx::BeginGroupPanel(label.c_str());
 			if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen)) {
+				ImGuiEx::IndentGuard indent3DModelsElement;
 				chain.add(sgeFindMember(ModelEntry, isRenderable));
 				ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
 				chain.pop();
@@ -218,6 +226,7 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 					modelSets.mtlOverrides.resize(loadedModelIface->getModel3D().numMaterials());
 
 					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Materials")) {
+						ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 						for (int iMtl : rng_int(loadedModelIface->getModel3D().numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
 

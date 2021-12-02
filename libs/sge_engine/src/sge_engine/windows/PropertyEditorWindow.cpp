@@ -529,6 +529,7 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		sge_snprintf(headerName, SGE_ARRSZ(headerName), "%s of %s", memberName, memberTypeDesc->name);
 
 		if (ImGui::CollapsingHeader(headerName, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding)) {
+			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			// ImGui::BeginChild(memberTypeDesc->name, ImVec2(0.f, 0.f), true, ImGuiWindowFlags_AlwaysAutoResize |
 			// ImGuiWindowFlags_NoSavedSettings);
 			for (auto& membersMember : memberTypeDesc->members) {
@@ -546,6 +547,7 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		char headerName[256];
 		sge_snprintf(headerName, SGE_ARRSZ(headerName), "%s of %s", memberName, memberTypeDesc->name);
 		if (ImGui::CollapsingHeader(headerName, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding)) {
+			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			int const numElements = int(memberTypeDesc->stdVectorSize(pMember));
 			int elemRemovedIdx = -1;
 

@@ -20,6 +20,7 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 		GameWorld* world = m_inspector.getWorld();
 
 		if (ImGui::CollapsingHeader(ICON_FK_CODE "  World Scripts")) {
+			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			ImGui::Text("Add World Scripts objects to be executed.");
 			std::string label;
 			int indexToDelete = -1;
@@ -46,6 +47,7 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_LIGHTBULB_O " Scene Default Lighting")) {
+			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			ImGui::ColorEdit3("Ambient Light", m_inspector.getWorld()->m_ambientLight.data);
 			ImGuiEx::Label("Ambient Intensity");
 			ImGui::DragFloat("##Ambient Intensity", &m_inspector.getWorld()->m_ambientLightIntensity, 0.01f, 0.f, 100.f);
@@ -56,6 +58,7 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_CAMERA " Gameplay")) {
+			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			ImGuiEx::Label(ICON_FK_CAMERA " Gameplay Camera");
 			actorPicker("##CameraActorPicker", *m_inspector.getWorld(), m_inspector.getWorld()->m_cameraPovider, nullptr, true);
 
@@ -83,6 +86,7 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_CUBES " Physics")) {
+			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			ImGuiEx::Label("Number of Physics Steps per Frame");
 			ImGui::DragInt("##SPFPhysics", &world->m_physicsSimNumSubSteps, 0.1f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
 
@@ -93,6 +97,7 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_FILTER " Grid")) {
+			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			ImGuiEx::Label("Show Grid");
 			ImGui::Checkbox("##ShowGirdCB", &world->gridShouldDraw);
 

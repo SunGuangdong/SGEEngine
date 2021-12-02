@@ -146,11 +146,19 @@ inline vec4f fromImGui(const ImVec4& v) {
 namespace ImGuiEx {
 
 struct IDGuard {
-	[[nodiscard]] explicit IDGuard(ImGuiID id) { ImGui::PushID(id); }
-	[[nodiscard]] explicit IDGuard(const void* ptr) { ImGui::PushID(ptr); }
-	[[nodiscard]] explicit IDGuard(const char* const cString) { ImGui::PushID(cString); }
+	[[nodiscard]] explicit IDGuard(ImGuiID id) {
+		ImGui::PushID(id);
+	}
+	[[nodiscard]] explicit IDGuard(const void* ptr) {
+		ImGui::PushID(ptr);
+	}
+	[[nodiscard]] explicit IDGuard(const char* const cString) {
+		ImGui::PushID(cString);
+	}
 
-	~IDGuard() { ImGui::PopID(); }
+	~IDGuard() {
+		ImGui::PopID();
+	}
 
 	// Disable copy:
 	IDGuard(const IDGuard&) = delete;
@@ -159,6 +167,16 @@ struct IDGuard {
 	// Disable move:
 	IDGuard(IDGuard&&) = delete;
 	IDGuard& operator=(IDGuard&&) = delete;
+};
+
+struct IndentGuard {
+	IndentGuard() {
+		ImGui::Indent();
+	}
+
+	~IndentGuard() {
+		ImGui::Unindent();
+	}
 };
 
 SGE_CORE_API void BeginGroupPanel(const char* name, const ImVec2 size = ImVec2(-1.f, -1.f));
