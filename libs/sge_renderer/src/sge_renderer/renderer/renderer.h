@@ -177,10 +177,13 @@ struct Shader : public RAIResource {
 
 	ResourceType::Enum getResourceType() const final { return ResourceType::Shader; }
 
-	// Creates the shader using the native language for the API.
+	/// Creates the shader using the native language of the API.
 	virtual CreateShaderResult createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint) = 0;
 
 	virtual const ShaderType::Enum getShaderType() const = 0;
+
+	/// Returns the bytecode used for creating this shader.
+	virtual bool getCreationBytecode(std::vector<char>& outMemory) const = 0;
 };
 
 //-----------------------------------------------------------------------

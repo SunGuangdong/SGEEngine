@@ -2,10 +2,10 @@
 
 #include "GraphicsInterface_d3d11.h"
 #include "Shader_d3d11.h"
-#include "sge_renderer/renderer/HLSLTranslator.h"
-#include <d3dcompiler.h>
-#include "sge_utils/utils/timer.h"
 #include "sge_log/Log.h"
+#include "sge_renderer/renderer/HLSLTranslator.h"
+#include "sge_utils/utils/timer.h"
+#include <d3dcompiler.h>
 
 namespace sge {
 
@@ -17,19 +17,19 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 
 	ID3D11Device* const d3ddev = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice();
 
-	//m_cachedCode = pCode;
+	// m_cachedCode = pCode;
 	m_shaderType = type;
 
 	// Just an interestiong flag to be remembered -> D3DCOMPILE_PACK_MATRIX_ROW_MAJOR
 	const DWORD compileFlags = 0;
-	//const DWORD compileFlags = D3DCOMPILE_AVOID_FLOW_CONTROL;
-	//const DWORD compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0; // For exrternal shader debugging in RenderDoc or PIX
+	// const DWORD compileFlags = D3DCOMPILE_AVOID_FLOW_CONTROL;
+	// const DWORD compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0; // For exrternal shader debugging in RenderDoc or PIX
 	// and so on.
 
 	// Compile the shader.
 	TComPtr<ID3D10Blob> compilationErrorBlob;
 	Timer t;
-	
+
 	const HRESULT compilatonResult = D3DCompile(pCode, strlen(pCode), NULL, NULL, NULL, entryPoint,
 	                                            getDevice<SGEDeviceD3D11>()->D3D11_GetWorkingShaderModel(type).c_str(), // shader model
 	                                            compileFlags,                                                           // flags1
@@ -126,6 +126,20 @@ ID3D11InputLayout* ShaderD3D11::D3D11_GetInputLayoutForVertexDeclIndex(const Ver
 	sgeAssert(SUCCEEDED(hr));
 
 	return inputLayout.p;
+}
+
+bool ShaderD3D11::getCreationBytecode(std::vector<char>& outMemory) const {
+	if (m_compiledBlob) {
+		void* memory = m_compiledBlob.p->GetBufferPointer();
+		size_t memorySizeBytes = m_compiledBlob.p->GetBufferSize();
+		if (!memory || memorySizeBytes == 0) {
+			outMemory.resize(memorySizeBytes);
+			memcpy(outMemory.data(), memory, memorySizeBytes);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void ShaderD3D11::destroy() {

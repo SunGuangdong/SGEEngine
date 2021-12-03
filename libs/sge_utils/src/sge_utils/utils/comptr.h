@@ -5,15 +5,12 @@
 #include <Unknwn.h>
 
 namespace sge {
-#if 0
-	template< typename TYPE >
-	using TComPtr = CComPtr<TYPE>;
-#else
 template <typename TYPE>
 class TComPtr {
   public:
 	TComPtr()
-	    : p(nullptr) {}
+	    : p(nullptr) {
+	}
 
 	TComPtr(TYPE* pPtr)
 	    : p(pPtr) {
@@ -32,7 +29,9 @@ class TComPtr {
 		return (*this);
 	}
 
-	~TComPtr() { Release(); }
+	~TComPtr() {
+		Release();
+	}
 
 	template <typename T>
 	operator T() {
@@ -68,19 +67,33 @@ class TComPtr {
 		return static_cast<const U*>(p);
 	}
 
-	operator bool() const { return p != nullptr; }
+	operator bool() const {
+		return p != nullptr;
+	}
 
-	operator TYPE*() const { return p; }
-	TYPE** operator&() { return &p; }
-	TYPE* const* operator&() const { return &p; }
-	bool operator!() const { return (p == nullptr); }
+	operator TYPE*() const {
+		return p;
+	}
+	TYPE** operator&() {
+		return &p;
+	}
+	TYPE* const* operator&() const {
+		return &p;
+	}
+	bool operator!() const {
+		return (p == nullptr);
+	}
 	TComPtr& operator=(TYPE* pT) {
 		p = pT;
 		AddRef();
 		return *this;
 	}
-	TYPE* operator->() { return p; }
-	const TYPE* operator->() const { return p; }
+	TYPE* operator->() {
+		return p;
+	}
+	const TYPE* operator->() const {
+		return p;
+	}
 
   protected:
 	void AddRef() {
@@ -91,6 +104,5 @@ class TComPtr {
   public:
 	mutable TYPE* p;
 };
-#endif
 
 } // namespace sge

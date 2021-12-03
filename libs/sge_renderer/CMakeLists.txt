@@ -35,7 +35,7 @@ target_include_directories(sge_renderer PUBLIC "../../libs_ext/stb")
 target_link_libraries(sge_renderer PUBLIC sge_utils)
 target_link_libraries(sge_renderer PUBLIC sge_log)
 target_link_libraries(sge_renderer PUBLIC HLSLParser)
-target_link_libraries(sge_renderer PUBLIC mcpp)
+target_link_libraries(sge_renderer PUBLIC sge_codepreproc)
 if(SGE_REND_API STREQUAL "OpenGL" AND NOT EMSCRIPTEN)
 	# on Emscripten for OpenGL do not use our own glew, it has its own.
 	target_link_libraries(sge_renderer PUBLIC glew)

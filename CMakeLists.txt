@@ -184,6 +184,7 @@ endif()
 
 # Add SGEEngine and all of its targets.
 add_subdirectory(./libs/sge_utils)
+add_subdirectory(./libs/sge_codepreproc)
 
 # Set Definitions Rendering APIs.
 if(SGE_REND_API STREQUAL "Direct3D11")
@@ -248,6 +249,7 @@ sge_mark_external_target(miniaudio)
 sge_mark_internal_lib(mdlconvlib)
 sge_mark_internal_lib(sge_utils)
 sge_mark_internal_lib(sge_utils_Tests)
+sge_mark_internal_lib(sge_codepreproc)
 sge_mark_internal_lib(sge_log)
 sge_mark_internal_lib(sge_renderer)
 sge_mark_internal_lib(sge_audio)

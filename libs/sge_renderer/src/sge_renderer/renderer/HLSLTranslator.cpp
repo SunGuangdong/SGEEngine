@@ -1,145 +1,15 @@
-#include <cstring>
-#include <mutex>
-#include <unordered_map>
-// HLSLParser +  MCPP
 #include "HLSLTranslator.h"
+#include "sge_codepreproc/sge_codepreproc.h"
 #include "sge_log/Log.h"
-#include "sge_mcpp.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/strings.h"
 #include <Engine.h>
 #include <GLSLGenerator.h>
 #include <HLSLGenerator.h>
 #include <HLSLParser.h>
-
-constexpr const char* const SGE_FAKE_SHADER_SRC_FILE = "<NO-FILE>";
-
-namespace preprocessor {
-struct Args {
-	const char* input; // the inut code
-	int strlen_input;
-	int ptr;             // an index pointer pointing in input (may point at input.size() because output_fn must return '\0'
-	std::string& output; // the result code
-	std::string& errors; // [TODO]
-};
-
-// This function must return '\0'!
-char* input_fn(char* buffer, int size, void* userdata) {
-	Args* args = (Args*)userdata;
-
-	int sz = args->strlen_input + 1; // in order to return '\0'
-	size -= 1;                       // the manually added null terminator
-	size = ((sz - args->ptr) > size) ? size : (sz - args->ptr);
-
-	if (size != 0) {
-		memcpy(buffer, args->input + args->ptr, size);
-		args->ptr += size;
-		buffer[size] = 0;
-	}
-
-	return size ? buffer : 0;
-}
-
-void output_fn(int c, void* userdata) {
-	Args* const args = static_cast<Args*>(userdata);
-	args->output += char(c);
-}
-
-void error_fn(void* UNUSED(userdata), char* format, va_list arg) {
-	// This is not really called only when error accure
-	sgeLogWarn(format, arg);
-}
-
-std::string preprocess(const char* code, const char* const* macros, const int numMacros, std::set<std::string>* outIncludedFiles) {
-	// Not that anyone is going to do it but:
-	// mcpp uses some global state, so it isn't thread safe!
-	static std::mutex lock;
-	const std::lock_guard<std::mutex> lockGuard(lock);
-
-	std::vector<std::string> args;
-	std::vector<const char*> argsCFormat;
-
-	args.push_back("mcpp");
-	args.push_back(SGE_FAKE_SHADER_SRC_FILE);
-
-	std::string compileOptionsForMCpp;
-	for (int t = 0; t < numMacros; ++t) {
-		args.push_back(string_format("-D%s", macros[t]));
-	}
-
-	for (const std::string& arg : args) {
-		argsCFormat.push_back(arg.c_str());
-	}
-
-	std::unordered_map<std::string, std::vector<char>> includeFiles;
-
-	struct UserData {
-		const char* code = nullptr;
-		std::unordered_map<std::string, std::vector<char>>& includeFiles;
-	};
-
-	UserData udata = {code, includeFiles};
-
-	const auto loadFileFn = [](const char* filename, const char** out_contents, size_t* out_contents_size, void* user_data) -> int {
-		UserData& udata = *static_cast<UserData*>(user_data);
-
-		if (strcmp(filename, SGE_FAKE_SHADER_SRC_FILE) == 0) {
-			if (out_contents) {
-				*out_contents = udata.code;
-			}
-
-			if (out_contents_size) {
-				*out_contents_size = strlen(udata.code);
-			}
-			return 1;
-		}
-		const std::string fileToLoad = std::string("core_shaders/") + filename;
-		auto itrExisting = udata.includeFiles.find(fileToLoad.c_str());
-		std::vector<char>* pFileData = nullptr;
-		if (itrExisting != udata.includeFiles.end()) {
-			pFileData = &itrExisting->second;
-		} else {
-			std::vector<char> data;
-			if (sge::FileReadStream::readFile(fileToLoad.c_str(), data) == false) {
-				return 0;
-			}
-			data.emplace_back('\0');
-
-			udata.includeFiles[fileToLoad] = std::move(data);
-			pFileData = &udata.includeFiles[fileToLoad];
-		}
-
-		if (pFileData) {
-			if (out_contents) {
-				*out_contents = pFileData->data();
-			}
-
-			if (out_contents_size) {
-				*out_contents_size = pFileData->size();
-			}
-			return 1;
-		}
-
-		return 0;
-	};
-
-	// These two are redirected to some global mcpp values.
-	char* compilationResult = nullptr;
-	char* colpilationErrors = nullptr;
-
-	int const res =
-	    sge_mcpp_preprocess(&compilationResult, &colpilationErrors, argsCFormat.data(), int(argsCFormat.size()), loadFileFn, &udata);
-	std::string result = compilationResult ? compilationResult : "";
-
-	if (outIncludedFiles != nullptr) {
-		for (auto& itr : includeFiles) {
-			outIncludedFiles->insert(itr.first);
-		}
-	}
-
-	return result;
-}
-} // namespace preprocessor
+#include <cstring>
+#include <mutex>
+#include <unordered_map>
 
 namespace sge {
 
@@ -164,10 +34,11 @@ bool translateHLSL(const char* const pCode,
 	}
 
 
-	const std::string processsedCode = preprocessor::preprocess(pCode, macros.data(), int(macros.size()), outIncludedFiles);
+	const std::string processsedCode =
+	    preprocessCode(pCode, "<NO-FILE>", macros.data(), int(macros.size()), "core_shaders/", outIncludedFiles);
 
 	M4::Allocator m4Alloc;
-	M4::HLSLParser hlslParser(&m4Alloc, SGE_FAKE_SHADER_SRC_FILE, processsedCode.c_str(), processsedCode.size());
+	M4::HLSLParser hlslParser(&m4Alloc, "<NO-FILE>", processsedCode.c_str(), processsedCode.size());
 	M4::HLSLTree tree(&m4Alloc);
 
 	if (hlslParser.Parse(&tree) == false) {
