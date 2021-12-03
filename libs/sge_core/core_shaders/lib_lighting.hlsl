@@ -2,8 +2,8 @@
 #define LIGHTING_SHADER
 
 #include "ShaderLightData.h"
-#include "lib_pbr.shader"
-#include "lib_textureMapping.shader"
+#include "lib_pbr.hlsl"
+#include "lib_textureMapping.hlsl"
 
 struct MaterialSample {
 	float3 hitPointWs;

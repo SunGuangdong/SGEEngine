@@ -3,11 +3,11 @@
 #define PI 3.14159265f
 
 #if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
-#include "lib_skinning.shader"
+#include "lib_skinning.hlsl"
 #endif
 
-#include "lib_lighting.shader"
-#include "lib_textureMapping.shader"
+#include "lib_lighting.hlsl"
+#include "lib_textureMapping.hlsl"
 
 //--------------------------------------------------------------------
 // Uniforms

@@ -2,7 +2,7 @@
 #include "FWDDefault_buildShadowMaps.h"
 
 #if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
-	#include "lib_skinning.shader"
+	#include "lib_skinning.hlsl"
 #endif
 
 //--------------------------------------------------------------------

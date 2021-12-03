@@ -52,7 +52,7 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 		// clang-format on
 
 		SGEDevice* const sgedev = rdest.getDevice();
-		shadingPermut->createFromFile(sgedev, "core_shaders/ConstantColor.shader", compileTimeOptions, uniformsToCache);
+		shadingPermut->createFromFile(sgedev, "core_shaders/ConstantColor.hlsl", compileTimeOptions, uniformsToCache);
 	}
 
 	if (m_rasterWireframeDepthBias.HasResource() == false) {

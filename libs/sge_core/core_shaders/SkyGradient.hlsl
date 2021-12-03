@@ -1,4 +1,4 @@
-#include "lib_textureMapping.shader"
+#include "lib_textureMapping.hlsl"
 
 cbuffer SkyShaderCBufferParams {
 	float4x4 uView;

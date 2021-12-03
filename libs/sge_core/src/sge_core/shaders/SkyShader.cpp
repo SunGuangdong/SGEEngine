@@ -38,7 +38,7 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 
 		ShadingProgramPermuator tempPermutator;
 
-		if (tempPermutator.createFromFile(sgedev, "core_shaders/SkyGradient.shader", compileTimeOptions, uniformsToCache,
+		if (tempPermutator.createFromFile(sgedev, "core_shaders/SkyGradient.hlsl", compileTimeOptions, uniformsToCache,
 		                                  &includedFilesByShaders)) {
 			shadingPermut = std::move(tempPermutator);
 		} else {

@@ -40,7 +40,7 @@ macro(add_dir_2 place dir num_filter_trims)
 		SET(REALDIR ${dir})
 	endif()
 
-	FILE(GLOB stuff "${REALDIR}/*.cpp" "${REALDIR}/*.cc" "${REALDIR}/*.c" "${REALDIR}/*.h" "${REALDIR}/*.hpp" "${REALDIR}/*.inl" "${REALDIR}/*.shader")
+	FILE(GLOB stuff "${REALDIR}/*.cpp" "${REALDIR}/*.cc" "${REALDIR}/*.c" "${REALDIR}/*.h" "${REALDIR}/*.hpp" "${REALDIR}/*.inl" "${REALDIR}/*.hlsl")
 	SET(${place} ${${place}} ${stuff})
 	trim_front_words(${REALDIR} REALDIR "${num_filter_trims}")
 	# replacing forward slashes with back slashes so filters can be generated (back slash used in parsing...)
