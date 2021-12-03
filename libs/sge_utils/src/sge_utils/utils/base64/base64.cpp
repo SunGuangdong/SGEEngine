@@ -158,4 +158,28 @@ void base64_decode(const char* encodedString, size_t stringLength, void* vptrDec
 		decodedData[2] = ((indices[2] & 0x03) << 6) + indices[3];
 }
 
+
+std::string base64Encode(const void* data, size_t datasize) {
+	size_t strLen = base64_get_encoded_strlen(datasize);
+
+	std::vector<char> encodedDataRaw;
+	encodedDataRaw.resize(strLen + 1, '\0');
+	base64_encode(data, datasize, encodedDataRaw.data());
+
+	sgeAssert(encodedDataRaw.back() == '\0');
+
+	return std::string(encodedDataRaw.data());
+}
+
+bool base64Decode(const char* encodedString, size_t stringLength, std::vector<char>& outDecodedData) {
+	if (base64_is_correctly_encoded(encodedString, stringLength)) {
+		const size_t decodedDataSizeBytes = base64_get_decoded_datasize_exact(encodedString, stringLength);
+		outDecodedData.resize(decodedDataSizeBytes);
+		base64_decode(encodedString, stringLength, outDecodedData.data());
+		return true;
+	}
+
+	return false;
+}
+
 } // namespace sge

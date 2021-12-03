@@ -77,6 +77,46 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	return CreateShaderResult(true, "");
 }
 
+CreateShaderResult ShaderD3D11::createFromNativeBytecode(const ShaderType::Enum type, std::vector<char> nativeBytecode) {
+	destroy();
+
+	m_shaderType = type;
+
+	ID3D11Device* const d3ddev = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice();
+
+	HRESULT createShaderResult = E_FAIL;
+
+	D3D10CreateBlob(nativeBytecode.size(), &m_compiledBlob);
+	memcpy(m_compiledBlob->GetBufferPointer(), nativeBytecode.data(), nativeBytecode.size());
+
+	if (type == ShaderType::VertexShader) {
+		createShaderResult = d3ddev->CreateVertexShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
+		                                                (ID3D11VertexShader**)&m_dx11Shader);
+	} else if (type == ShaderType::PixelShader) {
+		createShaderResult = d3ddev->CreatePixelShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
+		                                               (ID3D11PixelShader**)&m_dx11Shader);
+	} else {
+		// Unknown shader type.
+		sgeAssert(false);
+	}
+
+	if (FAILED(createShaderResult)) {
+		return CreateShaderResult(false, "ID3D11Device::Create*Shader failed!");
+	}
+
+	// Finally obtain the shader reflation...
+	TComPtr<ID3D11ShaderReflection> d3dRefl;
+	const HRESULT reflResult =
+	    D3DReflect(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&d3dRefl);
+
+	if (FAILED(reflResult) || (d3dRefl == NULL)) {
+		destroy();
+		return CreateShaderResult(false, "D3DReflect failed!");
+	}
+
+	return CreateShaderResult(true, "");
+}
+
 bool ShaderD3D11::isValid() const {
 	return m_dx11Shader != nullptr;
 }
@@ -132,7 +172,7 @@ bool ShaderD3D11::getCreationBytecode(std::vector<char>& outMemory) const {
 	if (m_compiledBlob) {
 		void* memory = m_compiledBlob.p->GetBufferPointer();
 		size_t memorySizeBytes = m_compiledBlob.p->GetBufferSize();
-		if (!memory || memorySizeBytes == 0) {
+		if (memory != nullptr && memorySizeBytes > 0) {
 			outMemory.resize(memorySizeBytes);
 			memcpy(outMemory.data(), memory, memorySizeBytes);
 			return true;

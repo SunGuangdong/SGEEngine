@@ -19,8 +19,12 @@ struct ShaderD3D11 : public Shader {
 	// Creates the shader using the native language for the API.
 	virtual CreateShaderResult createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint) override;
 
+	virtual CreateShaderResult createFromNativeBytecode(const ShaderType::Enum type, std::vector<char> nativeBytecode) override;
+
 	/// Returns the bytecode used for creating this shader.
 	virtual bool getCreationBytecode(std::vector<char>& outMemory) const override;
+
+	
 
 	virtual void destroy() override;
 	virtual bool isValid() const override;

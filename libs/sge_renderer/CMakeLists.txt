@@ -51,6 +51,7 @@ endif()
 
 if(SGE_REND_API STREQUAL "Direct3D11")
 	target_link_libraries(sge_renderer PUBLIC d3d11.lib)
+	target_link_libraries(sge_renderer PUBLIC d3d10.lib)
 	target_link_libraries(sge_renderer PUBLIC d3dcompiler.lib)
 	target_link_libraries(sge_renderer PUBLIC dxguid.lib)
 endif()

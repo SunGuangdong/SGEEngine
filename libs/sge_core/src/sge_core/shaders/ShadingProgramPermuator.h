@@ -44,12 +44,14 @@ struct SGE_CORE_API ShadingProgramPermuator {
   public:
 	bool createFromFile(SGEDevice* sgedev,
 	                    const char* const fileName,
+	                    const char* const precompiledCacheFile,
 	                    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
 	                    const std::vector<Unform>& uniformsToCacheInLUT,
 	                    std::set<std::string>* outIncludedFiles = nullptr);
 
 	bool create(SGEDevice* sgedev,
 	            const char* const shaderCode,
+	            const char* const precompiledCacheFile,
 	            const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
 	            const std::vector<Unform>& uniformsToCacheInLUT,
 	            std::set<std::string>* outIncludedFiles = nullptr);
@@ -63,7 +65,11 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	}
 
   private:
+	void generateShadingProgramsCompilationCache(const char* const precompiledCacheFile) const;
+
+  private:
 	OptionPermuataor compileTimeOptionsPermutator;
+	std::set<std::string> dependantFiles;
 	std::vector<Permutation> perPermutationShadingProg;
 };
 

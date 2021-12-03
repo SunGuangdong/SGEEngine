@@ -65,7 +65,7 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		    {uUseDiffuseTexForAlphaMasking, "uUseDiffuseTexForAlphaMasking", ShaderType::PixelShader}};
 
 		SGEDevice* const sgedev = rdest.getDevice();
-		shadingPermutFWDBuildShadowMaps->createFromFile(sgedev, "core_shaders/FWDDefault_buildShadowMaps.hlsl", compileTimeOptions,
+		shadingPermutFWDBuildShadowMaps->createFromFile(sgedev, "core_shaders/FWDDefault_buildShadowMaps.hlsl", "shader_cache/FWDBuildShadowMaps.shadercache", compileTimeOptions,
 		                                                uniformsToCache);
 	}
 

@@ -161,7 +161,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		};
 
 
-		shadingPermutFWDShading->createFromFile(sgedev, "core_shaders/FWDDefault_shading.hlsl", compileTimeOptions, uniformsToCache);
+		shadingPermutFWDShading->createFromFile(sgedev, "core_shaders/FWDDefault_shading.hlsl", "shader_cache/FWDDefault_shading.shadercache", compileTimeOptions, uniformsToCache);
 	}
 
 	// Find the values of the shader options that are going to be used.
