@@ -2,6 +2,7 @@
 #include "sge_core/ICore.h"
 #include "sge_log/Log.h"
 #include "sge_utils/utils/FileStream.h"
+#include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/base64/base64.h"
 #include "sge_utils/utils/hash_combine.h"
 #include "sge_utils/utils/json.h"
@@ -18,6 +19,11 @@ struct ShadingProgramsCacheFile {
 
   public:
 	bool saveToFile(const char* cacheFilename) const {
+		std::string fileDir = extractFileDir(cacheFilename, true);
+		if (!fileDir.empty()) {
+			createDirectory(fileDir.c_str());
+		}
+
 		JsonValueBuffer jvb;
 
 		JsonValue* jRoot = jvb(JID_MAP);
@@ -41,7 +47,7 @@ struct ShadingProgramsCacheFile {
 			jShadeProgByteCode->setMember("vsDataEncoded", jvb(vsDataEncoded));
 			jShadeProgByteCode->setMember("psDataEncoded", jvb(psDataEncoded));
 
-#if 1
+#if 0
 			std::vector<char> vsdec;
 			base64Decode(vsDataEncoded.c_str(), vsDataEncoded.size(), vsdec);
 			sgeAssert(bytecode.vsBytecode == vsdec);
@@ -140,17 +146,18 @@ bool ShadingProgramPermuator::createFromFile(SGEDevice* sgedev,
                                              const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
                                              const std::vector<Unform>& uniformsToCacheInLUT,
                                              std::set<std::string>* outIncludedFiles) {
-	std::vector<char> fileContents;
-	if (FileReadStream::readFile(filename, fileContents)) {
+	*this = ShadingProgramPermuator();
+
+	std::string fileContents;
+	if (FileReadStream::readTextFile(filename, fileContents)) {
 		if (outIncludedFiles != nullptr) {
 			outIncludedFiles->insert(filename);
 		}
 
-		fileContents.push_back('\0');
+		dependantFilesForShaderCachemaking.insert(filename);
 
-		dependantFiles.insert(filename);
-
-		return create(sgedev, fileContents.data(), precompiledCacheFile, compileTimeOptions, uniformsToCacheInLUT, outIncludedFiles);
+		return create(sgedev, fileContents.data(), filename, precompiledCacheFile, compileTimeOptions, uniformsToCacheInLUT,
+		              outIncludedFiles);
 	}
 
 	return false;
@@ -158,12 +165,24 @@ bool ShadingProgramPermuator::createFromFile(SGEDevice* sgedev,
 
 bool ShadingProgramPermuator::create(SGEDevice* sgedev,
                                      const char* const shaderCode,
+                                     const char* const shaderCodeFileName,
                                      const char* const precompiledCacheFile,
                                      const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
                                      const std::vector<Unform>& uniformsToCacheInLUT,
                                      std::set<std::string>* outIncludedFiles) {
 	*this = ShadingProgramPermuator();
 
+	return createInternal(sgedev, shaderCode, shaderCodeFileName, precompiledCacheFile, compileTimeOptions, uniformsToCacheInLUT,
+	                      outIncludedFiles);
+}
+
+bool ShadingProgramPermuator::createInternal(SGEDevice* sgedev,
+                                             const char* const shaderCode,
+                                             const char* const shaderCodeFileName,
+                                             const char* const precompiledCacheFile,
+                                             const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
+                                             const std::vector<Unform>& uniformsToCacheInLUT,
+                                             std::set<std::string>* outIncludedFiles) {
 	// Verify the safety indices.
 	for (int t = 0; t < uniformsToCacheInLUT.size(); ++t) {
 		if (uniformsToCacheInLUT[t].safetyIndex != t) {
@@ -193,6 +212,8 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 
 	const bool isCacheLoadedAndValid = isCacheLoaded && programCompiledCache.verifyThatCacheIsUpDoDate();
 	if (isCacheLoadedAndValid) {
+		sgeLogCheck("For %s a vaild shader cache will be used.", shaderCodeFileName);
+
 		for (int iPerm = 0; iPerm < compileTimeOptionsPermutator.getAllPermunations().size(); ++iPerm) {
 			const auto& permCache = programCompiledCache.perPermutBytecode[iPerm];
 
@@ -209,6 +230,8 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 
 		hadErrors = false;
 	} else {
+		sgeLogWarn("For %s no valid cache file is found. The shaders are going to be compiled.", shaderCodeFileName);
+
 		// No cache compile for real.
 		std::string shaderCodeFull;
 		size_t shaderCodeSize = strlen(shaderCode);
@@ -230,7 +253,7 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 
 			// Compile the program and if succeeded, grab a reflection and cache the requested uniform locations.
 			const CreateShaderResult programCreateResult = perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
-			    shaderCodeFull.c_str(), shaderCodeFull.c_str(), &dependantFiles);
+			    shaderCodeFull.c_str(), shaderCodeFull.c_str(), &dependantFilesForShaderCachemaking);
 
 			if (programCreateResult.succeeded == false) {
 				sgeLogError("Shader Compilation Failed:\n%s", programCreateResult.errors.c_str());
@@ -250,7 +273,7 @@ bool ShadingProgramPermuator::create(SGEDevice* sgedev,
 	}
 
 	if (outIncludedFiles) {
-		outIncludedFiles->insert(dependantFiles.begin(), dependantFiles.end());
+		outIncludedFiles->insert(dependantFilesForShaderCachemaking.begin(), dependantFilesForShaderCachemaking.end());
 	}
 
 	if (!hadErrors && !isCacheLoadedAndValid && precompiledCacheFile != nullptr) {
@@ -264,7 +287,7 @@ void ShadingProgramPermuator::generateShadingProgramsCompilationCache(const char
 	ShadingProgramsCacheFile cacheFile;
 
 	std::vector<char> fileData;
-	for (const std::string& filename : dependantFiles) {
+	for (const std::string& filename : dependantFilesForShaderCachemaking) {
 		fileData.clear();
 		FileReadStream::readFile(filename.c_str(), fileData);
 		unsigned hash = hash_djb2(fileData.data(), fileData.size());
@@ -283,7 +306,6 @@ void ShadingProgramPermuator::generateShadingProgramsCompilationCache(const char
 
 		cacheFile.perPermutBytecode.push_back({std::move(vsBytecode), std::move(psBytecode)});
 	}
-
 
 	cacheFile.saveToFile(precompiledCacheFile);
 }

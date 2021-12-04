@@ -348,9 +348,7 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		const JsonValue* const jMember = jValue->getMember(mfd.name);
 
 		if (jMember == nullptr) {
-			sgeLogError("[SERIALIZATION] A member is missing %s::%s. This that is going to be skipped and left as it is.\n", typeDesc->name,
-			            mfd.name);
-			// sgeAssert(false);
+			sgeLogWarn("[DESERIALIZATION] Missing %s::%s, deserialization will be skipped.\n", typeDesc->name, mfd.name);
 			continue;
 		} else {
 			bool succeeded = false;
@@ -446,7 +444,6 @@ GameObject*
 	if (shouldGenerateNewId) {
 		id = ObjectId();
 	}
-
 
 	// Get the type of the object.
 	const char* objectTypeName = jObject->getMember("type")->GetString();
