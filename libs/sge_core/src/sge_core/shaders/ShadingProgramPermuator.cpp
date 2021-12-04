@@ -1,144 +1,12 @@
 #include "ShadingProgramPermuator.h"
+#include "ShadingProgramPermuatorCache.h"
 #include "sge_core/ICore.h"
 #include "sge_log/Log.h"
 #include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/Path.h"
-#include "sge_utils/utils/base64/base64.h"
 #include "sge_utils/utils/hash_combine.h"
-#include "sge_utils/utils/json.h"
 #include "sge_utils/utils/strings.h"
 
-
 namespace sge {
-
-struct ShadingProgramsCacheFile {
-	struct ShadingProgramByteCode {
-		std::vector<char> vsBytecode;
-		std::vector<char> psBytecode;
-	};
-
-  public:
-	bool saveToFile(const char* cacheFilename) const {
-		std::string fileDir = extractFileDir(cacheFilename, true);
-		if (!fileDir.empty()) {
-			createDirectory(fileDir.c_str());
-		}
-
-		JsonValueBuffer jvb;
-
-		JsonValue* jRoot = jvb(JID_MAP);
-		JsonValue* jSrcFiles = jRoot->setMember("sourceFiles", jvb(JID_ARRAY));
-
-		for (const auto& fileNameHashPair : sourceFileContentsHash) {
-			JsonValue* jFileHashPair = jSrcFiles->arrPush(jvb(JID_MAP));
-			jFileHashPair->setMember("file", jvb(fileNameHashPair.first));
-			jFileHashPair->setMember("hash", jvb(fileNameHashPair.second));
-		}
-
-		JsonValue* jPermutationsBytecodes = jRoot->setMember("shaderBytecodesPerPermutation", jvb(JID_ARRAY));
-		for (const ShadingProgramByteCode& bytecode : perPermutBytecode) {
-			JsonValue* jShadeProgByteCode = jPermutationsBytecodes->arrPush(jvb(JID_MAP));
-
-			std::string vsDataEncoded =
-			    base64Encode(bytecode.vsBytecode.data(), bytecode.vsBytecode.size() * sizeof(bytecode.vsBytecode[0]));
-			std::string psDataEncoded =
-			    base64Encode(bytecode.psBytecode.data(), bytecode.psBytecode.size() * sizeof(bytecode.psBytecode[0]));
-
-			jShadeProgByteCode->setMember("vsDataEncoded", jvb(vsDataEncoded));
-			jShadeProgByteCode->setMember("psDataEncoded", jvb(psDataEncoded));
-
-#if 0
-			std::vector<char> vsdec;
-			base64Decode(vsDataEncoded.c_str(), vsDataEncoded.size(), vsdec);
-			sgeAssert(bytecode.vsBytecode == vsdec);
-
-			std::vector<char> psdec;
-			base64Decode(psDataEncoded.c_str(), psDataEncoded.size(), psdec);
-			sgeAssert(bytecode.psBytecode == psdec);
-#endif
-		}
-
-		JsonWriter jw;
-		bool succeeded = jw.WriteInFile(cacheFilename, jRoot, true);
-		return succeeded;
-	}
-
-	bool verifyThatCacheIsUpDoDate() const {
-		std::vector<char> fileData;
-		for (const auto& fileNameHashPair : sourceFileContentsHash) {
-			fileData.clear();
-			FileReadStream::readFile(fileNameHashPair.first.c_str(), fileData);
-			unsigned realDataHash = hash_djb2(fileData.data(), fileData.size());
-
-			if (realDataHash != fileNameHashPair.second) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	bool loadFileFile(const char* cacheFilename) {
-		try {
-			*this = ShadingProgramsCacheFile();
-
-			if (isStringEmpty(cacheFilename)) {
-				return false;
-			}
-
-			FileReadStream frs;
-			if (frs.open(cacheFilename) == false) {
-				return false;
-			}
-
-			JsonParser jp;
-			if (jp.parse(&frs) == false) {
-				sgeAssert(false && "The shader cache file seems to be broken.");
-				return false;
-			}
-
-			const JsonValue* jRoot = jp.getRoot();
-
-			// Load the file hashes.
-			const JsonValue& jSrcFiles = jRoot->getMemberOrThrow("sourceFiles");
-			for (int iFilePair = 0; iFilePair < jSrcFiles.arrSize(); ++iFilePair) {
-				const JsonValue* jFileHashPair = jSrcFiles.arrAt(iFilePair);
-				std::string file = jFileHashPair->getMemberOrThrow("file").GetStringOrThrow();
-				unsigned hash = (unsigned)jFileHashPair->getMemberOrThrow("hash").getNumberAs<int>();
-
-				this->sourceFileContentsHash[file] = hash;
-			}
-
-			// Load the shaders bytecode.
-			const JsonValue& jPermutationsBytecodes = jRoot->getMemberOrThrow("shaderBytecodesPerPermutation");
-			for (int iPerm = 0; iPerm < jPermutationsBytecodes.arrSize(); ++iPerm) {
-				const JsonValue* jShadeProgByteCode = jPermutationsBytecodes.arrAt(iPerm);
-				std::string vsBytecodeEncoded = jShadeProgByteCode->getMemberOrThrow("vsDataEncoded").GetStringOrThrow();
-				std::string psBytecodeEncoded = jShadeProgByteCode->getMemberOrThrow("psDataEncoded").GetStringOrThrow();
-
-				std::vector<char> vsDecoded;
-				base64Decode(vsBytecodeEncoded.data(), vsBytecodeEncoded.size(), vsDecoded);
-
-				std::vector<char> psDecoded;
-				base64Decode(psBytecodeEncoded.data(), psBytecodeEncoded.size(), psDecoded);
-
-				perPermutBytecode.emplace_back(ShadingProgramByteCode{std::move(vsDecoded), std::move(psDecoded)});
-			}
-
-			return true;
-		} catch (...) {
-			sgeAssertFalse("The cache file seems to be broken");
-			*this = ShadingProgramsCacheFile();
-			return false;
-		}
-	}
-
-
-  public:
-	std::map<std::string, unsigned> sourceFileContentsHash;
-	std::vector<ShadingProgramByteCode> perPermutBytecode;
-};
-
 
 bool ShadingProgramPermuator::createFromFile(SGEDevice* sgedev,
                                              const char* const filename,
@@ -199,7 +67,7 @@ bool ShadingProgramPermuator::createInternal(SGEDevice* sgedev,
 	}
 
 	// Check if the cache is valid.
-	ShadingProgramsCacheFile programCompiledCache;
+	ShadingProgramPermuatorCache programCompiledCache;
 	bool isCacheLoaded = false;
 	if (!isStringEmpty(precompiledCacheFile)) {
 		isCacheLoaded = programCompiledCache.loadFileFile(precompiledCacheFile);
@@ -284,7 +152,7 @@ bool ShadingProgramPermuator::createInternal(SGEDevice* sgedev,
 }
 
 void ShadingProgramPermuator::generateShadingProgramsCompilationCache(const char* const precompiledCacheFile) const {
-	ShadingProgramsCacheFile cacheFile;
+	ShadingProgramPermuatorCache cacheFile;
 
 	std::vector<char> fileData;
 	for (const std::string& filename : dependantFilesForShaderCachemaking) {

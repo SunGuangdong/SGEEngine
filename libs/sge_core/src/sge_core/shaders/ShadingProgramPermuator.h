@@ -26,7 +26,7 @@ struct SGE_CORE_API ShadingProgramPermuator {
 		int safetyIndex;
 		const char* uniformName;
 
-		/// On witch shader stage is this uniform needed. 
+		/// On witch shader stage is this uniform needed.
 		// If a uniform is needed on multiple stages, just add it multiple times for every different stage.
 		ShaderType::Enum shaderStage;
 	};
@@ -87,6 +87,7 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	                    std::set<std::string>* outIncludedFiles = nullptr);
 
 
+	/// Generates the cache file for the shader compilation cache.
 	void generateShadingProgramsCompilationCache(const char* const precompiledCacheFile) const;
 
   private:
