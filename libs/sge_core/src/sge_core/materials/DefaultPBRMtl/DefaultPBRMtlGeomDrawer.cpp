@@ -353,7 +353,6 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 
 	paramsCb.uAmbientLightColor = lighting.ambientLightColor;
 	paramsCb.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
-	paramsCb.uRimLightColorWWidth = lighting.uRimLightColorWWidth;
 
 	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
 	                          getCore()->getGraphicsResources().BS_backToFrontAlpha);

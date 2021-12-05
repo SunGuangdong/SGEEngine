@@ -1,5 +1,5 @@
 #if 1
-// This thing makes the driver to auto-choose the high-end GPU instead of the "integrated" one.
+/// This thing makes the driver to auto-choose the high-end GPU instead of the "integrated" one.
 #ifdef _WIN32
 extern "C" {
 __declspec(dllexport) int NvOptimusEnablement = 0x00000001;
@@ -21,9 +21,9 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/application.h"
 #include "sge_core/setImGuiContexCore.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/IPlugin.h"
-#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/setImGuiContextEngine.h"
 #include "sge_engine/windows/EditorWindow.h"
 #include "sge_log/Log.h"
@@ -44,7 +44,7 @@ char** g_argv = nullptr;
 
 struct SGEGameWindow : public WindowBase {
 	Timer m_timer;
-	std::string pluginName;
+	std::string pluginFileName;
 	DLLHandler m_dllHandler;
 	sint64 m_workingDLLModTime = 0;
 	IPlugin* m_pluginInst = nullptr;
@@ -75,8 +75,12 @@ struct SGEGameWindow : public WindowBase {
 		if (event == WE_Destroying) {
 			JsonValueBuffer jvb;
 			JsonValue* jRoot = jvb(JID_MAP);
-			jRoot->setMember("window_width", jvb(cachedWindowSize.x));
-			jRoot->setMember("window_height", jvb(cachedWindowSize.y));
+			if (cachedWindowSize.x > 0) {
+				jRoot->setMember("window_width", jvb(cachedWindowSize.x));
+			}
+			if (cachedWindowSize.y) {
+				jRoot->setMember("window_height", jvb(cachedWindowSize.y));
+			}
 			jRoot->setMember("is_maximized", jvb(isMaximized()));
 
 			JsonWriter jw;
@@ -107,15 +111,14 @@ struct SGEGameWindow : public WindowBase {
 		mainTargetDesc.bWindowed = true;
 #endif
 
-		// Obtain the backbuffer rendertarget
-		// initialized the device and the immediate context
+		// Obtain the backbuffer render target initialize the device and the immediate context.
 		SGEDevice* const device = SGEDevice::create(mainTargetDesc);
 
 		SGEImGui::initialize(device->getContext(), device->getWindowFrameTarget(), device->getWindowFrameTarget()->getViewport());
 		ImGui::SetCurrentContext(getImGuiContextCore());
 		setImGuiContextEngine(getImGuiContextCore());
 
-		// Setup Audio device
+		// Setup Audio device.
 		AudioDevice* const audioDevice = new AudioDevice();
 		audioDevice->createAudioDevice();
 		audioDevice->startAudioDevice();
@@ -123,15 +126,16 @@ struct SGEGameWindow : public WindowBase {
 		getCore()->setup(device, audioDevice);
 		getCore()->getAssetLib()->scanForAvailableAssets("assets");
 
+		// Find the game plugin dll filename.
 		for (auto const& entry : std::filesystem::directory_iterator("./")) {
 			if (std::filesystem::is_regular_file(entry) && entry.path().extension() == ".gll") {
-				pluginName = entry.path().string();
+				pluginFileName = entry.path().string();
 			}
 		}
 		typeLib().performRegistration();
 		createAndInitializeEngineGlobal();
 
-		if (pluginName.empty()) {
+		if (pluginFileName.empty()) {
 			getEngineGlobal()->changeActivePlugin(&dummyPlugin);
 		} else {
 			loadPlugin();
@@ -141,10 +145,10 @@ struct SGEGameWindow : public WindowBase {
 	}
 
 	void loadPlugin() {
-		const sint64 modtime = FileReadStream::getFileModTime(pluginName.c_str());
+		const sint64 modtime = FileReadStream::getFileModTime(pluginFileName.c_str());
 
-		if (!pluginName.empty() && (modtime > m_workingDLLModTime || m_workingDLLModTime == 0)) {
-			//if (m_workingDLLModTime != 0) {
+		if (!pluginFileName.empty() && (modtime > m_workingDLLModTime || m_workingDLLModTime == 0)) {
+			// if (m_workingDLLModTime != 0) {
 			//	DialogYesNo("Realod DLL", "Game DLL is about to be reloaded!");
 			//}
 
@@ -161,7 +165,7 @@ struct SGEGameWindow : public WindowBase {
 			// Notify that we are about to unload the plugin.
 			getEngineGlobal()->notifyOnPluginPreUnload();
 			if (m_pluginInst) {
-				// Unload all game worlds as they contain memory allocated by the game plugin 
+				// Unload all game worlds as they contain memory allocated by the game plugin
 				// as we want to unload all game owned data as all virtual pointers to it will get invalid.
 				getEngineGlobal()->getEditorWindow()->newScene();
 
@@ -173,11 +177,11 @@ struct SGEGameWindow : public WindowBase {
 			// Unload the old plugin DLL and load the new one.
 			m_dllHandler.unload();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
-			copyFile(pluginName.c_str(), "working_plugin.dll");
+			copyFile(pluginFileName.c_str(), "working_plugin.dll");
 			m_dllHandler.load("working_plugin.dll");
 			m_workingDLLModTime = modtime;
 
-			// Obain the new plugin interface.
+			// Obain the new plugin interop interface.
 			GetInpteropFnPtr interopGetter = reinterpret_cast<GetInpteropFnPtr>(m_dllHandler.getProcAdress("getInterop"));
 			sgeAssert(interopGetter != nullptr && "The loaded game dll does not have a getInterop()!\n");
 			if (interopGetter) {
@@ -196,7 +200,7 @@ struct SGEGameWindow : public WindowBase {
 					getEngineGlobal()->getEditorWindow()->loadWorldFromFile(
 					    "reload_level.lvl", !workingFilename.empty() ? workingFilename.c_str() : nullptr, true);
 				}
-				sgeLogCheck("Reloaded %s\n", pluginName.c_str());
+				sgeLogCheck("Reloaded %s\n", pluginFileName.c_str());
 			}
 		}
 	}
@@ -214,14 +218,12 @@ struct SGEGameWindow : public WindowBase {
 		}
 		getEngineGlobal()->clearAnyoneNeedForRelativeCursorThisFrame();
 
-		float const bgColor[] = {0.f, 0.f, 0.f, 1.f};
-
 		SGEImGui::newFrame(GetInputState());
 
 		SGEContext* const sgecon = getCore()->getDevice()->getContext();
+		float const bgColor[] = {0.f, 0.f, 0.f, 1.f};
 		sgecon->clearColor(getCore()->getDevice()->getWindowFrameTarget(), -1, bgColor);
 		sgecon->clearDepth(getCore()->getDevice()->getWindowFrameTarget(), 1.f);
-
 
 		if (m_pluginInst) {
 			m_pluginInst->run();
@@ -242,7 +244,7 @@ struct SGEGameWindow : public WindowBase {
 	}
 };
 
-void main_loop() {
+void sgeMainLoop() {
 	sge::ApplicationHandler::get()->PollEvents();
 	for (WindowBase* wnd : sge::ApplicationHandler::get()->getAllWindows()) {
 		SGEGameWindow* gameWindow = dynamic_cast<SGEGameWindow*>(wnd);
@@ -255,6 +257,8 @@ void main_loop() {
 int sge_main(int argc, char** argv) {
 	sgeLogInfo("sge_main()\n");
 
+	// Force the numeric locale to use "." for demical numbers as 
+	// we have calls like atof scanf that so on that rely on this.
 	setlocale(LC_NUMERIC, "C");
 
 	g_argc = argc;
@@ -276,16 +280,18 @@ int sge_main(int argc, char** argv) {
 	sge::ApplicationHandler::get()->NewWindow<SGEGameWindow>("SGEEngine Editor", windowSize.x, windowSize.y, isMaximized);
 
 #ifdef __EMSCRIPTEN__
-	emscripten_set_main_loop(main_loop, 0, true);
+	// In web browsers we cannot loop ourselves as we are going to make the page freeze.
+	// Emscripten offer us a way to get a function being called in a loop by the browser
+	// so it doesn't freeze.
+	emscripten_set_main_loop(sgeMainLoop, 0, true);
 #else
 	while (sge::ApplicationHandler::get()->shouldStopRunning() == false) {
-		main_loop();
+		sgeMainLoop();
 	};
 #endif
 
 	return 0;
 }
-
 
 #ifdef __EMSCRIPTEN__
 #include <SDL2/SDL.h>
@@ -296,29 +302,27 @@ int sge_main(int argc, char** argv) {
 #include <SDL_syswm.h>
 #endif
 
-
 // Caution:
 // SDL2 might have a macro (depending on the target platform) for the main function!
 int main(int argc, char* argv[]) {
 	sgeLogInfo("main()\n");
 	sgeRegisterMiniDumpHandler();
 
-
-	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+	// Disable the mouse from generating fake touch events.
+	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0"); 
+	
 	SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "1");
-#ifdef __EMSCRIPTEN__
 
+#ifdef __EMSCRIPTEN__
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-
 #else
 	SDL_Init(SDL_INIT_EVERYTHING);
 #ifdef SGE_RENDERER_D3D11
 	// SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
 #else if SGE_RENDERER_GL
-
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
@@ -330,20 +334,12 @@ int main(int argc, char* argv[]) {
 	// SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 5);
 	// SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
 	// SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-	//
+
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 #endif
 #endif
 
-	// SDL_SetRelativeMouseMode(SDL_TRUE);
-
-	// const int numJoystics = SDL_NumJoysticks();
-	// for (int iJoy = 0; iJoy < numJoystics; ++iJoy) {
-	//	if (SDL_IsGameController(iJoy)) {
-	//		[[maybe_unused]] SDL_GameController* const gameController = SDL_GameControllerOpen(iJoy);
-	//	}
-	//}
 	return sge_main(argc, argv);
 }

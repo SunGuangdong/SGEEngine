@@ -43,9 +43,6 @@ struct ObjectLighting {
 	/// where then normals chage.
 	float ambientFakeDetailBias = 0.f;
 
-	/// The rim light in the scene.
-	vec4f uRimLightColorWWidth = vec4f(vec3f(0.1f), 0.7f);
-
 	/// lightsCount is the size of the array pointed by @ppLightData.
 	int lightsCount = 0;
 

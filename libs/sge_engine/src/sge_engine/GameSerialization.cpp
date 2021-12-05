@@ -18,6 +18,11 @@ enum SceneVersion {
 	sceneVersion_count = sceneVersion_enumEnd,
 };
 
+template <typename T>
+JsonValue* serializeVariableT(const T& value, JsonValueBuffer& jvb) {
+	return serializeVariable(typeLib().find(sgeTypeId(T)), (char*)&value, jvb);
+}
+
 /// @T needs to be somethings that inherits IAssetInterface.
 template <typename TAssetIface>
 JsonValue* serializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, JsonValueBuffer& jvb) {
@@ -554,8 +559,7 @@ JsonValue* serializeGameWorld(const GameWorld* world, JsonValueBuffer& jvb) {
 
 	jWorld->setMember("ambientLightColor", serializeVariableT(world->m_ambientLight, jvb));
 	jWorld->setMember("ambientLightIntensity", serializeVariableT(world->m_ambientLightIntensity, jvb));
-	jWorld->setMember("rimLightColor", serializeVariableT(world->m_rimLight, jvb));
-	jWorld->setMember("rimCosineWidth", serializeVariableT(world->m_rimCosineWidth, jvb));
+	jWorld->setMember("ambientLightFakeDetailAmount", serializeVariableT(world->m_ambientLightFakeDetailAmount, jvb));
 
 	jWorld->setMember("gridShouldDraw", serializeVariableT(world->gridShouldDraw, jvb));
 	jWorld->setMember("gridNumSegments", serializeVariableT(world->gridNumSegments, jvb));
@@ -653,20 +657,16 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* 
 		world->m_cameraPovider.id = jCameraProvider->getNumberAs<int>();
 	}
 
-	if (const JsonValue* const jAmbientLightColor = jWorld->getMember("ambientLightColor")) {
-		deserializeVariable((char*)&world->m_ambientLight, jAmbientLightColor, typeLib().find(sgeTypeId(vec3f)));
+	if (const JsonValue* const jValue = jWorld->getMember("ambientLightColor")) {
+		deserializeVariable((char*)&world->m_ambientLight, jValue, typeLib().find(sgeTypeId(vec3f)));
 	}
 
-	if (const JsonValue* const jAmbientLightColor = jWorld->getMember("ambientLightIntensity")) {
-		deserializeVariable((char*)&world->m_ambientLightIntensity, jAmbientLightColor, typeLib().find(sgeTypeId(float)));
+	if (const JsonValue* const jValue = jWorld->getMember("ambientLightIntensity")) {
+		deserializeVariable((char*)&world->m_ambientLightIntensity, jValue, typeLib().find(sgeTypeId(float)));
 	}
 
-	if (const JsonValue* const jRimLightColor = jWorld->getMember("rimLightColor")) {
-		deserializeVariable((char*)&world->m_rimLight, jRimLightColor, typeLib().find(sgeTypeId(vec3f)));
-	}
-
-	if (const JsonValue* const jRimWidth = jWorld->getMember("rimCosineWidth")) {
-		deserializeVariable((char*)&world->m_rimCosineWidth, jRimWidth, typeLib().find(sgeTypeId(float)));
+	if (const JsonValue* const jValue = jWorld->getMember("ambientLightFakeDetailAmount")) {
+		deserializeVariable((char*)&world->m_ambientLightFakeDetailAmount, jValue, typeLib().find(sgeTypeId(float)));
 	}
 
 	deserializeWorldMember(&world->gridShouldDraw, "gridShouldDraw", sgeTypeId(decltype(world->gridShouldDraw)));

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "sge_core/typelib/typeLib.h"
 #include "sge_engine_api.h"
 #include <string>
 
@@ -42,8 +41,5 @@ SGE_ENGINE_API GameObject*
 SGE_ENGINE_API JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const data, JsonValueBuffer& jvb);
 SGE_ENGINE_API bool deserializeVariable(char* const valueData, const JsonValue* jValue, const TypeDesc* const typeDesc);
 
-template <typename T>
-JsonValue* serializeVariableT(const T& value, JsonValueBuffer& jvb) {
-	return serializeVariable(typeLib().find(sgeTypeId(T)), (char*)&value, jvb);
-}
+
 } // namespace sge

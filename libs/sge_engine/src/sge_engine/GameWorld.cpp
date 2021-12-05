@@ -282,6 +282,10 @@ void GameWorld::clear() {
 	m_editorCamera.m_projSets.aspectRatio = 1.f; // Just some default to be overriden.
 	m_editorCamera.m_projSets.near = 0.1f;
 	m_editorCamera.m_projSets.far = 10000.f;
+
+	m_ambientLight = vec3f(0.25f);
+	m_ambientLightIntensity = 1.f;
+	m_ambientLightFakeDetailAmount = 1.f;
 }
 
 void GameWorld::update(const GameUpdateSets& updateSets) {

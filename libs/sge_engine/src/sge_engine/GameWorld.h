@@ -286,21 +286,19 @@ struct SGE_ENGINE_API GameWorld {
 	vec3f m_ambientLight = vec3f(0.25f);
 	float m_ambientLightIntensity = 1.f;
 	float m_ambientLightFakeDetailAmount = 1.f;
-	vec3f m_rimLight = vec3f(0.1f);
-	float m_rimCosineWidth = 0.3f;
 
 	/// A pointer to the attached inspector(if any).
 	GameInspector* inspector = nullptr;
 
 	/// A set of object ready to start playing at the beginning of the next step.
-	std::vector<GameObject*> objectsAwaitingCreation; 
+	std::vector<GameObject*> objectsAwaitingCreation;
 	// All playing game object sorted by type.
-	std::unordered_map<TypeId, std::vector<GameObject*>> playingObjects; 
+	std::unordered_map<TypeId, std::vector<GameObject*>> playingObjects;
 	/// A set of actors that are going to be compleatley deleted for the game world.
-	vector_set<ObjectId> objectsWantingPermanentKill; 
+	vector_set<ObjectId> objectsWantingPermanentKill;
 
 	/// A look up table for fast searching for an object with a specific id.
-	std::unordered_map<ObjectId, GameObject*> m_gameObjectByIdLUT; 
+	std::unordered_map<ObjectId, GameObject*> m_gameObjectByIdLUT;
 
 	/// Hierarchical relationship between actors.
 	/// These two are deeply connected to one another!

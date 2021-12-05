@@ -333,7 +333,6 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 
 	lighting.ambientLightColor = getWorld()->m_ambientLight * getWorld()->m_ambientLightIntensity;
 	lighting.ambientFakeDetailBias = getWorld()->m_ambientLightFakeDetailAmount;
-	lighting.uRimLightColorWWidth = vec4f(getWorld()->m_rimLight, getWorld()->m_rimCosineWidth);
 
 	// Extract the alpha sorting plane.
 	const vec3f zSortingPlanePosWs = drawSets.drawCamera->getCameraPosition();
@@ -558,8 +557,12 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 
 	const Geometry& geom = evalMesh.geometry;
 
-	mat4f finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? n2w : n2w * evalNode.evalGlobalTransform;
-	finalTrasform = finalTrasform * ri.traitModel->m_models[ri.iModel].m_additionalTransform;
+	mat4f finalTrasform;
+	if (evalMesh.geometry.hasVertexSkinning()) {
+		finalTrasform = n2w * ri.traitModel->m_models[ri.iModel].m_additionalTransform;
+	} else {
+		finalTrasform = n2w * ri.traitModel->m_models[ri.iModel].m_additionalTransform * evalNode.evalGlobalTransform;
+	}
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {
 		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), finalTrasform, geom,

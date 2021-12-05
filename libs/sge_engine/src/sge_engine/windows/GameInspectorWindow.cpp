@@ -96,37 +96,6 @@ void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 			}
 		}
 
-		if (ImGui::CollapsingHeader("Lighting")) {
-			ImGui::ColorPicker3("Ambient Light", m_inspector.getWorld()->m_ambientLight.data);
-			ImGui::ColorPicker3("Rim Light", m_inspector.getWorld()->m_rimLight.data);
-			ImGui::DragFloat("Rim Width Cosine", &m_inspector.getWorld()->m_rimCosineWidth, 0.01f, 0.f, 1.f);
-		}
-
-		if (ImGui::CollapsingHeader("Game Camera")) {
-			ImGui::InputInt("Playing Camera", &m_inspector.getWorld()->m_cameraPovider.id);
-			ImGui::SameLine();
-			if (ImGui::Button("Pick")) {
-				ImGui::OpenPopup("Game Camera Picker");
-			}
-
-			if (ImGui::BeginPopup("Game Camera Picker")) {
-				m_inspector.getWorld()->iterateOverPlayingObjects(
-				    [&](const GameObject* object) -> bool {
-					    if (getTrait<TraitCamera>(object)) {
-						    bool selected = false;
-						    if (ImGui::Selectable(object->getDisplayNameCStr(), &selected)) {
-							    m_inspector.getWorld()->m_cameraPovider = object->getId();
-						    }
-					    }
-
-					    return true;
-				    },
-				    false);
-
-				ImGui::EndPopup();
-			}
-		}
-
 		// History.
 		if (ImGui::CollapsingHeader("History")) {
 			auto commandsNamesGetter = [](void* data, int idx, const char** text) -> bool {
@@ -162,18 +131,6 @@ void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 			}
 
 			ImGui::Text("Steps taken %d", m_inspector.m_world->totalStepsTaken);
-		}
-
-		// Hierarchical relationships.
-		if (ImGui::CollapsingHeader("Hierarchy")) {
-			static int child;
-			static int parent;
-			ImGui::InputInt("child", &child);
-			ImGui::InputInt("parent", &parent);
-
-			if (ImGui::Button("Set Parent!")) {
-				m_inspector.getWorld()->setParentOf(ObjectId(child), ObjectId(parent));
-			}
 		}
 
 		ImGui::InputInt("MS Delay", &m_inspector.getWorld()->debug.forceSleepMs, 1, 10);
