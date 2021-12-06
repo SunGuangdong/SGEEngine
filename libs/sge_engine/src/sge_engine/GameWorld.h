@@ -283,7 +283,7 @@ struct SGE_ENGINE_API GameWorld {
 	EditorCamera m_editorCamera;
 
 	// Scene default ambient lighting.
-	vec3f m_ambientLight = vec3f(0.25f);
+	vec3f m_ambientLight = vec3f(1.f);
 	float m_ambientLightIntensity = 1.f;
 	float m_ambientLightFakeDetailAmount = 1.f;
 

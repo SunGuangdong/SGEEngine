@@ -5,6 +5,7 @@
 #include "sge_engine/Actor.h"
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/GameDrawer/IRenderItem.h"
+#include "sge_utils/ChangeIndex.h"
 
 namespace sge {
 
@@ -24,10 +25,10 @@ struct ModelEntry {
 
 	bool updateAssetProperty() {
 		if (m_assetProperty.update()) {
+			changeIndex.markAChange();
 			onAssetModelChanged();
-			return true;
 		}
-		return false;
+		return changeIndex.checkForChangeAndUpdate();
 	}
 
 	void setModel(const char* assetPath);
@@ -42,6 +43,7 @@ struct ModelEntry {
 	void onAssetModelChanged();
 
   public:
+	ChangeIndex changeIndex;
 	bool isRenderable = true;
 	AssetProperty m_assetProperty;
 	mat4f m_additionalTransform = mat4f::getIdentity();
@@ -52,7 +54,6 @@ struct ModelEntry {
 	// If null the static EvaluatedModel of the asset is going to get rendered.
 	Optional<EvaluatedModel> m_evalModel;
 };
-
 
 /// @brief TraitModel is a trait designed to be attached in an Actor.
 /// It provides a simple way to assign a renderable 3D Model to the game object (both animated and static).
@@ -82,6 +83,9 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	void addModel(const char* assetPath);
 	void addModel(AssetPtr& asset);
+	void clearModels() {
+		m_models.clear();
+	}
 
 	/// Not called automatically see the class comment above.
 	/// Updates the working models.

@@ -25,6 +25,14 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 			mtl = mtlProvider->getMaterial();
 		}
 
+		AssetPtr mtlProviderAsset = std::dynamic_pointer_cast<Asset>(mtlProvider);
+		if (isAssetLoaded(mtlProviderAsset)) {
+			ImGui::Text("Editing Asset %s",  mtlProviderAsset->getPath().c_str());
+		} else {
+			ImGui::Text("You are editing a material witch is not an asset!");
+		}
+
+		ImGui::Separator();
 
 		if (mtl) {
 			if (const TypeDesc* mtlTypeDesc = typeLib().find(mtl->getTypeId())) {

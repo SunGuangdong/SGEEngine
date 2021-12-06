@@ -283,7 +283,7 @@ void GameWorld::clear() {
 	m_editorCamera.m_projSets.near = 0.1f;
 	m_editorCamera.m_projSets.far = 10000.f;
 
-	m_ambientLight = vec3f(0.25f);
+	m_ambientLight = vec3f(1.f);
 	m_ambientLightIntensity = 1.f;
 	m_ambientLightFakeDetailAmount = 1.f;
 }

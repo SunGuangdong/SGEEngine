@@ -4,6 +4,7 @@
 #include "GameSerialization.h"
 #include "InspectorCmd.h"
 #include "sge_core/ICore.h"
+#include "sge_engine/AssetProperty.h"
 #include "sge_engine/DynamicProperties.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_utils/utils/strings.h"
@@ -29,6 +30,13 @@ void CmdMemberChange::setActorLocalTransform(CmdMemberChange* cmd, GameInspector
 	if (actor) {
 		actor->setLocalTransform(*(transf3d*)(src), true);
 	}
+}
+
+void CmdMemberChange::setAssetPropertyChange(CmdMemberChange* UNUSED(cmd), GameInspector* UNUSED(inspector), void* dest, void* src) {
+	AssetProperty* destAsset = reinterpret_cast<AssetProperty*>(dest);
+	AssetProperty* srcAsset = reinterpret_cast<AssetProperty*>(src);
+
+	destAsset->setAsset(srcAsset->getAsset());
 }
 
 CmdMemberChange::~CmdMemberChange() {
@@ -375,19 +383,25 @@ void CmdCompound::addCommand(InspectorCmd* const cmd) {
 
 void CmdCompound::apply(GameInspector* inspector) {
 	for (int t = 0; t < cmds.size(); ++t) {
-		if_checked(cmds[t]) { cmds[t]->apply(inspector); }
+		if_checked(cmds[t]) {
+			cmds[t]->apply(inspector);
+		}
 	}
 }
 
 void CmdCompound::redo(GameInspector* inspector) {
 	for (int t = 0; t < cmds.size(); ++t) {
-		if_checked(cmds[t]) { cmds[t]->redo(inspector); }
+		if_checked(cmds[t]) {
+			cmds[t]->redo(inspector);
+		}
 	}
 }
 
 void CmdCompound::undo(GameInspector* inspector) {
 	for (int t = int(cmds.size()) - 1; t >= 0; --t) {
-		if_checked(cmds[t]) { cmds[t]->undo(inspector); }
+		if_checked(cmds[t]) {
+			cmds[t]->undo(inspector);
+		}
 	}
 }
 

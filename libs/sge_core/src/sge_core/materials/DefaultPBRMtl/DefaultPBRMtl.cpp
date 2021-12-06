@@ -9,7 +9,7 @@
 namespace sge {
 
 // clang-format off
-ReflAddTypeId(DefaultPBRMtl, 10'11'21'0001);
+ReflAddTypeId(DefaultPBRMtl, 10'11'21'0000);
 ReflBlock() {
 	ReflAddType(DefaultPBRMtl)
 		ReflMember(DefaultPBRMtl, forceNoLighting)

@@ -35,11 +35,7 @@ struct MainMenuScript final : public IWorldScript {
 		std::shared_ptr<ButtonWidget> btn = std::make_shared<ButtonWidget>(uiContext, Pos(0_f, 0_f), Size(1_f, 0.333_f));
 		btn->setText("New Game");
 		eventSubs.push_back(btn->subscribe_onRelease(
-		    [&] { 
-				sgeLogCheck("PRessed!");
-				return;
-				getWorld()->addPostSceneTask(new PostSceneUpdateTaskLoadWorldFormFile("assets/levels/level0.lvl", true)); 
-			}));
+		    [&] { getWorld()->addPostSceneTask(new PostSceneUpdateTaskLoadWorldFormFile("assets/levels/level0.lvl", true)); }));
 
 		mainMenuButtonsWidget->addChild(btn);
 
@@ -50,7 +46,9 @@ struct MainMenuScript final : public IWorldScript {
 		uiContext.addRootWidget(rootMenuWidget);
 	}
 
-	void onPostUpdate(const GameUpdateSets& u) override { uiContext.update(u.is, getWorld()->userProjectionSettings.canvasSize, u.dt); }
+	void onPostUpdate(const GameUpdateSets& u) override {
+		uiContext.update(u.is, getWorld()->userProjectionSettings.canvasSize, u.dt);
+	}
 
 	void onPostDraw(const GameDrawSets& drawSets) override {
 		UIDrawSets uiDrawSets;

@@ -4,35 +4,37 @@
 
 namespace sge {
 
+AssetProperty::AssetProperty(const AssetProperty& ref) {
+	*this = ref;
+}
+
+AssetProperty& AssetProperty::operator=(const AssetProperty& ref) {
+	setAsset(ref.m_asset);
+	m_acceptedAssetIfaceTypes = ref.m_acceptedAssetIfaceTypes;
+	m_uiPossibleAssets = ref.m_uiPossibleAssets;
+
+	return *this;
+}
+
 bool AssetProperty::update() {
-	if (isUpToDate()) {
-		return false;
-	}
-
-	m_currentAsset = m_targetAsset;
-	if (m_currentAsset.empty() == false) {
-		m_asset = getCore()->getAssetLib()->getAssetFromFile(m_currentAsset.c_str());
-	} else {
-		m_asset = AssetPtr();
-	}
-
-	return true;
+	bool hadAChange = m_assetChangeIndex.checkForChangeAndUpdate();
+	return hadAChange;
 }
 
-
-void AssetProperty::setAsset(AssetPtr asset) {
-	m_asset = std::move(asset);
-	m_targetAsset = m_asset->getPath();
-	m_currentAsset = m_asset->getPath();
+void AssetProperty::setAsset(AssetPtr newAsset) {
+	if (m_asset != newAsset) {
+		m_assetChangeIndex.markAChange();
+		m_asset = std::move(newAsset);
+	}
 }
 
-void AssetProperty::setTargetAsset(const char* const assetPath) {
-	m_targetAsset = assetPath ? assetPath : "";
+void AssetProperty::setAsset(const char* newAssetPath) {
+	setAsset(getCore()->getAssetLib()->getAssetFromFile(newAssetPath));
 }
 
 ReflAddTypeId(AssetProperty, 20'03'01'0001);
 ReflBlock() {
-	ReflAddType(AssetProperty) ReflMember(AssetProperty, m_targetAsset);
+	ReflAddType(AssetProperty) ReflMember(AssetProperty, m_asset);
 }
 
 } // namespace sge

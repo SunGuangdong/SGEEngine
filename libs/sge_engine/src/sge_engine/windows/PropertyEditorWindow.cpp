@@ -23,8 +23,6 @@
 #include "sge_engine/traits/TraitScriptSlot.h"
 
 namespace sge {
-// struct MDiffuseMaterial;
-struct TraitModel;
 
 //----------------------------------------------------------
 // ProperyEditorUIGen
@@ -98,7 +96,7 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 	}
 
 	// Just push some unique ID in order to avoid clashes for UI elements with same name(as imgui uses names for ids).
-	ImGui::PushID((void*)pMember);
+	ImGuiEx::IDGuard memberIDGuard((void*)pMember);
 
 	const PropertyEditorGeneratorForTypeFn pUserUIGenerator =
 	    getEngineGlobal()->getPropertyEditorIUGeneratorForType(memberTypeDesc->typeId);
@@ -256,29 +254,38 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 	} else if (memberTypeDesc->typeId == sgeTypeId(AssetProperty)) {
 		const AssetProperty& assetPropery = *(AssetProperty*)(pMember);
 
-		if (assetPropery.m_uiPossibleAssets.size() == 0) {
-			chain.add(typeLib().findMember(&AssetProperty::m_targetAsset));
-			editStringAsAssetPath(inspector, memberName, gameObject, chain, assetPropery.m_acceptedAssetIfaceTypes.data(),
-			                      assetPropery.m_acceptedAssetIfaceTypes.size());
-			chain.pop();
+		AssetPtr assetToChange = assetPropery.m_asset;
+		bool hadAChange = false;
+		if (assetPropery.m_uiPossibleAssets.empty()) {
+			hadAChange = assetPicker(memberName, assetToChange, getCore()->getAssetLib(), assetPropery.m_acceptedAssetIfaceTypes.data(),
+			                         assetPropery.m_acceptedAssetIfaceTypes.size());
 		} else {
-			ImGuiEx::Label("Asset");
-			if (ImGui::BeginCombo("##Asset", assetPropery.m_targetAsset.c_str())) {
+			ImGuiEx::Label(memberName);
+
+			const char* const comboSelectedItemText =
+			    isAssetLoaded(assetPropery.getAsset()) ? assetPropery.getAsset()->getPath().c_str() : nullptr;
+
+			if (ImGui::BeginCombo("##Asset", comboSelectedItemText)) {
 				for (const std::string& option : assetPropery.m_uiPossibleAssets) {
-					bool isSelected = option == assetPropery.m_targetAsset;
+					bool isSelected = option == comboSelectedItemText;
 					if (ImGui::Selectable(option.c_str(), &isSelected)) {
-						chain.add(typeLib().findMember(&AssetProperty::m_targetAsset));
-
-						CmdMemberChange* cmd = new CmdMemberChange;
-						cmd->setup(gameObject, chain, &assetPropery.m_targetAsset, &option, nullptr);
-						inspector.appendCommand(cmd, true);
-
-						chain.pop();
+						assetToChange = getCore()->getAssetLib()->getAssetFromFile(option.c_str());
+						hadAChange = true;
 					}
 				}
 
 				ImGui::EndCombo();
 			}
+		}
+
+		if (hadAChange) {
+			AssetProperty newData = assetPropery;
+			newData.setAsset(assetToChange);
+			AssetProperty oldData = assetPropery;
+
+			CmdMemberChange* const cmd = new CmdMemberChange;
+			cmd->setup(gameObject, chain, &oldData, &newData, CmdMemberChange::setAssetPropertyChange);
+			inspector.appendCommand(cmd, true);
 		}
 	} else if (memberTypeDesc->typeId == sgeTypeId(bool)) {
 		bool v = *(bool*)(pMember);
@@ -523,8 +530,6 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			ImGui::Text("%s is of type enum %s with unknown value", memberName, typeLib().find(memberTypeDesc->enumUnderlayingType)->name);
 		}
 	} else if (memberTypeDesc->members.size() != 0) {
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2{40, 40});
-
 		char headerName[256];
 		sge_snprintf(headerName, SGE_ARRSZ(headerName), "%s of %s", memberName, memberTypeDesc->name);
 
@@ -542,7 +547,6 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			// ImGui::EndChild();
 			ImGui::Separator();
 		}
-		ImGui::PopStyleVar();
 	} else if (memberTypeDesc->stdVectorUnderlayingType.isValid()) {
 		char headerName[256];
 		sge_snprintf(headerName, SGE_ARRSZ(headerName), "%s of %s", memberName, memberTypeDesc->name);
@@ -554,12 +558,12 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			for (int t = 0; t < numElements; ++t) {
 				MemberChain memberChain = chain;
 				memberChain.knots.back().arrayIdx = t;
-				ImGui::PushID(t);
+
+				ImGuiEx::IDGuard elemIdGuard(t);
 				doMemberUI(inspector, gameObject, memberChain);
 				if (ImGui::Button(ICON_FK_TRASH)) {
 					elemRemovedIdx = t;
 				}
-				ImGui::PopID();
 			}
 
 			bool elemAdded = ImGui::Button(ICON_FK_PLUS);
@@ -586,9 +590,6 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 
 		ImGui::Text("Non editable value '%s' of type '%s'", memberName, typeName);
 	}
-
-
-	ImGui::PopID();
 }
 void ProperyEditorUIGen::editFloat(GameInspector& inspector, const char* label, GameObject* actor, MemberChain chain) {
 	bool justReleased = 0;
@@ -640,15 +641,17 @@ void ProperyEditorUIGen::editInt(GameInspector& inspector, const char* label, Ga
 	int* const pActorsValue = (int*)chain.follow(actor);
 	int v = *pActorsValue;
 
+
+	ImGuiEx::IDGuard actorValueIDGuard(pActorsValue);
+
 	ImGuiEx::Label(label);
-	ImGui::PushID(pActorsValue);
+
 	if (mdMayBeNull == nullptr) {
 		SGEImGui::DragInts("##EditInt", &v, 1, &justReleased, &justActivated);
 	} else {
 		SGEImGui::DragInts("##EditInt", &v, 1, &justReleased, &justActivated, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_int,
 		                   mdMayBeNull->max_int);
 	}
-	ImGui::PopID();
 
 	if (justActivated) {
 		g_propWidgetState.widgetSavedData.resetVariantToValue<int>(*pActorsValue);
@@ -758,12 +761,11 @@ void PropertyEditorWindow::update(SGEContext* const UNUSED(sgecon), const InputS
 				for (int t = 0; t < m_inspector.m_selection.size(); ++t) {
 					GameObject* actorFromSel = m_inspector.getWorld()->getObjectById(m_inspector.m_selection[t].objectId);
 					if (actorFromSel) {
-						ImGui::PushID(t);
+						ImGuiEx::IDGuard idGuard(t);
 						if (ImGui::Selectable(actorFromSel->getDisplayNameCStr(), gameObject == actorFromSel)) {
 							std::swap(m_inspector.m_selection[t], m_inspector.m_selection[0]);
 							gameObject = actorFromSel;
 						}
-						ImGui::PopID();
 					}
 				}
 

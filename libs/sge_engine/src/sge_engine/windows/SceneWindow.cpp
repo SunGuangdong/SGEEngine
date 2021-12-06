@@ -7,13 +7,20 @@
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/GameInspector.h"
+#include "sge_engine/ui/ImGuiDragDrop.h"
 #include "sge_utils/math/color.h"
 #include "sge_utils/utils/Wildcard.h"
 
 #include "SceneWindow.h"
 #include "sge_engine/EngineGlobal.h"
 
+// Things that shouldn't be placed here, but
+// the proper solution is missing:
+#include "sge_engine/actors/AStaticObstacle.h" // This one is needed for drag-n-drop of assets in the scene.
+
 namespace sge {
+
+struct AStaticObstacle;
 
 void SceneWindow::update(SGEContext* const sgecon, const InputState& isOriginal) {
 	if (m_gameDrawer == nullptr) {
@@ -159,6 +166,28 @@ void SceneWindow::update(SGEContext* const sgecon, const InputState& isOriginal)
 			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(m_canvasSize.x, m_canvasSize.y));
 		} else {
 			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(m_canvasSize.x, m_canvasSize.y), ImVec2(0, 1), ImVec2(1, 0));
+		}
+
+		if (ImGui::BeginDragDropTarget()) {
+			if (Optional<std::string> droppedAssetPath = DragDropPayloadAsset::accept()) {
+				if (droppedAssetPath) {
+					if (getLoadedAssetIface<AssetIface_Model3D>(getCore()->getAssetLib()->getAssetFromFile(droppedAssetPath->c_str()))) {
+						CmdObjectCreation* cmd = new CmdObjectCreation;
+						cmd->setup(sgeTypeId(AStaticObstacle));
+						inspector->appendCommand(cmd, true);
+
+						AStaticObstacle* newActorToBePlaced = inspector->getWorld()->getActor<AStaticObstacle>(cmd->getCreatedObjectId());
+						if_checked(newActorToBePlaced) {
+							// TODO: add a undo/redo command for this change.
+							newActorToBePlaced->m_traitModel.clearModels(); // Remove the default cube.
+							newActorToBePlaced->m_traitModel.addModel(droppedAssetPath->c_str());
+
+							inspector->m_plantingTool.setup(newActorToBePlaced);
+							inspector->setTool(&inspector->m_plantingTool);
+						}
+					}
+				}
+			}
 		}
 	}
 	ImGui::End();
@@ -373,7 +402,6 @@ void SceneWindow::drawOverlay(const GameDrawSets& drawSets) {
 	GameInspector* const inspector = world->getInspector();
 	SGEContext* const sgecon = drawSets.rdest.sgecon;
 
-	// HACK:
 	if (!sgecon) {
 		return;
 	}

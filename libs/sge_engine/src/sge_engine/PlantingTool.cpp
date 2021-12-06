@@ -23,11 +23,16 @@ void PlantingTool::setup(Actor* actorToPlant) {
 
 void PlantingTool::setup(const vector_set<ObjectId>& actorsToPlant, GameWorld& world) {
 	actorsToPlantOriginalTrasnforms.clear();
+	actorsToIgnorePhysicsHits.clear();
 
 	for (ObjectId actorId : actorsToPlant) {
 		Actor* actor = world.getActorById(actorId);
 		if (actor) {
 			actorsToPlantOriginalTrasnforms[actor->getId()] = actor->getTransform();
+
+			// Add the object and all of its child to be ignored by raycasts.
+			world.getAllChildren(actorsToIgnorePhysicsHits, actor->getId());
+			actorsToIgnorePhysicsHits.insert(actor->getId());
 		}
 	}
 }
@@ -74,13 +79,18 @@ InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
 	}
 
 	std::function<bool(const Actor*)> actorFilterFn = [&](const Actor* a) -> bool {
-		return actorsToPlantOriginalTrasnforms.find_element(a->getId()) != nullptr || a->getType() == sgeTypeId(AInvisibleRigidObstacle);
+		bool isInIngnoreList = actorsToIgnorePhysicsHits.count(a->getId()) != 0;
+		return isInIngnoreList || a->getType() == sgeTypeId(AInvisibleRigidObstacle);
 	};
 
+	// Try to cast a ray from the camera in direction of the cursor position.
+	// Based on that hit compute the transformation of the object.
+	// If not physics world hit was found, come up with something based on the camera settings.
 	RayResultActor rayResult;
 	rayResult.setup(nullptr, rayPos, rayTar, actorFilterFn);
 	world->physicsWorld.dynamicsWorld->rayTest(rayPos, rayTar, rayResult);
 
+	transf3d primaryActorNewTransf = actorsToPlantOriginalTrasnforms.begin().value();
 	if (rayResult.hasHit()) {
 		const vec3f hitNormal = normalized0(fromBullet(rayResult.m_hitNormalWorld));
 
@@ -90,7 +100,6 @@ InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
 		const vec3f rotateAxis = cross(vec3f::getAxis(1), hitNormal);
 		const float rotationAngle = asinf(rotateAxis.length());
 
-		transf3d primaryActorNewTransf = actorsToPlantOriginalTrasnforms.begin().value();
 		primaryActorNewTransf.p = fromBullet(rayResult.m_hitPointWorld);
 		primaryActorNewTransf.r = quatf::getAxisAngle(rotateAxis.normalized0(), rotationAngle);
 
@@ -101,40 +110,72 @@ InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
 			}
 		}
 
-		// Apply the snapping form the transform tool.
-		if (inspector->m_transformTool.m_useSnapSettings) {
-			primaryActorNewTransf.p = inspector->m_transformTool.m_snapSettings.applySnappingTranslation(primaryActorNewTransf.p);
-		}
+	} else {
+		// intersect with the "grid" plane witch is looking towards Y+ from (0,0,0).
+		const Plane p = Plane::FromPosAndDir(vec3f(0.f), vec3f::axis_y());
+		const float hitDistance = intersectRayPlane(pickRay.pos, pickRay.dir, p.norm(), p.d());
 
-		const transf3d diffTrasform = primaryActorNewTransf * actorsToPlantOriginalTrasnforms.begin().value().inverseSimple();
+		if (hitDistance != FLT_MAX) {
+			if (hitDistance > 0.f) {
+				primaryActorNewTransf.p = pickRay.Sample(hitDistance);
+			} else {
+				// A bit a of strage solution but here me out:
+				// if the hit distance is negative, this means that the camera is not looking towards
+				// the plane, meaning that the hit is behind the camera.
+				// Placing the object behind the camera is pretty stupid and non-intuitive.
+				// In order to place the object on same logical position We are going to do this:
+				//
+				//    (plane) ------------------*(negative hit)----------------------
+				//                               \                    
+				//                                 \             
+				//                                   \           
+				//                                     (eye)
+				//                                      \
+				//                                       >(look dir)
+				//                                        \                            
+				//                                         * abs(hit) We would use this hit here, so the object would be infornt of the
+				//                                         camera.
 
-		if (isAllowedToTakeInput && is.IsKeyReleased(Key::Key_MouseLeft)) {
-			CmdCompound* cmdAll = new CmdCompound();
-
-			for (auto pair : actorsToPlantOriginalTrasnforms) {
-				Actor* actor = world->getActorById(pair.key());
-				if (actor) {
-					CmdMemberChange* const cmd = new CmdMemberChange();
-					transf3d newTransform = diffTrasform * pair.value();
-					cmd->setupLogicTransformChange(*actor, pair.value(), newTransform);
-					cmdAll->addCommand(cmd);
-				}
-			}
-
-			inspector->appendCommand(cmdAll, true);
-
-			result.propagateInput = false;
-			result.isDone = true;
-			return result;
-		} else {
-			for (auto pair : actorsToPlantOriginalTrasnforms) {
-				Actor* actor = world->getActorById(pair.key());
-				if (actor) {
-					actor->setTransform(diffTrasform * pair.value(), true);
-				}
+				const float absHitDistance = fabsf(hitDistance);
+				primaryActorNewTransf.p = pickRay.Sample(absHitDistance);
 			}
 		}
 	}
+
+	// Apply the snapping form the transform tool.
+	if (inspector->m_transformTool.m_useSnapSettings) {
+		primaryActorNewTransf.p = inspector->m_transformTool.m_snapSettings.applySnappingTranslation(primaryActorNewTransf.p);
+	}
+
+	const transf3d diffTrasform = primaryActorNewTransf * actorsToPlantOriginalTrasnforms.begin().value().inverseSimple();
+
+	if (isAllowedToTakeInput && is.IsKeyReleased(Key::Key_MouseLeft)) {
+		CmdCompound* cmdAll = new CmdCompound();
+
+		for (auto pair : actorsToPlantOriginalTrasnforms) {
+			Actor* actor = world->getActorById(pair.key());
+			if (actor) {
+				CmdMemberChange* const cmd = new CmdMemberChange();
+				transf3d newTransform = diffTrasform * pair.value();
+				cmd->setupLogicTransformChange(*actor, pair.value(), newTransform);
+				cmdAll->addCommand(cmd);
+			}
+		}
+
+		inspector->appendCommand(cmdAll, true);
+
+		result.propagateInput = false;
+		result.isDone = true;
+		return result;
+	} else {
+		for (auto pair : actorsToPlantOriginalTrasnforms) {
+			Actor* actor = world->getActorById(pair.key());
+			if (actor) {
+				actor->setTransform(diffTrasform * pair.value(), true);
+			}
+		}
+	}
+
 
 	result.propagateInput = false;
 	return result;

@@ -30,6 +30,10 @@ struct SGE_ENGINE_API PlantingTool : public IInspectorTool {
 
 	std::string m_modelForStaticObstacle;
 	vector_map<ObjectId, transf3d> actorsToPlantOriginalTrasnforms;
+	// When planting the object we need to ignore some object hits to make the tool usable.
+	// These objects are the ones what we currently "plant" and the others are the children
+	// of these objects, as they will move as the tool works.
+	vector_set<ObjectId> actorsToIgnorePhysicsHits;
 };
 
 } // namespace sge

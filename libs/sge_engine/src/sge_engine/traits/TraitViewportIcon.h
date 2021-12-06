@@ -19,7 +19,7 @@ struct SGE_ENGINE_API TraitViewportIcon : public Trait {
 	TraitViewportIcon();
 
 	void setTexture(const char* assetPath, bool updateNow) {
-		m_assetProperty.setTargetAsset(assetPath);
+		m_assetProperty.setAsset(assetPath);
 		if (updateNow) {
 			postUpdate();
 		}

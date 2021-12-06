@@ -10,12 +10,12 @@ namespace sge {
 //--------------------------------------------------------------------
 
 // clang-format off
-ReflAddTypeId(CollisionShapeSource, 20'03'02'0005);
-ReflBlock() {
-	ReflAddType(CollisionShapeSource) ReflEnumVal((int)CollisionShapeSource::FromBoundingBox, "FromBoundingBox")
-	ReflEnumVal((int)CollisionShapeSource::FromConcaveHulls, "FromConcaveHulls")
-	ReflEnumVal((int)CollisionShapeSource::FromConvexHulls, "FromConvexHulls");
-}
+//ReflAddTypeId(CollisionShapeSource, 20'03'02'0005);
+//ReflBlock() {
+//	ReflAddType(CollisionShapeSource) ReflEnumVal((int)CollisionShapeSource::FromBoundingBox, "FromBoundingBox")
+//	ReflEnumVal((int)CollisionShapeSource::FromConcaveHulls, "FromConcaveHulls")
+//	ReflEnumVal((int)CollisionShapeSource::FromConvexHulls, "FromConvexHulls");
+//}
 
 ReflAddTypeId(AStaticObstacle, 20'03'02'0006);
 ReflBlock() {
@@ -39,7 +39,7 @@ void AStaticObstacle::create() {
 
 	m_traitModel.uiDontOfferResizingModelCount = false;
 	m_traitModel.m_models.resize(1);
-	m_traitModel.m_models[0].m_assetProperty.setTargetAsset("assets/editor/models/box.mdl");
+	m_traitModel.m_models[0].m_assetProperty.setAsset("assets/editor/models/box.mdl");
 }
 
 void AStaticObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {

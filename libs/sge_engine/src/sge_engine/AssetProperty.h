@@ -2,6 +2,7 @@
 
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine_api.h"
+#include "sge_utils/ChangeIndex.h"
 #include "sge_utils/utils/StaticArray.h"
 
 namespace sge {
@@ -9,7 +10,12 @@ namespace sge {
 /// @brief A Helper class usually used as a property to game object.
 /// This is a reference to an asset, by using the @update() method you can check if new asset has been assigned.
 struct SGE_ENGINE_API AssetProperty {
-	AssetProperty() = delete;
+	/// Asset propery needs a list of accepted assets.
+	/// Please use one of the other constructors.
+	AssetProperty() = default;
+
+	AssetProperty(const AssetProperty& ref);
+	AssetProperty& operator=(const AssetProperty& ref);
 
 	explicit AssetProperty(AssetIfaceType assetType) {
 		m_acceptedAssetIfaceTypes.push_back(assetType);
@@ -26,69 +32,65 @@ struct SGE_ENGINE_API AssetProperty {
 		m_acceptedAssetIfaceTypes.push_back(assetType2);
 	}
 
-	AssetProperty(AssetIfaceType assetType, const char* const initialTargetAsset) {
+	AssetProperty(AssetIfaceType assetType, const char* const initialAsset) {
 		m_acceptedAssetIfaceTypes.push_back(assetType);
-		setTargetAsset(initialTargetAsset);
+		setAsset(initialAsset);
 	}
 
-	/// @brief Should be called by the user. Checks if the target asset has changed and if its loads the new asset.
+	
+
+	/// @brief Should be called by the user.
 	/// @return True if new asset was assigned.
 	bool update();
 
-	bool isUpToDate() const {
-		return m_targetAsset == m_currentAsset;
-	}
-
 	void clear() {
-		m_currentAsset.clear();
+		m_assetChangeIndex.markAChange();
 		m_asset = nullptr;
 	}
 
-	/// @brief Changes directly the current asset.
-	/// @param asset
-	void setAsset(AssetPtr asset);
+	/// @brief Changes the asset.
+	void setAsset(AssetPtr newAsset);
 
-	/// @brief Sets the asset that will generate a change when calling @update.
-	/// Useful when others depend on knowing what this asset is.
-	/// @param assetPath
-	void setTargetAsset(const char* const assetPath);
+	/// @brief Changes the asset.
+	void setAsset(const char* newAssetPath);
 
+	/// Retrienves the current asset.
 	AssetPtr& getAsset() {
 		return m_asset;
 	}
+
+	/// Retrienves the current asset.
 	const AssetPtr& getAsset() const {
 		return m_asset;
 	}
 
+	/// Returns the asset interface of the currently assigned asset
+	/// if the asset is loaded and supports the specifiedi nterface.
 	template <typename TAssetIface>
 	TAssetIface* getAssetInterface() {
 		return getLoadedAssetIface<TAssetIface>(m_asset);
 	}
 
+	/// Returns the asset interface of the currently assigned asset
+	/// if the asset is loaded and supports the specifiedi nterface.
 	template <typename TAssetIface>
 	const TAssetIface* getAssetInterface() const {
 		return getLoadedAssetIface<TAssetIface>(m_asset);
 	}
 
-	AssetProperty& operator=(const AssetProperty& ref) {
-		m_targetAsset = ref.m_targetAsset;
-		m_acceptedAssetIfaceTypes = ref.m_acceptedAssetIfaceTypes;
-		m_uiPossibleAssets = ref.m_uiPossibleAssets;
-
-		// m_currentAsset not copied so when an object is duplicated it would need to force inititalize it,
-		// which is needed so it could initialize its dependencies like rigid body.
-		// m_asset is not copied for the same reason as m_currentAsset.
-		// TODO: the above might no longer be needed.
-		return *this;
+	/// Returns the change index of the asset.
+	/// Useful if traking for changes via @update method isn't viable.
+	const ChangeIndex& getChangeIndex() const {
+		return m_assetChangeIndex;
 	}
 
   public:
-	// Caution: there is a custom copy logic.
-	StaticArray<AssetIfaceType, int(assetIface_count)> m_acceptedAssetIfaceTypes;
-	std::string m_targetAsset;
-
-	std::string m_currentAsset;
 	AssetPtr m_asset;
+	ChangeIndex m_assetChangeIndex;
+
+	/// A list of all accepted asset interfaces by this property.
+	/// Caution: there is a custom copy logic for @m_acceptedAssetIfaceTypes.
+	StaticArray<AssetIfaceType, int(assetIface_count)> m_acceptedAssetIfaceTypes;
 	std::vector<std::string> m_uiPossibleAssets;
 };
 

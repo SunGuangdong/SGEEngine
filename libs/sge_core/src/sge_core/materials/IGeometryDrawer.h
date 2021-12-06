@@ -51,8 +51,7 @@ struct ObjectLighting {
 
 	static ObjectLighting getAmbientLightOnly() {
 		ObjectLighting result;
-		// 2.f is used instead of one to compensate for the dimming of ambientFakeDetailBias.
-		result.ambientLightColor = vec3f(2.f);
+		result.ambientLightColor = vec3f(1.f);
 		result.ambientFakeDetailBias = 1.f;
 
 		return result;

@@ -60,8 +60,10 @@ struct SGEGameWindow : public WindowBase {
 
 		if (event == WE_Resize) {
 			const WE_Resize_Data& resizeData = *static_cast<const WE_Resize_Data*>(eventData);
-			cachedWindowSize.x = resizeData.width;
-			cachedWindowSize.y = resizeData.height;
+			if (resizeData.width > 0)
+				cachedWindowSize.x = resizeData.width;
+			if (resizeData.height > 0)
+				cachedWindowSize.y = resizeData.height;
 
 			SGEDevice* device = getCore()->getDevice();
 
@@ -75,12 +77,9 @@ struct SGEGameWindow : public WindowBase {
 		if (event == WE_Destroying) {
 			JsonValueBuffer jvb;
 			JsonValue* jRoot = jvb(JID_MAP);
-			if (cachedWindowSize.x > 0) {
-				jRoot->setMember("window_width", jvb(cachedWindowSize.x));
-			}
-			if (cachedWindowSize.y) {
-				jRoot->setMember("window_height", jvb(cachedWindowSize.y));
-			}
+
+			jRoot->setMember("window_width", jvb(cachedWindowSize.x));
+			jRoot->setMember("window_height", jvb(cachedWindowSize.y));
 			jRoot->setMember("is_maximized", jvb(isMaximized()));
 
 			JsonWriter jw;
@@ -257,7 +256,7 @@ void sgeMainLoop() {
 int sge_main(int argc, char** argv) {
 	sgeLogInfo("sge_main()\n");
 
-	// Force the numeric locale to use "." for demical numbers as 
+	// Force the numeric locale to use "." for demical numbers as
 	// we have calls like atof scanf that so on that rely on this.
 	setlocale(LC_NUMERIC, "C");
 
@@ -309,8 +308,8 @@ int main(int argc, char* argv[]) {
 	sgeRegisterMiniDumpHandler();
 
 	// Disable the mouse from generating fake touch events.
-	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0"); 
-	
+	SDL_SetHint(SDL_HINT_TOUCH_MOUSE_EVENTS, "0");
+
 	SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "1");
 
 #ifdef __EMSCRIPTEN__

@@ -9,11 +9,11 @@
 
 namespace sge {
 
-enum class CollisionShapeSource : int {
-	FromBoundingBox,
-	FromConvexHulls,
-	FromConcaveHulls,
-};
+//enum class CollisionShapeSource : int {
+//	FromBoundingBox,
+//	FromConvexHulls,
+//	FromConcaveHulls,
+//};
 
 //--------------------------------------------------------------------
 // AStaticObstacle

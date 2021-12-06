@@ -107,7 +107,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 			ModelWriter modelWriter;
 			const bool succeeded = modelWriter.write(importedModel, fullAssetPath.c_str());
 
-			
+
 
 			std::string notificationMsg = string_format("Imported %s", fullAssetPath.c_str());
 			sgeLogInfo(notificationMsg.c_str());
@@ -322,6 +322,56 @@ void AssetsWindow::update_assetImport(SGEContext* const sgecon, const InputState
 	}
 }
 
+Texture* AssetsWindow::getThumbnailForModel3D(const std::string& localAssetPath) {
+	if (assetPreviewTex[localAssetPath].IsResourceValid()) {
+		return assetPreviewTex[localAssetPath]->getRenderTarget(0);
+	} else {
+		AssetPtr thumbnailAsset = getCore()->getAssetLib()->getAssetFromFile(localAssetPath.c_str(), nullptr, true);
+		if (isAssetLoaded(thumbnailAsset, assetIface_model3d)) {
+			AABox3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(thumbnailAsset)->getStaticEval().aabox;
+			if (bboxModel.IsEmpty() == false) {
+				orbit_camera camera;
+
+				camera.orbitPoint = bboxModel.center();
+				camera.radius = bboxModel.diagonal().length() * 1.25f;
+				camera.yaw = deg2rad(45.f);
+				camera.pitch = deg2rad(45.f);
+
+				RawCamera rawCamera = RawCamera(camera.eyePosition(), camera.GetViewMatrix(),
+				                                mat4f::getPerspectiveFovRH(deg2rad(60.f), 1.f, 0.1f, 10000.f, 0.f, kIsTexcoordStyleD3D));
+
+				GpuHandle<FrameTarget> ft = getCore()->getDevice()->requestResource<FrameTarget>();
+				ft->create2D(64, 64);
+				getCore()->getDevice()->getContext()->clearDepth(ft, 1.f);
+
+				RenderDestination rdest;
+				rdest.frameTarget = ft;
+				rdest.viewport = ft->getViewport();
+				rdest.sgecon = getCore()->getDevice()->getContext();
+
+				drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting::getAmbientLightOnly(),
+				              getLoadedAssetIface<AssetIface_Model3D>(thumbnailAsset)->getStaticEval(), InstanceDrawMods());
+
+				assetPreviewTex[localAssetPath] = ft;
+				return assetPreviewTex[localAssetPath]->getRenderTarget(0);
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+Texture* AssetsWindow::getThumbnailForAsset(const std::string& localAssetPath) {
+	AssetPtr thumbnailAsset = getCore()->getAssetLib()->getAssetFromFile(localAssetPath.c_str(), nullptr, true);
+	if (isAssetLoaded(thumbnailAsset, assetIface_model3d)) {
+		return getThumbnailForModel3D(localAssetPath);
+	} else if (AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(thumbnailAsset)) {
+		return texIface->getTexture();
+	}
+
+	return nullptr;
+}
+
 void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is) {
 	if (isClosed()) {
 		return;
@@ -412,7 +462,9 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 				}
 
 				// Show every file in the current directory with an icon next to it.
+				int i = 0;
 				for (const fs::directory_entry& entry : fs::directory_iterator(pathToAssets)) {
+					i++;
 					const std::string localAssetPath = relativePathToCwdCanoize(entry.path().string());
 
 					if (entry.is_regular_file() && m_exploreFilter.PassFilter(entry.path().filename().string().c_str())) {
@@ -433,10 +485,24 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 						}
 
 						if (assetType != assetIface_unknown) {
-							if (ImGui::Selectable(label.c_str())) {
+							bool showAsSelected = isAssetLoaded(explorePreviewAsset) && explorePreviewAsset->getPath() == localAssetPath;
+
+
+							Texture* thumbnailTex = getThumbnailForAsset(localAssetPath);
+							if (thumbnailTex) {
+								ImGui::Image(thumbnailTex, ImVec2(64.f, 64.f));
+								ImGui::SameLine();
+							}
+
+							if (ImGui::Selectable(label.c_str(), &showAsSelected)) {
 								explorePreviewAssetChanged = true;
 								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str());
+
+								if (auto mtlIface = getLoadedAssetIface<AssetIface_Material>(explorePreviewAsset)) {
+									openMaterialEditWindow(mtlIface);
+								}
 							}
+
 							if (ImGui::IsItemClicked(1)) {
 								rightClickedPath = entry.path();
 							}
@@ -446,43 +512,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 								ImGui::Text(localAssetPath.c_str());
 								ImGui::EndDragDropSource();
 							}
-#if 0
-							if (assetPreviewTex[localAssetPath].IsResourceValid()) {
-								ImGui::Image(assetPreviewTex[localAssetPath]->getRenderTarget(0), ImVec2(64.f, 64.f));
-							} else {
-								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str(), nullptr, true);
-								if (isAssetLoaded(explorePreviewAsset, assetIface_model3d)) {
-									AABox3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
-									if (bboxModel.IsEmpty() == false) {
-										orbit_camera camera;
 
-										camera.orbitPoint = bboxModel.center();
-										camera.radius = bboxModel.diagonal().length() * 1.25f;
-										camera.yaw = deg2rad(45.f);
-										camera.pitch = deg2rad(45.f);
-
-										RawCamera rawCamera = RawCamera(
-										    camera.eyePosition(), camera.GetViewMatrix(),
-										    mat4f::getPerspectiveFovRH(deg2rad(60.f), 1.f, 0.1f, 10000.f, 0.f, kIsTexcoordStyleD3D));
-
-										GpuHandle<FrameTarget> ft = getCore()->getDevice()->requestResource<FrameTarget>();
-										ft->create2D(64, 64);
-										getCore()->getDevice()->getContext()->clearDepth(ft, 1.f);
-
-										RenderDestination rdest;
-										rdest.frameTarget = ft;
-										rdest.viewport = ft->getViewport();
-										rdest.sgecon = getCore()->getDevice()->getContext();
-
-										imods.forceNoLighting = true;
-										drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(),
-										              getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval(), InstanceDrawMods());
-
-										assetPreviewTex[localAssetPath] = ft;
-									}
-								}
-							}
-#endif
 
 
 						} else {
@@ -776,45 +806,54 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 		if (isAssetLoaded(explorePreviewAsset)) {
 			ImGui::NextColumn();
 
-			if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)) {
-				doPreviewAssetModel(is, explorePreviewAssetChanged);
-			} else if (AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(explorePreviewAsset)) {
-				doPreviewAssetTexture2D(texIface);
-			} else if (AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(explorePreviewAsset)) {
-				if (AssetIface_Texture2D* spriteTexIface =
-				        getLoadedAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
-					auto desc = spriteTexIface->getTexture()->getDesc().texture2D;
-					ImVec2 sz = ImGui::GetContentRegionAvail();
-					ImGui::Image(spriteTexIface->getTexture(), sz);
-				}
-			} else if (AssetIface_Material* mtlIface = getLoadedAssetIface<AssetIface_Material>(explorePreviewAsset)) {
-				if (ImGui::Button(ICON_FK_PICTURE_O " Edit Material")) {
-					std::shared_ptr<IMaterial> mtl = mtlIface->getMaterial();
-
-					MaterialEditWindow* mtlEditWnd =
-					    dynamic_cast<MaterialEditWindow*>(getEngineGlobal()->findWindowByName(ICON_FK_PICTURE_O " Material Edit"));
-					if (mtlEditWnd == nullptr) {
-						mtlEditWnd = new MaterialEditWindow(ICON_FK_PICTURE_O " Material Edit", m_inspector);
-						getEngineGlobal()->addWindow(mtlEditWnd);
+			if (ImGui::BeginChild("Asset Quick Info and Inspect")) {
+				if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)) {
+					doPreviewAssetModel(is, explorePreviewAssetChanged);
+				} else if (AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(explorePreviewAsset)) {
+					doPreviewAssetTexture2D(texIface);
+				} else if (AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(explorePreviewAsset)) {
+					if (AssetIface_Texture2D* spriteTexIface =
+					        getLoadedAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
+						auto desc = spriteTexIface->getTexture()->getDesc().texture2D;
+						ImVec2 sz = ImGui::GetContentRegionAvail();
+						ImGui::Image(spriteTexIface->getTexture(), sz);
 					}
-
-					mtlEditWnd->setAsset(std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset));
+				} else if (AssetIface_Material* mtlIface = getLoadedAssetIface<AssetIface_Material>(explorePreviewAsset)) {
+					if (ImGui::Button(ICON_FK_PICTURE_O " Edit Material")) {
+						openMaterialEditWindow(mtlIface);
+					}
+				} else if (IAssetInterface_Audio* audioIface = getLoadedAssetIface<IAssetInterface_Audio>(explorePreviewAsset)) {
+					ImGui::Text("No Preview");
+					if (auto audioDataPtr = audioIface->getAudioData()) {
+						// auto audioData = explorePreviewAsset->asAudio();
+						// ImGui::Text("Vorbis encoded Audio file");
+						// ImGui::Text("Sample Rate: %.1f kHZ", (float)(*track)->info.samplesPerSecond / 1000.0f);
+						// ImGui::Text("Number of channels: %d", (*track)->info.numChannels);
+						// ImGui::Text("Length: %.2f s", (float)(*track)->info.numSamples / (float)(*track)->info.samplesPerSecond);
+					}
+				} else {
+					ImGui::Text("No Preview");
 				}
-			} else if (IAssetInterface_Audio* audioIface = getLoadedAssetIface<IAssetInterface_Audio>(explorePreviewAsset)) {
-				ImGui::Text("No Preview");
-				if (auto audioDataPtr = audioIface->getAudioData()) {
-					// auto audioData = explorePreviewAsset->asAudio();
-					// ImGui::Text("Vorbis encoded Audio file");
-					// ImGui::Text("Sample Rate: %.1f kHZ", (float)(*track)->info.samplesPerSecond / 1000.0f);
-					// ImGui::Text("Number of channels: %d", (*track)->info.numChannels);
-					// ImGui::Text("Length: %.2f s", (float)(*track)->info.numSamples / (float)(*track)->info.samplesPerSecond);
-				}
-			} else {
-				ImGui::Text("No Preview");
 			}
+			ImGui::EndChild();
 		}
 	}
 	ImGui::End();
+}
+
+void AssetsWindow::openMaterialEditWindow(sge::AssetIface_Material* mtlIface) {
+	std::shared_ptr<IMaterial> mtl = mtlIface->getMaterial();
+
+	MaterialEditWindow* mtlEditWnd =
+	    dynamic_cast<MaterialEditWindow*>(getEngineGlobal()->findWindowByName(ICON_FK_PICTURE_O " Material Edit"));
+	if (mtlEditWnd == nullptr) {
+		mtlEditWnd = new MaterialEditWindow(ICON_FK_PICTURE_O " Material Edit", m_inspector);
+		getEngineGlobal()->addWindow(mtlEditWnd);
+	} else {
+		ImGui::SetNextWindowFocus();
+	}
+
+	mtlEditWnd->setAsset(std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset));
 }
 
 void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreviewAssetChanged) {

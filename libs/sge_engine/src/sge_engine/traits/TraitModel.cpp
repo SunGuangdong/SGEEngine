@@ -41,14 +41,13 @@ ReflBlock() {
 // TraitModel::ModelEntry
 //-----------------------------------------------------------------
 void ModelEntry::setModel(const char* assetPath) {
-	m_assetProperty.setTargetAsset(assetPath);
-	updateAssetProperty();
+	m_assetProperty.setAsset(assetPath);
+	changeIndex.markAChange();
 }
 
 void ModelEntry::setModel(AssetPtr& asset) {
 	m_assetProperty.setAsset(asset);
-	m_evalModel = NullOptional();
-	updateAssetProperty();
+	changeIndex.markAChange();
 }
 
 void ModelEntry::onAssetModelChanged() {
@@ -296,5 +295,6 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 SgePluginOnLoad() {
 	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitModel), editUI_for_TraitModel);
 }
+
 
 } // namespace sge

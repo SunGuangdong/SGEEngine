@@ -51,6 +51,7 @@ struct SGE_ENGINE_API CmdCompound : public InspectorCmd {
 struct SGE_ENGINE_API CmdMemberChange : public InspectorCmd {
 	static void setActorLogicTransform(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src);
 	static void setActorLocalTransform(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src);
+	static void setAssetPropertyChange(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src);
 
 	CmdMemberChange() = default;
 	~CmdMemberChange();

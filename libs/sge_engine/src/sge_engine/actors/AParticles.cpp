@@ -161,8 +161,6 @@ void AParticlesSimple::doAttributeEditor(GameInspector* inspector) {
 				chain.add(tdPartDesc->findMember(&ParticleGroupDesc::alphaFadeOutAfterBeforeDeath));
 				ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
 				chain.pop();
-
-				ImGuiEx::EndGroupPanel();
 			}
 
 			if (ImGui::CollapsingHeader("Spawning Shape")) {

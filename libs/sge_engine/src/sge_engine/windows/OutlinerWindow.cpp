@@ -125,8 +125,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 
 				// Drag-and-drop support used for parenting/unparenting objects.
 				// When the users start draging create a list of all selected nodes plus the one
-				// that was used to initiate the dragging. When dropped these object are going to get parented to
-				// something depending on where the user dropped them.
+				// that was used to initiate the dragging. When dropped these object are
+				// going to get parented to something depending on where the user dropped them.
 				if (ImGui::BeginDragDropSource()) {
 					DragDropPayloadActor::setPayload(currentEntity->getId());
 
@@ -135,8 +135,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 				}
 
 				// Handle dropping actors over another actor to parent it.
-				// Do not do the parenting here as we are currently traversing the hierarchy and it will mess up the algorithm.
-				// Save the data and do it once we've done iterating.
+				// Do not do the parenting here as we are currently traversing the hierarchy
+				// and it will mess up the algorithm. Save the data and do it once we've done iterating.
 				if (ImGui::BeginDragDropTarget()) {
 					if (Optional<std::set<ObjectId>> dropedIds = DragDropPayloadActor::accept()) {
 						dragAndDropTargetedActor = currentEntity->getId();
@@ -154,7 +154,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 				shouldShowChildren = true;
 			}
 
-			// The the tree node is opened (by clicking the arrow) add the GUI for children objects in the hierarchy.
+			// The the tree node is opened (by clicking the arrow) add
+			// the GUI for children objects in the hierarchy.
 			if (shouldShowChildren) {
 				if (pAllChildObjects && pAllChildObjects->empty() == false) {
 					for (ObjectId childId : *pAllChildObjects) {
@@ -178,7 +179,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 		    },
 		    false);
 
-		// Drop over empty space in the outliner window means that the user wants to un-parent the selected objects.
+		// Drop over empty space in the outliner window means that the user
+		// wants to un-parent the selected objects.
 		// Setting the window as a drag-and-drop target isn't currently supported in ImGui.
 		// This is workaround was propoused by the author of the library.
 		if (ImGui::BeginDragDropTargetCustom(dropTargetRectForWindow, 1234)) {
