@@ -51,8 +51,6 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	void openAssetImport(const std::string& filename);
 
   private:
-	void update_assetImport(SGEContext* const sgecon, const InputState& is);
-
 	/// @brief Imports the specified asset with the specified settings.
 	bool importAsset(AssetImportData& aid);
 

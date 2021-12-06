@@ -25,19 +25,21 @@ struct Player : public Actor {
 	float jumpButtonHeldTime = 0.f;
 	static inline const float kMaxJumpHeldTime = 1.f;
 
-	virtual AABox3f getBBoxOS() const { return AABox3f(); }
+	AABox3f getBBoxOS() const override {
+		return ttModel.getBBoxOS();
+	}
 
-	void create() {
+	void create() override {
 		registerTrait(ttRigidbody);
 		registerTrait(ttModel);
 
 		ttModel.addModel("assets/models/catBall.mdl");
+
 		ttRigidbody.getRigidBody()->create(this, CollsionShapeDesc::createSphere(1.f), 1.f, false);
 		ttRigidbody.getRigidBody()->setRollingFriction(0.025f);
 		ttRigidbody.getRigidBody()->setSpinningFriction(0.025f);
 		ttRigidbody.getRigidBody()->setFriction(0.8f);
 		ttRigidbody.getRigidBody()->setBounciness(0.9f);
-
 		ttRigidbody.getRigidBody()->setDamping(0.05f, 0.005f);
 	}
 
@@ -51,7 +53,7 @@ struct Player : public Actor {
 	void update(const GameUpdateSets& u) {
 		if (u.isGamePaused()) {
 			return;
-		} 
+		}
 
 		// Lock the cursor to the center of the screen and hide it
 		// as we want to control the camera with the mouse.
@@ -67,7 +69,7 @@ struct Player : public Actor {
 		Actor* const cameraActor = getWorld()->getActorById(cameraObject);
 
 		vec3f wsForward = vec3f(0.f, 0.f, -1.f);
-		vec3f wsRight = vec3f(1.f, 0.f, 0.f); 
+		vec3f wsRight = vec3f(1.f, 0.f, 0.f);
 
 		if (cameraActor) {
 			float motionCamera = u.is.isCursorRelative() ? -u.is.GetCursorMotion().x * 0.25f : 0.f;
@@ -105,7 +107,7 @@ struct Player : public Actor {
 			wobbleForce -= 16.f * u.dt;
 			jumpButtonHeldTime += u.dt;
 			jumpButtonHeldTime = clamp(kMaxJumpHeldTime, 0.f, kMaxJumpHeldTime);
-		} 
+		}
 
 		vec3f additionalForce = vec3f(0.f);
 		float dr = inputDirWsRight.dot(ttRigidbody.getRigidBody()->getLinearVel().x0z());

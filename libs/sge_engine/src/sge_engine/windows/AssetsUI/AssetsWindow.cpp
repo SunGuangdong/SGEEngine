@@ -139,7 +139,8 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				AssetPtr assetTexture = assetLib->getAssetFromFile(textureDstPath.c_str());
 				assetLib->reloadAssetModified(assetTexture);
 			}
-
+			
+			// Create the model.
 			AssetPtr assetModel = assetLib->getAssetFromFile(fullAssetPath.c_str());
 			assetLib->reloadAssetModified(assetModel);
 
@@ -163,23 +164,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 		if (m_sgeImportFBXFileAsMultiple && m_sgeImportFBXFileAsMultiple(importedModels, modelImportAddRes, aid.fileToImportPath.c_str())) {
 			createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 
-			for (MultiModelImportResult& model : importedModels) {
-				if (model.propsedFilename.empty())
-					continue;
 
-				std::string path = aid.outputDir + "/" + model.propsedFilename;
-
-				// Convert the 3d model to our internal type.
-				ModelWriter modelWriter;
-				const bool succeeded = modelWriter.write(model.importedModel, path.c_str());
-
-				AssetPtr assetModel = assetLib->getAssetFromFile(path.c_str());
-				assetLib->reloadAssetModified(assetModel);
-
-				std::string notificationMsg = string_format("Imported %s", path.c_str());
-				sgeLogInfo(notificationMsg.c_str());
-				getEngineGlobal()->showNotification(notificationMsg);
-			}
 
 			// Create the needed materials.
 			JsonValueBuffer jvb;
@@ -206,6 +191,25 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 
 				AssetPtr assetTexture = assetLib->getAssetFromFile(textureDstPath.c_str());
 				assetLib->reloadAssetModified(assetTexture);
+			}
+
+			// Create the models.
+			for (MultiModelImportResult& model : importedModels) {
+				if (model.propsedFilename.empty())
+					continue;
+
+				std::string path = aid.outputDir + "/" + model.propsedFilename;
+
+				// Convert the 3d model to our internal type.
+				ModelWriter modelWriter;
+				const bool succeeded = modelWriter.write(model.importedModel, path.c_str());
+
+				AssetPtr assetModel = assetLib->getAssetFromFile(path.c_str());
+				assetLib->reloadAssetModified(assetModel);
+
+				std::string notificationMsg = string_format("Imported %s", path.c_str());
+				sgeLogInfo(notificationMsg.c_str());
+				getEngineGlobal()->showNotification(notificationMsg);
 			}
 
 			return true;
@@ -256,70 +260,6 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 	}
 
 	return false;
-}
-
-void AssetsWindow::update_assetImport(SGEContext* const sgecon, const InputState& is) {
-	if (ImGui::Button(ICON_FK_PLUS " Add Asset")) {
-		std::string filename = FileOpenDialog("Import 3D Model", true, "*.fbx\0*.fbx\0*.dae\0*.dae\0*.obj\0*.obj\0*.*\0*.*\0", nullptr);
-		if (filename.empty() == false) {
-			openAssetImport(filename);
-		}
-	}
-
-	if (ImGui::BeginChild("Child Assets To Import")) {
-		std::string groupPanelName;
-		for (int iAsset = 0; iAsset < m_assetsToImport.size(); ++iAsset) {
-			AssetImportData& aid = m_assetsToImport[iAsset];
-			ImGui::PushID(&aid);
-
-			if (aid.importFailed) {
-				ImGui::TextColored(ImVec4(1.f, 0.f, 0.f, 1.f), "Failed to Import");
-			}
-
-			string_format(groupPanelName, "3D Model %s", aid.fileToImportPath.c_str());
-			ImGuiEx::BeginGroupPanel(groupPanelName.c_str());
-			{
-				if (ImGui::Button("Import As")) {
-					aid.outputFilename = FileSaveDialog("Import 3D Model As", "*.mdl\0*.mdl", "mdl", nullptr);
-				}
-				ImGui::SameLine();
-				char importAs[1024] = {0};
-				sge_strcpy(importAs, aid.outputFilename.c_str());
-				if (ImGui::InputText("##Import As", importAs, SGE_ARRSZ(importAs))) {
-					aid.outputFilename = importAs;
-				}
-
-				ImGui::Checkbox("Preview", &aid.preview);
-				if (aid.preview) {
-					if (aid.assetType == assetIface_model3d) {
-						aid.modelPreviewWidget.doWidget(sgecon, is, getLoadedAssetIface<AssetIface_Model3D>(aid.tempAsset)->getStaticEval(),
-						                                vec2f(-1.f, 256.f));
-					}
-				}
-
-				if (ImGui::Button(ICON_FK_DOWNLOAD "Import")) {
-					if (importAsset(aid)) {
-						m_assetsToImport.erase(m_assetsToImport.begin() + iAsset);
-						iAsset--;
-					}
-				}
-
-				ImGui::SameLine();
-				if (ImGui::Button(ICON_FK_TRASH " Remove")) {
-					m_assetsToImport.erase(m_assetsToImport.begin() + iAsset);
-					iAsset--;
-				}
-			}
-			ImGuiEx::EndGroupPanel();
-
-			ImGui::PopID();
-		}
-
-		if (ImGui::Button("Import All")) {
-		}
-
-		ImGui::EndChild();
-	}
 }
 
 Texture* AssetsWindow::getThumbnailForModel3D(const std::string& localAssetPath) {
@@ -447,6 +387,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 
 				Optional<fs::path> rightClickedPath;
 
+				// Show All sub directories of the one we currenly explore.
 				std::string dirToAdd;
 				for (const fs::directory_entry& entry : fs::directory_iterator(pathToAssets)) {
 					if (entry.is_directory() && m_exploreFilter.PassFilter(entry.path().filename().string().c_str())) {
@@ -479,6 +420,8 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 							string_format(label, "%s %s", ICON_FK_FILE, entry.path().filename().string().c_str());
 						} else if (assetType == assetIface_audio) {
 							string_format(label, "%s %s", ICON_FK_FILE_AUDIO_O, entry.path().filename().string().c_str());
+						} else if (assetType == assetIface_mtl) {
+							string_format(label, "%s %s", ICON_FK_PAINT_BRUSH, entry.path().filename().string().c_str());
 						} else {
 							// Not implemented asset interface.
 							string_format(label, "%s %s", ICON_FK_QUESTION_CIRCLE, entry.path().filename().string().c_str());
@@ -486,7 +429,6 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 
 						if (assetType != assetIface_unknown) {
 							bool showAsSelected = isAssetLoaded(explorePreviewAsset) && explorePreviewAsset->getPath() == localAssetPath;
-
 
 							Texture* thumbnailTex = getThumbnailForAsset(localAssetPath);
 							if (thumbnailTex) {
@@ -512,9 +454,6 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is
 								ImGui::Text(localAssetPath.c_str());
 								ImGui::EndDragDropSource();
 							}
-
-
-
 						} else {
 							ImGui::Selectable(label.c_str());
 						}
