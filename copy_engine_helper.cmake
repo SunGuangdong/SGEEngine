@@ -50,8 +50,12 @@ endif()
 	)
 	
 	#sge_core shaders
+	#add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
+	#				   COMMAND ${CMAKE_COMMAND} -E copy_directory
+    #                   ${CMAKE_SOURCE_DIR}/libs/sge_core/core_shaders/ ${target_output_dir}/core_shaders)
+	
 	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
-					   COMMAND ${CMAKE_COMMAND} -E copy_directory
+					   COMMAND ${CMAKE_COMMAND} -E create_symlink
                        ${CMAKE_SOURCE_DIR}/libs/sge_core/core_shaders/ ${target_output_dir}/core_shaders)
 	
 	# sge_engine

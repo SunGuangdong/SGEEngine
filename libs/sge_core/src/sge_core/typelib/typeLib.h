@@ -579,6 +579,7 @@ struct SGE_CORE_API TypeLib {
 
 		TypeDesc& retval = m_registeredTypes[sgeTypeId(T)];
 		retval = TypeDesc::create<T>(name);
+		isCompleted[sgeTypeId(T)] = false;
 
 		// Auto-guess some traits.
 		if constexpr (std::is_enum<T>::value) {
