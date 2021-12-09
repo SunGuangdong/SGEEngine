@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "sge_core/sgecore_api.h"
@@ -13,6 +14,10 @@
 #include "CollisionMesh.h"
 
 namespace sge {
+
+struct AssetLibrary;
+struct AssetIface_Material;
+struct IMaterial;
 
 struct Model_CollisionShapeBox {
 	Model_CollisionShapeBox() = default;
@@ -72,7 +77,8 @@ struct Model_CollisionShapeSphere {
 
 /// Loading settings describing how the model should be loaded.
 struct ModelLoadSettings {
-	/// The directory of the file, used for loading asset. Needed when the model references other assets like textures.
+	/// The directory of the file, used for dependacy(materials or textures)loading assets.
+	/// Needed when the model references other assets like textures.
 	std::string assetDir;
 };
 
@@ -139,7 +145,8 @@ struct SGE_CORE_API ModelMesh {
 
 	AABox3f aabox; ///< The bounding box around the vertices of the mesh, without any deformation by skinning or anything else.
 
-	std::vector<ModelMeshBone> bones; ///< A list of bones affecting the mesh.
+	///< A list of bones affecting the mesh.
+	std::vector<ModelMeshBone> bones;
 
 	// The member below are available only if @Model::createRenderingResources gets called:
 
@@ -200,7 +207,6 @@ struct ModelAnimation {
 };
 
 struct ModelNode {
-	/// int nodeIdx = -1; // The "id" used to identify this piece of data in the file.
 	transf3d staticLocalTransform; ///< The local transformation of the node when not animated.
 
 	std::vector<MeshAttachment> meshAttachments;
@@ -215,9 +221,11 @@ struct ModelNode {
 /// like the GPUHandles to the vertex buffers needed.
 /// To render and/or play animations on that model use @EvaluatedModel.
 struct SGE_CORE_API Model {
-	/// @brief If the model is going to be used for rendering, you need to call this function
-	/// after the model is fully loaded. It will initialize vertex/index buffer or other needed data.
-	void createRenderingResources(SGEDevice& sgedev);
+	/// @brief If the model is going to be used for rendering,
+	/// you need to call this function after the model is fully loaded.
+	/// It will initialize vertex/index buffer or other needed data.
+	void prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetlib);
+
 
 	int makeNewNode();
 	int makeNewMaterial();
@@ -228,9 +236,11 @@ struct SGE_CORE_API Model {
 	int getRootNodeIndex() const {
 		return m_rootNodeIndex;
 	}
+
 	ModelNode* getRootNode() {
 		return nodeAt(getRootNodeIndex());
 	}
+
 	const ModelNode* getRootNode() const {
 		return nodeAt(getRootNodeIndex());
 	}
@@ -238,36 +248,42 @@ struct SGE_CORE_API Model {
 	int numNodes() const {
 		return int(m_nodes.size());
 	}
-	ModelNode* nodeAt(int nodeIndex);
-	const ModelNode* nodeAt(int nodeIndex) const;
-	int findFistNodeIndexWithName(const std::string& name) const;
 
 	int numMaterials() const {
 		return int(m_materials.size());
 	}
-	ModelMaterial* materialAt(int materialIndex);
-	const ModelMaterial* materialAt(int materialIndex) const;
 
 	int numMeshes() const {
 		return int(m_meshes.size());
 	}
-	ModelMesh* meshAt(int meshIndex);
-	const ModelMesh* meshAt(int meshIndex) const;
 
 	int numAnimations() const {
 		return int(m_animations.size());
 	}
+
+	ModelNode* nodeAt(int nodeIndex);
+	const ModelNode* nodeAt(int nodeIndex) const;
+	int findFistNodeIndexWithName(const std::string& name) const;
+	ModelMaterial* materialAt(int materialIndex);
+	const ModelMaterial* materialAt(int materialIndex) const;
+	IMaterial* loadedMaterialAt(int mtlIndex);
+	IMaterial* loadedMaterialAt(int mtlIndex) const;
+	ModelMesh* meshAt(int meshIndex);
+	const ModelMesh* meshAt(int meshIndex) const;
 	const ModelAnimation* animationAt(int iAnim) const;
 	ModelAnimation* animationAt(int iAnim);
 	const ModelAnimation* getAnimationByName(const std::string& name) const;
 	int getAnimationIndexByName(const std::string& name) const;
 
+
 	const std::vector<ModelNode*>& getNodes() {
 		return m_nodes;
 	}
+
 	const std::vector<ModelMesh*>& getMeshes() {
 		return m_meshes;
 	}
+
 	const std::vector<ModelMaterial*>& getMatrials() {
 		return m_materials;
 	}
@@ -275,18 +291,34 @@ struct SGE_CORE_API Model {
 	void setModelLoadSettings(const ModelLoadSettings& loadSets) {
 		m_loadSets = loadSets;
 	}
+
 	const ModelLoadSettings& getModelLoadSetting() const {
 		return m_loadSets;
 	}
 
   private:
+	void loadMaterials(AssetLibrary& assetLib);
+
+  private:
+	/// The index of the root node in the model.
+	/// All other nodes or somehow childred of this one.
 	int m_rootNodeIndex = -1;
+
+	/// An ordered list of all animations described by this model.
 	std::vector<ModelAnimation> m_animations;
+	/// An ordered list of all nodes. Others refer to this by its index here.
 	std::vector<ModelNode*> m_nodes;
+	/// An ordered list of all meshes. Others refer to this by its index here.
 	std::vector<ModelMesh*> m_meshes;
+	/// An ordered list of all raw materials data. Others refer to this by its index here.
 	std::vector<ModelMaterial*> m_materials;
+	/// A list of loaded materials ready to be used for rendering. Each elements corresponds
+	/// to an element with the same index in @m_materials.
+	std::vector<std::shared_ptr<AssetIface_Material>> m_loadedMaterial;
 
 	/// The actual storage for the model data.
+	/// The pointers of @m_nodes, @m_meshes, @m_materials
+	/// point to these.
 	ChunkContainer<ModelMesh> m_containerMesh;
 	ChunkContainer<ModelMaterial> m_containerMaterial;
 	ChunkContainer<ModelNode> m_containerNode;
@@ -294,7 +326,10 @@ struct SGE_CORE_API Model {
 	/// Cached loading settings.
 	ModelLoadSettings m_loadSets;
 
-  public: // TODO: make this private.
+  public:
+	// TODO: make these private.
+	// TODO: Make these use the same strcture we have for the physics RigidBody creation.
+
 	/// Stores the various collision shapes defineded in the model.
 	/// They are useful for having one place for the rendering geometry and the
 	/// geometry that is going to be used for game physics.

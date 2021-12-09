@@ -12,10 +12,16 @@ namespace sge {
 
 /// @brief Describes what should happen when an animation track finishes.
 enum TrackTransition : int {
-	trackTransition_loop,     ///< The animation should continue to loop when it ends. Example idle animation.
-	trackTransition_stop,     ///< The animation should stop at the end frame. Example death animations.
-	trackTransition_switchTo, ///< The animation should switch to another one when it ends. Example is when jump animation ends usually
-	                          ///< we want to be in landing anticipation animation.
+	/// The animation should continue to loop when it ends. Example idle animation.
+	trackTransition_loop,
+
+	/// The animation should stop at the end frame. Example death animations.
+	trackTransition_stop,
+
+	/// The animation should switch to another track when it ends. 
+	/// Example is when jump animation ends usually
+	/// we want to be in landing anticipation animation.
+	trackTransition_switchTo,
 };
 
 /// @brief AnimatorTrack describes a state in which our 3D model could be.

@@ -544,8 +544,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 			if (imageButton(m_assets.m_assetPlayIcon))
 				m_sceneInstance.getInspector().m_disableAutoStepping = false;
 		} else if (imageButton(m_assets.m_assetPauseIcon)) {
-			if (imageButton(m_assets.m_assetPauseIcon))
-				m_sceneInstance.getInspector().m_disableAutoStepping = true;
+			m_sceneInstance.getInspector().m_disableAutoStepping = true;
 		}
 
 

@@ -57,7 +57,7 @@ bool EvaluatedModel::evaluateFromMoments(const EvalMomentSets evalMoments[], int
 		EvalMomentSets staticMoment;
 		evaluateFromMomentsInternal(&staticMoment, 1);
 	}
-	evaluateMaterials();
+
 	evaluateSkinning();
 
 	return true;
@@ -65,7 +65,6 @@ bool EvaluatedModel::evaluateFromMoments(const EvalMomentSets evalMoments[], int
 
 bool EvaluatedModel::evaluateFromNodesGlobalTransform(const std::vector<mat4f>& boneGlobalTrasnformOverrides) {
 	evaluateNodesFromExternalBones(boneGlobalTrasnformOverrides);
-	evaluateMaterials();
 	evaluateSkinning();
 	return true;
 }
@@ -165,50 +164,6 @@ bool EvaluatedModel::evaluateNodesFromExternalBones(const std::vector<mat4f>& bo
 	return true;
 }
 
-bool EvaluatedModel::evaluateMaterials() {
-	if (areMaterialsAlreadyEvaluated) {
-		return false;
-	}
-
-	areMaterialsAlreadyEvaluated = true;
-	m_evaluatedMaterials.resize(m_model->numMaterials());
-
-	std::string texPath;
-
-	for (int iMaterial = 0; iMaterial < m_model->numMaterials(); ++iMaterial) {
-		const ModelMaterial* const rawMaterial = m_model->materialAt(iMaterial);
-
-		if (!rawMaterial->assetForThisMaterial.empty()) {
-			m_evaluatedMaterials[iMaterial] = m_assetLibrary->getLoadedAssetIface<AssetIface_Material>(
-			    rawMaterial->assetForThisMaterial.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
-		} else {
-			std::shared_ptr<DefaultPBRMtl> evalMtl = std::make_shared<DefaultPBRMtl>();
-			// Legacy material import where the materials weren't a separate asset.
-			evalMtl->diffuseColor = rawMaterial->oldInplaceMtl.diffuseColor;
-			evalMtl->roughness = rawMaterial->oldInplaceMtl.roughness;
-			evalMtl->metallic = rawMaterial->oldInplaceMtl.metallic;
-			evalMtl->needsAlphaSorting = rawMaterial->oldInplaceMtl.needsAlphaSorting;
-			evalMtl->alphaMultiplier = rawMaterial->oldInplaceMtl.alphaMultiplier;
-
-			// Metallic map.
-			evalMtl->texDiffuse = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.diffuseTextureName.c_str(),
-			                                                                          m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texMetallic = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(
-			    rawMaterial->oldInplaceMtl.metallicTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texRoughness = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(
-			    rawMaterial->oldInplaceMtl.roughnessTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
-			evalMtl->texNormalMap = m_assetLibrary->getLoadedAssetIface<AssetIface_Texture2D>(
-			    rawMaterial->oldInplaceMtl.normalTextureName.c_str(), m_model->getModelLoadSetting().assetDir.c_str());
-
-			std::shared_ptr<AssetIface_Material_Simple> mtlProvider = std::make_shared<AssetIface_Material_Simple>();
-			mtlProvider->mtl = evalMtl;
-
-			m_evaluatedMaterials[iMaterial] = mtlProvider;
-		}
-	}
-
-	return true;
-}
 
 bool EvaluatedModel::evaluateSkinning() {
 	SGEContext* const context = getCore()->getDevice()->getContext();

@@ -643,7 +643,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 					for (const ParticleGroupState::ParticleState& particle : pstate.getParticles()) {
 						mat4f particleTForm = n2w * mat4f::getTranslation(particle.pos) * mat4f::getScaling(particle.scale);
 
-						drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting, modelIface->getSharedEval(),
+						drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting, modelIface->getStaticEval(),
 						              InstanceDrawMods());
 					}
 				}

@@ -93,7 +93,6 @@ AABox3f TraitModel::getBBoxOS() const {
 }
 
 void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems) {
-
 	if (isRenderable == false) {
 		return;
 	}
@@ -140,28 +139,23 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 					}
 
 					if (mtl == nullptr) {
-						const std::shared_ptr<AssetIface_Material>& mtlProvider =
-						    evalModel->getEvalMaterial(node->meshAttachments[iAttach].attachedMaterialIndex);
-						if (mtlProvider) {
-							const std::shared_ptr<IMaterial>& mtlIface = mtlProvider->getMaterial();
-							if (mtlIface) {
-								mtl = mtlIface.get();
-							}
-						}
+						mtl = evalModel->m_model->loadedMaterialAt(node->meshAttachments[iAttach].attachedMaterialIndex);
 					}
 
-					IMaterialData* imtlData = mtl->getMaterialDataLocalStorage();
+					if (mtl) {
+						IMaterialData* imtlData = mtl->getMaterialDataLocalStorage();
 
-					renderItem.pMtlData = imtlData;
-					renderItem.zSortingPositionWs = mat_mul_pos(node2world, evalNode.aabbGlobalSpace.center());
-					renderItem.traitModel = this;
-					renderItem.evalModel = evalModel;
-					renderItem.iModel = iModel;
-					renderItem.iEvalNode = iNode;
-					renderItem.iEvalNodeMechAttachmentIndex = iAttach;
-					renderItem.needsAlphaSorting = imtlData->needsAlphaSorting;
+						renderItem.pMtlData = imtlData;
+						renderItem.zSortingPositionWs = mat_mul_pos(node2world, evalNode.aabbGlobalSpace.center());
+						renderItem.traitModel = this;
+						renderItem.evalModel = evalModel;
+						renderItem.iModel = iModel;
+						renderItem.iEvalNode = iNode;
+						renderItem.iEvalNodeMechAttachmentIndex = iAttach;
+						renderItem.needsAlphaSorting = imtlData->needsAlphaSorting;
 
-					renderItems.push_back(renderItem);
+						renderItems.push_back(renderItem);
+					}
 				}
 			}
 		}

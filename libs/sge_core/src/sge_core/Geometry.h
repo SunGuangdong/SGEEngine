@@ -36,12 +36,18 @@ struct Geometry {
 	    , ibByteOffset(ibByteOffset)
 	    , stride(stride)
 	    , ibFmt(ibFmt)
-	    , numElements(numElements) {}
+	    , numElements(numElements) {
+	}
 
-	bool hasData() const { return vertexBuffer != nullptr; }
+	bool hasData() const {
+		return vertexBuffer != nullptr;
+	}
 
-	bool hasVertexSkinning() const { return skinningBoneTransforms != nullptr && firstBoneOffset >= 0; }
+	bool hasVertexSkinning() const {
+		return skinningBoneTransforms != nullptr && firstBoneOffset >= 0;
+	}
 
+  public:
 	Buffer* vertexBuffer = nullptr;
 	Buffer* indexBuffer = nullptr;
 	Texture* skinningBoneTransforms = nullptr;

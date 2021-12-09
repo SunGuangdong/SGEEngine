@@ -1,13 +1,14 @@
-#include <functional>
-
 #include "Model.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
+#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
+#include <functional>
 
 namespace sge {
 
 //--------------------------------------------------------------
 // Model
 //--------------------------------------------------------------
-void Model::createRenderingResources(SGEDevice& sgedev) {
+void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib) {
 	for (ModelMesh* const mesh : m_meshes) {
 		const ResourceUsage::Enum usage = ResourceUsage::Immutable;
 
@@ -26,6 +27,44 @@ void Model::createRenderingResources(SGEDevice& sgedev) {
 				const BufferDesc ibd = BufferDesc::GetDefaultIndexBuffer((uint32)mesh->indexBufferRaw.size(), usage);
 				mesh->indexBuffer->create(ibd, mesh->indexBufferRaw.data());
 			}
+		}
+	}
+
+	loadMaterials(assetLib);
+}
+
+void Model::loadMaterials(AssetLibrary& assetLib) {
+	m_loadedMaterial.resize(numMaterials());
+
+	for (int iMaterial = 0; iMaterial < numMaterials(); ++iMaterial) {
+		const ModelMaterial* const rawMaterial = materialAt(iMaterial);
+
+		if (!rawMaterial->assetForThisMaterial.empty()) {
+			m_loadedMaterial[iMaterial] = assetLib.getLoadedAssetIface<AssetIface_Material>(rawMaterial->assetForThisMaterial.c_str(),
+			                                                                                getModelLoadSetting().assetDir.c_str());
+		} else {
+			std::shared_ptr<DefaultPBRMtl> evalMtl = std::make_shared<DefaultPBRMtl>();
+			// Legacy material import where the materials weren't a separate asset.
+			evalMtl->diffuseColor = rawMaterial->oldInplaceMtl.diffuseColor;
+			evalMtl->roughness = rawMaterial->oldInplaceMtl.roughness;
+			evalMtl->metallic = rawMaterial->oldInplaceMtl.metallic;
+			evalMtl->needsAlphaSorting = rawMaterial->oldInplaceMtl.needsAlphaSorting;
+			evalMtl->alphaMultiplier = rawMaterial->oldInplaceMtl.alphaMultiplier;
+
+			// Metallic map.
+			evalMtl->texDiffuse = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.diffuseTextureName.c_str(),
+			                                                                         getModelLoadSetting().assetDir.c_str());
+			evalMtl->texMetallic = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(
+			    rawMaterial->oldInplaceMtl.metallicTextureName.c_str(), getModelLoadSetting().assetDir.c_str());
+			evalMtl->texRoughness = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(
+			    rawMaterial->oldInplaceMtl.roughnessTextureName.c_str(), getModelLoadSetting().assetDir.c_str());
+			evalMtl->texNormalMap = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.normalTextureName.c_str(),
+			                                                                           getModelLoadSetting().assetDir.c_str());
+
+			std::shared_ptr<AssetIface_Material_Simple> mtlProvider = std::make_shared<AssetIface_Material_Simple>();
+			mtlProvider->mtl = evalMtl;
+
+			m_loadedMaterial[iMaterial] = mtlProvider;
 		}
 	}
 }
@@ -105,6 +144,24 @@ const ModelMaterial* Model::materialAt(int materialIndex) const {
 		return m_materials[materialIndex];
 	}
 	sgeAssert(false);
+	return nullptr;
+}
+
+IMaterial* Model::loadedMaterialAt(int materialIndex) {
+	if (materialIndex >= 0 && materialIndex < int(m_loadedMaterial.size())) {
+		if (m_loadedMaterial[materialIndex]) {
+			return m_loadedMaterial[materialIndex]->getMaterial().get();
+		}
+	}
+	return nullptr;
+}
+
+IMaterial* Model::loadedMaterialAt(int materialIndex) const {
+	if (materialIndex >= 0 && materialIndex < int(m_loadedMaterial.size())) {
+		if (m_loadedMaterial[materialIndex]) {
+			return m_loadedMaterial[materialIndex]->getMaterial().get();
+		}
+	}
 	return nullptr;
 }
 

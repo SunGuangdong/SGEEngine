@@ -15,7 +15,18 @@ struct TraitModelRenderItem : public IRenderItem {
 	int iEvalNode = -1; // The mesh to be rendered from the model.
 	int iEvalNodeMechAttachmentIndex = -1;
 
-	IMaterialData* pMtlData;
+	IMaterialData* pMtlData = nullptr;
+};
+
+struct TraitModelRenderItem2 : public IRenderItem {
+	Geometry geometry;
+	std::vector<mat4f> bonesTransforms;
+	IMaterialData* pMtlData = nullptr;
+
+	/// Transform the mesh to world space.
+	/// Includes the actorToWorld transform 
+	/// and the additional transofrm of the TraitModel.
+	mat4f mesh2world;
 };
 
 } // namespace sge

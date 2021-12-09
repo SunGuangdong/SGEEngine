@@ -29,13 +29,10 @@ bool AssetModel3D::loadAssetFromFile(const char* const path) {
 		return false;
 	}
 
-	m_model.createRenderingResources(*getCore()->getDevice());
+	m_model.prepareForRendering(*getCore()->getDevice(), m_ownerAssetLib);
 
 	m_staticEval.initialize(&m_ownerAssetLib, &m_model);
 	m_staticEval.evaluateStatic();
-
-	m_sharedEval.initialize(&m_ownerAssetLib, &m_model);
-	m_sharedEval.evaluateStatic();
 
 	if (succeeded) {
 		m_status = AssetStatus_Loaded;

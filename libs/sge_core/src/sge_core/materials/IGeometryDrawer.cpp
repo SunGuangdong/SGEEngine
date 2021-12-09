@@ -43,8 +43,8 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
 			mat4f const finalTrasform =
 			    (evalMesh.geometry.hasVertexSkinning()) ? geomWorldTransfrom : geomWorldTransfrom * evalNode.evalGlobalTransform;
 
-			const std::shared_ptr<AssetIface_Material>& mtlIface = evalModel.getEvalMaterial(meshAttachment.attachedMaterialIndex);
-			IMaterialData* mdlData = mtlIface && mtlIface->getMaterial() ? mtlIface->getMaterial()->getMaterialDataLocalStorage() : nullptr;
+			IMaterial* mtl = evalModel.m_model->loadedMaterialAt(meshAttachment.attachedMaterialIndex);
+			IMaterialData* mdlData = mtl ? mtl->getMaterialDataLocalStorage() : nullptr;
 
 			if_checked(mdlData) {
 				const MaterialFamilyLibrary::MaterialFamilyData* family =

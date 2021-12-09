@@ -13,13 +13,10 @@
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/utils/vector_map.h"
 
-#include "sge_core/materials/IMaterial.h"
-
 namespace sge {
 
 struct AssetLibrary;
 struct Asset;
-struct AssetIface_Material;
 
 struct EvaluatedNode {
 	mat4f evalLocalTransform = mat4f::getZero();
@@ -72,7 +69,6 @@ struct SGE_CORE_API EvaluatedModel {
 
 	/// Adds an animation that can be specified to the evaluate function.
 	/// Returns the index of the donor.
-	/// The asset will be taken form the assetLibrary specified to @initialize.
 	int addAnimationDonor(const AssetPtr& donorAsset);
 
 	/// Evaluates the model at the specified momemnt.
@@ -95,13 +91,6 @@ struct SGE_CORE_API EvaluatedModel {
 	}
 	const EvaluatedMesh& getEvalMesh(const int iMesh) const {
 		return m_evaluatedMeshes[iMesh];
-	}
-
-	int getNumEvalMaterial() const {
-		return int(m_evaluatedMaterials.size());
-	}
-	const std::shared_ptr<AssetIface_Material>& getEvalMaterial(const int iMesh) const {
-		return m_evaluatedMaterials[iMesh];
 	}
 
 	int getNumEvalNodes() const {
@@ -130,7 +119,6 @@ struct SGE_CORE_API EvaluatedModel {
 	bool evaluateNodes_common();
 	bool evaluateFromMomentsInternal(const EvalMomentSets evalMoments[], int numMoments);
 	bool evaluateNodesFromExternalBones(const std::vector<mat4f>& boneGlobalTrasnformOverrides);
-	bool evaluateMaterials();
 	bool evaluateSkinning();
 
   private:
@@ -151,11 +139,6 @@ struct SGE_CORE_API EvaluatedModel {
 	/// @brief Since meshes can be animated only by bone transforms, which only modify their bones.
 	/// We can patically evalute them only once.
 	std::vector<EvaluatedMesh> m_evaluatedMeshes;
-
-	/// @brief Since materials cannot be animated in any way,
-	/// and we cannot "accept" them from a donor they can be evaluated only once.
-	bool areMaterialsAlreadyEvaluated = false;
-	std::vector<std::shared_ptr<AssetIface_Material>> m_evaluatedMaterials;
 
 	std::vector<AnimationDonor> m_donors; // Caution: ckind of assumes that the AnimationDonor is moveable.
 

@@ -40,6 +40,20 @@ bool assetPicker(const char* label,
 		wasAssetPicked = true;
 	}
 
+	if (ImGui::IsItemClicked(1)) {
+		ImGui::OpenPopup("AssetPickerRightClickMenu");
+	}
+
+	if (ImGui::BeginPopup("AssetPickerRightClickMenu")) {
+		if (ImGui::Selectable("Clear")) {
+			assetPath.clear();
+			wasAssetPicked = true;
+		}
+
+		ImGui::EndPopup();
+	}
+	
+
 	// Handle accepting drops from drag and drop.
 	if (ImGui::BeginDragDropTarget()) {
 		if (Optional<std::string> droppedAssetPath = DragDropPayloadAsset::accept()) {
