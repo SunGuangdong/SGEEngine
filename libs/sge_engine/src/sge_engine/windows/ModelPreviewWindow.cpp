@@ -109,18 +109,45 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			animationDonors.clear();
 			previewAimationTime = 0.f;
 			autoPlayAnimation = true;
+			m_evalAnimator = ModelAnimator2();
+			nextTrackIndex = 0;
 			if (isAssetLoaded(m_model, assetIface_model3d)) {
-				m_eval.initialize(assetLib, &getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
+				m_eval.initialize(&getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
+				m_evalAnimator.create(*m_eval.m_model);
+
+				nextTrackIndex = 0;
+				for (int iAnim = 0; iAnim < m_eval.m_model->numAnimations(); ++iAnim) {
+					m_evalAnimator.trackCreate(nextTrackIndex);
+					m_evalAnimator.trackAddAmim(nextTrackIndex, nullptr, iAnim);
+
+					trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName);
+					trackAnimDuration.push_back(m_eval.m_model->animationAt(iAnim)->durationSec);
+					nextTrackIndex++;
+				}
+
+				// If there is at least one track play it.
+				if (nextTrackIndex > 0) {
+					m_evalAnimator.playTrack(0);
+				}
 			}
 		}
 
 		if (isAssetLoaded(m_model)) {
-			if (ImGui::Button("Add Animation Donor")) {
-				AssetPtr donor;
-				if (promptForModel(donor)) {
-					sgeAssert(isAssetLoaded(donor));
-					animationDonors.push_back(donor);
-					m_eval.addAnimationDonor(donor);
+			if (ImGui::Button("Add Animation from other model")) {
+				AssetPtr animSrcModel;
+				if (promptForModel(animSrcModel)) {
+					if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(animSrcModel)) {
+						Model& srcModel = modelIface->getModel3D();
+
+						for (int iAnim = 0; iAnim < srcModel.numAnimations(); ++iAnim) {
+							m_evalAnimator.trackCreate(nextTrackIndex);
+							m_evalAnimator.trackAddAmim(nextTrackIndex, &srcModel, iAnim);
+
+							trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath());
+							trackAnimDuration.push_back(srcModel.animationAt(iAnim)->durationSec);
+							nextTrackIndex++;
+						}
+					}
 				}
 			}
 		}
@@ -134,60 +161,28 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 
 		ImGui::EndChild();
 		ImGui::NextColumn();
-		if (m_model.get() != NULL) {
-			if (ImGui::BeginCombo("Animation", animationComboPreviewValue.c_str())) {
-				if (ImGui::Selectable("<None>")) {
-					animationComboPreviewValue = "<None>";
-					iPreviewAnimDonor = -1;
-					iPreviewAnimation = -1;
-				}
+		if (m_model.get() != NULL && m_evalAnimator.getNumTacks() > 0) {
 
-				for (int t = 0; t < m_eval.m_model->numAnimations(); ++t) {
-					const ModelAnimation* anim = m_eval.m_model->animationAt(t);
-					if (ImGui::Selectable(anim->animationName.c_str())) {
-						animationComboPreviewValue = anim->animationName;
-						iPreviewAnimDonor = -1;
-						iPreviewAnimation = t;
-					}
-				}
+			int playingTrackId = m_evalAnimator.getPlayingTrackId();
+			static std::string none = "None";
+			const std::string& previewName = playingTrackId > 0 ? trackDisplayName[playingTrackId] : none;
 
-				for (int iDonor = 0; iDonor < animationDonors.size(); ++iDonor) {
-					const Model& donorModel = getLoadedAssetIface<AssetIface_Model3D>(animationDonors[iDonor])->getModel3D();
-					for (int t = 0; t < donorModel.numAnimations(); ++t) {
-						const ModelAnimation* anim = donorModel.animationAt(t);
-						if (ImGui::Selectable((animationDonors[iDonor]->getPath() + " | " + anim->animationName).c_str())) {
-							animationComboPreviewValue = anim->animationName;
-							iPreviewAnimDonor = iDonor;
-							iPreviewAnimation = t;
-						}
+			if (ImGui::BeginCombo("Animation", previewName.c_str())) {
+				for (int t = 0; t < trackDisplayName.size(); ++t) {
+					if (ImGui::Selectable(trackDisplayName[t].c_str())) {
+						m_evalAnimator.playTrack(t);
 					}
 				}
 
 				ImGui::EndCombo();
 			}
 
-			EvalMomentSets evalMoment;
-			if (iPreviewAnimation == -1) {
-				evalMoment = EvalMomentSets();
-			} else {
-				const ModelAnimation* anim = m_eval.findAnimation(iPreviewAnimDonor, iPreviewAnimation);
+			m_evalAnimator.forceTrack(m_evalAnimator.getPlayingTrackId(), animationTime);
 
-				ImGui::Checkbox("Auto Play", &autoPlayAnimation);
-				if (autoPlayAnimation) {
-					previewAimationTime += 0.016f; // TODO timer.
+			std::vector<mat4f> nodeTrasf;
+			nodeTrasf.resize(m_eval.m_model->numNodes());
 
-					if (previewAimationTime > anim->durationSec) {
-						previewAimationTime -= anim->durationSec;
-					}
-				}
-
-				ImGui::SliderFloat("Time", &previewAimationTime, 0.f, anim->durationSec);
-
-				evalMoment.donorIndex = iPreviewAnimDonor;
-				evalMoment.animationIndex = iPreviewAnimation;
-				evalMoment.time = previewAimationTime;
-			}
-
+			m_evalAnimator.computeModleNodesTrasnforms();
 			m_eval.evaluateFromMoments(&evalMoment, 1);
 
 			const ImVec2 canvas_pos = ImGui::GetCursorScreenPos();

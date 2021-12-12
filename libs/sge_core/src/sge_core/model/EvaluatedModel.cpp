@@ -12,143 +12,46 @@
 
 namespace sge {
 
-void EvaluatedModel::initialize(AssetLibrary* const assetLibrary, Model* model) {
-	sgeAssert(assetLibrary != nullptr);
-	sgeAssert(model != nullptr);
-
+void EvaluatedModel::initialize(Model* model) {
 	*this = EvaluatedModel();
-	m_assetLibrary = assetLibrary;
+
+	sgeAssert(model != nullptr);
 	m_model = model;
+	if (m_model) {
+		evaluateStatic();
+	}
 }
 
-int EvaluatedModel::addAnimationDonor(const AssetPtr& donorAsset) {
-	if (isAssetLoaded(donorAsset, assetIface_model3d) == false || !isInitialized()) {
-		return -1;
-	}
+void EvaluatedModel::evaluateStatic() {
+	std::vector<mat4f> globalMatrices(m_model->numNodes());
 
-	for (int iDonor = 0; iDonor < m_donors.size(); ++iDonor) {
-		if (donorAsset == m_donors[iDonor].donorModel) {
-			return iDonor;
-		}
-	}
+	int iRoot = m_model->getRootNodeIndex();
 
-	AnimationDonor animDonor;
+	std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode, const mat4f& parentGlobalTform) -> void {
+		ModelNode* rawNode = m_model->nodeAt(iNode);
+		mat4f ownGlobalTransform = parentGlobalTform * rawNode->staticLocalTransform.toMatrix();
 
-	animDonor.donorModel = donorAsset;
-	animDonor.originalNodeId_to_donorNodeId.resize(m_model->numNodes(), -1);
+		globalMatrices[iNode] = ownGlobalTransform;
 
-	// Build the node-to-node remapping, Keep in mind that some nodes might not be present in the donor.
-	// in that case -1 should be written for that node index.
-	for (const int iOrigNode : range_int(m_model->numNodes())) {
-		const std::string& originalNodeName = m_model->nodeAt(iOrigNode)->name;
-		animDonor.originalNodeId_to_donorNodeId[iOrigNode] =
-		    getLoadedAssetIface<AssetIface_Model3D>(animDonor.donorModel)->getModel3D().findFistNodeIndexWithName(originalNodeName);
-	}
-
-	m_donors.emplace_back(std::move(animDonor));
-
-	return int(m_donors.size()) - 1;
-}
-
-bool EvaluatedModel::evaluateFromMoments(const EvalMomentSets evalMoments[], int numMoments) {
-	if (numMoments != 0 && evalMoments != nullptr) {
-		evaluateFromMomentsInternal(evalMoments, numMoments);
-	} else {
-		EvalMomentSets staticMoment;
-		evaluateFromMomentsInternal(&staticMoment, 1);
-	}
-
-	evaluateSkinning();
-
-	return true;
-}
-
-bool EvaluatedModel::evaluateFromNodesGlobalTransform(const std::vector<mat4f>& boneGlobalTrasnformOverrides) {
-	evaluateNodesFromExternalBones(boneGlobalTrasnformOverrides);
-	evaluateSkinning();
-	return true;
-}
-
-bool EvaluatedModel::evaluateNodes_common() {
-	aabox.setEmpty();
-	m_evaluatedNodes.resize(m_model->numNodes());
-
-	// Initialize the attachments to the node.
-
-	for (int iNode : range_int(m_model->numNodes())) {
-		EvaluatedNode& evalNode = m_evaluatedNodes[iNode];
-		// [EVAL_MESH_NODE_DEFAULT_ZERO]
-		evalNode.evalLocalTransform = mat4f::getZero();
-		evalNode.evalGlobalTransform = mat4f::getZero();
-	}
-
-	return true;
-}
-
-bool EvaluatedModel::evaluateFromMomentsInternal(const EvalMomentSets evalMoments[], int numMoments) {
-	evaluateNodes_common();
-
-	// Evaluates the nodes. They may be effecte by multiple models (stealing animations and blending them)
-	for (int const iMoment : range_int(numMoments)) {
-		const EvalMomentSets& moment = evalMoments[iMoment];
-
-		// Find the animation donor.
-		const AnimationDonor* donor = nullptr;
-		if (moment.donorIndex >= 0) {
-			if (moment.donorIndex < int(m_donors.size())) {
-				donor = &m_donors[moment.donorIndex];
-			} else {
-				sgeAssert(false && "Animation donor with the specified index could not be found!");
-				continue;
-			}
-		}
-
-		const Model& donorModel = (donor != nullptr) ? getLoadedAssetIface<AssetIface_Model3D>(donor->donorModel)->getModel3D() : *m_model;
-		const ModelAnimation* const donorAnimation = donorModel.animationAt(moment.animationIndex);
-
-		const float evalTime = moment.time;
-
-		for (int iOrigNode = 0; iOrigNode < m_model->numNodes(); ++iOrigNode) {
-			// Use the node form the specified Model in the node, if such node doesn't exists, fallback to the originalNode.
-			const int donorNodeIndex = (donor != nullptr) ? donor->originalNodeId_to_donorNodeId[iOrigNode] : iOrigNode;
-
-			// Find the node that is equvalent to the node in @m_model and evaluate its transform.
-			// If no such node was found use the default transformation from @m_model.
-			transf3d nodeLocalTransform;
-			if (donorNodeIndex >= 0) {
-				nodeLocalTransform = donorModel.nodeAt(donorNodeIndex)->staticLocalTransform;
-				if (donorAnimation != nullptr) {
-					donorAnimation->evaluateForNode(nodeLocalTransform, donorNodeIndex, evalTime);
-				}
-			} else {
-				nodeLocalTransform = m_model->nodeAt(iOrigNode)->staticLocalTransform;
-			}
-
-			// Caution: [EVAL_MESH_NODE_DEFAULT_ZERO]
-			// It is assumed that all transforms in evalNode are initialized to zero!
-			m_evaluatedNodes[iOrigNode].evalLocalTransform += nodeLocalTransform.toMatrix() * moment.weight;
-		}
-	}
-
-	// Evaluate the node global transform by traversing the node hierarchy using the local transform computed above.
-	// Evaluate attached meshes to the evaluated nodes.
-	std::function<void(int, mat4f)> traverseGlobalTransform;
-	traverseGlobalTransform = [&](int iNode, const mat4f& parentTransfrom) -> void {
-		EvaluatedNode& evalNode = m_evaluatedNodes[iNode];
-		evalNode.evalGlobalTransform = parentTransfrom * evalNode.evalLocalTransform;
-		evalNode.aabbGlobalSpace = evalNode.aabbGlobalSpace.getTransformed(evalNode.evalGlobalTransform);
-
-		for (const int childNodeIndex : m_model->nodeAt(iNode)->childNodes) {
-			traverseGlobalTransform(childNodeIndex, evalNode.evalGlobalTransform);
+		for (int childIndex : rawNode->childNodes) {
+			evalGlobalTransform(childIndex, ownGlobalTransform);
 		}
 	};
 
-	traverseGlobalTransform(m_model->getRootNodeIndex(), mat4f::getIdentity());
+	evaluate(globalMatrices.data(), globalMatrices.size());
+}
+
+
+bool EvaluatedModel::evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount) {
+	span<const mat4f> nodesTrasfSpan = span<const mat4f>(nodesGlobalTransform, nodesGlobalTransformCount);
+	evaluate_ApplyNodeGlobalTransforms(nodesTrasfSpan);
+	evaluate_Skinning();
 	return true;
 }
 
-bool EvaluatedModel::evaluateNodesFromExternalBones(const std::vector<mat4f>& boneGlobalTrasnformOverrides) {
-	evaluateNodes_common();
+bool EvaluatedModel::evaluate_ApplyNodeGlobalTransforms(const span<const mat4f>& boneGlobalTrasnformOverrides) {
+	aabox.setEmpty();
+	m_evaluatedNodes.resize(m_model->numNodes());
 
 	if (boneGlobalTrasnformOverrides.size() != m_model->numNodes()) {
 		sgeAssert(false && "It seems that the provided amount of node transforms isn't the one that we expect");
@@ -157,19 +60,17 @@ bool EvaluatedModel::evaluateNodesFromExternalBones(const std::vector<mat4f>& bo
 
 	for (int iNode = 0; iNode < m_model->numNodes(); ++iNode) {
 		EvaluatedNode& evalNode = m_evaluatedNodes[iNode];
-		// evalNode.evalLocalTransform is not computed as it isn't needed by anything at the moment.
 		evalNode.evalGlobalTransform = boneGlobalTrasnformOverrides[iNode];
 	}
 
 	return true;
 }
 
-
-bool EvaluatedModel::evaluateSkinning() {
-	SGEContext* const context = getCore()->getDevice()->getContext();
-
+bool EvaluatedModel::evaluate_Skinning() {
 	m_evaluatedMeshes.resize(m_model->numMeshes());
 	m_perMeshSkinningBonesTransformOFfsetInTex.resize(m_model->numMeshes(), -1);
+
+	// Clear the preovious state.
 	bonesTransformTexDataForAllMeshes.clear();
 
 	// Evaluate the meshes.
@@ -206,6 +107,7 @@ bool EvaluatedModel::evaluateSkinning() {
 		const bool doesBigEnoughTextureExists =
 		    m_skinningBoneTransfsTex.HasResource() && m_skinningBoneTransfsTex->getDesc().texture2D.height >= neededTexHeight;
 
+		SGEContext* const context = getCore()->getDevice()->getContext();
 		if (doesBigEnoughTextureExists == false) {
 			TextureDesc td;
 			td.textureType = UniformType::Texture2D;
@@ -256,16 +158,5 @@ bool EvaluatedModel::evaluateSkinning() {
 	return true;
 }
 
-const ModelAnimation* EvaluatedModel::findAnimation(const int idxDonor, const int animIndex) const {
-	if (idxDonor == -1) {
-		return m_model->animationAt(animIndex);
-	}
-
-	if (idxDonor >= 0 && idxDonor < m_donors.size()) {
-		return getLoadedAssetIface<AssetIface_Model3D>(m_donors[idxDonor].donorModel)->getModel3D().animationAt(animIndex);
-	}
-
-	return nullptr;
-}
 
 } // namespace sge

@@ -5,6 +5,7 @@
 #include "sge_engine/GameDrawer/GameDrawer.h"
 
 #include "sge_core/model/EvaluatedModel.h"
+#include "sge_core/model/ModelAnimator2.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/tiny/orbit_camera.h"
 #include "sge_utils/utils/optional.h"
@@ -20,14 +21,6 @@ struct SGE_ENGINE_API ModelPreviewWidget {
 
 
 struct ModelPreviewWindow : public IImGuiWindow {
-	struct MomentDataUI {
-		bool isEnabled = true;
-		AssetPtr modelAsset;
-		int animationMagicIndex = 0; // 0 is static moment, eveything else is the animation index + 1
-		EvalMomentSets moment;       // The actual moment that is going to be used.
-	};
-
-  public:
 	ModelPreviewWindow(std::string windowName, bool createAsChild = false)
 	    : m_windowName(std::move(windowName))
 	    , m_createAsChild(createAsChild) {
@@ -36,11 +29,13 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	bool isClosed() override {
 		return !m_isOpened;
 	}
-	void update(SGEContext* const sgecon, const InputState& is) override;
+
 	const char* getWindowName() const override {
 		return m_windowName.c_str();
 	}
 
+	void update(SGEContext* const sgecon, const InputState& is) override;
+	
 	AssetPtr& getModel() {
 		return m_model;
 	}
@@ -50,8 +45,8 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	bool m_createAsChild = false;
 	bool m_isOpened = true;
 
-	bool m_autoPlay = true;
 	AssetPtr m_model;
+	bool m_autoPlay = true;
 	GpuHandle<FrameTarget> m_frameTarget;
 
 	orbit_camera camera;
@@ -64,6 +59,12 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	std::vector<AssetPtr> animationDonors;
 
 	EvaluatedModel m_eval;
+	ModelAnimator2 m_evalAnimator;
+
+	int nextTrackIndex = 0;
+	float animationTime = 0.f;
+	std::vector<std::string> trackDisplayName;
+	std::vector<float> trackAnimDuration;
 };
 
 

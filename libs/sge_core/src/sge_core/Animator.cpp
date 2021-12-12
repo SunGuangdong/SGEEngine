@@ -1,4 +1,4 @@
-
+#if 0
 #include "Animator.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
@@ -201,3 +201,4 @@ void ModelAnimator::computeEvalMoments(std::vector<EvalMomentSets>& outMoments) 
 	}
 }
 } // namespace sge
+#endif
