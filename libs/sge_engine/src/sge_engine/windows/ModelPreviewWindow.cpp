@@ -90,15 +90,11 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened)) {
-		AssetLibrary* const assetLib = getCore()->getAssetLib();
-
 		if (m_frameTarget.IsResourceValid() == false) {
 			m_frameTarget = sgecon->getDevice()->requestResource<FrameTarget>();
 			m_frameTarget->create2D(64, 64);
 		}
 
-		ImGui::Columns(2);
-		ImGui::BeginChild("sidebar_wnd");
 
 		if (ImGui::Button("Pick##ModeToPreview")) {
 			promptForModel(m_model);
@@ -159,13 +155,13 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			ImGui::Text("Pick a Model");
 		}
 
-		ImGui::EndChild();
-		ImGui::NextColumn();
+		ImGui::DragFloat("Time", &animationTime, 0.01f);
+
 		if (m_model.get() != NULL && m_evalAnimator.getNumTacks() > 0) {
 
 			int playingTrackId = m_evalAnimator.getPlayingTrackId();
 			static std::string none = "None";
-			const std::string& previewName = playingTrackId > 0 ? trackDisplayName[playingTrackId] : none;
+			const std::string& previewName = playingTrackId >= 0 ? trackDisplayName[playingTrackId] : none;
 
 			if (ImGui::BeginCombo("Animation", previewName.c_str())) {
 				for (int t = 0; t < trackDisplayName.size(); ++t) {
@@ -180,10 +176,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 			m_evalAnimator.forceTrack(m_evalAnimator.getPlayingTrackId(), animationTime);
 
 			std::vector<mat4f> nodeTrasf;
-			nodeTrasf.resize(m_eval.m_model->numNodes());
-
-			m_evalAnimator.computeModleNodesTrasnforms();
-			m_eval.evaluateFromMoments(&evalMoment, 1);
+			m_evalAnimator.computeModleNodesTrasnforms(nodeTrasf);
+			m_eval.evaluate(nodeTrasf.data(), int(nodeTrasf.size()));
 
 			const ImVec2 canvas_pos = ImGui::GetCursorScreenPos();
 			ImVec2 canvas_size = ImGui::GetContentRegionAvail();

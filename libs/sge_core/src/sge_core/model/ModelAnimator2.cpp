@@ -1,4 +1,5 @@
 #include "ModelAnimator2.h"
+#include "sge_core/model/Model.h"
 #include "sge_utils/utils/range_loop.h"
 #include <functional>
 
@@ -106,7 +107,7 @@ void ModelAnimator2::forceTrack(int trackIdToPlay, float animTime) {
 
 	TrackPlayback playback;
 	playback.trackId = trackIdToPlay;
-	playback.timeInAnimation = 0.f;
+	playback.timeInAnimation = animTime;
 	playback.iAnimation = 0;
 	playback.mixingWeight = 1.f;
 	playback.normWeight = 1.f;
@@ -220,26 +221,28 @@ void ModelAnimator2::advanceAnimation(const float dt) {
 		float totalWeigth = 0.f;
 		for (int iPlayback = 0; iPlayback < m_playbacks.size(); ++iPlayback) {
 			TrackPlayback& playback = m_playbacks[iPlayback];
-			const AnimationTrack& trackInfo = m_tracks[playback.trackId];
-
 			totalWeigth += playback.mixingWeight;
 		}
 
 		for (int iPlayback = 0; iPlayback < m_playbacks.size(); ++iPlayback) {
 			TrackPlayback& playback = m_playbacks[iPlayback];
-			m_playbacks[iPlayback].normWeight = m_playbacks[iPlayback].mixingWeight / totalWeigth;
+			playback.normWeight = m_playbacks[iPlayback].mixingWeight / totalWeigth;
 		}
 	}
 }
 
-void ModelAnimator2::computeModleNodesTrasnforms(span<mat4f>& outNodeTransforms) {
-	if (outNodeTransforms.size() < m_modelToAnimate->numNodes()) {
-		sgeAssertFalse("The outNodeTransforms is not big enough!");
-		return;
-	}
+int ModelAnimator2::getNumNodes() const {
+	return m_modelToAnimate ? m_modelToAnimate->numNodes() : 0;
+}
 
-	for (mat4f& m : outNodeTransforms) {
-		m = mat4f::getZero();
+void ModelAnimator2::computeModleNodesTrasnforms(mat4f* outNodeTransforms) {
+	// if (outNodeTransforms.size() < m_modelToAnimate->numNodes()) {
+	//	sgeAssertFalse("The outNodeTransforms is not big enough!");
+	//	return;
+	//}
+
+	for (int t = 0; t < getNumNodes(); ++t) {
+		outNodeTransforms[t] = mat4f::getZero();
 	}
 
 	// Evaluates the nodes. They may be effecte by multiple models (stealing animations and blending them)
@@ -252,7 +255,8 @@ void ModelAnimator2::computeModleNodesTrasnforms(span<mat4f>& outNodeTransforms)
 
 		const float evalTime = playback.timeInAnimation;
 
-		for (int iOrigNode = 0; iOrigNode < m_modelToAnimate->numNodes(); ++iOrigNode) {
+		const int numNodes = m_modelToAnimate->numNodes();
+		for (int iOrigNode = 0; iOrigNode < numNodes; ++iOrigNode) {
 			// Use the node form the specified Model in the node, if such node doesn't exists, fallback to the originalNode.
 			int donorNodeIndex = -1;
 			if (animSrc.modelAnimSouce) {
@@ -275,25 +279,26 @@ void ModelAnimator2::computeModleNodesTrasnforms(span<mat4f>& outNodeTransforms)
 				nodeLocalTransform = m_modelToAnimate->nodeAt(iOrigNode)->staticLocalTransform;
 			}
 
-			// Caution: [EVAL_MESH_NODE_DEFAULT_ZERO]
-			// It is assumed that all transforms in evalNode are initialized to zero!
-			// Compute the local transform of each node. Once we are done with all nodes
-			// we are going to convert these to global transforms.
-			outNodeTransforms[iOrigNode] += nodeLocalTransform.toMatrix() * playback.normWeight;
+			if (playback.normWeight != 1.f) {
+				outNodeTransforms[iOrigNode] += nodeLocalTransform.toMatrix() * playback.normWeight;
+			} else {
+				outNodeTransforms[iOrigNode] += nodeLocalTransform.toMatrix();
+			}
 		}
 	}
 
 	// Evaluate the node global transform by traversing the node hierarchy using the
 	// local transform computed above.
-	std::function<void(int, mat4f)> traverseGlobalTransform;
-	traverseGlobalTransform = [&](int iNode, const mat4f& parentTransfrom) -> void {
+	std::function<void(mat4f*, Model*, int, mat4f)> traverseGlobalTransform;
+	traverseGlobalTransform = [&traverseGlobalTransform](mat4f* outNodeTransforms, Model* model, int iNode,
+	                                                     const mat4f& parentTransfrom) -> void {
 		outNodeTransforms[iNode] = parentTransfrom * outNodeTransforms[iNode];
-		for (const int childNodeIndex : m_modelToAnimate->nodeAt(iNode)->childNodes) {
-			traverseGlobalTransform(childNodeIndex, outNodeTransforms[iNode]);
+		for (const int childNodeIndex : model->nodeAt(iNode)->childNodes) {
+			traverseGlobalTransform(outNodeTransforms, model, childNodeIndex, outNodeTransforms[iNode]);
 		}
 	};
 
-	traverseGlobalTransform(m_modelToAnimate->getRootNodeIndex(), mat4f::getIdentity());
+	traverseGlobalTransform(outNodeTransforms, m_modelToAnimate, m_modelToAnimate->getRootNodeIndex(), mat4f::getIdentity());
 }
 
 } // namespace sge

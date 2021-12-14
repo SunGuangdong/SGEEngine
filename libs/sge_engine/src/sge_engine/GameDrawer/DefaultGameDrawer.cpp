@@ -548,7 +548,7 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
                                                   DrawReason const drawReason) {
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
 	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
-	const mat4f n2w = ri.traitModel->getActor()->getTransformMtx();
+	const mat4f actor2world = ri.traitModel->getActor()->getTransformMtx();
 	ModelNode* node = ri.evalModel->m_model->nodeAt(ri.iEvalNode);
 
 	const MeshAttachment& meshAttachment = node->meshAttachments[ri.iEvalNodeMechAttachmentIndex];
@@ -559,9 +559,9 @@ void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
 
 	mat4f finalTrasform;
 	if (evalMesh.geometry.hasVertexSkinning()) {
-		finalTrasform = n2w * ri.traitModel->m_models[ri.iModel].m_additionalTransform;
+		finalTrasform = actor2world * ri.traitModel->m_models[ri.iModel].m_additionalTransform;
 	} else {
-		finalTrasform = n2w * ri.traitModel->m_models[ri.iModel].m_additionalTransform * evalNode.evalGlobalTransform;
+		finalTrasform = actor2world * ri.traitModel->m_models[ri.iModel].m_additionalTransform * evalNode.evalGlobalTransform;
 	}
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {

@@ -24,9 +24,6 @@ void EvaluatedModel::initialize(Model* model) {
 
 void EvaluatedModel::evaluateStatic() {
 	std::vector<mat4f> globalMatrices(m_model->numNodes());
-
-	int iRoot = m_model->getRootNodeIndex();
-
 	std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode, const mat4f& parentGlobalTform) -> void {
 		ModelNode* rawNode = m_model->nodeAt(iNode);
 		mat4f ownGlobalTransform = parentGlobalTform * rawNode->staticLocalTransform.toMatrix();
@@ -38,7 +35,10 @@ void EvaluatedModel::evaluateStatic() {
 		}
 	};
 
-	evaluate(globalMatrices.data(), globalMatrices.size());
+	const int iRoot = m_model->getRootNodeIndex();
+	evalGlobalTransform(iRoot, mat4f::getIdentity());
+
+	evaluate(globalMatrices.data(), int(globalMatrices.size()));
 }
 
 

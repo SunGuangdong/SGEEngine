@@ -31,7 +31,7 @@ bool AssetModel3D::loadAssetFromFile(const char* const path) {
 
 	m_model.prepareForRendering(*getCore()->getDevice(), m_ownerAssetLib);
 
-	m_staticEval.initialize(&m_ownerAssetLib, &m_model);
+	m_staticEval.initialize(&m_model);
 	m_staticEval.evaluateStatic();
 
 	if (succeeded) {

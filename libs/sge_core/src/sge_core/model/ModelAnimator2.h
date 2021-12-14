@@ -1,8 +1,11 @@
 #pragma once
 
+#include "sge_core/sgecore_api.h"
+#include "sge_utils/math/mat4.h"
 #include "sge_utils/utils/span.h"
 #include <array>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 
@@ -25,7 +28,7 @@ enum TrackTransition : int {
 	trackTransition_switchTo,
 };
 
-struct ModelAnimator2 {
+struct SGE_CORE_API ModelAnimator2 {
 	/// Initializes the @ModelAnimator2 so it could animate the nodes to the specified model.
 	void create(Model& modelToBeAnimated);
 
@@ -51,7 +54,18 @@ struct ModelAnimator2 {
 	void forceTrack(int trackIdToPlay, float animTime);
 
 	void advanceAnimation(const float dt);
-	void computeModleNodesTrasnforms(span<mat4f>& outNodeTransforms);
+
+	/// @param [out] outNodeTransforms a pre-allocated array holding a trasnform for each node.
+	/// The size could be obtained by @getNumNodes.
+	void computeModleNodesTrasnforms(mat4f* outNodeTransforms);
+
+	/// @param [out] outNodeTransforms will be automatically resized to hold a transform for each node.
+	void computeModleNodesTrasnforms(std::vector<mat4f>& outNodeTransforms) {
+		outNodeTransforms.resize(getNumNodes());
+		computeModleNodesTrasnforms(outNodeTransforms.data());
+	}
+
+	int getNumNodes() const;
 
 	int getNumTacks() const {
 		return int(m_tracks.size());
@@ -127,7 +141,7 @@ struct ModelAnimator2 {
 	/// This is a stack so the last one is "dominant".
 	std::vector<TrackPlayback> m_playbacks;
 
-	std::unordered_map<Model*, std::vector<int>> m_perModel_srcNode_toNode;
+	std::unordered_map<const Model*, std::vector<int>> m_perModel_srcNode_toNode;
 };
 
 } // namespace sge

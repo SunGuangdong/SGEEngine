@@ -6,6 +6,8 @@
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/GameDrawer/IRenderItem.h"
 #include "sge_utils/ChangeIndex.h"
+#include "sge_utils/utils/optional.h"
+#include "sge_core/model/EvaluatedModel.h"
 
 namespace sge {
 
