@@ -57,7 +57,7 @@ void ModelAnimator::playTrack(int const trackId, Optional<float> blendToSeconds)
 
 	playback.trackId = trackId;
 	playback.timeInAnimation = 0.f;
-	playback.iAnimation = 0; // TODO: randomize this.
+	playback.trackAnimationIndex = 0; // TODO: randomize this.
 	// If there is going to be a fadeout start form 0 weight growing to one, to smoothly transition.
 	// otherwise durectly use 100% weight.
 	playback.unormWeight = m_playbacks.empty() ? 1.f : 0.f;
@@ -78,7 +78,7 @@ void ModelAnimator::update(float const dt) {
 
 		const AnimatorTrack& trackInfo = m_tracks[playback.trackId];
 
-		AnimatorTrack::AnimationDonor animationDonor = trackInfo.animations[playback.iAnimation];
+		AnimatorTrack::AnimationDonor animationDonor = trackInfo.animations[playback.trackAnimationIndex];
 		const ModelAnimation* const animInfo = animationDonor.getAnimation();
 
 		if (animInfo == nullptr) {
@@ -103,7 +103,7 @@ void ModelAnimator::update(float const dt) {
 			switch (trackInfo.transition) {
 				case trackTransition_loop: {
 					playback.timeInAnimation = playback.timeInAnimation - animInfo->durationSec * (float)signedRepeatCnt;
-					playback.iAnimation = 0; // TODO: randomize the animation.
+					playback.trackAnimationIndex = 0; // TODO: randomize the animation.
 				} break;
 				case trackTransition_stop: {
 					playback.timeInAnimation = animInfo->durationSec;
@@ -181,8 +181,8 @@ void ModelAnimator::computeEvalMoments(std::vector<EvalMomentSets>& outMoments) 
 		EvalMomentSets momentForTrack;
 		momentForTrack.weight = playback.unormWeight / maxUnormWeightTotal;
 		momentForTrack.time = playback.timeInAnimation;
-		momentForTrack.donorIndex = trackInfo.animations[playback.iAnimation].donorIndex;
-		momentForTrack.animationIndex = trackInfo.animations[playback.iAnimation].animationIndexInDonor;
+		momentForTrack.donorIndex = trackInfo.animations[playback.trackAnimationIndex].donorIndex;
+		momentForTrack.animationIndex = trackInfo.animations[playback.trackAnimationIndex].animationIndexInDonor;
 
 		totalWeigth += momentForTrack.weight;
 

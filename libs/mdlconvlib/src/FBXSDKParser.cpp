@@ -1218,11 +1218,10 @@ void FBXSDKParser::importAnimations() {
 						fbxsdk::FbxTime const fbxKeyTime = fKey.GetTime();
 
 						const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
-						fbxsdk::FbxVector4 const fRotation = localTransform.GetS();
+						fbxsdk::FbxVector4 const fScaling = localTransform.GetS();
 
 						// Convert the keyframe to our own format and save it.
 						float const keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
-						fbxsdk::FbxVector4 const fScaling = localTransform.GetS();
 						vec3f const scaling = vec3f((float)fScaling.mData[0], (float)fScaling.mData[1], (float)fScaling.mData[2]);
 						nodeKeyFrames.scalingKeyFrames[keyTimeSeconds] = scaling;
 					}

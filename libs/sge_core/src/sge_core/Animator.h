@@ -82,7 +82,7 @@ struct SGE_CORE_API ModelAnimator {
 	struct TrackPlayback {
 		int trackId = -1;
 
-		int iAnimation = -1;
+		int trackAnimationIndex = -1;
 		float timeInAnimation = 0.f;
 		float unormWeight = 1.f;
 	};

@@ -115,7 +115,7 @@ struct SGE_CORE_API ModelAnimator2 {
 	/// Describes the state of a track being currently played.
 	struct TrackPlayback {
 		int trackId = -1;
-		int iAnimation = -1;
+		int trackAnimationIndex = -1; // The index in @AnimationTrack::animationSources that provides the animation.
 		float timeInAnimation = 0.f;
 
 		/// Unormalzed weight, used when mixing multiple track playbacks.

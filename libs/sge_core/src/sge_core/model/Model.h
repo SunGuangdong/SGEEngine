@@ -185,7 +185,14 @@ struct ModelAnimation {
 	    , perNodeKeyFrames(std::move(perNodeKeyFrames)) {
 	}
 
-	bool evaluateForNode(transf3d& outTransform, const int nodeIndex, const float time) const {
+	/// Modifies the specified transform and amends the keyframed data. Non-keyframed data is not changed.
+	/// Usually you want to initialize this to the node static local transform before calling this function
+	/// to properly get the transform of the node at that moment in animation.
+	/// @param [in,out] outTransform the transform to get modified.
+	/// @param [in] the keyframes for the targeted node.
+	/// @param [in] time is the time in the animation used to interpolate between keyframes.
+	/// @return true if there were keyframes for the node.
+	bool modifyTransformWithKeyFrames(transf3d& outTransform, const int nodeIndex, const float time) const {
 		auto itr = perNodeKeyFrames.find(nodeIndex);
 		if (itr != perNodeKeyFrames.end()) {
 			itr->second.evaluate(outTransform, time);

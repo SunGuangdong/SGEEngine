@@ -94,7 +94,7 @@ void ModelAnimator2::playTrack(int trackIdToPlay) {
 
 	playback.trackId = trackIdToPlay;
 	playback.timeInAnimation = 0.f;
-	playback.iAnimation = 0; // TODO: randomize this.
+	playback.trackAnimationIndex = 0; // TODO: randomize this.
 	// If there is going to be a fadeout start form 0 weight growing to one, to smoothly transition.
 	// otherwise durectly use 100% weight.
 	playback.mixingWeight = m_playbacks.empty() ? 1.f : 0.f;
@@ -108,7 +108,7 @@ void ModelAnimator2::forceTrack(int trackIdToPlay, float animTime) {
 	TrackPlayback playback;
 	playback.trackId = trackIdToPlay;
 	playback.timeInAnimation = animTime;
-	playback.iAnimation = 0;
+	playback.trackAnimationIndex = 0;
 	playback.mixingWeight = 1.f;
 	playback.normWeight = 1.f;
 
@@ -128,7 +128,7 @@ void ModelAnimator2::advanceAnimation(const float dt) {
 
 		const AnimationTrack& trackInfo = m_tracks[playback.trackId];
 
-		const AnimationModelSrc& animationSrc = trackInfo.animationSources[playback.iAnimation];
+		const AnimationModelSrc& animationSrc = trackInfo.animationSources[playback.trackAnimationIndex];
 		const ModelAnimation* const animInfo = animationSrc.modelAnimSouce->animationAt(animationSrc.animIndexInAnimSource);
 
 		if (animInfo == nullptr) {
@@ -154,7 +154,7 @@ void ModelAnimator2::advanceAnimation(const float dt) {
 			switch (trackInfo.transition) {
 				case trackTransition_loop: {
 					playback.timeInAnimation = playback.timeInAnimation - animInfo->durationSec * (float)signedRepeatCnt;
-					playback.iAnimation = 0; // TODO: randomize the animation.
+					playback.trackAnimationIndex = 0; // TODO: randomize the animation.
 				} break;
 				case trackTransition_stop: {
 					playback.timeInAnimation = animInfo->durationSec;
@@ -241,23 +241,27 @@ void ModelAnimator2::computeModleNodesTrasnforms(mat4f* outNodeTransforms) {
 	//	return;
 	//}
 
-	for (int t = 0; t < getNumNodes(); ++t) {
-		outNodeTransforms[t] = mat4f::getZero();
+	bool isSingleTrackPlaying = m_playbacks.size() == 1;
+
+	if (!isSingleTrackPlaying) {
+		for (int t = 0; t < getNumNodes(); ++t) {
+			outNodeTransforms[t] = mat4f::getZero();
+		}
 	}
 
 	// Evaluates the nodes. They may be effecte by multiple models (stealing animations and blending them)
 	for (const TrackPlayback& playback : m_playbacks) {
 		const AnimationTrack& track = m_tracks[playback.trackId];
-		const AnimationModelSrc& animSrc = track.animationSources[playback.iAnimation];
+		const AnimationModelSrc& animSrc = track.animationSources[playback.trackAnimationIndex];
 
 		const Model& animationSourceModel = (animSrc.modelAnimSouce != nullptr) ? *animSrc.modelAnimSouce : *m_modelToAnimate;
-		const ModelAnimation* const animationSourceAnimation = animationSourceModel.animationAt(playback.iAnimation);
+		const ModelAnimation* const animationSourceAnimation = animationSourceModel.animationAt(animSrc.animIndexInAnimSource);
 
 		const float evalTime = playback.timeInAnimation;
 
 		const int numNodes = m_modelToAnimate->numNodes();
 		for (int iOrigNode = 0; iOrigNode < numNodes; ++iOrigNode) {
-			// Use the node form the specified Model in the node, if such node doesn't exists, fallback to the originalNode.
+			// Find the node index in the animation source model.
 			int donorNodeIndex = -1;
 			if (animSrc.modelAnimSouce) {
 				donorNodeIndex = m_perModel_srcNode_toNode[&animationSourceModel][iOrigNode];
@@ -265,24 +269,23 @@ void ModelAnimator2::computeModleNodesTrasnforms(mat4f* outNodeTransforms) {
 				donorNodeIndex = iOrigNode;
 			}
 
-			// Find the node that is equvalent to the node in @m_model and evaluate its transform.
+			// Now evaluate the transform of that node for the animation moment.
 			// If no such node was found use the default transformation from @m_model.
 			transf3d nodeLocalTransform;
 			if (donorNodeIndex >= 0) {
 				if (animationSourceAnimation != nullptr) {
-					animationSourceAnimation->evaluateForNode(nodeLocalTransform, donorNodeIndex, evalTime);
-				} else {
 					nodeLocalTransform = animationSourceModel.nodeAt(donorNodeIndex)->staticLocalTransform;
+					animationSourceAnimation->modifyTransformWithKeyFrames(nodeLocalTransform, donorNodeIndex, evalTime);
 				}
 			} else {
 				// In no matching node is found, apply the static transform that has no animation.
 				nodeLocalTransform = m_modelToAnimate->nodeAt(iOrigNode)->staticLocalTransform;
 			}
 
-			if (playback.normWeight != 1.f) {
-				outNodeTransforms[iOrigNode] += nodeLocalTransform.toMatrix() * playback.normWeight;
+			if (isSingleTrackPlaying) {
+				outNodeTransforms[iOrigNode] = nodeLocalTransform.toMatrix();
 			} else {
-				outNodeTransforms[iOrigNode] += nodeLocalTransform.toMatrix();
+				outNodeTransforms[iOrigNode] += nodeLocalTransform.toMatrix() * playback.normWeight;
 			}
 		}
 	}
@@ -292,9 +295,10 @@ void ModelAnimator2::computeModleNodesTrasnforms(mat4f* outNodeTransforms) {
 	std::function<void(mat4f*, Model*, int, mat4f)> traverseGlobalTransform;
 	traverseGlobalTransform = [&traverseGlobalTransform](mat4f* outNodeTransforms, Model* model, int iNode,
 	                                                     const mat4f& parentTransfrom) -> void {
-		outNodeTransforms[iNode] = parentTransfrom * outNodeTransforms[iNode];
+		mat4f currNodeGlobalTransform = parentTransfrom * outNodeTransforms[iNode];
+		outNodeTransforms[iNode] = currNodeGlobalTransform;
 		for (const int childNodeIndex : model->nodeAt(iNode)->childNodes) {
-			traverseGlobalTransform(outNodeTransforms, model, childNodeIndex, outNodeTransforms[iNode]);
+			traverseGlobalTransform(outNodeTransforms, model, childNodeIndex, currNodeGlobalTransform);
 		}
 	};
 

@@ -51,31 +51,43 @@ namespace ProperyEditorUIGen {
 void ProperyEditorUIGen::doGameObjectUI(GameInspector& inspector, GameObject* const gameObject) {
 	const TypeDesc* const pDesc = typeLib().find(gameObject->getType());
 	if (pDesc != nullptr) {
-		ImGui::Text("Object Type: %s", pDesc->name);
 
-		int idGui = gameObject->getId().id;
-		ImGui::InputInt("Id", &idGui, 0);
+		const AssetIface_Texture2D* iconImg =
+		    getLoadedAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(gameObject->getType()));
+		if (iconImg && iconImg->getTexture()) {
+			ImGui::Image(iconImg->getTexture(), ImVec2(32.f, 32.f));
+			ImGui::SameLine();
+		}
 
+		ImGui::Text(pDesc->name);
+		
 
-		IActorCustomAttributeEditorTrait* const actorCustomAETrait = getTrait<IActorCustomAttributeEditorTrait>(gameObject);
+		char objIdText[64] = {'\0'};
+		sge_snprintf(objIdText, SGE_ARRSZ(objIdText), "%d", gameObject->getId().id);
+		ImGuiEx::Label("ID");
+		ImGui::InputText("##GameObject_Id", objIdText, SGE_ARRSZ(objIdText), ImGuiInputTextFlags_ReadOnly);
 
-		if (actorCustomAETrait) {
-			// If the attribute editor is customly made, make sure that we show the most common properties automatically.
-			// It is thedious to always add them manually.
-			ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(GameObject, m_displayName));
-			if (gameObject->isActor()) {
-				ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(Actor, m_logicTransform));
-				ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(Actor, m_forceAlphaZSort));
-			}
+		if (ImGui::BeginChild("PropertyEditorObjectProperties")) {
+			IActorCustomAttributeEditorTrait* const actorCustomAETrait = getTrait<IActorCustomAttributeEditorTrait>(gameObject);
+			if (actorCustomAETrait) {
+				// If the attribute editor is customly made, make sure that we show the most common properties automatically.
+				// It is thedious to always add them manually.
+				ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(GameObject, m_displayName));
+				if (gameObject->isActor()) {
+					ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(Actor, m_logicTransform));
+					ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(Actor, m_forceAlphaZSort));
+				}
 
-			actorCustomAETrait->doAttributeEditor(&inspector);
-		} else {
-			for (const MemberDesc& member : pDesc->members) {
-				if (member.isEditable()) {
-					ProperyEditorUIGen::doMemberUI(inspector, gameObject, MemberChain(&member));
+				actorCustomAETrait->doAttributeEditor(&inspector);
+			} else {
+				for (const MemberDesc& member : pDesc->members) {
+					if (member.isEditable()) {
+						ProperyEditorUIGen::doMemberUI(inspector, gameObject, MemberChain(&member));
+					}
 				}
 			}
 		}
+		ImGui::EndChild();
 	}
 }
 

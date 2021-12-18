@@ -63,7 +63,7 @@ void LogWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSE
 			// Check if new messages have appeared since the last update.
 			// If so, scroll to the bottom of the messages.
 			if (prevUpdateMessageCount != int(log.getMessages().size())) {
-				ImGui::SetScrollHere(1.0f);
+				ImGui::SetScrollHereY(1.0f);
 			}
 			prevUpdateMessageCount = int(log.getMessages().size());
 		}
