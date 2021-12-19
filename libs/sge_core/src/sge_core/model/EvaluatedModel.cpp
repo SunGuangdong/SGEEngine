@@ -46,6 +46,7 @@ bool EvaluatedModel::evaluate(const mat4f* nodesGlobalTransform, const int nodes
 	span<const mat4f> nodesTrasfSpan = span<const mat4f>(nodesGlobalTransform, nodesGlobalTransformCount);
 	evaluate_ApplyNodeGlobalTransforms(nodesTrasfSpan);
 	evaluate_Skinning();
+	evaluate_getAllGeometries();
 	return true;
 }
 
@@ -154,6 +155,31 @@ bool EvaluatedModel::evaluate_Skinning() {
 			aabox.expand(m_evaluatedNodes[iNode].aabbGlobalSpace);
 		}
 	}
+
+	return true;
+}
+
+bool EvaluatedModel::evaluate_getAllGeometries() {
+	m_allEvalGeometries.clear();
+
+	for (int iNode = 0; iNode < getNumEvalNodes(); ++iNode) {
+		const EvaluatedNode& evalNode = getEvalNode(iNode);
+
+		EvaluatedGeomInstance geomInst;
+
+		geomInst.modelSpaceTransform = evalNode.evalGlobalTransform;
+		for (const MeshAttachment& meshAttachment : m_model->nodeAt(iNode)->meshAttachments) {
+			const EvaluatedMesh& evalMesh = getEvalMesh(meshAttachment.attachedMeshIndex);
+			ModelMesh* mesh = m_model->meshAt(meshAttachment.attachedMeshIndex);
+
+			geomInst.geometry = evalMesh.geometry;
+			geomInst.iMaterial = meshAttachment.attachedMaterialIndex;
+			geomInst.modelSpaceBBox = mesh->aabox.getTransformed(geomInst.modelSpaceTransform);
+
+			m_allEvalGeometries.push_back(geomInst);
+		}
+	}
+
 
 	return true;
 }

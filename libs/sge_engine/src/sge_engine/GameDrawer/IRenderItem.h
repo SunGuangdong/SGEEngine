@@ -25,12 +25,21 @@ struct IRenderItem {
 
 	// Values that must be filled by user:
 
-	vec3f zSortingPositionWs = vec3f(0.f); ///< Must be filled by user. The point in world space to be used for zSorting.
-	bool needsAlphaSorting = false; ///< Must be filled by user.  True if the item needs to be sorted for correct alpha blending.
+	/// Must be filled by user. The point in world space to be used for zSorting.
+	/// Even if render item does not need alpha blending it is good to compute it
+	/// as this is used for fron-to-back rendering of opaque object to reduce the
+	/// overdraw done by pixel shaders.
+	vec3f zSortingPositionWs = vec3f(0.f); 
 
-	// Intervalues used at a later stage.
+	/// Must be filled by user.  True if the item needs to be sorted for correct alpha blending.
+	bool needsAlphaSorting = false; 
 
-	float zSortingValue = 0; ///< A value computed later, it is used for sorting objects based on the camera.
+public:
+	/// Internal values used at a later stage.
+	/// Do not specify, let the GameDrawer do it.
+	
+	/// A value computed later, it is used for sorting objects based on the camera orientation and @zSortingPositionWs.
+	float zSortingValue = 0; 
 };
 
 } // namespace sge

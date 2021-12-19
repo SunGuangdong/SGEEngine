@@ -13,7 +13,7 @@
 #include "sge_utils/math/mat4.h"
 
 #include "sge_engine/GameDrawer/RenderItems/HelperDrawRenderItem.h"
-#include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
+#include "sge_engine/GameDrawer/RenderItems/GeometryRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitParticlesRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitSpriteRrenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitViewportIconRenderItem.h"
@@ -51,10 +51,10 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	/// form actors and the actual rendering is done by this function.
 	void drawCurrentRenderItems(const GameDrawSets& drawSets, DrawReason drawReason, bool shouldDrawSky);
 
-	void drawRenderItem_TraitModel(TraitModelRenderItem& ri,
-	                               const GameDrawSets& drawSets,
-	                               const ObjectLighting& lighting,
-	                               DrawReason const drawReason);
+	void drawRenderItem_Geometry(GeometryRenderItem& ri,
+	                             const GameDrawSets& drawSets,
+	                             const ObjectLighting& lighting,
+	                             DrawReason const drawReason);
 
 	void drawRenderItem_TraitSprite(const TraitSpriteRenderItem& ri,
 	                                const GameDrawSets& drawSets,
@@ -93,12 +93,13 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	/// draw camera frustum.
 	bool isInFrustum(const GameDrawSets& drawSets, Actor* actor) const;
 	void getActorObjectLighting(Actor* actor, ObjectLighting& lighting);
+	void getLightingForLocation(const AABox3f& bboxWs, ObjectLighting& lighting);
 
 	void clearRenderItems() {
 		m_RIs_opaque.clear();
 		m_RIs_alphaSorted.clear();
 
-		m_RIs_traitModel.clear();
+		m_RIs_geometry.clear();
 		m_RIs_traitSprite.clear();
 		m_RIs_traitViewportIcon.clear();
 		m_RIs_traitParticles.clear();
@@ -128,7 +129,7 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	std::vector<IRenderItem*> m_RIs_alphaSorted; ///< Pointers to all semi-transparent render items. Pointers are not owned.
 
 	// Render items cache to save up on memory.
-	std::vector<TraitModelRenderItem> m_RIs_traitModel;
+	std::vector<GeometryRenderItem> m_RIs_geometry;
 	std::vector<TraitSpriteRenderItem> m_RIs_traitSprite;
 	std::vector<TraitViewportIconRenderItem> m_RIs_traitViewportIcon;
 	std::vector<TraitParticlesSimpleRenderItem> m_RIs_traitParticles;

@@ -13,7 +13,7 @@ namespace sge {
 
 struct ICamera;
 struct TraitModel;
-struct TraitModelRenderItem;
+struct GeometryRenderItem;
 
 struct ModelEntry {
 	ModelEntry()
@@ -100,7 +100,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	/// Returns the bounding box of all models.
 	AABox3f getBBoxOS() const;
 
-	void getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems);
+	void getRenderItems(DrawReason drawReason, std::vector<GeometryRenderItem>& renderItems);
 
 	void invalidateCachedAssets();
 

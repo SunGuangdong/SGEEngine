@@ -28,6 +28,23 @@ struct EvaluatedMesh {
 	Geometry geometry;
 };
 
+/// Usually when we render a model, we do not care about the hierarchy
+/// we just wanna draw the meshes in it at correct locations.
+/// This class represents a single mesh instance and its location
+/// so we could just draw it with any nodes traversal.
+struct EvaluatedGeomInstance {
+	/// An assembled set of geometry ready for rendering.
+	Geometry geometry;
+
+	/// The index of the material in the owning Model.
+	int iMaterial = -1;
+
+	/// The transform of the geometry(mesh) with all nodes hierarchy applied.
+	mat4f modelSpaceTransform = mat4f::getIdentity();
+
+	AABox3f modelSpaceBBox;
+};
+
 struct SGE_CORE_API EvaluatedModel {
 	EvaluatedModel()
 	    : m_model(nullptr) {
@@ -41,7 +58,7 @@ struct SGE_CORE_API EvaluatedModel {
 	/// @brief Evaluates the models with the specified transforms for each node (in model global space, not local).
 	/// Useful for ragdolls or inverse kinematics.
 	/// @param boneGlobalTrasnformOverrides an array for each node matched by the
-	/// index in the array specifying the global transformation to be used.
+	/// index in the array specifying the location in model space to be used for that node.
 	bool evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount);
 
 	/// Evaluates the model with no animation applied.
@@ -76,9 +93,14 @@ struct SGE_CORE_API EvaluatedModel {
 		return -1;
 	}
 
+	const std::vector<EvaluatedGeomInstance>& getEvalGeoms() const {
+		return m_allEvalGeometries;
+	}
+
   private:
 	bool evaluate_ApplyNodeGlobalTransforms(const span<const mat4f>& boneGlobalTrasnformOverrides);
 	bool evaluate_Skinning();
+	bool evaluate_getAllGeometries();
 
   public:
 	Model* m_model = nullptr;
@@ -100,6 +122,8 @@ struct SGE_CORE_API EvaluatedModel {
 	/// This vector hold the row index of the 1st bone for the specified mesh.
 	/// -1 if there are no bones for that mesh.
 	std::vector<int> m_perMeshSkinningBonesTransformOFfsetInTex;
+
+	std::vector<EvaluatedGeomInstance> m_allEvalGeometries;
 
 	AABox3f aabox;
 

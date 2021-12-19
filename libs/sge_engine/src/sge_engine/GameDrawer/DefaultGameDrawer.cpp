@@ -251,19 +251,26 @@ bool DefaultGameDrawer::isInFrustum(const GameDrawSets& drawSets, Actor* actor) 
 	return true;
 }
 
-void DefaultGameDrawer::getActorObjectLighting(Actor* actor, ObjectLighting& lighting) {
-	// Find all the lights that can affect this object.
+void DefaultGameDrawer::getLightingForLocation(const AABox3f& bboxWs, ObjectLighting& lighting) {
 	m_shadingLightPerObject.clear();
-	AABox3f bboxOS = actor->getBBoxOS();
-	AABox3f actorBBoxWs = bboxOS.getTransformed(actor->getTransformMtx());
+
+	// Find all the lights that can affect the area covered by the bounding box.
+	// Usually this bbox comes from some actor.
 	for (const ShadingLightData& shadingLight : m_shadingLights) {
-		if (shadingLight.lightBoxWs.IsEmpty() || shadingLight.lightBoxWs.overlaps(actorBBoxWs)) {
+		if (shadingLight.lightBoxWs.IsEmpty() || shadingLight.lightBoxWs.overlaps(bboxWs)) {
 			m_shadingLightPerObject.emplace_back(&shadingLight);
 		}
 	}
 
 	lighting.ppLightData = m_shadingLightPerObject.data();
 	lighting.lightsCount = int(m_shadingLightPerObject.size());
+}
+
+void DefaultGameDrawer::getActorObjectLighting(Actor* actor, ObjectLighting& lighting) {
+	// Find all the lights that can affect this object.
+	const AABox3f bboxOS = actor->getBBoxOS();
+	const AABox3f actorBBoxWs = bboxOS.getTransformed(actor->getTransformMtx());
+	getLightingForLocation(actorBBoxWs, lighting);
 }
 
 void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason) {
@@ -279,7 +286,7 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 	}
 
 	if (TraitModel* const trait = getTrait<TraitModel>(actor); item.editMode == editMode_actors && trait != nullptr) {
-		trait->getRenderItems(drawReason, m_RIs_traitModel);
+		trait->getRenderItems(drawReason, m_RIs_geometry);
 	}
 
 	if (TraitSprite* const trait = getTrait<TraitSprite>(actor); item.editMode == editMode_actors && trait != nullptr) {
@@ -343,7 +350,7 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 	m_RIs_opaque.clear();
 	m_RIs_alphaSorted.clear();
 
-	for (auto& ri : m_RIs_traitModel) {
+	for (auto& ri : m_RIs_geometry) {
 		ri.zSortingValue = zSortPlane.Distance(ri.zSortingPositionWs);
 		if (ri.needsAlphaSorting) {
 			m_RIs_alphaSorted.push_back(&ri);
@@ -400,8 +407,7 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 	}
 
 	// The opaque items don't need to be sorted in any way for the rendering to appear correct.
-	// However, if we sort them fron-to-back we would reduce the pixel shader overdraw,
-	// as for objects further back, there would be already a bigger z-depth value.
+	// However, if we sort them fron-to-back we would reduce the pixel shader overdraw.
 	std::sort(m_RIs_opaque.begin(), m_RIs_opaque.end(),
 	          [](IRenderItem* a, IRenderItem* b) -> bool { return a->zSortingValue < b->zSortingValue; });
 
@@ -410,17 +416,14 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 	std::sort(m_RIs_alphaSorted.rbegin(), m_RIs_alphaSorted.rend(),
 	          [](IRenderItem* a, IRenderItem* b) -> bool { return a->zSortingValue < b->zSortingValue; });
 
-	// TODO Sort the render items.
-
 	// Draw the render items.
 	auto drawRenderItems = [&](std::vector<IRenderItem*>& renderItems) -> void {
 		for (auto& riRaw : renderItems) {
-			if (auto riTraitModel = dynamic_cast<TraitModelRenderItem*>(riRaw)) {
+			if (auto geomRi = dynamic_cast<GeometryRenderItem*>(riRaw)) {
 				// Find all the lights that can affect this object.
 				ObjectLighting reasonInfo = lighting;
-				getActorObjectLighting(riTraitModel->traitModel->getActor(), reasonInfo);
-
-				drawRenderItem_TraitModel(*riTraitModel, drawSets, reasonInfo, drawReason);
+				getLightingForLocation(geomRi->bboxWs, reasonInfo);
+				drawRenderItem_Geometry(*geomRi, drawSets, reasonInfo, drawReason);
 			} else if (auto riSprite = dynamic_cast<TraitSpriteRenderItem*>(riRaw)) {
 				// Find all the lights that can affect this object.
 				ObjectLighting reasonInfo = lighting;
@@ -505,6 +508,7 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 #if 0
 	// This code here is something needed only for debugging shadow maps.
 	// I ended up writing this from stach more than 10 times that is why I decided to keep it.
+	// It basically draws the shadow map of thr 1st light in the top left corner of the game screen.
 	if (drawReason == drawReason_editing) {
 		if (m_shadingLights.size() > 0 && m_shadingLights[0].shadowMap) {
 			drawSets.quickDraw->drawTexture(drawSets.rdest, 0.f, 0.f, 256.f, m_shadingLights[0].shadowMap);
@@ -542,36 +546,24 @@ void DefaultGameDrawer::drawSky(const GameDrawSets& drawSets, const DrawReason d
 	}
 }
 
-void DefaultGameDrawer::drawRenderItem_TraitModel(TraitModelRenderItem& ri,
-                                                  const GameDrawSets& drawSets,
-                                                  const ObjectLighting& lighting,
-                                                  DrawReason const drawReason) {
-	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
-	const vec3f camLookDir = drawSets.drawCamera->getCameraLookDir();
-	const mat4f actor2world = ri.traitModel->getActor()->getTransformMtx();
-	ModelNode* node = ri.evalModel->m_model->nodeAt(ri.iEvalNode);
-
-	const MeshAttachment& meshAttachment = node->meshAttachments[ri.iEvalNodeMechAttachmentIndex];
-	const EvaluatedMesh& evalMesh = ri.evalModel->getEvalMesh(meshAttachment.attachedMeshIndex);
-	const EvaluatedNode& evalNode = ri.evalModel->getEvalNode(ri.iEvalNode);
-
-	const Geometry& geom = evalMesh.geometry;
-
-	mat4f finalTrasform;
-	if (evalMesh.geometry.hasVertexSkinning()) {
-		finalTrasform = actor2world * ri.traitModel->m_models[ri.iModel].m_additionalTransform;
-	} else {
-		finalTrasform = actor2world * ri.traitModel->m_models[ri.iModel].m_additionalTransform * evalNode.evalGlobalTransform;
+void DefaultGameDrawer::drawRenderItem_Geometry(GeometryRenderItem& ri,
+                                                const GameDrawSets& drawSets,
+                                                const ObjectLighting& lighting,
+                                                DrawReason const drawReason) {
+	if (ri.geometry == nullptr || ri.pMtlData == nullptr) {
+		return;
 	}
 
+	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
+
 	if (drawReason_IsVisualizeSelection(drawReason)) {
-		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), finalTrasform, geom,
+		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), ri.worldTransform, *ri.geometry,
 		                                   getSelectionTintColor(drawReason), false);
 	} else if (drawReason == drawReason_gameplayShadow) {
-		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), finalTrasform,
-		                                *drawSets.shadowMapBuildInfo, geom, /* ri.mtl.diffuseTexture*/ nullptr, false);
+		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), ri.worldTransform,
+		                                *drawSets.shadowMapBuildInfo, *ri.geometry, /* ri.mtl.diffuseTexture*/ nullptr, false);
 	} else {
-		drawGeometry(drawSets.rdest, *drawSets.drawCamera, finalTrasform, lighting, geom, ri.pMtlData, InstanceDrawMods());
+		drawGeometry(drawSets.rdest, *drawSets.drawCamera, ri.worldTransform, lighting, *ri.geometry, ri.pMtlData, InstanceDrawMods());
 	}
 }
 

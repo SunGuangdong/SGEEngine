@@ -33,6 +33,25 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
                                 const ObjectLighting& lighting,
                                 const EvaluatedModel& evalModel,
                                 const InstanceDrawMods& instDrawMods) {
+	for (const EvaluatedGeomInstance& geomInst : evalModel.getEvalGeoms()) {
+		IMaterial* mtl = evalModel.m_model->loadedMaterialAt(geomInst.iMaterial);
+		IMaterialData* mdlData = mtl ? mtl->getMaterialDataLocalStorage() : nullptr;
+
+		if_checked(mdlData) {
+			const MaterialFamilyLibrary::MaterialFamilyData* family =
+			    getCore()->getMaterialLib()->findFamilyById(mdlData->materialFamilyId);
+
+			// If there is skinning the node transformation is already applied in the bones of that mesh.
+			const mat4f finalTrasform =
+			    (geomInst.geometry.hasVertexSkinning()) ? geomWorldTransfrom : geomWorldTransfrom * geomInst.modelSpaceTransform;
+
+			if_checked(family && family->geometryDrawer) {
+				family->geometryDrawer->drawGeometry(rdest, camera, finalTrasform, lighting, geomInst.geometry, mdlData, instDrawMods);
+			}
+		}
+	}
+
+#if 0
 	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
 		const ModelNode* rawNode = evalModel.m_model->nodeAt(iNode);
@@ -40,6 +59,8 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
 		for (int iMesh = 0; iMesh < rawNode->meshAttachments.size(); ++iMesh) {
 			const MeshAttachment& meshAttachment = rawNode->meshAttachments[iMesh];
 			const EvaluatedMesh& evalMesh = evalModel.getEvalMesh(meshAttachment.attachedMeshIndex);
+
+			// If there is skinning the node transformation is already applied in the bones of that mesh.
 			mat4f const finalTrasform =
 			    (evalMesh.geometry.hasVertexSkinning()) ? geomWorldTransfrom : geomWorldTransfrom * evalNode.evalGlobalTransform;
 
@@ -50,13 +71,13 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
 				const MaterialFamilyLibrary::MaterialFamilyData* family =
 				    getCore()->getMaterialLib()->findFamilyById(mdlData->materialFamilyId);
 
-				// TODO: here we need to find the material family and the approriate IGeometryDrawer for that material family.
-				// This means that this function should not be here
 				if_checked(family && family->geometryDrawer) {
 					family->geometryDrawer->drawGeometry(rdest, camera, finalTrasform, lighting, evalMesh.geometry, mdlData, instDrawMods);
 				}
 			}
 		}
 	}
+#endif
 }
+
 } // namespace sge

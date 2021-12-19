@@ -28,6 +28,8 @@ enum TrackTransition : int {
 	trackTransition_switchTo,
 };
 
+/// A class used to animate a @Model.
+/// It enables you to blend multiple animation and use animations from other Models.
 struct SGE_CORE_API ModelAnimator2 {
 	/// Initializes the @ModelAnimator2 so it could animate the nodes to the specified model.
 	void create(Model& modelToBeAnimated);

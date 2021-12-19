@@ -5,7 +5,7 @@
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_core/typelib/typeLib.h"
 #include "sge_engine/EngineGlobal.h"
-#include "sge_engine/GameDrawer/RenderItems/TraitModelRenderItem.h"
+#include "sge_engine/GameDrawer/RenderItems/GeometryRenderItem.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/actors/ALocator.h"
@@ -92,7 +92,7 @@ AABox3f TraitModel::getBBoxOS() const {
 	return bbox;
 }
 
-void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRenderItem>& renderItems) {
+void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRenderItem>& renderItems) {
 	if (isRenderable == false) {
 		return;
 	}
@@ -108,7 +108,7 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 		}
 		AssetIface_Model3D* modelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 
-		mat4f node2world = getActor()->getTransformMtx();
+		mat4f actor2world = getActor()->getTransformMtx();
 
 		const EvaluatedModel* evalModel = nullptr;
 		if (modelSets.m_evalModel.hasValue()) {
@@ -118,43 +118,37 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<TraitModelRen
 		}
 
 		if (evalModel) {
-			int numNodes = evalModel->getNumEvalNodes();
+			for (const EvaluatedGeomInstance& geomInst : evalModel->getEvalGeoms()) {
+				IMaterial* mtl = nullptr;
 
-			for (int iNode = 0; iNode < numNodes; ++iNode) {
-				TraitModelRenderItem renderItem;
-
-				const EvaluatedNode& evalNode = evalModel->getEvalNode(iNode);
-				const ModelNode* node = evalModel->m_model->nodeAt(iNode);
-				int numAttachments = int(node->meshAttachments.size());
-				for (int iAttach = 0; iAttach < numAttachments; ++iAttach) {
-					int mtlIndex = node->meshAttachments[iAttach].attachedMaterialIndex;
-
-					IMaterial* mtl = nullptr;
-					if (mtlIndex < modelSets.mtlOverrides.size()) {
-						if (modelSets.mtlOverrides[mtlIndex]) {
-							if (modelSets.mtlOverrides[mtlIndex]) {
-								mtl = modelSets.mtlOverrides[mtlIndex]->getMaterial().get();
-							}
+				// Check if there is a material override specified.
+				if (geomInst.iMaterial < modelSets.mtlOverrides.size()) {
+					if (modelSets.mtlOverrides[geomInst.iMaterial]) {
+						if (modelSets.mtlOverrides[geomInst.iMaterial]) {
+							mtl = modelSets.mtlOverrides[geomInst.iMaterial]->getMaterial().get();
 						}
 					}
+				}
 
-					if (mtl == nullptr) {
-						mtl = evalModel->m_model->loadedMaterialAt(node->meshAttachments[iAttach].attachedMaterialIndex);
-					}
+				// If there isn't material override use the default one in the model.
+				if (mtl == nullptr) {
+					mtl = evalModel->m_model->loadedMaterialAt(geomInst.iMaterial);
+				}
 
-					if (mtl) {
-						IMaterialData* imtlData = mtl->getMaterialDataLocalStorage();
+				if (mtl) {
+					IMaterialData* const imtlData = mtl->getMaterialDataLocalStorage();
 
-						renderItem.pMtlData = imtlData;
-						renderItem.zSortingPositionWs = mat_mul_pos(node2world, evalNode.aabbGlobalSpace.center());
-						renderItem.traitModel = this;
-						renderItem.evalModel = evalModel;
-						renderItem.iModel = iModel;
-						renderItem.iEvalNode = iNode;
-						renderItem.iEvalNodeMechAttachmentIndex = iAttach;
-						renderItem.needsAlphaSorting = imtlData->needsAlphaSorting;
+					if (imtlData) {
+						GeometryRenderItem ri;
+						ri.geometry = &geomInst.geometry;
+						ri.pMtlData = imtlData;
+						ri.worldTransform = actor2world * modelSets.m_additionalTransform * geomInst.modelSpaceTransform;
+						ri.bboxWs = geomInst.modelSpaceBBox.getTransformed(ri.worldTransform);
 
-						renderItems.push_back(renderItem);
+						ri.zSortingPositionWs = mat_mul_pos(ri.worldTransform, geomInst.modelSpaceBBox.center());
+						ri.needsAlphaSorting = imtlData->needsAlphaSorting;
+
+						renderItems.push_back(ri);
 					}
 				}
 			}

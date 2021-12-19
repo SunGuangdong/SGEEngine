@@ -289,7 +289,7 @@ Texture* AssetsWindow::getThumbnailForModel3D(const std::string& localAssetPath)
 				rdest.viewport = ft->getViewport();
 				rdest.sgecon = getCore()->getDevice()->getContext();
 
-				drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting::getAmbientLightOnly(),
+				drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting::makeAmbientLightOnly(),
 				              getLoadedAssetIface<AssetIface_Model3D>(thumbnailAsset)->getStaticEval(), InstanceDrawMods());
 
 				assetPreviewTex[localAssetPath] = ft;
