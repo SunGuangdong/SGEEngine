@@ -55,9 +55,9 @@ struct SGE_CORE_API EvaluatedModel {
 		return m_model;
 	}
 
-	/// @brief Evaluates the models with the specified transforms for each node (in model global space, not local).
+	/// Evaluates the model with the specified transforms for each node (in model global space, not local).
 	/// Useful for ragdolls or inverse kinematics.
-	/// @param boneGlobalTrasnformOverrides an array for each node matched by the
+	/// @param [in] nodesGlobalTransform an array for each node matched by the
 	/// index in the array specifying the location in model space to be used for that node.
 	bool evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount);
 

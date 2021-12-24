@@ -7,6 +7,8 @@
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtlGeomDrawer.h"
 #include "sge_core/materials/MaterialFamilyList.h"
+#include "sge_core/materials/SimpleTriplanar/SimpleTriplanarMtl.h"
+#include "sge_core/materials/SimpleTriplanar/SimpleTriplanarMtlGeomDrawer.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/common.h"
@@ -196,9 +198,27 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) {
 
 	// Register the DefaultPBR material family.
 	{
-		MaterialFamilyDesc pbrFd = {1001, "DefaultPBR", []() -> IGeometryDrawer* { return new DefaultPBRMtlGeomDrawer(); },
-		                            []() -> std::shared_ptr<IMaterial> { return std::make_shared<DefaultPBRMtl>(); }};
+		// clang-format off
+		MaterialFamilyDesc pbrFd = {
+			1001,
+			"DefaultPBR", 
+			[]() -> IGeometryDrawer* { return new DefaultPBRMtlGeomDrawer(); },
+		    []() -> std::shared_ptr<IMaterial> { return std::make_shared<DefaultPBRMtl>(); }
+		};
+
 		getMaterialLib()->registerFamily(pbrFd);
+		// clang-format on
+
+		// clang-format off
+		MaterialFamilyDesc simpleTriplanarFd = {
+			1002,
+			"SimpleTriplanar", 
+			[]() -> IGeometryDrawer* { return new SimpleTriplanarMtlGeomDrawer(); },
+		    []() -> std::shared_ptr<IMaterial> { return std::make_shared<SimpleTriplanarMtl>(); }
+		};
+
+		getMaterialLib()->registerFamily(simpleTriplanarFd);
+		// clang-format on
 	}
 
 	return;

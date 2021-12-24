@@ -40,18 +40,28 @@ ReflBlock() {
 //-----------------------------------------------------------------
 // TraitModel::ModelEntry
 //-----------------------------------------------------------------
-void ModelEntry::setModel(const char* assetPath) {
-	m_assetProperty.setAsset(assetPath);
-	changeIndex.markAChange();
+void ModelEntry::setModel(const char* assetPath, bool setupCustomEvalState) {
+	AssetPtr asset = getCore()->getAssetLib()->getAssetFromFile(assetPath);
+	setModel(asset, setupCustomEvalState);
 }
 
-void ModelEntry::setModel(AssetPtr& asset) {
+void ModelEntry::setModel(AssetPtr& asset, bool setupCustomEvalState) {
+	customEvalModel = NullOptional();
 	m_assetProperty.setAsset(asset);
+
+	if (setupCustomEvalState) {
+		AssetIface_Model3D* mdlIface = getLoadedAssetIface<AssetIface_Model3D>(asset);
+		if (mdlIface) {
+			customEvalModel = EvaluatedModel();
+			customEvalModel->initialize(&mdlIface->getModel3D());
+		}
+	}
+
 	changeIndex.markAChange();
 }
 
 void ModelEntry::onAssetModelChanged() {
-	m_evalModel = NullOptional();
+	customEvalModel = NullOptional();
 
 	if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(m_assetProperty.getAsset())) {
 		mtlOverrides.resize(modelIface->getModel3D().numMaterials());
@@ -60,10 +70,14 @@ void ModelEntry::onAssetModelChanged() {
 
 AABox3f ModelEntry::getBBoxOS() const {
 	// If the attached asset is a model use it to compute the bounding box.
-	const AssetIface_Model3D* const modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
-	if (modelIface) {
-		AABox3f bbox = modelIface->getStaticEval().aabox.getTransformed(m_additionalTransform);
-		return bbox;
+	if (customEvalModel) {
+		return customEvalModel->aabox.getTransformed(m_additionalTransform);
+	} else {
+		const AssetIface_Model3D* const modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+		if (modelIface) {
+			AABox3f bbox = modelIface->getStaticEval().aabox.getTransformed(m_additionalTransform);
+			return bbox;
+		}
 	}
 
 	return AABox3f();
@@ -72,14 +86,14 @@ AABox3f ModelEntry::getBBoxOS() const {
 //-----------------------------------------------------------------
 // TraitModel
 //-----------------------------------------------------------------
-void TraitModel::addModel(const char* assetPath) {
+void TraitModel::addModel(const char* assetPath, bool setupCustomEvalState) {
 	m_models.push_back(ModelEntry());
-	m_models.back().setModel(assetPath);
+	m_models.back().setModel(assetPath, setupCustomEvalState);
 }
 
-void TraitModel::addModel(AssetPtr& asset) {
+void TraitModel::addModel(AssetPtr& asset, bool setupCustomEvalState) {
 	m_models.push_back(ModelEntry());
-	m_models.back().setModel(asset);
+	m_models.back().setModel(asset, setupCustomEvalState);
 }
 
 AABox3f TraitModel::getBBoxOS() const {
@@ -111,8 +125,8 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRende
 		mat4f actor2world = getActor()->getTransformMtx();
 
 		const EvaluatedModel* evalModel = nullptr;
-		if (modelSets.m_evalModel.hasValue()) {
-			evalModel = &modelSets.m_evalModel.get();
+		if (modelSets.customEvalModel.hasValue()) {
+			evalModel = &modelSets.customEvalModel.get();
 		} else if (modelIface) {
 			evalModel = &modelIface->getStaticEval();
 		}

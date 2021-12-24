@@ -87,7 +87,6 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	return &mdlData;
 }
 
-
 JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb, const char* localDir) {
 	JsonValue* jMaterial = jvb(JID_MAP);
 
@@ -145,7 +144,7 @@ bool DefaultPBRMtl::fromJson(const JsonValue* jMaterial, const char* localDir) {
 	}
 
 	if (const JsonValue* jNeedsAlphaSorting = jMaterial->getMember("disableCulling")) {
-		forceNoLighting = jNeedsAlphaSorting->getAsBool();
+		disableCulling = jNeedsAlphaSorting->getAsBool();
 	}
 
 	jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(diffuseColor.data, 4);

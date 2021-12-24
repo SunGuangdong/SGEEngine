@@ -8,7 +8,8 @@
 namespace sge {
 
 /// @brief A Helper class usually used as a property to game object.
-/// This is a reference to an asset, by using the @update() method you can check if new asset has been assigned.
+/// This is a reference to an asset, 
+/// by using the @update() method you can check if new asset has been assigned.
 struct SGE_ENGINE_API AssetProperty {
 	/// Asset propery needs a list of accepted assets.
 	/// Please use one of the other constructors.

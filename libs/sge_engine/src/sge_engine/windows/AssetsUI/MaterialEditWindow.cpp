@@ -27,7 +27,7 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 
 		AssetPtr mtlProviderAsset = std::dynamic_pointer_cast<Asset>(mtlProvider);
 		if (isAssetLoaded(mtlProviderAsset)) {
-			ImGui::Text("Editing Asset %s",  mtlProviderAsset->getPath().c_str());
+			ImGui::Text("Editing Asset %s", mtlProviderAsset->getPath().c_str());
 		} else {
 			ImGui::Text("You are editing a material witch is not an asset!");
 		}
@@ -71,16 +71,21 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 
 					} else if (md.typeId == sgeTypeId(vec4f)) {
 						vec4f& v4 = *(vec4f*)chain.follow(mtl.get());
-						ImGuiEx::Label(md.name);
+						ImGuiEx::Label(md.prettyName.c_str());
 						if (md.flags & MFF_Vec4fAsColor) {
 							hadChange |= ImGui::ColorEdit4("##colorEdit", v4.data, ImGuiColorEditFlags_InputRGB);
 						} else {
 							hadChange |= SGEImGui::DragFloats("##v4Edit", v4.data, 4, nullptr, nullptr);
 						}
 
+					} else if (md.typeId == sgeTypeId(vec3f)) {
+						vec3f& v3 = *(vec3f*)chain.follow(mtl.get());
+						ImGuiEx::Label(md.prettyName.c_str());
+						hadChange |= SGEImGui::DragFloats("##edit", v3.data, 3, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float,
+						                                  md.max_float);
 					} else if (md.typeId == sgeTypeId(vec2f)) {
 						vec2f& v2 = *(vec2f*)chain.follow(mtl.get());
-						ImGuiEx::Label(md.name);
+						ImGuiEx::Label(md.prettyName.c_str());
 						hadChange |= SGEImGui::DragFloats("##edit", v2.data, 2, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float,
 						                                  md.max_float);
 					} else if (md.typeId == sgeTypeId(float)) {
@@ -90,7 +95,7 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 							f = rad2deg(f);
 						}
 
-						ImGuiEx::Label(md.name);
+						ImGuiEx::Label(md.prettyName.c_str());
 						hadChange |=
 						    SGEImGui::DragFloats("##edit", &f, 1, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float, md.max_float);
 
@@ -99,7 +104,7 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputSta
 						}
 					} else if (md.typeId == sgeTypeId(bool)) {
 						bool& b = *(bool*)chain.follow(mtl.get());
-						ImGuiEx::Label(md.name);
+						ImGuiEx::Label(md.prettyName.c_str());
 						hadChange |= ImGui::Checkbox("##Edit", &b);
 					} else {
 						ImGui::LabelText("UI not written for member %s type.", md.name);

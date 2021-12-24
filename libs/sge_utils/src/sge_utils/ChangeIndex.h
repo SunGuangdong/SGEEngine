@@ -5,12 +5,11 @@ namespace sge {
 /// ChangeIndex is a way to to track if a change to some other part of the software has changed.
 /// It is a workaround in the situation where we do not have callbacks to notify that a change has happened.
 /// The way this works, when a change occures, the "changer" needs to call markAChange().
-/// Later during a function that needs to see if any changes have occured you could call @checkForChangeAndUpdate
-/// and if the function returns true than that means a unprocessed change has happened since the last call of the function.
-/// 
-
+/// Later, during a function that needs to see if any changes have occured 
+/// you could call @checkForChangeAndUpdate.
+/// and if the function returns true than that means 
+/// a unprocessed change has happened since the last call of the function.
 struct ChangeIndex {
-
 	/// Constructs a change index that has a change in it.
 	/// So @checkForChangeAndUpdate would return true if we call it after the constructor.
 	ChangeIndex() = default;
@@ -37,7 +36,11 @@ struct ChangeIndex {
 	}
 
   private:
+	/// Hold the value that represents the latest change.
+	/// Other values are compared and updated accoding to this one.
 	unsigned upToDateValue = 1;
+
+	/// Holds what was the value when we last called @checkForChangeAndUpdate.
 	unsigned lastCheckedValued = 0;
 };
 

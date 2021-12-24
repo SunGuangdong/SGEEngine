@@ -34,12 +34,8 @@ struct SGE_CORE_API ModelAnimator2 {
 	/// Initializes the @ModelAnimator2 so it could animate the nodes to the specified model.
 	void create(Model& modelToBeAnimated);
 
-	/// Create a new track.
-	/// @param [in] trackId is a user specified number, identifying the track.
-	/// A track is a set of animations that should are logically the same.
-	/// For example a character might have multiple idle animations to add variations.
-	/// The track just combines all of them in one set.
-	void trackCreate(int trackId);
+
+	void trackSetFadeTime(int trackId, float fadingTime);
 
 	/// Add an animation source to the specified track, so when playing this track
 	/// the animation would have the option to choose this animation.
@@ -49,6 +45,8 @@ struct SGE_CORE_API ModelAnimator2 {
 	void trackAddAmim(int trackId, Model* srcModel, const char* animationNameInSrcModel);
 
 	void trackAddAmim(int trackId, Model* srcModel, int animIndexInSrcModel);
+	void trackAddAmimPath(int trackId, const char* modelAssetPath, int animIndexInSrcModel);
+	void trackAddAmimPath(int trackId, const char* modelAssetPath, const char* animNameInModel);
 
 	/// Sets the current playing track to the specified one.
 	void playTrack(int trackIdToPlay);

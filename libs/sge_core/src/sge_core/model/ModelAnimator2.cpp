@@ -1,4 +1,6 @@
 #include "ModelAnimator2.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
+#include "sge_core/ICore.h"
 #include "sge_core/model/Model.h"
 #include "sge_utils/utils/range_loop.h"
 #include <functional>
@@ -11,12 +13,13 @@ void ModelAnimator2::create(Model& modelToBeAnimated) {
 	this->m_modelToAnimate = &modelToBeAnimated;
 }
 
-void ModelAnimator2::trackCreate(int trackId) {
+
+void ModelAnimator2::trackSetFadeTime(int trackId, float fadingTime) {
 	if (m_tracks.count(trackId) == 0) {
 		m_tracks[trackId] = AnimationTrack();
-	} else {
-		sgeAssertFalse("A track with this id has already been created");
 	}
+
+	m_tracks[trackId].fadeInOutTime = fadingTime;
 }
 
 void ModelAnimator2::trackAddAmim(int trackId, Model* srcModel, const char* animationNameInSrcModel) {
@@ -50,6 +53,23 @@ void ModelAnimator2::trackAddAmim(int trackId, Model* srcModel, int animIndexInS
 		createNodeToNodeRemapForModel(*srcModel);
 	}
 }
+
+void ModelAnimator2::trackAddAmimPath(int trackId, const char* modelAssetPath, int animIndexInSrcModel) {
+	std::shared_ptr<AssetIface_Model3D> mdlIface = getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
+	if (mdlIface) {
+		trackAddAmim(trackId, &mdlIface->getModel3D(), animIndexInSrcModel);
+	}
+}
+
+void ModelAnimator2::trackAddAmimPath(int trackId, const char* modelAssetPath, const char* animNameInModel) {
+	std::shared_ptr<AssetIface_Model3D> mdlIface = getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
+	if (mdlIface) {
+		int animIndex = mdlIface->getModel3D().getAnimationIndexByName(animNameInModel);
+		trackAddAmim(trackId, &mdlIface->getModel3D(), animIndex);
+	}
+}
+
+
 
 void ModelAnimator2::createNodeToNodeRemapForModel(Model& srcModel) {
 	if (m_perModel_srcNode_toNode.count(&srcModel) > 0) {

@@ -15,6 +15,9 @@ struct ICamera;
 struct TraitModel;
 struct GeometryRenderItem;
 
+/// ModelEntry is used to assign an AssetIface_Model3D model to TraitModel
+/// to get rendered. These use the evaluated state provided by this interface and cannot be animated.
+/// For animated models use @CustomModelEntry.
 struct ModelEntry {
 	ModelEntry()
 	    : m_assetProperty(assetIface_model3d) {
@@ -33,8 +36,8 @@ struct ModelEntry {
 		return changeIndex.checkForChangeAndUpdate();
 	}
 
-	void setModel(const char* assetPath);
-	void setModel(AssetPtr& asset);
+	void setModel(const char* assetPath, bool setupCustomEvalState = false);
+	void setModel(AssetPtr& asset, bool setupCustomEvalState = false);
 
 	/// Computes the bounding box of the attached 3D model.
 	/// Including the m_additionalTransform
@@ -46,15 +49,17 @@ struct ModelEntry {
 
   public:
 	ChangeIndex changeIndex;
+
 	bool isRenderable = true;
 	AssetProperty m_assetProperty;
 	mat4f m_additionalTransform = mat4f::getIdentity();
 	std::vector<std::shared_ptr<AssetIface_Material>> mtlOverrides;
 
 	// Used when the trait is going to render an animated model.
-	// This holds the evaluated 3D model to be rendered.
-	// If null the static EvaluatedModel of the asset is going to get rendered.
-	Optional<EvaluatedModel> m_evalModel;
+	// This holds the evaluated 3D model to be rendered and if specified
+	// the @m_assetProperty will be compleatly ignored.
+	// This one is not serializable and does not appear in the user interface in any shape of form.
+	Optional<EvaluatedModel> customEvalModel;
 };
 
 /// @brief TraitModel is a trait designed to be attached in an Actor.
@@ -83,8 +88,8 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	TraitModel() = default;
 
-	void addModel(const char* assetPath);
-	void addModel(AssetPtr& asset);
+	void addModel(const char* assetPath, bool setupCustomEvalState = false);
+	void addModel(AssetPtr& asset, bool setupCustomEvalState = false);
 	void clearModels() {
 		m_models.clear();
 	}

@@ -113,7 +113,6 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 
 				nextTrackIndex = 0;
 				for (int iAnim = 0; iAnim < m_eval.m_model->numAnimations(); ++iAnim) {
-					m_evalAnimator.trackCreate(nextTrackIndex);
 					m_evalAnimator.trackAddAmim(nextTrackIndex, nullptr, iAnim);
 
 					trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName);
@@ -136,7 +135,6 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) 
 						Model& srcModel = modelIface->getModel3D();
 
 						for (int iAnim = 0; iAnim < srcModel.numAnimations(); ++iAnim) {
-							m_evalAnimator.trackCreate(nextTrackIndex);
 							m_evalAnimator.trackAddAmim(nextTrackIndex, &srcModel, iAnim);
 
 							trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath());

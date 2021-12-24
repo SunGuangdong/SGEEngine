@@ -10,13 +10,13 @@
 namespace sge {
 
 /// A helper struct to construct empty Optional variable.
-/// example return NullOptional();
+/// example usage: NullOptional();
 struct NullOptional {};
 
 template <class T>
 struct Optional {
   private:
-	typename AlignedStorage<sizeof(T), alignof(T)>::type m_storage;
+	typename AlignedStorageTyped<T>::type m_storage;
 	bool m_isValid = false;
 
   public:
@@ -25,13 +25,20 @@ struct Optional {
 
 	Optional() = default;
 
-	~Optional() { destroyStorage(); }
+	~Optional() {
+		destroyStorage();
+	}
 
-	Optional(const NullOptional&) {}
+	Optional(const NullOptional&) {
+	}
 
-	Optional(const T& other) { copyConstructStorage(other); }
+	Optional(const T& other) {
+		copyConstructStorage(other);
+	}
 
-	Optional(T&& other) { moveConstructStorage(std::move(other)); }
+	Optional(T&& other) {
+		moveConstructStorage(std::move(other));
+	}
 
 	Optional(const Optional& other) {
 		if (other.isValid()) {
@@ -76,11 +83,17 @@ struct Optional {
 		return *this;
 	}
 
-	bool operator==(T& other) const { return m_isValid && get() == other; }
+	bool operator==(T& other) const {
+		return m_isValid && get() == other;
+	}
 
-	bool operator!=(T& other) const { return !m_isValid || (get() != other); }
+	bool operator!=(T& other) const {
+		return !m_isValid || (get() != other);
+	}
 
-	void reset() { *this = Optional(); }
+	void reset() {
+		*this = Optional();
+	}
 
 	TNoRef* operator->() {
 		sgeAssert(isValid());
@@ -94,11 +107,17 @@ struct Optional {
 		return &result;
 	}
 
-	operator bool() const { return m_isValid; }
+	operator bool() const {
+		return m_isValid;
+	}
 
-	bool isValid() const { return (bool)(*this); }
+	bool isValid() const {
+		return (bool)(*this);
+	}
 
-	bool hasValue() const { return (bool)(*this); }
+	bool hasValue() const {
+		return (bool)(*this);
+	}
 
 	T& get() {
 		sgeAssert(isValid());
@@ -112,8 +131,12 @@ struct Optional {
 		return result;
 	}
 
-	T& operator*() { return get(); }
-	const T& operator*() const { return get(); }
+	T& operator*() {
+		return get();
+	}
+	const T& operator*() const {
+		return get();
+	}
 
   private:
 	// void defaultConstructStorage() {
