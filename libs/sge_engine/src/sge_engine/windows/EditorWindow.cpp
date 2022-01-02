@@ -1,3 +1,5 @@
+
+
 #include <filesystem>
 
 #include "ActorCreateWindow.h"
@@ -35,6 +37,7 @@
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"
 #include "sge_utils/utils/strings.h"
+#include "sge_utils/debugger/VSDebugger.h"
 
 #include "IconsForkAwesome/IconsForkAwesome.h"
 
@@ -498,6 +501,10 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 			ImGui::EndMenu();
 		}
 
+		if (isVSDebuggerPresent()) {
+			ImGui::TextColored(ImVec4(1.f, 1.f, 0.f, 1.f), "Debugging");
+		}
+
 		ImGui::EndMenuBar();
 	}
 
@@ -652,10 +659,11 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		}
 		ImGuiEx::TextTooltip("Align the preview camera to +Z axis.");
 
-		// int editMode_int = (int)editMode;
-		// if (ImGui::Combo("Mode", &editMode_int, "Actors\0Points\0")) {
-		//	editMode = (EditMode)editMode_int;
-		//}
+		// Add a little message showing that we are currently debugging.
+		if (isVSDebuggerPresent()) {
+			ImGui::SameLine();
+			ImGui::Text(ICON_FK_BUG " Debugging");
+		}
 
 		ImGui::SameLine();
 		ImGui::Separator();

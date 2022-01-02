@@ -436,7 +436,7 @@ ParticleGroupState::SpriteRendData*
 //--------------------------------------------------------------
 
 void TraitParticlesSimple::update(const GameUpdateSets& u) {
-	if (u.isGamePaused() || !m_isEnabled) {
+	if (u.isSimulationPaused() || !m_isEnabled) {
 		return;
 	}
 

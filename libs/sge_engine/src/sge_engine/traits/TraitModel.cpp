@@ -68,19 +68,25 @@ void ModelEntry::onAssetModelChanged() {
 	}
 }
 
-AABox3f ModelEntry::getBBoxOS() const {
+AABox3f ModelEntry::getBBoxOS(const mat4f& invWorldTrasnform) const {
+	AABox3f bbox;
+
 	// If the attached asset is a model use it to compute the bounding box.
 	if (customEvalModel) {
-		return customEvalModel->aabox.getTransformed(m_additionalTransform);
+		bbox = customEvalModel->aabox.getTransformed(m_additionalTransform);
 	} else {
 		const AssetIface_Model3D* const modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 		if (modelIface) {
-			AABox3f bbox = modelIface->getStaticEval().aabox.getTransformed(m_additionalTransform);
-			return bbox;
+			bbox = modelIface->getStaticEval().aabox.getTransformed(m_additionalTransform);
 		}
 	}
 
-	return AABox3f();
+	// TODO: take in to concideration: ignoreActorTransform
+	if (ignoreActorTransform && !bbox.IsEmpty()) {
+		return bbox.getTransformed(invWorldTrasnform);
+	}
+
+	return bbox;
 }
 
 //-----------------------------------------------------------------
@@ -98,9 +104,8 @@ void TraitModel::addModel(AssetPtr& asset, bool setupCustomEvalState) {
 
 AABox3f TraitModel::getBBoxOS() const {
 	AABox3f bbox;
-
 	for (const ModelEntry& mdl : m_models) {
-		bbox.expand(mdl.getBBoxOS());
+		bbox.expand(mdl.getBBoxOS(mat4f::getIdentity()));
 	}
 
 	return bbox;

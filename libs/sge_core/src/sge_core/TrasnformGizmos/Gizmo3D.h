@@ -4,7 +4,7 @@
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/sge_utils.h"
-#include "sgecore_api.h"
+#include "sge_core/sgecore_api.h"
 
 namespace sge {
 

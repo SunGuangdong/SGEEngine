@@ -2,7 +2,7 @@
 
 #include "Actor.h"
 #include "InspectorTool.h"
-#include "sge_core/Gizmo3D.h"
+#include "sge_core/TrasnformGizmos/Gizmo3D.h"
 
 #include <vector>
 

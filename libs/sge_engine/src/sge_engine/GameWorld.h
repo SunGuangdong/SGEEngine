@@ -59,25 +59,26 @@ struct SGE_ENGINE_API PostSceneUpdateTaskLoadWorldFormFile final : public IPostS
 /// The game objects need to be aware that they will get updated and the editor might suddenly change them.
 struct GameUpdateSets {
 	GameUpdateSets() = default;
-	GameUpdateSets(float const dt, bool const isPaused, InputState const is /*, SGEContext* const sgecon*/)
+	GameUpdateSets(float dt, bool isPaused, InputState is)
 	    : dt(dt)
-	    , isPaused(isPaused)
+	    , isSimPaused(isPaused)
 	    , is(is) {
 	}
 
 	/// @brief Returns true if the game is paused for some reason.
-	bool isGamePaused() const {
-		return isPaused;
+	bool isSimulationPaused() const {
+		return isSimPaused;
 	}
 
 	/// @brief Returns true if the game is not paused.
 	bool isPlaying() const {
-		return !isGamePaused();
+		return !isSimulationPaused();
 	}
 
-	float dt = 0.f;       ///< The delta time to be used when updateing.
-	bool isPaused = true; ///< True if the game is paused for any reason (usually we are in the editor and the game is paused there).
-	InputState is;        ///< The input state to be used when updateing the scene.
+	float dt = 0.f; ///< The delta time to be used when updateing.
+	bool isSimPaused =
+	    true;      ///< True if the simulation is paused for any reason (usually we are in the editor and the game is paused there).
+	InputState is; ///< The input state to be used when updateing the scene.
 };
 
 /// @brief GameWorld is the main class that hold all alocated GameObject (Material, Scripts, Actors and so on),

@@ -361,7 +361,7 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 	// as the collision geometry might be needed by some tools (like the PlantingTool or the nav mesh)
 	// we do not want any physics simulations while the game is paused.
 	// If not paused, then perform the normal physics simulation.
-	if (updateSets.isGamePaused()) {
+	if (updateSets.isSimulationPaused()) {
 		physicsWorld.dynamicsWorld->updateAabbs();
 	} else {
 		const int numSubStepsForPhysics = std::max(1, m_physicsSimNumSubSteps);
@@ -425,7 +425,7 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 		}
 	}
 
-	if (updateSets.isGamePaused() == false) {
+	if (updateSets.isSimulationPaused() == false) {
 		timeSpendPlaying += updateSets.dt;
 		totalStepsTaken++;
 	}

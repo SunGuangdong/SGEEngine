@@ -5,6 +5,7 @@
 
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_core/ICore.h"
+#include "sge_core/TrasnformGizmos/Gizmo3DDraw.h"
 
 namespace sge {
 
@@ -219,7 +220,7 @@ void TransformTool::onUI(GameInspector* inspector) {
 }
 
 void TransformTool::drawOverlay(const GameDrawSets& drawSets) {
-	getCore()->drawGizmo(drawSets.rdest, m_gizmo, drawSets.drawCamera->getProjView());
+	drawGizmo(drawSets.rdest, m_gizmo, drawSets.drawCamera->getProjView());
 }
 
 

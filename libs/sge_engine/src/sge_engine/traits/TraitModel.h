@@ -40,8 +40,10 @@ struct ModelEntry {
 	void setModel(AssetPtr& asset, bool setupCustomEvalState = false);
 
 	/// Computes the bounding box of the attached 3D model.
-	/// Including the m_additionalTransform
-	AABox3f getBBoxOS() const;
+	/// Including the m_additionalTransform,
+	/// @worldTrasnform is used to compute correctly the bounding box 
+	/// when ignoreActorTransform is used.
+	AABox3f getBBoxOS(const mat4f& invWorldTrasnform) const;
 
   private:
 	/// Called when the asset model has been changed.
@@ -51,6 +53,7 @@ struct ModelEntry {
 	ChangeIndex changeIndex;
 
 	bool isRenderable = true;
+	bool ignoreActorTransform = false; ///< true, when the actor transform should be ignored when rendering the 3D model.
 	AssetProperty m_assetProperty;
 	mat4f m_additionalTransform = mat4f::getIdentity();
 	std::vector<std::shared_ptr<AssetIface_Material>> mtlOverrides;
