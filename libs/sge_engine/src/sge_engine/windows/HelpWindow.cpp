@@ -5,7 +5,7 @@
 
 namespace sge {
 
-void HelpWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void HelpWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}

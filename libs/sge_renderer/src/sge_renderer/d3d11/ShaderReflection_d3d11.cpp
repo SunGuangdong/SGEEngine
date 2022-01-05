@@ -49,8 +49,11 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 		}
 
 		TComPtr<ID3D11ShaderReflection> pD3DReflection;
-		const HRESULT reflResult = D3DReflect(shader->D3D11_GetByteCode()->GetBufferPointer(), shader->D3D11_GetByteCode()->GetBufferSize(),
+		[[maybe_unused]] const HRESULT reflResult =
+		    D3DReflect(shader->D3D11_GetByteCode()->GetBufferPointer(), shader->D3D11_GetByteCode()->GetBufferSize(),
 		                                      IID_ID3D11ShaderReflection, (void**)&pD3DReflection);
+
+		sgeAssert(SUCCEEDED(reflResult));
 
 		D3D11_SHADER_DESC d3dShaderDesc;
 		pD3DReflection->GetDesc(&d3dShaderDesc);

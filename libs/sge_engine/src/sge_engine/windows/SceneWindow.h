@@ -10,6 +10,7 @@ namespace sge {
 struct InputState;
 struct IGameDrawer;
 
+/// SceneWindow is the window that is used to view and edit the scene in 3D.
 struct SGE_ENGINE_API SceneWindow : public IImGuiWindow {
 	SceneWindow(std::string windowName, IGameDrawer* gameDrawer)
 	    : m_windowName(std::move(windowName))
@@ -18,7 +19,7 @@ struct SGE_ENGINE_API SceneWindow : public IImGuiWindow {
 	void setGameDrawer(IGameDrawer* gd) { m_gameDrawer = gd; }
 
 	bool isClosed() override { return false; }
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is) override;
 	const char* getWindowName() const override { return m_windowName.c_str(); }
 
 	InputState computeInputStateInDomainSpace(const InputState& isOriginal) const;

@@ -182,7 +182,7 @@ ReflBlock() {
 	ReflAddType(short);
 	ReflAddType(unsigned short);
 
-#if 1 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
+#if 0 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
 	ReflAddType(TypeId)
 		ReflMember(TypeId, id);
 #else

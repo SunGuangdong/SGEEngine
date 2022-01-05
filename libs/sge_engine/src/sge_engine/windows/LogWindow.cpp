@@ -9,7 +9,7 @@
 
 namespace sge {
 
-void LogWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void LogWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}

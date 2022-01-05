@@ -25,7 +25,6 @@ inline float hermiteEval(float t, const float p[4]) {
 
 inline float hermiteEvalTanget(float t, const float p[4]) {
 	const float tt = t * t;
-	const float ttt = tt * t;
 
 	float q1 = -3.f * tt + 4.f * t - 1.f;
 	float q2 = 9.f * tt - 10.f * t;
@@ -53,7 +52,6 @@ inline vec2f hermiteEval(float t, const vec2f p[4]) {
 
 inline vec2f hermiteEvalTanget(float t, const vec2f p[4]) {
 	const float tt = t * t;
-	const float ttt = tt * t;
 
 	float q1 = -3.f * tt + 4.f * t - 1.f;
 	float q2 = 9.f * tt - 10.f * t;
@@ -81,7 +79,6 @@ inline vec3f hermiteEval(float t, const vec3f p[4]) {
 
 inline vec3f hermiteEvalTanget(float t, const vec3f p[4]) {
 	const float tt = t * t;
-	const float ttt = tt * t;
 
 	float q1 = -3.f * tt + 4.f * t - 1.f;
 	float q2 = 9.f * tt - 10.f * t;

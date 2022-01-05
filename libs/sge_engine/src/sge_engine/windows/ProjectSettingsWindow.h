@@ -14,7 +14,7 @@ struct SGE_ENGINE_API ProjectSettingsWindow : public IImGuiWindow {
 	ProjectSettingsWindow(std::string windowName);
 
 	bool isClosed() override { return !m_isOpened; }
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 	const char* getWindowName() const override { return m_windowName.c_str(); }
 
   private:

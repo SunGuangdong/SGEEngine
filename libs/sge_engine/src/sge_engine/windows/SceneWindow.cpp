@@ -22,7 +22,7 @@ namespace sge {
 
 struct AStaticObstacle;
 
-void SceneWindow::update(SGEContext* const sgecon, const InputState& isOriginal) {
+void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& isOriginal) {
 	if (m_gameDrawer == nullptr) {
 		return;
 	}

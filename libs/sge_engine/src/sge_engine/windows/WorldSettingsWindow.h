@@ -10,17 +10,21 @@ struct InputState;
 struct GameInspector;
 
 struct SGE_ENGINE_API WorldSettingsWindow : public IImGuiWindow {
-	WorldSettingsWindow(std::string windowName, GameInspector& inspector)
+	WorldSettingsWindow(std::string windowName)
 	    : m_windowName(std::move(windowName))
-	    , m_inspector(inspector) {}
+	    {
+	}
 
-	bool isClosed() override { return !m_isOpened; }
-	void update(SGEContext* const sgecon, const InputState& is) override;
-	const char* getWindowName() const override { return m_windowName.c_str(); }
+	bool isClosed() override {
+		return !m_isOpened;
+	}
+	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
+	const char* getWindowName() const override {
+		return m_windowName.c_str();
+	}
 
   private:
 	bool m_isOpened = true;
-	GameInspector& m_inspector;
 	std::string m_windowName;
 };
 

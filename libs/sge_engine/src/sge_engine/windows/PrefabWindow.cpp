@@ -18,7 +18,7 @@
 
 namespace sge {
 
-void PrefabWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void PrefabWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}
@@ -42,12 +42,12 @@ void PrefabWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UN
 
 				// Create the prefab world.
 				vector_set<ObjectId> entitesToSaveInPrefab;
-				for (const SelectedItem& item : m_inspector.m_selection) {
+				for (const SelectedItem& item : inspector->m_selection) {
 					if (item.editMode != editMode_actors) {
 						continue;
 					}
 
-					m_inspector.getWorld()->getAllRelativesOf(entitesToSaveInPrefab, item.objectId);
+					inspector->getWorld()->getAllRelativesOf(entitesToSaveInPrefab, item.objectId);
 					entitesToSaveInPrefab.insert(item.objectId);
 				}
 
@@ -55,7 +55,7 @@ void PrefabWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UN
 					JsonValueBuffer jvb;
 
 					GameWorld prefabWorld;
-					m_inspector.getWorld()->createPrefab(prefabWorld, false, &entitesToSaveInPrefab);
+					inspector->getWorld()->createPrefab(prefabWorld, false, &entitesToSaveInPrefab);
 					const JsonValue* const jPrefabWorld = serializeGameWorld(&prefabWorld, jvb);
 
 					// Ensure that the prefabs directory exists.
@@ -99,7 +99,7 @@ void PrefabWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UN
 		if (m_availablePrefabs.isValid()) {
 			for (const std::string& prefabPath : m_availablePrefabs.get()) {
 				if (ImGui::Selectable(prefabPath.c_str())) {
-					m_inspector.getWorld()->instantiatePrefab(prefabPath.c_str(), true, true);
+					inspector->getWorld()->instantiatePrefab(prefabPath.c_str(), true, true);
 				}
 			}
 		}

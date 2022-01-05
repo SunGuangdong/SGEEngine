@@ -16,7 +16,7 @@
 
 namespace sge {
 
-void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
 	const ImVec4 kPrimarySelectionColor(0.f, 1.f, 0.f, 1.f);
 
 	if (isClosed()) {
@@ -46,7 +46,7 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 			nodeNamesFilter.Clear();
 		}
 
-		GameWorld* const world = m_inspector.getWorld();
+		GameWorld* const world = inspector->getWorld();
 
 		ObjectId dragAndDropTargetedActor;
 		std::set<ObjectId> droppedActorsOnTargetActor;
@@ -76,7 +76,7 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 
 			if (passesFilter) {
 				bool isCurrrentNodePrimarySelection = false;
-				bool isCurrentNodeSelected = m_inspector.isSelected(currentEntity->getId(), &isCurrrentNodePrimarySelection);
+				bool isCurrentNodeSelected = inspector->isSelected(currentEntity->getId(), &isCurrrentNodePrimarySelection);
 				if (isCurrentNodeSelected) {
 					treeNodeFlags |= ImGuiTreeNodeFlags_Selected;
 				}
@@ -113,13 +113,13 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 
 				if (ImGui::IsMouseReleased(0) && ImGui::IsItemHovered(ImGuiHoveredFlags_None)) {
 					if (ImGui::GetIO().KeyCtrl) {
-						m_inspector.deselect(currentEntity->getId());
+						inspector->deselect(currentEntity->getId());
 					} else if (ImGui::GetIO().KeyShift) {
-						bool shouldSelectAsPrimary = m_inspector.isSelected(currentEntity->getId());
-						m_inspector.select(currentEntity->getId(), shouldSelectAsPrimary);
+						bool shouldSelectAsPrimary = inspector->isSelected(currentEntity->getId());
+						inspector->select(currentEntity->getId(), shouldSelectAsPrimary);
 					} else {
-						m_inspector.deselectAll();
-						m_inspector.select(currentEntity->getId());
+						inspector->deselectAll();
+						inspector->select(currentEntity->getId());
 					}
 				}
 
@@ -170,7 +170,7 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 		};
 
 		// Recursivley display tree nodes which represent the actors that are playing in the scene.
-		m_inspector.getWorld()->iterateOverPlayingObjects(
+		inspector->getWorld()->iterateOverPlayingObjects(
 		    [&](GameObject* object) -> bool {
 			    if (world->getParentId(object->m_id).isNull()) {
 				    addChildObjects(object, false);
@@ -186,8 +186,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 		if (ImGui::BeginDragDropTargetCustom(dropTargetRectForWindow, 1234)) {
 			if (Optional<std::set<ObjectId>> dropedIds = DragDropPayloadActor::accept()) {
 				CmdActorGrouping* const cmd = new CmdActorGrouping;
-				cmd->setup(*m_inspector.getWorld(), ObjectId(), dropedIds.get());
-				m_inspector.appendCommand(cmd, true);
+				cmd->setup(*inspector->getWorld(), ObjectId(), dropedIds.get());
+				inspector->appendCommand(cmd, true);
 			}
 
 
@@ -198,8 +198,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 		// the drop-target actor.
 		if (!droppedActorsOnTargetActor.empty() && droppedActorsOnTargetActor.count(dragAndDropTargetedActor) == 0) {
 			CmdActorGrouping* const cmd = new CmdActorGrouping;
-			cmd->setup(*m_inspector.getWorld(), dragAndDropTargetedActor, droppedActorsOnTargetActor);
-			m_inspector.appendCommand(cmd, true);
+			cmd->setup(*inspector->getWorld(), dragAndDropTargetedActor, droppedActorsOnTargetActor);
+			inspector->appendCommand(cmd, true);
 		}
 
 

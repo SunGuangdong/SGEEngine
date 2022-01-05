@@ -10,11 +10,11 @@
 
 namespace sge {
 
-MaterialEditWindow::MaterialEditWindow(std::string windowName, GameInspector& UNUSED(inspector))
+MaterialEditWindow::MaterialEditWindow(std::string windowName)
     : m_windowName(std::move(windowName)) {
 }
 
-void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSED(inspector), const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}

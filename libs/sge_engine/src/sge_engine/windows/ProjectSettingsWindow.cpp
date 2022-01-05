@@ -14,7 +14,9 @@ ProjectSettingsWindow::ProjectSettingsWindow(std::string windowName)
 	m_gamePlayerSetting.loadFromJsonFile("appdata/game_project_settings.json");
 }
 
-void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon),
+                                   struct GameInspector* UNUSED(inspector),
+                                   const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}

@@ -160,8 +160,6 @@ ReflBlock() {
 // clang-format on
 
 Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const world, const Settings& settings, const State& prevState) {
-	const int kMaxRecursions = 3;
-
 	TraitPath3D* const path = getTrait<TraitPath3D>(world->getActorById(settings.pathId));
 
 	if (path == nullptr || path->isEmpty()) {

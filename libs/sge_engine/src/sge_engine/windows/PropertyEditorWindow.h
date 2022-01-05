@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include "IImGuiWindow.h"
+#include <string>
 
 namespace sge {
 
@@ -42,9 +42,8 @@ namespace ProperyEditorUIGen {
 /// PropertyEditorWindow enables the user to edit values on game objects.
 /// These edits generate undo/redo commands (command history).
 struct SGE_ENGINE_API PropertyEditorWindow : public IImGuiWindow {
-	PropertyEditorWindow(std::string windowName, GameInspector& inspector)
-	    : m_windowName(std::move(windowName))
-	    , m_inspector(inspector) {
+	PropertyEditorWindow(std::string windowName)
+	    : m_windowName(std::move(windowName)) {
 	}
 
 	bool isClosed() override {
@@ -55,11 +54,11 @@ struct SGE_ENGINE_API PropertyEditorWindow : public IImGuiWindow {
 		return m_windowName.c_str();
 	}
 
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 
   private:
 	bool m_isOpened = true;
-	GameInspector& m_inspector;
+	GameInspector* m_inspector;
 	std::string m_windowName;
 
 	/// The filter string for the search box.

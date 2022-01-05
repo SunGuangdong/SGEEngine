@@ -7,10 +7,10 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_utils/utils/DLLHandler.h"
 #include <string>
+#include <filesystem>
 
 namespace sge {
 struct InputState;
-struct GameInspector;
 struct FrameTarget;
 
 /// AssetsWindow is a window in the engine interface for exploring and importing assets.
@@ -35,14 +35,14 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	};
 
   public:
-	AssetsWindow(std::string windowName, GameInspector& inspector);
+	AssetsWindow(std::string windowName);
 	bool isClosed() override {
 		return !m_isOpened;
 	}
 	
 	Texture* getThumbnailForAsset(const std::string& localAssetPath);
 	Texture* getThumbnailForModel3D(const std::string& localAssetPath);
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
 	void openMaterialEditWindow(sge::AssetIface_Material* mtlIface);
 	const char* getWindowName() const override {
 		return m_windowName.c_str();
@@ -64,7 +64,6 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	std::string openAssetImport_filename;
 
 	bool m_isOpened = true;
-	GameInspector& m_inspector;
 	std::string m_windowName;
 
 	/// The path to the currently right clicked object. If the path is empty there is no right clicked object and we should not display the

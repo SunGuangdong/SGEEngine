@@ -84,7 +84,7 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	}
 }
 
-void ModelPreviewWindow::update(SGEContext* const sgecon, const InputState& is) {
+void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is) {
 	if (isClosed()) {
 		return;
 	}

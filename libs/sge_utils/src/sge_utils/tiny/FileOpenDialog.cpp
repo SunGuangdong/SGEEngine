@@ -64,7 +64,7 @@ std::string FileOpenDialog(const std::string& prompt, bool fileMustExists, const
 			ofns.Flags |= OFN_FILEMUSTEXIST;
 		}
 
-		const BOOL okClicked = GetOpenFileNameA(&ofns);
+		[[maybe_unused]] const BOOL success = GetOpenFileNameA(&ofns);
 
 		SetCurrentDirectory(currentDir);
 	} else {
@@ -117,7 +117,7 @@ std::string FileSaveDialog(const std::string& prompt, const char* fileFilter, co
 		ofns.lpstrInitialDir = initialDir;
 		ofns.Flags |= OFN_FILEMUSTEXIST;
 
-		const BOOL okClicked = GetSaveFileNameA(&ofns);
+		[[maybe_unused]] const BOOL success = GetSaveFileNameA(&ofns);
 
 		SetCurrentDirectoryA(currentDir);
 	} else {

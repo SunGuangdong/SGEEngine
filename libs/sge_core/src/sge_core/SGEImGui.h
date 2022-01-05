@@ -50,6 +50,7 @@ struct SGE_CORE_API SGEImGui {
 	                       float v_max = 0.0f,
 	                       const char* display_format = "%.3f",
 	                       float power = 1.0f);
+
 	static bool DragInts(const char* label,
 	                     int* ints,
 	                     int numInts,
@@ -59,6 +60,7 @@ struct SGE_CORE_API SGEImGui {
 	                     int v_min = 0.0f,
 	                     int v_max = 0.0f,
 	                     const char* display_format = "%.0f");
+
 	static bool ColorPicker4(const char* label,
 	                         float col[4],
 	                         bool* const pJustReleased,

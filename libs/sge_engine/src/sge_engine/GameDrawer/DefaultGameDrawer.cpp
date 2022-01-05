@@ -321,7 +321,6 @@ vec4f getSelectionTintColor(DrawReason drawReason) {
 	const bool useWireframe = drawReason_IsVisualizeSelection(drawReason);
 	const vec4f wireframeColor =
 	    (drawReason == drawReason_visualizeSelectionPrimary) ? getPrimarySelectionColor() : kSecondarySelectionColor;
-	const int wireframeColorInt = colorToIntRgba(wireframeColor);
 	vec4f selectionTint = useWireframe ? wireframeColor : vec4f(0.f);
 	selectionTint.w = useWireframe ? 1.f : 0.f;
 

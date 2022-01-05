@@ -28,7 +28,7 @@ GamePlayWindow::GamePlayWindow(std::string windowName, const char* const worldJs
 	m_sceneInstance.getWorld().isEdited = false;
 }
 
-void GamePlayWindow::update(SGEContext* const sgecon, const InputState& isOriginal) {
+void GamePlayWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspector), const InputState& isOriginal) {
 	m_timer.tick();
 
 	if (isClosed()) {

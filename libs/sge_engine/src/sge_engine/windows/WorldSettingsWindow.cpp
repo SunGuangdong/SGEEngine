@@ -5,19 +5,19 @@
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
-#include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_engine/traits/TraitCamera.h"
+#include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_utils/sge_utils.h"
 #include "sge_utils/utils/strings.h"
 
 namespace sge {
-void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened)) {
-		GameWorld* world = m_inspector.getWorld();
+		GameWorld* world = inspector->getWorld();
 
 		if (ImGui::CollapsingHeader(ICON_FK_CODE "  World Scripts")) {
 			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
@@ -48,19 +48,22 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 
 		if (ImGui::CollapsingHeader(ICON_FK_LIGHTBULB_O " Scene Default Lighting")) {
 			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
-			ImGui::ColorEdit3("Ambient Light", m_inspector.getWorld()->m_ambientLight.data);
+			ImGui::ColorEdit3("Ambient Light", world->m_ambientLight.data);
 			ImGuiEx::Label("Ambient Intensity");
-			ImGui::DragFloat("##Ambient Intensity", &m_inspector.getWorld()->m_ambientLightIntensity, 0.01f, 0.f, 100.f);
+			ImGui::DragFloat("##Ambient Intensity", &world->m_ambientLightIntensity, 0.01f, 0.f, 100.f);
 			ImGuiEx::Label("Ambient Fake Detail");
-			ImGui::DragFloat("##Ambient Fake Detail", &m_inspector.getWorld()->m_ambientLightFakeDetailAmount, 0.01f, 0.f, 1.f);
-			//ImGui::ColorEdit3("Rim Light", m_inspector.getWorld()->m_rimLight.data);
-			//ImGui::DragFloat("Rim Width Cosine", &m_inspector.getWorld()->m_rimCosineWidth, 0.01f, 0.f, 1.f);
+
+			float fakeDetailAsPercentage = world->m_ambientLightFakeDetailAmount * 100.f;
+			ImGui::DragFloat("##Ambient Fake Detail", &fakeDetailAsPercentage, 0.1f, 0.f, 100.f, "%.3f %%");
+			world->m_ambientLightFakeDetailAmount = fakeDetailAsPercentage * 0.01f;
+			// ImGui::ColorEdit3("Rim Light", world->m_rimLight.data);
+			// ImGui::DragFloat("Rim Width Cosine", &world->m_rimCosineWidth, 0.01f, 0.f, 1.f);
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_CAMERA " Gameplay")) {
 			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			ImGuiEx::Label(ICON_FK_CAMERA " Gameplay Camera");
-			actorPicker("##CameraActorPicker", *m_inspector.getWorld(), m_inspector.getWorld()->m_cameraPovider, nullptr, true);
+			actorPicker("##CameraActorPicker", *world, world->m_cameraPovider, nullptr, true);
 
 			ImGui::SameLine();
 			if (ImGui::Button(ICON_FK_SHOPPING_CART)) {
@@ -68,12 +71,12 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 			}
 
 			if (ImGui::BeginPopup("Game Camera Picker")) {
-				m_inspector.getWorld()->iterateOverPlayingObjects(
+				world->iterateOverPlayingObjects(
 				    [&](const GameObject* object) -> bool {
 					    if (getTrait<TraitCamera>(object)) {
 						    bool selected = false;
 						    if (ImGui::Selectable(object->getDisplayNameCStr(), &selected)) {
-							    m_inspector.getWorld()->m_cameraPovider = object->getId();
+							    world->m_cameraPovider = object->getId();
 						    }
 					    }
 
@@ -109,7 +112,7 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_BUG " Debugging")) {
-			ImGui::InputInt("MS Delay", &m_inspector.getWorld()->debug.forceSleepMs, 1, 10);
+			ImGui::InputInt("MS Delay", &world->debug.forceSleepMs, 1, 10);
 		}
 	}
 	ImGui::End();

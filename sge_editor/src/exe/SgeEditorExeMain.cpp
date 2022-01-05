@@ -25,6 +25,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/IPlugin.h"
 #include "sge_engine/setImGuiContextEngine.h"
+#include "sge_engine/windows/AssetsUI/AssetsWindow.h"
 #include "sge_engine/windows/EditorWindow.h"
 #include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
@@ -34,6 +35,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_utils/utils/json.h"
 #include <filesystem>
 #include <thread>
+#include "IconsForkAwesome/IconsForkAwesome.h"
 
 #include "MiniDump.h"
 
@@ -90,8 +92,18 @@ struct SGEGameWindow : public WindowBase {
 		}
 
 		if (event == WE_FileDrop) {
+			// If a file has been droped on the application, open the asset import dialogue.
 			const WE_FileDrop_Data& filedropData = *static_cast<const WE_FileDrop_Data*>(eventData);
-			getEngineGlobal()->getEditorWindow()->openAssetImport(filedropData.filename);
+
+			AssetsWindow* wnd = getEngineGlobal()->findFirstWindowOfType<AssetsWindow>();
+			if (wnd) {
+				ImGui::SetWindowFocus(wnd->getWindowName());
+			} else {
+				wnd = new AssetsWindow(ICON_FK_FILE " Assets");
+				getEngineGlobal()->addWindow(wnd);
+			}
+
+			wnd->openAssetImport(filedropData.filename);
 		}
 	}
 
@@ -156,9 +168,9 @@ struct SGEGameWindow : public WindowBase {
 			bool shouldCurrentWorldBeReloaded = false;
 			std::string workingFilename;
 			if (m_pluginInst) {
-				shouldCurrentWorldBeReloaded = true;
-				workingFilename = getEngineGlobal()->getEditorWindow()->getWorld().m_workingFilePath;
-				getEngineGlobal()->getEditorWindow()->saveWorldToSpecificFile("reload_level.lvl");
+				//shouldCurrentWorldBeReloaded = true;
+				//workingFilename = getEngineGlobal()->getEditorWindow()->getWorld().m_workingFilePath;
+				//getEngineGlobal()->getEditorWindow()->saveWorldToSpecificFile("reload_level.lvl");
 			}
 
 			// Notify that we are about to unload the plugin.
@@ -228,7 +240,7 @@ struct SGEGameWindow : public WindowBase {
 			m_pluginInst->run();
 		}
 
-		getEngineGlobal()->getEditorWindow()->update(sgecon, GetInputState());
+		getEngineGlobal()->getEditorWindow()->update(sgecon, nullptr, GetInputState());
 
 		// Render the ImGui User Interface.
 		SGEImGui::render();

@@ -9,12 +9,11 @@
 #include "ActorCreateWindow.h"
 
 namespace sge {
-ActorCreateWindow::ActorCreateWindow(std::string windowName, GameInspector& inspector)
-    : m_windowName(std::move(windowName))
-    , m_inspector(inspector) {
+ActorCreateWindow::ActorCreateWindow(std::string windowName)
+    : m_windowName(std::move(windowName)) {
 }
 
-void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is)) {
 	const ImVec4 kPrimarySelectionColor(0.f, 1.f, 0.f, 1.f);
 
 	if (isClosed()) {
@@ -57,8 +56,8 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), const InputStat
 						continue;
 					}
 
-					const AssetIface_Texture2D* texIface =
-					    getLoadedAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId));
+					const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(
+					    getEngineGlobal()->getEngineAssets().getIconForObjectType(typeDesc->typeId));
 					Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 
 					ImGui::BeginChildFrame(ImHashStr(typeDesc->name), kWidgetSize, ImGuiWindowFlags_NoBackground);
@@ -96,13 +95,13 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), const InputStat
 					if (isImageButtonPressed) {
 						CmdObjectCreation* cmd = new CmdObjectCreation;
 						cmd->setup(typeDesc->typeId);
-						m_inspector.appendCommand(cmd, true);
+						inspector->appendCommand(cmd, true);
 
-						m_inspector.deselectAll();
-						m_inspector.select(cmd->getCreatedObjectId());
+						inspector->deselectAll();
+						inspector->select(cmd->getCreatedObjectId());
 
-						m_inspector.m_plantingTool.setup(m_inspector.getWorld()->getActorById(cmd->getCreatedObjectId()));
-						m_inspector.setTool(&m_inspector.m_plantingTool);
+						inspector->m_plantingTool.setup(inspector->getWorld()->getActorById(cmd->getCreatedObjectId()));
+						inspector->setTool(&inspector->m_plantingTool);
 
 						ImGui::FocusWindow(nullptr);
 					}

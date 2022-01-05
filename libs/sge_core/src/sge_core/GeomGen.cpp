@@ -372,7 +372,6 @@ void GeomGen::wiredSphere(std::vector<PosColorVert>& verts, const mat4f& transfo
 	const vec3f base = transform.data[3].xyz();
 
 	const int numCircleSegments = numSideDivs * 4;
-	const int numArcSegments = numCircleSegments / 2;
 	const float sideStepRadiands = sge2Pi / (float)numCircleSegments;
 
 	// XY circle.

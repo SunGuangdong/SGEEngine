@@ -155,7 +155,7 @@ const SpriteAnimation::Frame* SpriteAnimation::getFrameForTime(float time) const
 
 	const Frame* result = &frames[0];
 	for (const Frame& frm : frames) {
-		const float frameEndTime = frm.frameStart + frm.duration;
+		// const float frameEndTime = frm.frameStart + frm.duration;
 		if (time >= frm.frameStart) {
 			result = &frm;
 		}

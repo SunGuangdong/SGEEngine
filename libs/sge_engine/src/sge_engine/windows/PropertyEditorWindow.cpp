@@ -51,7 +51,6 @@ namespace ProperyEditorUIGen {
 void ProperyEditorUIGen::doGameObjectUI(GameInspector& inspector, GameObject* const gameObject) {
 	const TypeDesc* const pDesc = typeLib().find(gameObject->getType());
 	if (pDesc != nullptr) {
-
 		const AssetIface_Texture2D* iconImg =
 		    getLoadedAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(gameObject->getType()));
 		if (iconImg && iconImg->getTexture()) {
@@ -60,7 +59,7 @@ void ProperyEditorUIGen::doGameObjectUI(GameInspector& inspector, GameObject* co
 		}
 
 		ImGui::Text(pDesc->name);
-		
+
 
 		char objIdText[64] = {'\0'};
 		sge_snprintf(objIdText, SGE_ARRSZ(objIdText), "%d", gameObject->getId().id);
@@ -604,28 +603,44 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 	}
 }
 void ProperyEditorUIGen::editFloat(GameInspector& inspector, const char* label, GameObject* actor, MemberChain chain) {
-	bool justReleased = 0;
-	bool justActivated = 0;
-
-	const MemberDesc* mdMayBeNull = chain.getMemberDescIfNotIndexing();
+	const MemberDesc* const mdMayBeNull = chain.getMemberDescIfNotIndexing();
 
 	float* const pActorsValue = (float*)chain.follow(actor);
 	float v = *pActorsValue;
 
-	if (chain.knots.back().mfd->flags & MFF_FloatAsDegrees) {
-		v = rad2deg(v);
-	}
+	bool justReleased = false;
+	bool justActivated = false;
 
 	ImGuiEx::Label(label);
-	if (mdMayBeNull == nullptr) {
-		SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.1f);
-	} else {
-		SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.f, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_float,
-		                     mdMayBeNull->max_float);
-	}
-
 	if (chain.knots.back().mfd->flags & MFF_FloatAsDegrees) {
+		v = rad2deg(v);
+
+		if (mdMayBeNull == nullptr) {
+			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.1f);
+		} else {
+			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.f, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_float,
+			                     mdMayBeNull->max_float, "%3.f Degrees");
+		}
+
 		v = deg2rad(v);
+	} else if (chain.knots.back().mfd->flags & MFF_FloatAsDegrees) {
+		v = v * 100.f;
+
+		if (mdMayBeNull == nullptr) {
+			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.1f);
+		} else {
+			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.f, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_float,
+			                     mdMayBeNull->max_float, "%.3f %%");
+		}
+
+		v = v * 0.01f;
+	} else {
+		if (mdMayBeNull == nullptr) {
+			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.1f);
+		} else {
+			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.f, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_float,
+			                     mdMayBeNull->max_float);
+		}
 	}
 
 	if (justActivated) {
@@ -758,24 +773,24 @@ void ProperyEditorUIGen::editDynamicProperties(GameInspector& inspector, GameObj
 //----------------------------------------------------------
 // PropertyEditorWindow
 //----------------------------------------------------------
-void PropertyEditorWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void PropertyEditorWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
 		GameObject* gameObject =
-		    !m_inspector.m_selection.empty() ? m_inspector.getWorld()->getObjectById(m_inspector.m_selection[0].objectId) : nullptr;
+		    !inspector->m_selection.empty() ? inspector->getWorld()->getObjectById(inspector->m_selection[0].objectId) : nullptr;
 		if (gameObject == nullptr) {
 			ImGui::TextUnformatted("Meke a selection!");
 		} else {
 			if (ImGui::BeginCombo("Primary Selection", gameObject->getDisplayNameCStr())) {
-				for (int t = 0; t < m_inspector.m_selection.size(); ++t) {
-					GameObject* actorFromSel = m_inspector.getWorld()->getObjectById(m_inspector.m_selection[t].objectId);
+				for (int t = 0; t < inspector->m_selection.size(); ++t) {
+					GameObject* actorFromSel = inspector->getWorld()->getObjectById(inspector->m_selection[t].objectId);
 					if (actorFromSel) {
 						ImGuiEx::IDGuard idGuard(t);
 						if (ImGui::Selectable(actorFromSel->getDisplayNameCStr(), gameObject == actorFromSel)) {
-							std::swap(m_inspector.m_selection[t], m_inspector.m_selection[0]);
+							std::swap(inspector->m_selection[t], inspector->m_selection[0]);
 							gameObject = actorFromSel;
 						}
 					}
@@ -787,7 +802,7 @@ void PropertyEditorWindow::update(SGEContext* const UNUSED(sgecon), const InputS
 			ImGui::Separator();
 
 			// Show all the members of the actors structure.
-			ProperyEditorUIGen::doGameObjectUI(m_inspector, gameObject);
+			ProperyEditorUIGen::doGameObjectUI(*inspector, gameObject);
 		}
 	}
 	ImGui::End();

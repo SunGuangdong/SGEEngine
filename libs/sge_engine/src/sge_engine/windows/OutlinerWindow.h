@@ -12,19 +12,20 @@ struct InputState;
 struct GameInspector;
 
 struct SGE_ENGINE_API OutlinerWindow : public IImGuiWindow {
-	OutlinerWindow(std::string windowName, GameInspector& inspector)
+	OutlinerWindow(std::string windowName)
 	    : m_windowName(std::move(windowName))
-	    , m_inspector(inspector) {}
+	     {}
 
 	bool isClosed() override { return !m_isOpened; }
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 	const char* getWindowName() const override { return m_windowName.c_str(); }
+
+
 
   private:
 	char m_outlinerFilter[512] = {'*', '\0'};
 
 	bool m_isOpened = true;
-	GameInspector& m_inspector;
 	std::string m_windowName;
 	ImGuiTextFilter nodeNamesFilter;
 	ObjectId m_rightClickedActor;

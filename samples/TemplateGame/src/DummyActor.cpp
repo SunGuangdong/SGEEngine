@@ -21,7 +21,7 @@ struct DummyActor : public Actor {
 	}
 
 	void update(const GameUpdateSets& u) {
-		if (u.isGamePaused()) {
+		if (u.isSimulationPaused()) {
 			return;
 		}
 
@@ -29,7 +29,7 @@ struct DummyActor : public Actor {
 	}
 
 	void postUpdate(const GameUpdateSets& u) {
-		if (u.isGamePaused()) {
+		if (u.isSimulationPaused()) {
 			return;
 		}
 

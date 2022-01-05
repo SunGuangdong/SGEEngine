@@ -9,40 +9,40 @@
 #include "sge_utils/utils/strings.h"
 
 namespace sge {
-void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened)) {
-		if (m_inspector.getWorld()->m_workingFilePath.empty()) {
+		if (inspector->getWorld()->m_workingFilePath.empty()) {
 			ImGui::TextUnformatted("File not saved...");
 		} else {
-			ImGui::TextUnformatted(m_inspector.getWorld()->m_workingFilePath.c_str());
+			ImGui::TextUnformatted(inspector->getWorld()->m_workingFilePath.c_str());
 		}
 
-		GameWorld* world = m_inspector.getWorld();
+		GameWorld* world = inspector->getWorld();
 
 		if (ImGui::Button("Undo")) {
-			m_inspector.undoCommand();
+			inspector->undoCommand();
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Redo")) {
-			m_inspector.redoCommand();
+			inspector->redoCommand();
 		}
 
 		ImGui::SameLine();
 		ImGui::Spacing();
 		ImGui::SameLine();
 
-		if (ImGui::Button("Delete") && m_inspector.hasSelection()) {
-			m_inspector.deleteSelection(false);
+		if (ImGui::Button("Delete") && inspector->hasSelection()) {
+			inspector->deleteSelection(false);
 		}
 
-		if (ImGui::Button("Delete Hierarchy") && m_inspector.hasSelection()) {
-			m_inspector.deleteSelection(true);
+		if (ImGui::Button("Delete Hierarchy") && inspector->hasSelection()) {
+			inspector->deleteSelection(true);
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_CODE " Game World Scripts")) {
@@ -70,7 +70,7 @@ void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 				}
 
 				if (ImGui::Button(ICON_FK_EYEDROPPER)) {
-					auto& selection = m_inspector.getSelection();
+					auto& selection = inspector->getSelection();
 					if (selection.size() >= 1) {
 						GameObject* newObj = world->getObjectById(selection[0].objectId);
 						if (newObj) {
@@ -116,24 +116,24 @@ void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), const InputSt
 
 			// Display a list of all commands.
 			int curr = 0;
-			ImGui::ListBox("Cmd History", &curr, commandsNamesGetter, &m_inspector, m_inspector.m_lastExecutedCommandIdx + 1, 5);
+			ImGui::ListBox("Cmd History", &curr, commandsNamesGetter, &inspector, inspector->m_lastExecutedCommandIdx + 1, 5);
 		}
 
 		// Stepping.
 		ImGui::Separator();
 		{
-			ImGui::Checkbox("No Auto Step", &m_inspector.m_disableAutoStepping);
+			ImGui::Checkbox("No Auto Step", &inspector->m_disableAutoStepping);
 
-			m_inspector.m_stepOnce = false;
+			inspector->m_stepOnce = false;
 			if (ImGui::Button("Step Once")) {
-				m_inspector.m_disableAutoStepping = true;
-				m_inspector.m_stepOnce = true;
+				inspector->m_disableAutoStepping = true;
+				inspector->m_stepOnce = true;
 			}
 
-			ImGui::Text("Steps taken %d", m_inspector.m_world->totalStepsTaken);
+			ImGui::Text("Steps taken %d", inspector->m_world->totalStepsTaken);
 		}
 
-		ImGui::InputInt("MS Delay", &m_inspector.getWorld()->debug.forceSleepMs, 1, 10);
+		ImGui::InputInt("MS Delay", &inspector->getWorld()->debug.forceSleepMs, 1, 10);
 	}
 	ImGui::End();
 }

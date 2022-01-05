@@ -4,32 +4,28 @@
 
 namespace sge {
 
-void SceneInstance::newScene(bool forceKeepSameInspector) {
+void SceneInstance::newScene() {
 	m_world.clear();
-	if (forceKeepSameInspector == false) {
-		m_inspector.clear();
-	}
+	m_inspector.clear();
+
 	m_world.inspector = &m_inspector;
 	m_inspector.m_world = &m_world;
 	m_world.create();
 }
 
-void SceneInstance::loadWorldFromJson(const char* const json,
-                                      bool disableAutoSepping,
-                                      const char* const workingFileName,
-                                      bool forceKeepSameInspector) {
-	newScene(forceKeepSameInspector);
+void SceneInstance::loadWorldFromJson(const char* const json, bool disableAutoSepping, const char* const workingFileName) {
+	newScene();
 	[[maybe_unused]] bool success = loadGameWorldFromString(&m_world, json, workingFileName);
 	sgeAssert(success);
 
 	getInspector().m_disableAutoStepping = disableAutoSepping;
 }
 
-void SceneInstance::loadWorldFromFile(const char* const filename, bool disableAutoSepping, bool forceKeepSameInspector) {
+void SceneInstance::loadWorldFromFile(const char* const filename, bool disableAutoSepping) {
 	std::vector<char> fileContents;
 	if (FileReadStream::readFile(filename, fileContents)) {
 		fileContents.push_back('\0');
-		loadWorldFromJson(fileContents.data(), disableAutoSepping, filename, forceKeepSameInspector);
+		loadWorldFromJson(fileContents.data(), disableAutoSepping, filename);
 		return;
 	}
 

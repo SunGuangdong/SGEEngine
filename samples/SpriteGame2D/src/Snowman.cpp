@@ -60,7 +60,7 @@ struct Snowman : public Actor {
 	}
 
 	void update(const GameUpdateSets& u) {
-		if (u.isGamePaused()) {
+		if (u.isSimulationPaused()) {
 			return;
 		}
 

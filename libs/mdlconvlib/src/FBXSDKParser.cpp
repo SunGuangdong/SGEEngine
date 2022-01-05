@@ -458,7 +458,7 @@ void FBXSDKParser::importMaterials() {
 
 				int const textureCount = property.GetSrcObjectCount<FbxTexture>();
 				for (int const iTex : range_int(textureCount)) {
-					fbxsdk::FbxFileTexture* const fFileTex = fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(property.GetSrcObject<FbxTexture>(0));
+					fbxsdk::FbxFileTexture* const fFileTex = fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(property.GetSrcObject<FbxTexture>(iTex));
 					if (fFileTex) {
 						return fFileTex;
 					}

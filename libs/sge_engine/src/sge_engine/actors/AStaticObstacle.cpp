@@ -52,7 +52,7 @@ void AStaticObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 		}
 
 		std::vector<CollsionShapeDesc> shapeDescs;
-		const bool hasShape = addCollisionShapeBasedOnTraitModel(shapeDescs, m_traitModel);
+		addCollisionShapeBasedOnTraitModel(shapeDescs, m_traitModel);
 		if (shapeDescs.empty() == false) {
 			m_traitRB.getRigidBody()->create((Actor*)this, shapeDescs.data(), int(shapeDescs.size()), 0.f, false);
 

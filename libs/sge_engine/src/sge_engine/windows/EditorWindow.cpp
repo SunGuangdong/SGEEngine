@@ -31,13 +31,13 @@
 #include "sge_engine/actors/ACRSpline.h"
 #include "sge_engine/actors/ALight.h"
 #include "sge_engine/actors/ALine.h"
+#include "sge_utils/debugger/VSDebugger.h"
 #include "sge_utils/stl_algorithm_ex.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"
 #include "sge_utils/utils/strings.h"
-#include "sge_utils/debugger/VSDebugger.h"
 
 #include "IconsForkAwesome/IconsForkAwesome.h"
 
@@ -71,11 +71,11 @@ void EditorWindow::Assets::load() {
 }
 
 void EditorWindow::onGamePluginPreUnload() {
-	m_sceneInstance.newScene(true);
+	m_sceneInstances.clear();
+	iActiveInstance = -1;
 }
 
 void EditorWindow::onGamePluginChanged() {
-	m_gameDrawer->initialize(&m_sceneInstance.getWorld());
 	m_sceneWindow->setGameDrawer(m_gameDrawer.get());
 }
 
@@ -90,14 +90,14 @@ EditorWindow::EditorWindow(WindowBase& nativeWindow, std::string windowName)
 
 	newScene();
 
-	getEngineGlobal()->addWindow(new AssetsWindow(ICON_FK_FILE " Assets", m_sceneInstance.getInspector()));
-	getEngineGlobal()->addWindow(new OutlinerWindow(ICON_FK_SEARCH " Outliner", m_sceneInstance.getInspector()));
-	getEngineGlobal()->addWindow(new WorldSettingsWindow(ICON_FK_COGS " World Settings", m_sceneInstance.getInspector()));
-	getEngineGlobal()->addWindow(new PropertyEditorWindow(ICON_FK_COG " Property Editor", m_sceneInstance.getInspector()));
-	getEngineGlobal()->addWindow(new PrefabWindow("Prefabs", m_sceneInstance.getInspector()));
+	getEngineGlobal()->addWindow(new AssetsWindow(ICON_FK_FILE " Assets"));
+	getEngineGlobal()->addWindow(new OutlinerWindow(ICON_FK_SEARCH " Outliner"));
+	getEngineGlobal()->addWindow(new WorldSettingsWindow(ICON_FK_COGS " World Settings"));
+	getEngineGlobal()->addWindow(new PropertyEditorWindow(ICON_FK_COG " Property Editor"));
+	getEngineGlobal()->addWindow(new PrefabWindow("Prefabs"));
 	m_sceneWindow = new SceneWindow(ICON_FK_GLOBE " Scene", m_gameDrawer.get());
 	getEngineGlobal()->addWindow(m_sceneWindow);
-	getEngineGlobal()->addWindow(new ActorCreateWindow("Actor Create", m_sceneInstance.getInspector()));
+	getEngineGlobal()->addWindow(new ActorCreateWindow("Actor Create"));
 
 	getEngineGlobal()->addWindow(new LogWindow(ICON_FK_LIST " Log"));
 
@@ -164,30 +164,76 @@ void EditorWindow::openAssetImport(const std::string& filename) {
 	if (wnd) {
 		ImGui::SetWindowFocus(wnd->getWindowName());
 	} else {
-		wnd = new AssetsWindow(ICON_FK_FILE " Assets", m_sceneInstance.getInspector());
+		wnd = new AssetsWindow(ICON_FK_FILE " Assets");
 		getEngineGlobal()->addWindow(wnd);
 	}
 
 	wnd->openAssetImport(filename);
 }
 
+int EditorWindow::newEmptyInstance() {
+	m_sceneInstances.emplace_back(PerSceneInstanceData());
+
+	m_sceneInstances.back().sceneInstace = std::make_unique<SceneInstance>();
+	m_sceneInstances.back().sceneInstace->newScene();
+	m_sceneInstances.back().displayName = "New Level";
+
+	return (int)m_sceneInstances.size() - 1;
+}
+
+void EditorWindow::switchToInstance(int iInstance) {
+	if(iInstance >= 0 && iInstance < m_sceneInstances.size()) {
+		iActiveInstance = iInstance;
+		m_gameDrawer->initialize(&getActiveInstance()->getWorld());
+	}
+}
+
+void EditorWindow::deleteInstance(int iInstance) {
+	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
+		m_sceneInstances.erase(m_sceneInstances.begin() + iInstance);
+		iActiveInstance = (int)m_sceneInstances.size() - 1;
+
+		if (iActiveInstance < 0) {
+			iActiveInstance = newEmptyInstance();
+		}
+
+		switchToInstance(iActiveInstance);
+	}
+}
+
+SceneInstance* EditorWindow::getActiveInstance() {
+	if (iActiveInstance >= 0 && iActiveInstance < m_sceneInstances.size()) {
+		return m_sceneInstances[iActiveInstance].sceneInstace.get();
+	}
+
+	return nullptr;
+}
+
+EditorWindow::PerSceneInstanceData* EditorWindow::getActiveInstanceData() {
+	if (iActiveInstance >= 0 && iActiveInstance < m_sceneInstances.size()) {
+		return &m_sceneInstances[iActiveInstance];
+	}
+
+	return nullptr;
+}
+
 EditorWindow::~EditorWindow() {
 	sgeAssert(false);
 }
 
-void EditorWindow::newScene(bool forceKeepSameInspector) {
-	m_sceneInstance.newScene(forceKeepSameInspector);
-	if (m_gameDrawer) {
-		m_gameDrawer->initialize(&m_sceneInstance.getWorld());
-	}
+void EditorWindow::newScene(bool UNUSED(forceKeepSameInspector)) {
+	switchToInstance(newEmptyInstance());
 
-	// m_inspector.m_world->userProjectionSettings.aspectRatio = 1.f; // Just some default to be overriden.
+	// m_sceneInstance.newScene(forceKeepSameInspector);
+	// if (m_gameDrawer) {
+	//	m_gameDrawer->initialize(&m_sceneInstance.getWorld());
+	//}
 
-	for (auto& wnd : getEngineGlobal()->getAllWindows()) {
-		wnd->onNewWorld();
-	}
+	//// m_inspector.m_world->userProjectionSettings.aspectRatio = 1.f; // Just some default to be overriden.
 
-	m_nativeWindow.setWindowTitle("SGEEngine Editor - Untitled Scene*");
+	// for (auto& wnd : getEngineGlobal()->getAllWindows()) {
+	//	wnd->onNewWorld();
+	//}
 }
 
 void EditorWindow::loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename, bool forceKeepSameInspector) {
@@ -208,21 +254,34 @@ void EditorWindow::loadWorldFromFile(const char* const filename, const char* ove
 void EditorWindow::loadWorldFromJson(const char* const json,
                                      bool disableAutoSepping,
                                      const char* const workingFileName,
-                                     bool forceKeepSameInspector) {
-	m_sceneInstance.loadWorldFromJson(json, disableAutoSepping, workingFileName, forceKeepSameInspector);
-
-	for (auto& wnd : getEngineGlobal()->getAllWindows()) {
-		wnd->onNewWorld();
+                                     bool loadInNewInstance) {
+	if (loadInNewInstance && getActiveInstance() == nullptr) {
+		int iInstance = newEmptyInstance();
+		switchToInstance(iInstance);
 	}
 
-	std::string windowTitle = string_format("SGEEngine Editor - %s", workingFileName);
-	m_nativeWindow.setWindowTitle(windowTitle.c_str());
+	PerSceneInstanceData* sceneInstData = getActiveInstanceData();
+
+	if (workingFileName) {
+		sceneInstData->filename = workingFileName;
+	}
+
+	if (workingFileName) {
+		sceneInstData->displayName = extractFileNameWithExt(workingFileName);
+	} else {
+		sceneInstData->displayName = "Unsaved Scene";
+	}
+
+	sceneInstData->sceneInstace->loadWorldFromJson(json, disableAutoSepping, workingFileName);
 }
 
 void EditorWindow::saveWorldToFile(bool forceAskForFilename) {
 	std::string filename;
-	if (!forceAskForFilename && m_sceneInstance.getWorld().m_workingFilePath.empty() == false) {
-		filename = m_sceneInstance.getWorld().m_workingFilePath;
+
+	SceneInstance* sceneInst = getActiveInstance();
+
+	if (!forceAskForFilename && sceneInst->getWorld().m_workingFilePath.empty() == false) {
+		filename = sceneInst->getWorld().m_workingFilePath;
 	} else {
 		// In order for the File Save dialog to point to the default assets/levels directory
 		// the directory must exist.
@@ -252,12 +311,14 @@ void EditorWindow::saveWorldToSpecificFile(const char* filename) {
 		return;
 	}
 
-	bool succeeded = m_sceneInstance.saveWorldToFile(filename);
+	SceneInstance* sceneInst = getActiveInstance();
+
+	bool succeeded = sceneInst->saveWorldToFile(filename);
 
 	if (succeeded) {
 		getEngineGlobal()->showNotification(string_format("SUCCEEDED saving '%s'", filename));
 		sgeLogInfo("[SAVE_LEVEL] Saving game level succeeded. File is %s\n", filename);
-		m_sceneInstance.getWorld().m_workingFilePath = filename;
+		sceneInst->getWorld().m_workingFilePath = filename;
 
 		addReasecentScene(filename);
 	} else {
@@ -267,7 +328,7 @@ void EditorWindow::saveWorldToSpecificFile(const char* filename) {
 }
 
 
-void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
+void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspector), const InputState& is) {
 	m_timer.tick();
 
 	const ImGuiWindowFlags mainWndFlags =
@@ -276,6 +337,42 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 	ImGui::SetNextWindowPos(ImVec2(0.f, 0.f));
 	ImGui::SetNextWindowSize(ImVec2(float(m_nativeWindow.GetClientWidth()), float(m_nativeWindow.GetClientHeight())));
 	ImGui::Begin(m_windowName.c_str(), nullptr, mainWndFlags);
+
+	if (ImGui::BeginTabBar("SGEEdtorTabSceneInstances", ImGuiTabBarFlags_Reorderable)) {
+		int iInstanceToDelete = -1;
+		for (int iInst = 0; iInst < (int)m_sceneInstances.size(); ++iInst) {
+			ImGuiEx::IDGuard idguard(iInst);
+
+			int tabFlags = 0;
+
+			if (iInst == iActiveInstance) {
+				tabFlags |= ImGuiTabItemFlags_SetSelected;
+			}
+
+			bool isOpen = true;
+			if (ImGui::BeginTabItem(m_sceneInstances[iInst].displayName.c_str(), &isOpen)) {
+				if (iInst != iActiveInstance) {
+					switchToInstance(iInst);
+				}
+				ImGui::EndTabItem();
+			}
+
+			if (isOpen == false) {
+				iInstanceToDelete = iInst;
+			}
+		}
+
+		if (iInstanceToDelete) {
+			deleteInstance(iInstanceToDelete);
+		}
+
+		if (ImGui::TabItemButton("+ New", ImGuiTabItemFlags_Trailing)) {
+			switchToInstance(newEmptyInstance());
+		}
+
+		ImGui::EndTabBar();
+	}
+
 
 	// [SGE_EDITOR_MOUSE_CAPTURE_HOTKEY]
 	// while editing some games might need the cursor to be relative
@@ -286,24 +383,6 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 	// to capture the cursor.
 	if (is.IsKeyPressed(Key::Key_F2)) {
 		getEngineGlobal()->setEngineAllowingRelativeCursor(!getEngineGlobal()->getEngineAllowingRelativeCursor());
-	}
-
-	if (loadLevelFile.empty() == false) {
-		this->loadWorldFromFile(loadLevelFile.c_str());
-		loadLevelFile.clear();
-
-		GamePlayWindow* gameplayWindow = getEngineGlobal()->findFirstWindowOfType<GamePlayWindow>();
-
-		if (gameplayWindow == nullptr) {
-			JsonValueBuffer jvb;
-			JsonValue* jWorld = serializeGameWorld(&m_sceneInstance.getWorld(), jvb);
-			JsonWriter jw;
-			WriteStdStringStream stringStream;
-			jw.write(&stringStream, jWorld);
-
-			gameplayWindow = new GamePlayWindow("Game Play", stringStream.serializedString.c_str());
-			getEngineGlobal()->addWindow(gameplayWindow);
-		}
 	}
 
 	if (ImGui::BeginMenuBar()) {
@@ -322,7 +401,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 					const std::string filename = FileOpenDialog("Load GameWorld form file...", true, "*.lvl\0*.lvl\0", "./assets/levels");
 
 					if (!filename.empty()) {
-						loadWorldFromFile(filename.c_str());
+						loadWorldFromFile(filename.c_str(), filename.c_str(), true);
 					}
 				}
 			}
@@ -345,7 +424,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 				} else {
 					for (const auto& levelFile : levelsList) {
 						if (ImGui::MenuItem(levelFile.c_str())) {
-							loadWorldFromFile(levelFile.c_str());
+							loadWorldFromFile(levelFile.c_str(), nullptr, true);
 						}
 					}
 				}
@@ -374,7 +453,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
 				} else {
-					getEngineGlobal()->addWindow(new AssetsWindow(ICON_FK_FILE " Assets", m_sceneInstance.getInspector()));
+					getEngineGlobal()->addWindow(new AssetsWindow(ICON_FK_FILE " Assets"));
 				}
 			}
 
@@ -383,7 +462,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
 				} else {
-					getEngineGlobal()->addWindow(new OutlinerWindow(ICON_FK_SEARCH " Outliner", m_sceneInstance.getInspector()));
+					getEngineGlobal()->addWindow(new OutlinerWindow(ICON_FK_SEARCH " Outliner"));
 				}
 			}
 
@@ -392,7 +471,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
 				} else {
-					getEngineGlobal()->addWindow(new WorldSettingsWindow(ICON_FK_COGS " World Settings", m_sceneInstance.getInspector()));
+					getEngineGlobal()->addWindow(new WorldSettingsWindow(ICON_FK_COGS " World Settings"));
 				}
 			}
 
@@ -401,7 +480,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
 				} else {
-					getEngineGlobal()->addWindow(new PropertyEditorWindow("Propery Editor", m_sceneInstance.getInspector()));
+					getEngineGlobal()->addWindow(new PropertyEditorWindow("Propery Editor"));
 				}
 			}
 
@@ -410,7 +489,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
 				} else {
-					getEngineGlobal()->addWindow(new ActorCreateWindow("Actor Create", m_sceneInstance.getInspector()));
+					getEngineGlobal()->addWindow(new ActorCreateWindow("Actor Create"));
 				}
 			}
 
@@ -419,7 +498,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
 				} else {
-					getEngineGlobal()->addWindow(new PrefabWindow("Prefabs", m_sceneInstance.getInspector()));
+					getEngineGlobal()->addWindow(new PrefabWindow("Prefabs"));
 				}
 			}
 
@@ -428,7 +507,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 				if (gameplayWindow == nullptr) {
 					JsonValueBuffer jvb;
-					JsonValue* jWorld = serializeGameWorld(&m_sceneInstance.getWorld(), jvb);
+					JsonValue* jWorld = serializeGameWorld(&getActiveInstance()->getWorld(), jvb);
 					JsonWriter jw;
 					WriteStdStringStream stringStream;
 					jw.write(&stringStream, jWorld);
@@ -531,7 +610,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 	// Update the game world.
 	InputState isSceneWindowDomain = m_sceneWindow->computeInputStateInDomainSpace(is);
-	m_sceneInstance.update(m_timer.diff_seconds(), isSceneWindowDomain);
+	getActiveInstance()->update(m_timer.diff_seconds(), isSceneWindowDomain);
 
 	// Rendering.
 	sgecon->clearDepth(getCore()->getDevice()->getWindowFrameTarget(), 1.f);
@@ -547,50 +626,72 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 
 	if (ImGui::BeginChild("Toolbar", ImVec2(0, 48), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar)) {
-		if (m_assets.m_assetPlayIcon && m_sceneInstance.getInspector().m_disableAutoStepping) {
+		char previewName[512] = {0};
+
+		sge_snprintf(previewName, SGE_ARRSZ(previewName), "%d", iActiveInstance);
+
+		if (ImGui::BeginCombo(ICON_FK_PICTURE_O " Levels", "<>")) {
+			for (int iInst = 0; iInst < (int)m_sceneInstances.size(); ++iInst) {
+				sge_snprintf(previewName, SGE_ARRSZ(previewName), "%d", iInst);
+
+				if (ImGui::Selectable(previewName)) {
+					switchToInstance(iInst);
+				}
+			}
+
+			if (ImGui::Selectable("+ New Instace")) {
+				switchToInstance(newEmptyInstance());
+			}
+
+			ImGui::EndCombo();
+		}
+
+		ImGui::SameLine();
+
+		if (m_assets.m_assetPlayIcon && getActiveInstance()->getInspector().m_disableAutoStepping) {
 			if (imageButton(m_assets.m_assetPlayIcon))
-				m_sceneInstance.getInspector().m_disableAutoStepping = false;
+				getActiveInstance()->getInspector().m_disableAutoStepping = false;
 		} else if (imageButton(m_assets.m_assetPauseIcon)) {
-			m_sceneInstance.getInspector().m_disableAutoStepping = true;
+			getActiveInstance()->getInspector().m_disableAutoStepping = true;
 		}
 
 
 		ImGui::SameLine();
 
 		if (imageButton(m_assets.m_assetPickingIcon)) {
-			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_selectionTool);
+			getActiveInstance()->getInspector().setTool(&getActiveInstance()->getInspector().m_selectionTool);
 		}
 		ImGuiEx::TextTooltip("Enables the scene selection tool.\nShortcut: Q");
 
 		ImGui::SameLine();
 
 		if (imageButton(m_assets.m_assetTranslationIcon)) {
-			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Translation;
-			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
+			getActiveInstance()->getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Translation;
+			getActiveInstance()->getInspector().setTool(&getActiveInstance()->getInspector().m_transformTool);
 		}
 		ImGuiEx::TextTooltip("Enables the actor move tool.\nShortcut: W");
 
 		ImGui::SameLine();
 
 		if (imageButton(m_assets.m_assetRotationIcon)) {
-			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Rotation;
-			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
+			getActiveInstance()->getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Rotation;
+			getActiveInstance()->getInspector().setTool(&getActiveInstance()->getInspector().m_transformTool);
 		}
 		ImGuiEx::TextTooltip("Enables the actor rotation tool.\nShortcut: E");
 
 		ImGui::SameLine();
 
 		if (imageButton(m_assets.m_assetScalingIcon)) {
-			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Scaling;
-			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
+			getActiveInstance()->getInspector().m_transformTool.m_mode = Gizmo3D::Mode_Scaling;
+			getActiveInstance()->getInspector().setTool(&getActiveInstance()->getInspector().m_transformTool);
 		}
 		ImGuiEx::TextTooltip("Enables the actor scaling tool\nShortcut: R.");
 
 		ImGui::SameLine();
 
 		if (imageButton(m_assets.m_assetVolumeScaleIcon)) {
-			m_sceneInstance.getInspector().m_transformTool.m_mode = Gizmo3D::Mode_ScaleVolume;
-			m_sceneInstance.getInspector().setTool(&m_sceneInstance.getInspector().m_transformTool);
+			getActiveInstance()->getInspector().m_transformTool.m_mode = Gizmo3D::Mode_ScaleVolume;
+			getActiveInstance()->getInspector().setTool(&getActiveInstance()->getInspector().m_transformTool);
 		}
 		ImGuiEx::TextTooltip("Enables the actor box-scaling tool.\nShortcut: Ctrl + R");
 
@@ -603,7 +704,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 			}
 
 			JsonValueBuffer jvb;
-			JsonValue* jWorld = serializeGameWorld(&m_sceneInstance.getWorld(), jvb);
+			JsonValue* jWorld = serializeGameWorld(&getActiveInstance()->getWorld(), jvb);
 			JsonWriter jw;
 			WriteStdStringStream stringStream;
 			jw.write(&stringStream, jWorld);
@@ -615,13 +716,13 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGui::Separator();
 		ImGui::SameLine();
 
-		if (m_sceneInstance.getInspector().m_transformTool.m_useSnapSettings) {
+		if (getActiveInstance()->getInspector().m_transformTool.m_useSnapSettings) {
 			if (imageButton(m_assets.m_assetSnapToGridOnIcon)) {
-				m_sceneInstance.getInspector().m_transformTool.m_useSnapSettings = false;
+				getActiveInstance()->getInspector().m_transformTool.m_useSnapSettings = false;
 			}
 		} else {
 			if (imageButton(m_assets.m_assetSnapToGridOffIcon)) {
-				m_sceneInstance.getInspector().m_transformTool.m_useSnapSettings = true;
+				getActiveInstance()->getInspector().m_transformTool.m_useSnapSettings = true;
 			}
 		}
 		ImGuiEx::TextTooltip("Toggle on/off snapping for tools.");
@@ -633,29 +734,29 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGui::SameLine();
 
 		if (imageButton(m_assets.m_orthoIcon)) {
-			getInspector().getWorld()->m_editorCamera.isOrthograhpic = !getInspector().getWorld()->m_editorCamera.isOrthograhpic;
+			getActiveInstance()->getWorld().m_editorCamera.isOrthograhpic = !getActiveInstance()->getWorld().m_editorCamera.isOrthograhpic;
 		}
 		ImGuiEx::TextTooltip("Toggle the orthographic/perspective mode of the preview camera.");
 
 		ImGui::SameLine();
 		if (imageButton(m_assets.m_xIcon)) {
-			getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw = 0.f;
-			getInspector().getWorld()->m_editorCamera.m_orbitCamera.pitch = 0.f;
+			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.yaw = 0.f;
+			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.pitch = 0.f;
 		}
 		ImGuiEx::TextTooltip("Align the preview camera to +X axis.");
 
 		ImGui::SameLine();
 		if (imageButton(m_assets.m_yIcon)) {
-			getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw =
-			    deg2rad(90.f) * float(int(getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw / deg2rad(90.f)));
-			getInspector().getWorld()->m_editorCamera.m_orbitCamera.pitch = deg2rad(90.f);
+			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.yaw =
+			    deg2rad(90.f) * float(int(getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.yaw / deg2rad(90.f)));
+			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.pitch = deg2rad(90.f);
 		}
 		ImGuiEx::TextTooltip("Align the preview camera to +Y axis.");
 
 		ImGui::SameLine();
 		if (imageButton(m_assets.m_zIcon)) {
-			getInspector().getWorld()->m_editorCamera.m_orbitCamera.yaw = deg2rad(-90.f);
-			getInspector().getWorld()->m_editorCamera.m_orbitCamera.pitch = 0.f;
+			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.yaw = deg2rad(-90.f);
+			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.pitch = 0.f;
 		}
 		ImGuiEx::TextTooltip("Align the preview camera to +Z axis.");
 
@@ -669,23 +770,23 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 		ImGui::Separator();
 		ImGui::SameLine();
 #if 1
-		if (m_sceneInstance.getInspector().editMode == editMode_points) {
+		if (getActiveInstance()->getInspector().editMode == editMode_points) {
 			// Todo: Reenable this!
 			if (ImGui::Button("Tessalate")) {
 				std::map<ALine*, std::vector<int>> tessalateBetweenIndices;
 				std::map<ACRSpline*, std::vector<int>> tessalateBetweenIndicesCRSpline;
 
-				for (int t = 0; t < m_sceneInstance.getInspector().m_selection.size(); ++t) {
+				for (int t = 0; t < getActiveInstance()->getInspector().m_selection.size(); ++t) {
 					ALine* const spline =
-					    m_sceneInstance.getWorld().getActor<ALine>(m_sceneInstance.getInspector().m_selection[t].objectId);
+					    getActiveInstance()->getWorld().getActor<ALine>(getActiveInstance()->getInspector().m_selection[t].objectId);
 					if (spline) {
-						tessalateBetweenIndices[spline].push_back(m_sceneInstance.getInspector().m_selection[t].index);
+						tessalateBetweenIndices[spline].push_back(getActiveInstance()->getInspector().m_selection[t].index);
 					}
 
 					ACRSpline* const crSpline =
-					    m_sceneInstance.getWorld().getActor<ACRSpline>(m_sceneInstance.getInspector().m_selection[t].objectId);
+					    getActiveInstance()->getWorld().getActor<ACRSpline>(getActiveInstance()->getInspector().m_selection[t].objectId);
 					if (crSpline) {
-						tessalateBetweenIndicesCRSpline[crSpline].push_back(m_sceneInstance.getInspector().m_selection[t].index);
+						tessalateBetweenIndicesCRSpline[crSpline].push_back(getActiveInstance()->getInspector().m_selection[t].index);
 					}
 				}
 
@@ -693,7 +794,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 					if (itr.second.size() > 1) {
 						ASplineAddPoints* cmd = new ASplineAddPoints();
 						cmd->setup(itr.first, itr.second);
-						m_sceneInstance.getInspector().appendCommand(cmd, true);
+						getActiveInstance()->getInspector().appendCommand(cmd, true);
 					}
 				}
 
@@ -701,7 +802,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 					if (itr.second.size() > 1) {
 						ACRSplineAddPoints* cmd = new ACRSplineAddPoints();
 						cmd->setup(itr.first, itr.second);
-						m_sceneInstance.getInspector().appendCommand(cmd, true);
+						getActiveInstance()->getInspector().appendCommand(cmd, true);
 					}
 				}
 			}
@@ -765,7 +866,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 
 			if (ImGui::Selectable(levelFile.c_str(), &isSelected)) {
 				std::string filenameToOpen = levelFile;
-				loadWorldFromFile(filenameToOpen.c_str());
+				loadWorldFromFile(filenameToOpen.c_str(), filenameToOpen.c_str(), false);
 				m_isWelcomeWindowOpened = false;
 
 				// Caution: we need to break the loop here as the loadWorldFromFile() would modify m_rescentOpenedSceneFiles.
@@ -815,11 +916,11 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 	}
 
 	if (is.isKeyCombo(Key::Key_LCtrl, Key::Key_Z)) {
-		getInspector().undoCommand();
+		getActiveInstance()->getInspector().undoCommand();
 	}
 
 	if (is.isKeyCombo(Key::Key_LCtrl, Key::Key_Y)) {
-		getInspector().redoCommand();
+		getActiveInstance()->getInspector().redoCommand();
 	}
 
 	// Update the existing windows. if on the previous update the window was closed remove it.
@@ -836,7 +937,7 @@ void EditorWindow::update(SGEContext* const sgecon, const InputState& is) {
 			continue;
 		}
 
-		wnd->update(sgecon, is);
+		wnd->update(sgecon, &getActiveInstance()->getInspector(), is);
 	}
 }
 

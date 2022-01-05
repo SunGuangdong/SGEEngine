@@ -8,7 +8,7 @@ namespace sge {
 struct GameInspector;
 
 struct SGE_ENGINE_API MaterialEditWindow : public IImGuiWindow {
-	MaterialEditWindow(std::string windowName, GameInspector& inspector);
+	MaterialEditWindow(std::string windowName);
 	bool isClosed() override {
 		return !m_isOpened;
 	}
@@ -17,7 +17,7 @@ struct SGE_ENGINE_API MaterialEditWindow : public IImGuiWindow {
 		return m_windowName.c_str();
 	}
 
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
 
 	void setAsset(std::shared_ptr<AssetIface_Material> newMtlAsset) {
 		mtlProvider = newMtlAsset;

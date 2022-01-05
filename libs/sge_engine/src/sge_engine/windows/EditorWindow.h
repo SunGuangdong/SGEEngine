@@ -16,6 +16,8 @@ struct Asset;
 
 struct SceneWindow;
 
+/// EditorWindow is the root window of the whole application.
+/// It is unique in the application it hosts all the other windows.
 struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
   private:
 	struct Assets {
@@ -55,17 +57,18 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	void onGamePluginChanged();
 
 
-	bool isClosed() override { return false; }
+	bool isClosed() override {
+		return false;
+	}
 
-	void update(SGEContext* const sgecon, const InputState& is) override;
-	const char* getWindowName() const override { return m_windowName.c_str(); }
+	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
+	const char* getWindowName() const override {
+		return m_windowName.c_str();
+	}
 
 	void newScene(bool forceKeepSameInspector = false);
-	void loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename = nullptr, bool forceKeepSameInspector = false);
-	void loadWorldFromJson(const char* const json,
-	                       bool disableAutoSepping,
-	                       const char* const workingFileName = nullptr,
-	                       bool forceKeepSameInspector = false);
+	void loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename, bool loadInNewInstance);
+	void loadWorldFromJson(const char* const json, bool disableAutoSepping, const char* const workingFileName, bool loadInNewInstance);
 	void saveWorldToFile(bool forceAskForFilename);
 	void saveWorldToSpecificFile(const char* filename);
 
@@ -73,22 +76,32 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	void saveEditorSettings();
 	void addReasecentScene(const char* const filename);
 
-	void closeWelcomeWindow() { m_isWelcomeWindowOpened = false; }
+	void closeWelcomeWindow() {
+		m_isWelcomeWindowOpened = false;
+	}
 
 	void openAssetImport(const std::string& filename);
 
-	GameInspector& getInspector() { return m_sceneInstance.getInspector(); }
-	const GameInspector& getInspector() const { return m_sceneInstance.getInspector(); }
-	GameWorld& getWorld() { return m_sceneInstance.getWorld(); }
-	const GameWorld& getWorld() const { return m_sceneInstance.getWorld(); }
+	int newEmptyInstance();
+	void switchToInstance(int iInstance);
+	void deleteInstance(int iInstance);
 
-	std::string loadLevelFile;
+	SceneInstance* getActiveInstance();
+
+	struct PerSceneInstanceData {
+		std::string filename;
+		std::string displayName;
+		std::unique_ptr<SceneInstance> sceneInstace;
+	};
+
+	PerSceneInstanceData* getActiveInstanceData();
 
   private:
 	Assets m_assets;
 
 	WindowBase& m_nativeWindow;
-	SceneInstance m_sceneInstance;
+	int iActiveInstance = -1;
+	std::vector<PerSceneInstanceData> m_sceneInstances;
 	std::unique_ptr<IGameDrawer> m_gameDrawer;
 	std::string m_windowName;
 

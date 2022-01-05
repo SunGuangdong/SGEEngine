@@ -34,7 +34,7 @@ struct ModelPreviewWindow : public IImGuiWindow {
 		return m_windowName.c_str();
 	}
 
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 	
 	AssetPtr& getModel() {
 		return m_model;

@@ -641,7 +641,7 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* 
 	};
 
 	const auto jfmtVersion = jWorld->getMember("fmtVersion");
-	const int version = jfmtVersion ? jfmtVersion->getNumberAs<int>() : -1;
+	[[maybe_unused]] const int version = jfmtVersion ? jfmtVersion->getNumberAs<int>() : -1;
 
 	//
 	const JsonValue* jNextNameIdx = jWorld->getMember("nextNameIndex");

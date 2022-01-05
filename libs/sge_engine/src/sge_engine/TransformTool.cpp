@@ -216,7 +216,7 @@ void TransformTool::onUI(GameInspector* inspector) {
 	ImGui::DragFloat3("Scaling snapping", m_snapSettings.scaleSnapping.data, 0.1f);
 
 	ImGui::Checkbox("Apply Snapping", &m_useSnapSettings);
-	ImGui::Checkbox("Local space rotation", &m_localSpaceRotation);
+	ImGui::Checkbox("Local Space Rotation", &m_localSpaceRotation);
 }
 
 void TransformTool::drawOverlay(const GameDrawSets& drawSets) {
@@ -260,7 +260,7 @@ bool TransformTool::interact(
 				if (!m_localSpaceRotation) {
 					// Rotate the position around the gizmo.
 					const vec3f posOffset = objectTrasform.p - gizmoInitPos;
-					const float dist = (objectTrasform.p - gizmoInitPos).lengthSqr();
+					[[maybe_unused]] const float dist = (objectTrasform.p - gizmoInitPos).lengthSqr();
 
 					// if (dist > 1e-6f) {
 					objectTrasform.p = gizmoInitPos + mat_mul_pos(mat4f::getRotationQuat(gizmoTransform.r), posOffset);

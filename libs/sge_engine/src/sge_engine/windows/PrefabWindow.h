@@ -10,18 +10,17 @@ namespace sge {
 struct GameInspector;
 
 struct SGE_ENGINE_API PrefabWindow : public IImGuiWindow {
-	PrefabWindow(std::string windowName, GameInspector& inspector)
+	PrefabWindow(std::string windowName)
 	    : m_windowName(std::move(windowName))
-	    , m_inspector(inspector) {}
+	 {}
 
 	bool isClosed() override { return !m_isOpened; }
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 	const char* getWindowName() const override { return m_windowName.c_str(); }
 
   private:
 	bool m_isOpened = true;
 	std::string m_windowName;
-	GameInspector& m_inspector;
 
 	Optional<std::vector<std::string>> m_availablePrefabs;
 

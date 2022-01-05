@@ -11,7 +11,6 @@
 #include "sge_core/model/ModelReader.h"
 #include "sge_core/model/ModelWriter.h"
 #include "sge_engine/EngineGlobal.h"
-#include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/ui/ImGuiDragDrop.h"
 #include "sge_engine/ui/UIAssetPicker.h"
@@ -66,9 +65,8 @@ JsonValue* createDefaultPBRFromImportedMtl(ExternalPBRMaterialSettings& external
 	return jMaterial;
 }
 
-AssetsWindow::AssetsWindow(std::string windowName, GameInspector& inspector)
-    : m_windowName(std::move(windowName))
-    , m_inspector(inspector) {
+AssetsWindow::AssetsWindow(std::string windowName)
+    : m_windowName(std::move(windowName)) {
 	// Try to load the functions that will be used for importing 3D models.
 	if (mdlconvlibHandler.loadNoExt("mdlconvlib")) {
 		m_sgeImportFBXFile = reinterpret_cast<sgeImportFBXFileFn>(mdlconvlibHandler.getProcAdress("sgeImportFBXFile"));
@@ -105,9 +103,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 
 			// Convert the 3d model to our internal type.
 			ModelWriter modelWriter;
-			const bool succeeded = modelWriter.write(importedModel, fullAssetPath.c_str());
-
-
+			[[maybe_unused]] const bool succeeded = modelWriter.write(importedModel, fullAssetPath.c_str());
 
 			std::string notificationMsg = string_format("Imported %s", fullAssetPath.c_str());
 			sgeLogInfo(notificationMsg.c_str());
@@ -139,7 +135,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				AssetPtr assetTexture = assetLib->getAssetFromFile(textureDstPath.c_str());
 				assetLib->reloadAssetModified(assetTexture);
 			}
-			
+
 			// Create the model.
 			AssetPtr assetModel = assetLib->getAssetFromFile(fullAssetPath.c_str());
 			assetLib->reloadAssetModified(assetModel);
@@ -202,7 +198,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 
 				// Convert the 3d model to our internal type.
 				ModelWriter modelWriter;
-				const bool succeeded = modelWriter.write(model.importedModel, path.c_str());
+				[[maybe_unused]] const bool succeeded = modelWriter.write(model.importedModel, path.c_str());
 
 				AssetPtr assetModel = assetLib->getAssetFromFile(path.c_str());
 				assetLib->reloadAssetModified(assetModel);
@@ -312,7 +308,7 @@ Texture* AssetsWindow::getThumbnailForAsset(const std::string& localAssetPath) {
 	return nullptr;
 }
 
-void AssetsWindow::update(SGEContext* const UNUSED(sgecon), const InputState& is) {
+void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSED(inspector), const InputState& is) {
 	if (isClosed()) {
 		return;
 	}
@@ -786,7 +782,7 @@ void AssetsWindow::openMaterialEditWindow(sge::AssetIface_Material* mtlIface) {
 	MaterialEditWindow* mtlEditWnd =
 	    dynamic_cast<MaterialEditWindow*>(getEngineGlobal()->findWindowByName(ICON_FK_PICTURE_O " Material Edit"));
 	if (mtlEditWnd == nullptr) {
-		mtlEditWnd = new MaterialEditWindow(ICON_FK_PICTURE_O " Material Edit", m_inspector);
+		mtlEditWnd = new MaterialEditWindow(ICON_FK_PICTURE_O " Material Edit");
 		getEngineGlobal()->addWindow(mtlEditWnd);
 	} else {
 		ImGui::SetNextWindowFocus();

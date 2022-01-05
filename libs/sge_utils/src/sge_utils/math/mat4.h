@@ -348,9 +348,6 @@ struct mat4 {
 		const DATA_TYPE& z = q[2];
 		const DATA_TYPE& w = q[3];
 
-		const DATA_TYPE one = (DATA_TYPE)1.0;
-		const DATA_TYPE two = (DATA_TYPE)2.0;
-
 #if 0
 		result.data[0] = VEC_TYPE(1 - 2.0*(y*y + z*z), 2.0*(x*y + w*z), 2.0*(x*z - w*y), 0);
 		result.data[1] = VEC_TYPE(2.0*(x*y - w*z), 1 - 2.0*(x*x + z*z), 2.0*(y*z + w*x), 0);

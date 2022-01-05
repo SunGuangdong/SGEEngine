@@ -113,7 +113,7 @@ std::string preprocessCode(const char* code,
 	char* colpilationErrors = nullptr;
 
 	// Run the preprocessor.
-	int const res =
+	[[maybe_unused]] int const res =
 	    sge_mcpp_preprocess(&compilationResult, &colpilationErrors, argsCFormat.data(), int(argsCFormat.size()), loadFileFn, &udata);
 	std::string result = compilationResult ? compilationResult : "";
 

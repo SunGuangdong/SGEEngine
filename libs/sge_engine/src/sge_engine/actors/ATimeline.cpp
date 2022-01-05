@@ -80,17 +80,15 @@ struct TimelineWindow final : public IImGuiWindow {
 	    : m_windowName(std::move(windowName)) {
 		if (timeline) {
 			timelineActorId = timeline->getId();
-			m_inspector = timeline->GameObject::getWorld()->getInspector();
 		}
 	}
 
 	bool isClosed() override { return !m_isOpened; }
-	void update(SGEContext* const sgecon, const InputState& is) override;
+	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 	const char* getWindowName() const override { return m_windowName.c_str(); }
 
   private:
 	bool m_isOpened = true;
-	GameInspector* m_inspector = nullptr;
 	std::string m_windowName;
 
 	ObjectId timelineActorId;
@@ -104,19 +102,19 @@ struct TimelineWindow final : public IImGuiWindow {
 };
 
 
-void TimelineWindow::update(SGEContext* const UNUSED(sgecon), const InputState& UNUSED(is)) {
+void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
 	if (isClosed()) {
 		return;
 	}
 
-	if (m_inspector == nullptr) {
+	if (inspector == nullptr) {
 		m_isOpened = false;
 		return;
 	}
 
-	GameWorld& world = *m_inspector->getWorld();
+	GameWorld& world = *inspector->getWorld();
 
-	ATimeline* const timeline = (ATimeline*)m_inspector->getWorld()->getActorById(timelineActorId);
+	ATimeline* const timeline = (ATimeline*)inspector->getWorld()->getActorById(timelineActorId);
 	if (timeline == nullptr) {
 		m_isOpened = false;
 		return;
@@ -134,7 +132,7 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 			MemberChain chain;
 			chain.add(typeLib().findMember(&ATimeline::keyFrames));
 			cmd->setup(timeline->getId(), chain, &oldKeyFrames, &timeline->keyFrames, nullptr);
-			m_inspector->appendCommand(cmd, false);
+			inspector->appendCommand(cmd, false);
 		};
 
 		ImGui::Text(ICON_FK_EXCLAMATION_TRIANGLE
@@ -250,7 +248,7 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), const InputState& 
 
 			if (ImGui::MenuItem(ICON_FK_KEY " Set Key")) {
 				bool hadAChange = false;
-				for (const SelectedItem& sel : m_inspector->getSelection()) {
+				for (const SelectedItem& sel : inspector->getSelection()) {
 					if (sel.objectId != timeline->getId()) { // Do not keyframe the timeline. the user might have selected it by mistake.
 						if (Actor* actor = world.getActorById(sel.objectId)) {
 							timeline->keyFrames[m_lastRightClickedFrame][actor->getId()] = actor->getTransform();
@@ -360,7 +358,6 @@ void ATimeline::postUpdate(const GameUpdateSets& u) {
 	}
 
 	if (shouldUpdate) {
-		const float deltaTimeForUpdate = shouldUpdate ? u.dt : 0.f;
 		float evalTime = isInEditMode ? m_editingEvaltime : m_gameplayEvalTime;
 		if (m_useSmoothInterpolation) {
 			evalTime = smoothstep(evalTime / totalAnimLength) * totalAnimLength;
