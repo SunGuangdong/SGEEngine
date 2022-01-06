@@ -12,6 +12,7 @@
 #include "sge_engine//GameSerialization.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
+#include "sge_engine/ui/ImGuiDragDrop.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"
@@ -99,7 +100,13 @@ void PrefabWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector
 		if (m_availablePrefabs.isValid()) {
 			for (const std::string& prefabPath : m_availablePrefabs.get()) {
 				if (ImGui::Selectable(prefabPath.c_str())) {
-					inspector->getWorld()->instantiatePrefab(prefabPath.c_str(), true, true);
+					inspector->getWorld()->instantiatePrefab(prefabPath.c_str(), true, true, NullOptional());
+				}
+
+				if (ImGui::BeginDragDropSource()) {
+					DragDropPayloadPrefabFile::setPayload(prefabPath);
+					ImGui::Text(prefabPath.c_str());
+					ImGui::EndDragDropSource();
 				}
 			}
 		}

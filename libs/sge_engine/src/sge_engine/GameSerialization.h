@@ -18,8 +18,8 @@ struct TypeDesc;
 SGE_ENGINE_API JsonValue* serializeGameWorld(const GameWorld* world, JsonValueBuffer& jvb);
 SGE_ENGINE_API std::string serializeGameWorld(const GameWorld* world);
 
-SGE_ENGINE_API bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* const workingFilename = "");
-SGE_ENGINE_API bool loadGameWorldFromString(GameWorld* world, const char* const levelJson, const char* const workingFilename = "");
+SGE_ENGINE_API bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream);
+SGE_ENGINE_API bool loadGameWorldFromString(GameWorld* world, const char* const levelJson);
 SGE_ENGINE_API bool loadGameWorldFromFile(GameWorld* world, const char* const filename);
 
 SGE_ENGINE_API JsonValue* serializeObject(const GameObject* object, JsonValueBuffer& jvb);

@@ -226,8 +226,6 @@ void GameWorld::create() {
 }
 
 void GameWorld::clear() {
-	m_workingFilePath.clear();
-
 	m_nextObjectId = 1;
 	for (auto& itrObjByType : playingObjects) {
 		for (int t = 0; t < itrObjByType.second.size(); ++t) {
@@ -578,26 +576,30 @@ void GameWorld::getAllRelativesOf(vector_set<ObjectId>& result, ObjectId actorId
 	}
 }
 
-void sge::GameWorld::instantiatePrefab(const char* prefabPath, bool createHistory, bool shouldGenerateNewObjectIds) {
+void sge::GameWorld::instantiatePrefab(const char* prefabPath,
+                                       bool createHistory,
+                                       bool shouldGenerateNewObjectIds,
+                                       const Optional<transf3d>& offsetWorldSpace) {
 	GameWorld prefabWorld;
 	if (loadGameWorldFromFile(&prefabWorld, prefabPath)) {
-		instantiatePrefab(prefabWorld, createHistory, shouldGenerateNewObjectIds, nullptr);
-	} else {
-		sgeAssert(false);
+		instantiatePrefab(prefabWorld, createHistory, shouldGenerateNewObjectIds, nullptr, nullptr, offsetWorldSpace);
 	}
 }
 
 /// Instantients the specified world into the current world.
 /// @param [in] prefabPath a path the world file to be instantiated.
 /// @param [in] createHistory pass true if the changes should be added to undo/redo history.
-void GameWorld::instantiatePrefabFromJsonString(const char* prefabJson, bool createHistory, bool shouldGenerateNewObjectIds) {
+void GameWorld::instantiatePrefabFromJsonString(const char* prefabJson,
+                                                bool createHistory,
+                                                bool shouldGenerateNewObjectIds,
+                                                const Optional<transf3d>& offsetWorldSpace) {
 	GameWorld prefabWorld;
 	bool succeeded = loadGameWorldFromString(&prefabWorld, prefabJson);
 
 	if (succeeded) {
-		instantiatePrefab(prefabWorld, createHistory, shouldGenerateNewObjectIds, nullptr);
+		instantiatePrefab(prefabWorld, createHistory, shouldGenerateNewObjectIds, nullptr, nullptr, offsetWorldSpace);
 	} else {
-		sgeAssert(false);
+		sgeLogError("Failed to instantiage game objects from json describing game world");
 	}
 }
 
@@ -605,7 +607,8 @@ void sge::GameWorld::instantiatePrefab(const GameWorld& prefabWorld,
                                        bool createHistory,
                                        bool shouldGenerateNewObjectIds,
                                        const vector_set<ObjectId>* const pOblectsToInstantiate,
-                                       vector_set<ObjectId>* const newObjectIds) {
+                                       vector_set<ObjectId>* const newObjectIds,
+                                       const Optional<transf3d>& offsetWorldSpace) {
 	std::vector<GameObject*> createdObjects;
 	std::unordered_map<ObjectId, ObjectId> oldToNew;
 	std::unordered_map<ObjectId, ObjectId> oldParentOf;
@@ -659,6 +662,16 @@ void sge::GameWorld::instantiatePrefab(const GameWorld& prefabWorld,
 
 	for (GameObject* const prefabObject : prefabWorld.objectsAwaitingCreation) {
 		processActor(prefabObject);
+	}
+
+	if (offsetWorldSpace) {
+		for (GameObject* newObjectFromPrefab : createdObjects) {
+			if (Actor* actor = dynamic_cast<Actor*>(newObjectFromPrefab)) {
+				transf3d oldWorld = actor->getTransform();
+				transf3d newWorld = transf3d::applyBindingTransform(oldWorld, offsetWorldSpace.get());
+				actor->setTransform(newWorld);
+			}
+		}
 	}
 
 	// Fix the object relationships stored as members in the entites themselves

@@ -15,12 +15,6 @@ void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), GameInspector
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened)) {
-		if (inspector->getWorld()->m_workingFilePath.empty()) {
-			ImGui::TextUnformatted("File not saved...");
-		} else {
-			ImGui::TextUnformatted(inspector->getWorld()->m_workingFilePath.c_str());
-		}
-
 		GameWorld* world = inspector->getWorld();
 
 		if (ImGui::Button("Undo")) {

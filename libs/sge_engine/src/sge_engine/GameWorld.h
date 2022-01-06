@@ -205,12 +205,18 @@ struct SGE_ENGINE_API GameWorld {
 	/// @brief Instantients the specified world into the current world.
 	/// @param [in] prefabPath a path the world file to be instantiated.
 	/// @param [in] createHistory pass true if the changes should be added to undo/redo history.
-	void instantiatePrefab(const char* prefabPath, bool createHistory, bool shouldGenerateNewObjectIds);
+	void instantiatePrefab(const char* prefabPath,
+	                       bool createHistory,
+	                       bool shouldGenerateNewObjectIds,
+	                       const Optional<transf3d>& offsetWorldSpace);
 
 	/// Instantients the specified world into the current world.
 	/// @param [in] prefabPath a path the world file to be instantiated.
 	/// @param [in] createHistory pass true if the changes should be added to undo/redo history.
-	void instantiatePrefabFromJsonString(const char* prefabJson, bool createHistory, bool shouldGenerateNewObjectIds);
+	void instantiatePrefabFromJsonString(const char* prefabJson,
+	                                     bool createHistory,
+	                                     bool shouldGenerateNewObjectIds,
+	                                     const Optional<transf3d>& offsetWorldSpace);
 
 	/// Instantients the specified prefabWorld into the current world.
 	/// In result new objects will be generated in the current world, however for obvious reasions
@@ -222,7 +228,8 @@ struct SGE_ENGINE_API GameWorld {
 	                       bool createHistory,
 	                       bool shouldGenerateNewObjectIds,
 	                       const vector_set<ObjectId>* const pOblectsToInstantiate,
-	                       vector_set<ObjectId>* const newObjectIds = nullptr);
+	                       vector_set<ObjectId>* const newObjectIds = nullptr,
+	                       const Optional<transf3d>& offsetWorldSpace = NullOptional());
 
 	/// Creates a prefab world based on the current world.
 	/// @praam [out] prefabWorld the prefab world that is going to be created.
@@ -329,9 +336,6 @@ struct SGE_ENGINE_API GameWorld {
 	EventEmitter<> onWorldLoaded;
 
 	std::vector<std::unique_ptr<IPostSceneUpdateTask>> m_postSceneUpdateTasks;
-
-	/// If set this is the file that we are currently working with. Otherwise we are not working with a saved level.
-	std::string m_workingFilePath;
 
 	/// Script objects to get called.
 	std::vector<ObjectId> m_scriptObjects;

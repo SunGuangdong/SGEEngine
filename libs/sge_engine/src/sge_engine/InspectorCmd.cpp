@@ -484,7 +484,7 @@ void CmdObjectDeletion::redo(GameInspector* inspector) {
 
 void CmdObjectDeletion::undo(GameInspector* inspector) {
 	GameWorld* world = inspector->getWorld();
-	world->instantiatePrefabFromJsonString(m_prefabWorldJson.c_str(), false, false);
+	world->instantiatePrefabFromJsonString(m_prefabWorldJson.c_str(), false, false, NullOptional());
 
 	// Restore the hierarchy of the deleted objects.
 	for (auto& pair : m_originalHierarchy) {
@@ -521,7 +521,7 @@ void CmdExistingObjectCreation::apply(GameInspector* UNUSED(inspector)) {
 
 void CmdExistingObjectCreation::redo(GameInspector* inspector) {
 	GameWorld* world = inspector->getWorld();
-	world->instantiatePrefabFromJsonString(m_prefabWorldJson.c_str(), false, false);
+	world->instantiatePrefabFromJsonString(m_prefabWorldJson.c_str(), false, false, NullOptional());
 
 	// Restore the hierarchy of the deleted objects.
 	for (auto& pair : m_originalHierarchy) {

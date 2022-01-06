@@ -159,18 +159,6 @@ void EditorWindow::addReasecentScene(const char* const filename) {
 	saveEditorSettings();
 }
 
-void EditorWindow::openAssetImport(const std::string& filename) {
-	AssetsWindow* wnd = getEngineGlobal()->findFirstWindowOfType<AssetsWindow>();
-	if (wnd) {
-		ImGui::SetWindowFocus(wnd->getWindowName());
-	} else {
-		wnd = new AssetsWindow(ICON_FK_FILE " Assets");
-		getEngineGlobal()->addWindow(wnd);
-	}
-
-	wnd->openAssetImport(filename);
-}
-
 int EditorWindow::newEmptyInstance() {
 	m_sceneInstances.emplace_back(PerSceneInstanceData());
 
@@ -182,7 +170,7 @@ int EditorWindow::newEmptyInstance() {
 }
 
 void EditorWindow::switchToInstance(int iInstance) {
-	if(iInstance >= 0 && iInstance < m_sceneInstances.size()) {
+	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
 		iActiveInstance = iInstance;
 		m_gameDrawer->initialize(&getActiveInstance()->getWorld());
 	}
@@ -190,14 +178,18 @@ void EditorWindow::switchToInstance(int iInstance) {
 
 void EditorWindow::deleteInstance(int iInstance) {
 	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
-		m_sceneInstances.erase(m_sceneInstances.begin() + iInstance);
-		iActiveInstance = (int)m_sceneInstances.size() - 1;
 
-		if (iActiveInstance < 0) {
-			iActiveInstance = newEmptyInstance();
+		std::string message = string_format("Closing scene %s. All unsaved changes will be lost! Do you want to continue closing?",
+		                                    getInstanceData(iInstance)->displayName.c_str());
+		
+		if (DialogYesNo("Closing Scene", message.c_str())) {
+			m_sceneInstances.erase(m_sceneInstances.begin() + iInstance);
+			int newActiveInst = (int)m_sceneInstances.size() - 1;
+
+			if (newActiveInst >= 0) {
+				switchToInstance(newActiveInst);
+			}
 		}
-
-		switchToInstance(iActiveInstance);
 	}
 }
 
@@ -210,8 +202,12 @@ SceneInstance* EditorWindow::getActiveInstance() {
 }
 
 EditorWindow::PerSceneInstanceData* EditorWindow::getActiveInstanceData() {
-	if (iActiveInstance >= 0 && iActiveInstance < m_sceneInstances.size()) {
-		return &m_sceneInstances[iActiveInstance];
+	return getInstanceData(iActiveInstance);
+}
+
+EditorWindow::PerSceneInstanceData* EditorWindow::getInstanceData(int iInstance) {
+	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
+		return &m_sceneInstances[iInstance];
 	}
 
 	return nullptr;
@@ -272,16 +268,16 @@ void EditorWindow::loadWorldFromJson(const char* const json,
 		sceneInstData->displayName = "Unsaved Scene";
 	}
 
-	sceneInstData->sceneInstace->loadWorldFromJson(json, disableAutoSepping, workingFileName);
+	sceneInstData->sceneInstace->loadWorldFromJson(json, disableAutoSepping);
 }
 
-void EditorWindow::saveWorldToFile(bool forceAskForFilename) {
+void EditorWindow::saveInstanceToFile(int iInstance, bool forceAskForFilename) {
 	std::string filename;
 
-	SceneInstance* sceneInst = getActiveInstance();
+	PerSceneInstanceData* instData = getInstanceData(iInstance);
 
-	if (!forceAskForFilename && sceneInst->getWorld().m_workingFilePath.empty() == false) {
-		filename = sceneInst->getWorld().m_workingFilePath;
+	if (!forceAskForFilename && instData->filename.empty() == false) {
+		filename = instData->filename;
 	} else {
 		// In order for the File Save dialog to point to the default assets/levels directory
 		// the directory must exist.
@@ -302,28 +298,33 @@ void EditorWindow::saveWorldToFile(bool forceAskForFilename) {
 		}
 	}
 
-	saveWorldToSpecificFile(filename.c_str());
+	saveInstanceToSpecificFile(iInstance, filename.c_str());
 }
 
-void EditorWindow::saveWorldToSpecificFile(const char* filename) {
-	if (filename == nullptr) {
+void EditorWindow::saveInstanceToSpecificFile(int iInstance, const char* filename) {
+	if (isStringEmpty(filename)) {
 		sgeAssert(false && "saveWorldToSpecificFile expects a filename");
 		return;
 	}
 
-	SceneInstance* sceneInst = getActiveInstance();
+	PerSceneInstanceData* instData = getInstanceData(iInstance);
 
-	bool succeeded = sceneInst->saveWorldToFile(filename);
+	if (instData) {
+		bool succeeded = instData->sceneInstace->saveWorldToFile(filename);
+		if (succeeded) {
+			instData->filename = filename;
 
-	if (succeeded) {
-		getEngineGlobal()->showNotification(string_format("SUCCEEDED saving '%s'", filename));
-		sgeLogInfo("[SAVE_LEVEL] Saving game level succeeded. File is %s\n", filename);
-		sceneInst->getWorld().m_workingFilePath = filename;
+			getEngineGlobal()->showNotification(string_format("SUCCEEDED saving '%s'", filename));
+			sgeLogInfo("[SAVE_LEVEL] Saving game level succeeded. File is %s\n", filename);
+			instData->filename = filename;
+			instData->displayName = filename;
 
-		addReasecentScene(filename);
-	} else {
-		getEngineGlobal()->showNotification(string_format("FAILED saving level '%s'", filename));
-		sgeLogWarn("[SAVE_LEVEL] Saving game level failed or canceled!\n");
+			addReasecentScene(filename);
+		} else {
+			std::string error = string_format("FAILED saving level '%s'", filename);
+			getEngineGlobal()->showNotification(error);
+			sgeLogWarn(error.c_str());
+		}
 	}
 }
 
@@ -338,7 +339,7 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 	ImGui::SetNextWindowSize(ImVec2(float(m_nativeWindow.GetClientWidth()), float(m_nativeWindow.GetClientHeight())));
 	ImGui::Begin(m_windowName.c_str(), nullptr, mainWndFlags);
 
-	if (ImGui::BeginTabBar("SGEEdtorTabSceneInstances", ImGuiTabBarFlags_Reorderable)) {
+	if (ImGui::BeginTabBar("SGEEdtorTabSceneInstances", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs)) {
 		int iInstanceToDelete = -1;
 		for (int iInst = 0; iInst < (int)m_sceneInstances.size(); ++iInst) {
 			ImGuiEx::IDGuard idguard(iInst);
@@ -362,7 +363,7 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 			}
 		}
 
-		if (iInstanceToDelete) {
+		if (iInstanceToDelete >= 0) {
 			deleteInstance(iInstanceToDelete);
 		}
 
@@ -373,6 +374,11 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		ImGui::EndTabBar();
 	}
 
+	if (getActiveInstanceData() == nullptr) {
+		ImGui::Text("Create a new scene from the tab meny above");
+		ImGui::End();
+		return;
+	}
 
 	// [SGE_EDITOR_MOUSE_CAPTURE_HOTKEY]
 	// while editing some games might need the cursor to be relative
@@ -432,11 +438,11 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 			}
 
 			if (ImGui::MenuItem(ICON_FK_FLOPPY_O " Save")) {
-				saveWorldToFile(false);
+				saveInstanceToFile(iActiveInstance, false);
 			}
 
 			if (ImGui::MenuItem(ICON_FK_FLOPPY_O " Save As...")) {
-				saveWorldToFile(true);
+				saveInstanceToFile(iActiveInstance, true);
 			}
 			ImGui::EndMenu();
 		}
@@ -626,28 +632,6 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 
 
 	if (ImGui::BeginChild("Toolbar", ImVec2(0, 48), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar)) {
-		char previewName[512] = {0};
-
-		sge_snprintf(previewName, SGE_ARRSZ(previewName), "%d", iActiveInstance);
-
-		if (ImGui::BeginCombo(ICON_FK_PICTURE_O " Levels", "<>")) {
-			for (int iInst = 0; iInst < (int)m_sceneInstances.size(); ++iInst) {
-				sge_snprintf(previewName, SGE_ARRSZ(previewName), "%d", iInst);
-
-				if (ImGui::Selectable(previewName)) {
-					switchToInstance(iInst);
-				}
-			}
-
-			if (ImGui::Selectable("+ New Instace")) {
-				switchToInstance(newEmptyInstance());
-			}
-
-			ImGui::EndCombo();
-		}
-
-		ImGui::SameLine();
-
 		if (m_assets.m_assetPlayIcon && getActiveInstance()->getInspector().m_disableAutoStepping) {
 			if (imageButton(m_assets.m_assetPlayIcon))
 				getActiveInstance()->getInspector().m_disableAutoStepping = false;

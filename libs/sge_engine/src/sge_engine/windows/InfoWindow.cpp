@@ -46,12 +46,12 @@ void InfoWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* 
 
 		SGEDevice* const sgedev = getCore()->getDevice();
 
-		if (ImGui::CollapsingHeader("VertexDeclarations")) {
+		if (ImGui::CollapsingHeader("Vertex Declarations")) {
 			for (const auto& declPair : sgedev->getVertexDeclMap()) {
 				ImGui::Text("Declaration idx=%d, size=%d", declPair.second, declPair.first.size());
 
 				for (const VertexDecl& decl : declPair.first) {
-					ImGui::Text("%d %s %d %d", decl.bufferSlot, decl.semantic.c_str(), decl.byteOffset, decl.format);
+					ImGui::Text("\tslot=%d %s offset=%d fmt=%d", decl.bufferSlot, decl.semantic.c_str(), decl.byteOffset, decl.format);
 				}
 
 				ImGui::Separator();

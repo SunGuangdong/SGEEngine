@@ -937,7 +937,11 @@ struct MainFrameTargetDesc {
 struct FrameStatistics {
 	FrameStatistics() = default;
 
-	void Reset() { *this = FrameStatistics(); }
+	void Reset() { 
+		// Basically reset all to defaults but keep the times.
+		numDrawCalls = 0;
+		numPrimitiveDrawn = 0;
+	}
 
 	int numDrawCalls = 0;
 	size_t numPrimitiveDrawn = 0;

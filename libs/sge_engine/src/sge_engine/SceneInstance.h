@@ -29,7 +29,7 @@ struct SGE_ENGINE_API SceneInstance {
 	}
 
 	void newScene();
-	void loadWorldFromJson(const char* const json, bool disableAutoSepping, const char* const workingFileName);
+	void loadWorldFromJson(const char* const json, bool disableAutoSepping);
 	void loadWorldFromFile(const char* const filename, bool disableAutoSepping);
 	bool saveWorldToFile(const char* const filename);
 

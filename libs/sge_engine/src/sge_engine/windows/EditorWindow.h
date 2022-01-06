@@ -69,8 +69,8 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	void newScene(bool forceKeepSameInspector = false);
 	void loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename, bool loadInNewInstance);
 	void loadWorldFromJson(const char* const json, bool disableAutoSepping, const char* const workingFileName, bool loadInNewInstance);
-	void saveWorldToFile(bool forceAskForFilename);
-	void saveWorldToSpecificFile(const char* filename);
+	void saveInstanceToFile(int iInstance, bool forceAskForFilename);
+	void saveInstanceToSpecificFile(int iInstance, const char* filename);
 
 	void loadEditorSettings();
 	void saveEditorSettings();
@@ -79,8 +79,6 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	void closeWelcomeWindow() {
 		m_isWelcomeWindowOpened = false;
 	}
-
-	void openAssetImport(const std::string& filename);
 
 	int newEmptyInstance();
 	void switchToInstance(int iInstance);
@@ -95,6 +93,7 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	};
 
 	PerSceneInstanceData* getActiveInstanceData();
+	PerSceneInstanceData* getInstanceData(int iInstance);
 
   private:
 	Assets m_assets;

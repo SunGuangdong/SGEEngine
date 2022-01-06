@@ -608,7 +608,7 @@ std::string serializeGameWorld(const GameWorld* world) {
 	return std::move(ss.serializedString);
 }
 
-bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* const workingFilename) {
+bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream) {
 	if (!world || !stream) {
 		return false;
 	}
@@ -626,7 +626,6 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* 
 	const JsonValue* const jWorld = jsonParser.getRoot();
 
 	if (!jWorld) {
-		sgeAssert(false);
 		return false;
 	}
 
@@ -714,7 +713,6 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* 
 	}
 
 	// Save the filename that we are working with.
-	world->m_workingFilePath = workingFilename;
 	world->physicsWorld.setGravity(world->m_defaultGravity);
 	world->update(GameUpdateSets(0.f, true, InputState()));
 	world->onWorldLoaded.invokeEvent();
@@ -722,9 +720,9 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream, const char* 
 	return true;
 }
 
-bool loadGameWorldFromString(GameWorld* world, const char* const levelJson, const char* const workingFilename) {
+bool loadGameWorldFromString(GameWorld* world, const char* const levelJson) {
 	ReadCStringStream rs(levelJson);
-	return loadGameWorldFromStream(world, &rs, workingFilename);
+	return loadGameWorldFromStream(world, &rs);
 }
 
 bool loadGameWorldFromFile(GameWorld* world, const char* const filename) {
@@ -744,7 +742,7 @@ bool loadGameWorldFromFile(GameWorld* world, const char* const filename) {
 		return false;
 	}
 
-	return loadGameWorldFromStream(world, &frs, filename);
+	return loadGameWorldFromStream(world, &frs);
 }
 
 } // namespace sge

@@ -25,13 +25,13 @@ ReflAddTypeId(ANavMesh, 20'05'10'0002);
 
 ReflBlock() {
 	ReflAddType(NavMeshBuildSets)
-		ReflMemberNamed(NavMeshBuildSets, cellXZSize, "cellXZSize")
-		ReflMemberNamed(NavMeshBuildSets, cellYSize, "cellYSize")
+		ReflMemberNamed(NavMeshBuildSets, cellXZSize, "cellXZSize").uiRange(0.01f, 10000.f, 0.001f)
+		ReflMemberNamed(NavMeshBuildSets, cellYSize, "cellYSize").uiRange(0.01f, 10000.f, 0.001f)
 		ReflMemberNamed(NavMeshBuildSets, climbableSlopeAngle, "climbableSlopeAngle").addMemberFlag(MFF_FloatAsDegrees)
-		ReflMemberNamed(NavMeshBuildSets, cimbableStairHeight, "cimbableStairHeight")
-		ReflMemberNamed(NavMeshBuildSets, minRoomHeight, "minRoomHeight")
-		ReflMemberNamed(NavMeshBuildSets, agentRadius, "agentRadius")
-		ReflMemberNamed(NavMeshBuildSets, agentHeight, "agentHeight")
+		ReflMemberNamed(NavMeshBuildSets, cimbableStairHeight, "cimbableStairHeight").uiRange(0.f, 1000.f, 0.001f)
+		ReflMemberNamed(NavMeshBuildSets, minRoomHeight, "minRoomHeight").uiRange(0.f, 1000.f, 0.001f)
+		ReflMemberNamed(NavMeshBuildSets, agentRadius, "agentRadius").uiRange(0.f, 1000.f, 0.001f)
+		ReflMemberNamed(NavMeshBuildSets, agentHeight, "agentHeight").uiRange(0.f, 1000.f, 0.001f)
 	;
 
 	ReflAddActor(ANavMesh)

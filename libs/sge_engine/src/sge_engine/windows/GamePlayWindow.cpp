@@ -22,7 +22,7 @@ GamePlayWindow::GamePlayWindow(std::string windowName, const char* const worldJs
 	m_sceneInstance.newScene();
 	m_gameDrawer->initialize(&m_sceneInstance.getWorld());
 
-	m_sceneInstance.loadWorldFromJson(worldJsonString, false, "");
+	m_sceneInstance.loadWorldFromJson(worldJsonString, false);
 
 	m_sceneInstance.getWorld().m_useEditorCamera = false;
 	m_sceneInstance.getWorld().isEdited = false;

@@ -285,7 +285,6 @@ bool JsonParser::parse(IReadStream* instream) {
 	try {
 		root = parseValue(getNextJID());
 	} catch ([[maybe_unused]] const JsonParseError& except) {
-		sgeAssert(false);
 		return false;
 	}
 
@@ -316,7 +315,6 @@ JID JsonParser::getNextJID() {
 	} else if (ch == 'f') {
 		retval = JID_FALSE;
 	} else {
-		sgeAssert(false);
 		throw JsonParseError("Unknown json element found!");
 	}
 

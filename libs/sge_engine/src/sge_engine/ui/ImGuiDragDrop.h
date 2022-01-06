@@ -28,4 +28,10 @@ struct DragDropPayloadAsset {
 	static sge::Optional<std::string> accept();
 };
 
+struct DragDropPayloadPrefabFile {
+	static sge::Optional<std::string> decode(const ImGuiPayload* payload);
+	static void setPayload(const std::string& assetPath);
+	static sge::Optional<std::string> accept();
+};
+
 } // namespace sge

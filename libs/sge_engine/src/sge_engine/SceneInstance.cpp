@@ -13,9 +13,9 @@ void SceneInstance::newScene() {
 	m_world.create();
 }
 
-void SceneInstance::loadWorldFromJson(const char* const json, bool disableAutoSepping, const char* const workingFileName) {
+void SceneInstance::loadWorldFromJson(const char* const json, bool disableAutoSepping) {
 	newScene();
-	[[maybe_unused]] bool success = loadGameWorldFromString(&m_world, json, workingFileName);
+	[[maybe_unused]] bool success = loadGameWorldFromString(&m_world, json);
 	sgeAssert(success);
 
 	getInspector().m_disableAutoStepping = disableAutoSepping;
@@ -25,7 +25,7 @@ void SceneInstance::loadWorldFromFile(const char* const filename, bool disableAu
 	std::vector<char> fileContents;
 	if (FileReadStream::readFile(filename, fileContents)) {
 		fileContents.push_back('\0');
-		loadWorldFromJson(fileContents.data(), disableAutoSepping, filename);
+		loadWorldFromJson(fileContents.data(), disableAutoSepping);
 		return;
 	}
 
@@ -59,7 +59,7 @@ void SceneInstance::update(float dt, const InputState& is) {
 		PostSceneUpdateTaskSetWorldState* const taskChangeWorldJson = dynamic_cast<PostSceneUpdateTaskSetWorldState*>(task);
 		if (taskChangeWorldJson != nullptr) {
 			taskChangeWorldJson->newWorldStateJson;
-			loadWorldFromJson(taskChangeWorldJson->newWorldStateJson.c_str(), false, m_world.m_workingFilePath.c_str());
+			loadWorldFromJson(taskChangeWorldJson->newWorldStateJson.c_str(), false);
 			m_inspector.m_disableAutoStepping = !taskChangeWorldJson->noPauseNoEditorCamera;
 			m_world.m_useEditorCamera = !taskChangeWorldJson->noPauseNoEditorCamera;
 		}

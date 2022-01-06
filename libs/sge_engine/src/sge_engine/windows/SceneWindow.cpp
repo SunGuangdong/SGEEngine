@@ -10,6 +10,7 @@
 #include "sge_engine/ui/ImGuiDragDrop.h"
 #include "sge_utils/math/color.h"
 #include "sge_utils/utils/Wildcard.h"
+#include "sge_engine/GameSerialization.h"
 
 #include "SceneWindow.h"
 #include "sge_engine/EngineGlobal.h"
@@ -188,6 +189,19 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 					}
 				}
 			}
+
+			if (Optional<std::string> droppedPrefabPath = DragDropPayloadPrefabFile::accept()) {
+				GameWorld prefabWorld;
+				bool succeeded = loadGameWorldFromFile(&prefabWorld, droppedPrefabPath->c_str());
+
+				if (succeeded) {
+					vector_set<ObjectId> newObjects;
+					inspector->getWorld()->instantiatePrefab(prefabWorld, true, true, nullptr, &newObjects, NullOptional());
+
+					inspector->m_plantingTool.setup(newObjects, *inspector->getWorld());
+					inspector->setTool(&inspector->m_plantingTool);
+				}
+			}
 		}
 	}
 	ImGui::End();
@@ -300,6 +314,31 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 
 		if (ImGui::MenuItem(ICON_FK_FILES_O " Duplicate")) {
 			inspector->duplicateSelection();
+		}
+
+		if (ImGui::MenuItem(ICON_FK_FILES_O " Copy")) {
+			
+
+			vector_set<ObjectId> objectsToDuplicate;
+			for (int t = 0; t < inspector->m_selection.size(); ++t) {
+				if (inspector->m_selection[t].editMode == editMode_actors) {
+					objectsToDuplicate.insert(inspector->m_selection[t].objectId);
+				}
+			}
+
+			GameWorld prefabWorld;
+			inspector->getWorld()->createPrefab(prefabWorld, false, &objectsToDuplicate);
+
+			std::string json = serializeGameWorld(&prefabWorld);
+
+			ImGui::SetClipboardText(json.c_str());
+		}
+
+		if (ImGui::MenuItem(ICON_FK_FLOPPY_O " Paste")) {
+			const char* clipboardText = ImGui::GetClipboardText();
+			if (clipboardText) {
+				inspector->getWorld()->instantiatePrefabFromJsonString(clipboardText, true, true, NullOptional());
+			}
 		}
 
 		ImGui::Separator();

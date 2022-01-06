@@ -57,7 +57,7 @@ sge::Optional<std::set<sge::ObjectId>> DragDropPayloadActor::accept() {
 }
 
 //-----------------------------------------------------
-// DragDropPayloadActor
+// DragDropPayloadAsset
 //-----------------------------------------------------
 sge::Optional<std::string> DragDropPayloadAsset::decode(const ImGuiPayload* payload) {
 	if (payload && payload->IsDataType("sgedd_asset") && payload->Data != nullptr && payload->DataSize > 0) {
@@ -74,6 +74,29 @@ void DragDropPayloadAsset::setPayload(const std::string& assetPath) {
 
 sge::Optional<std::string> DragDropPayloadAsset::accept() {
 	if (ImGui::AcceptDragDropPayload("sgedd_asset")) {
+		return decode(ImGui::GetDragDropPayload());
+	}
+	return sge::NullOptional();
+}
+
+//-----------------------------------------------------
+// DragDropPayloadPrefabFile
+//-----------------------------------------------------
+sge::Optional<std::string> DragDropPayloadPrefabFile::decode(const ImGuiPayload* payload) {
+	if (payload && payload->IsDataType("sgedd_prefab_path") && payload->Data != nullptr && payload->DataSize > 0) {
+		return std::string((char*)payload->Data, payload->DataSize);
+	}
+	return sge::NullOptional();
+}
+
+void DragDropPayloadPrefabFile::setPayload(const std::string& assetPath) {
+	if (assetPath.empty() == false) {
+		ImGui::SetDragDropPayload("sgedd_prefab_path", assetPath.c_str(), assetPath.size());
+	}
+}
+
+sge::Optional<std::string> DragDropPayloadPrefabFile::accept() {
+	if (ImGui::AcceptDragDropPayload("sgedd_prefab_path")) {
 		return decode(ImGui::GetDragDropPayload());
 	}
 	return sge::NullOptional();
