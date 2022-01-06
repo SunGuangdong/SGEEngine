@@ -24,20 +24,11 @@ void LogWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* U
 		if (ImGui::BeginChild("MessagesWindow", ImVec2(-1.f, -1.f))) {
 			const std::vector<Log::Message>& messages = log.getMessages();
 
-			size_t maxNumImagesToDisplay = 0;
+			int startMessage = 0;
 			if (!m_showOldMessages) {
-				maxNumImagesToDisplay = 40;
-			} else {
-				maxNumImagesToDisplay = int(messages.size());
+				startMessage = maxOf(0, (int)messages.size() - 40);
 			}
-
-			int numDisplayedMessages = 0;
-			for (int iMessage = int(messages.size()) - 1; true; --iMessage) {
-				// Check if we've displayed enough messages.
-				if (iMessage < 0 || numDisplayedMessages == maxNumImagesToDisplay) {
-					break;
-				}
-
+			for (int iMessage = startMessage; iMessage < messages.size(); iMessage++) {
 				const Log::Message& msg = messages[iMessage];
 				switch (msg.type) {
 					case Log::messageType_check:
