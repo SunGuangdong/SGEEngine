@@ -164,6 +164,32 @@ void readGeometryElement(TFBXLayerElement* const element, int const controlPoint
 	}
 }
 
+/// Find all of the keyframes times for the specified curve and stores them in @outTimes.
+void getFbxAnimCurveKeyTimes(fbxsdk::FbxAnimCurve* curve, vector_set<fbxsdk::FbxTime>& outTimes) {
+	if (curve) {
+		const int keysCount = curve->KeyGetCount();
+		for (int t = 0; t < keysCount; ++t) {
+			outTimes.insert(curve->KeyGet(t).GetTime());
+		}
+	}
+};
+
+/// Finds all the keyframes times for the speicified fbx property for animation layer @fbxAnimLayer
+/// and stores them in @outTimes.
+void getLayerKeyTimesForProp(fbxsdk::FbxProperty& fbxProp, fbxsdk::FbxAnimLayer* fbxAnimLayer, vector_set<fbxsdk::FbxTime>& outTimes) {
+	// Check for full propery animation (while the whole ration Euler angles set or a quaternion).
+	// Usually exported like that form 3ds Max and Maya.
+	getFbxAnimCurveKeyTimes(fbxProp.GetCurve(fbxAnimLayer, false), outTimes);
+
+	// Check for individual components animations.
+	// Usually exported like that from Blender.
+	// Blender is strange it exports some keyframes as the above and some like that.
+	getFbxAnimCurveKeyTimes(fbxProp.GetCurve(fbxAnimLayer, FBXSDK_CURVENODE_COMPONENT_X), outTimes);
+	getFbxAnimCurveKeyTimes(fbxProp.GetCurve(fbxAnimLayer, FBXSDK_CURVENODE_COMPONENT_Y), outTimes);
+	getFbxAnimCurveKeyTimes(fbxProp.GetCurve(fbxAnimLayer, FBXSDK_CURVENODE_COMPONENT_Z), outTimes);
+	getFbxAnimCurveKeyTimes(fbxProp.GetCurve(fbxAnimLayer, FBXSDK_CURVENODE_ROTATION), outTimes);
+};
+
 //---------------------------------------------------------------
 // FBXSDKParser
 //---------------------------------------------------------------
@@ -1157,7 +1183,7 @@ void FBXSDKParser::importAnimations() {
 		std::map<int, KeyFrames> perNodeKeyFrames;
 
 		// Each stack constist of multiple layers. This abstaction is used by the artist in Maya/Max/ect. to separate the different type
-		// of keyframes while animating. This us purely used to keep the animation timeline organized and has no functionally when
+		// of keyframes while animating. This is purely used to keep the animation timeline organized and has no functionally when
 		// playing the animation in code.
 		int const layerCount = fbxAnimStack->GetMemberCount<fbxsdk::FbxAnimLayer>();
 		for (int const iLayer : range_int(layerCount)) {
@@ -1168,68 +1194,79 @@ void FBXSDKParser::importAnimations() {
 				fbxsdk::FbxNode* const fbxNode = itr.first;
 				KeyFrames nodeKeyFrames;
 
+				[[maybe_unused]] fbxsdk::FbxAnimCurveNode* curveNode = fbxNode->LclRotation.GetCurveNode(fbxAnimLayer, false);
+
 				if (!fbxNode) {
 					sgeAssert(false && "Failed to find nodes for importing their animations.");
 					continue;
 				}
 
 				// Check if the node's translation is animated.
-				if (fbxsdk::FbxAnimCurve* const fbxTranslCurve = fbxNode->LclTranslation.GetCurve(fbxAnimLayer, false)) {
-					const int keyFramesCount = fbxTranslCurve->KeyGetCount();
+				{
+					vector_set<fbxsdk::FbxTime> keyFrameTimesTranslation; // Assumes that vector_set stores the data linear and sorted.
+					getLayerKeyTimesForProp(fbxNode->LclTranslation, fbxAnimLayer, keyFrameTimesTranslation);
+					if (!keyFrameTimesTranslation.empty()) {
+						const int keyFramesCount = keyFrameTimesTranslation.size();
 
-					for (int const iKey : range_int(keyFramesCount)) {
-						const FbxAnimCurveKey fKey = fbxTranslCurve->KeyGet(iKey);
-						const fbxsdk::FbxTime fbxKeyTime = fKey.GetTime();
+						for (int const iKey : range_int(keyFramesCount)) {
+							const fbxsdk::FbxTime fbxKeyTime = keyFrameTimesTranslation.getNth(iKey);
 
-						const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
-						fbxsdk::FbxVector4 fbxPos = localTransform.GetT();
+							const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
+							fbxsdk::FbxVector4 fbxPos = localTransform.GetT();
 
-						// Convert the keyframe to our own format and save it.
-						const float keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
-						vec3f const position = vec3f((float)fbxPos.mData[0], (float)fbxPos.mData[1], (float)fbxPos.mData[2]);
+							// Convert the keyframe to our own format and save it.
+							const float keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
+							vec3f const position = vec3f((float)fbxPos.mData[0], (float)fbxPos.mData[1], (float)fbxPos.mData[2]);
 
-						nodeKeyFrames.positionKeyFrames[keyTimeSeconds] = position;
+							nodeKeyFrames.positionKeyFrames[keyTimeSeconds] = position;
+						}
 					}
 				}
 
 				// Check if the node's rotation is animated.
-				if (fbxsdk::FbxAnimCurve* const fbxRotationCurve = fbxNode->LclRotation.GetCurve(fbxAnimLayer, false)) {
-					const int keyFramesCount = fbxRotationCurve->KeyGetCount();
-					for (int const iKey : range_int(keyFramesCount)) {
-						fbxsdk::FbxAnimCurveKey const fKey = fbxRotationCurve->KeyGet(iKey);
-						fbxsdk::FbxTime const fbxKeyTime = fKey.GetTime();
+				{
+					vector_set<fbxsdk::FbxTime> keyFrameTimesRotation; // Assumes that vector_set stores the data linear and sorted.
+					getLayerKeyTimesForProp(fbxNode->LclRotation, fbxAnimLayer, keyFrameTimesRotation);
+					if (!keyFrameTimesRotation.empty()) {
+						const int keyFramesCount = keyFrameTimesRotation.size();
+						for (int const iKey : range_int(keyFramesCount)) {
+							fbxsdk::FbxTime const fbxKeyTime = keyFrameTimesRotation.getNth(iKey);
 
-						const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
-						fbxsdk::FbxVector4 const fRotation = localTransform.GetR();
+							const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
+							fbxsdk::FbxVector4 const fRotation = localTransform.GetR();
 
-						// Convert the keyframe to our own format and save it.
-						float const keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
-						quatf const rotation = quatFromFbx(FbxEuler::eOrderXYZ, fRotation);
-						nodeKeyFrames.rotationKeyFrames[keyTimeSeconds] = rotation;
+							// Convert the keyframe to our own format and save it.
+							float const keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
+							quatf const rotation = quatFromFbx(FbxEuler::eOrderXYZ, fRotation);
+							nodeKeyFrames.rotationKeyFrames[keyTimeSeconds] = rotation;
+						}
 					}
 				}
 
 				// Check if the node's scaling is animated.
-				if (fbxsdk::FbxAnimCurve* const fbxScalingCurve = fbxNode->LclScaling.GetCurve(fbxAnimLayer, false)) {
-					const int keyFramesCount = fbxScalingCurve->KeyGetCount();
-					for (int const iKey : range_int(keyFramesCount)) {
-						fbxsdk::FbxAnimCurveKey const fKey = fbxScalingCurve->KeyGet(iKey);
-						fbxsdk::FbxTime const fbxKeyTime = fKey.GetTime();
+				{
+					vector_set<fbxsdk::FbxTime> keyFrameTimesScaling; // Assumes that vector_set stores the data linear and sorted.
+					getLayerKeyTimesForProp(fbxNode->LclScaling, fbxAnimLayer, keyFrameTimesScaling);
 
-						const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
-						fbxsdk::FbxVector4 const fScaling = localTransform.GetS();
+					if (!keyFrameTimesScaling.empty()) {
+						const int keyFramesCount = keyFrameTimesScaling.size();
+						for (int const iKey : range_int(keyFramesCount)) {
+							fbxsdk::FbxTime const fbxKeyTime = keyFrameTimesScaling.getNth(iKey);
 
-						// Convert the keyframe to our own format and save it.
-						float const keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
-						vec3f const scaling = vec3f((float)fScaling.mData[0], (float)fScaling.mData[1], (float)fScaling.mData[2]);
-						nodeKeyFrames.scalingKeyFrames[keyTimeSeconds] = scaling;
+							const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
+							fbxsdk::FbxVector4 const fScaling = localTransform.GetS();
+
+							// Convert the keyframe to our own format and save it.
+							float const keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
+							vec3f const scaling = vec3f((float)fScaling.mData[0], (float)fScaling.mData[1], (float)fScaling.mData[2]);
+							nodeKeyFrames.scalingKeyFrames[keyTimeSeconds] = scaling;
+						}
 					}
 				}
 
 				// Save the keyframes to the animation.
-				// if there are no key frames, skip the node.
-				if (!nodeKeyFrames.positionKeyFrames.empty() || !nodeKeyFrames.rotationKeyFrames.empty() ||
-				    !nodeKeyFrames.scalingKeyFrames.empty()) {
+				// If there are no key frames, skip the node.
+				if (nodeKeyFrames.hasAnyKeyFrames()) {
 					perNodeKeyFrames[itr.second] = std::move(nodeKeyFrames);
 				}
 			} // End for each node loop.

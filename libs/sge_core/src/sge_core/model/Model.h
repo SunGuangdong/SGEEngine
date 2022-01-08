@@ -173,6 +173,10 @@ struct KeyFrames {
 	std::map<float, quatf> rotationKeyFrames;
 	std::map<float, vec3f> scalingKeyFrames;
 
+	bool hasAnyKeyFrames() const {
+		return !positionKeyFrames.empty() && !rotationKeyFrames.empty() && !scalingKeyFrames.empty();
+	}
+
 	void evaluate(transf3d& result, const float t) const;
 };
 

@@ -554,21 +554,14 @@ void AssimpImporter::importNodes_singleNode(const aiNode* asmpNode, int importNo
 }
 
 void AssimpImporter::importAnimations() {
-	static_assert(sizeof(aiVector3D) == 3 * sizeof(float), "");
-
 	for (int iAnim = 0; iAnim < (int)asmpScene->mNumAnimations; ++iAnim) {
 		const aiAnimation* const asmpAnim = asmpScene->mAnimations[iAnim];
 
-		// Take the start and end time of the animation. Offset the keyframes so in the imported animation
-		// the animation starts from 0 seconds.
-		const float animationStart = 0.f;
-		const float animationEnd = (float)asmpAnim->mDuration;
-		const float animationDuration = (float)asmpAnim->mDuration;
+		const float animationDuration = (float)(asmpAnim->mDuration * asmpAnim->mTicksPerSecond);
 
 		std::string animationName = asmpAnim->mName.C_Str();
-
 		if (animationName.empty()) {
-			animationName = string_format("AnimSgeImport_%d", iAnim);
+			animationName = string_format("AutoAnimName_%d", iAnim);
 		}
 
 		// Per node keyframes for this animation. They keyframes are in node local space.
@@ -591,7 +584,7 @@ void AssimpImporter::importAnimations() {
 			for (int t = 0; t < (int)asmpNodeAnim->mNumPositionKeys; ++t) {
 				const aiVectorKey& key = asmpNodeAnim->mPositionKeys[t];
 
-				float keyTime = (float)key.mTime;
+				float keyTime = (float)(key.mTime * asmpAnim->mTicksPerSecond);
 				nodeKeyFrames.positionKeyFrames[keyTime] = fromAssimp(key.mValue);
 			}
 
@@ -599,7 +592,7 @@ void AssimpImporter::importAnimations() {
 			for (int t = 0; t < (int)asmpNodeAnim->mNumRotationKeys; ++t) {
 				const aiQuatKey& key = asmpNodeAnim->mRotationKeys[t];
 
-				float keyTime = (float)key.mTime;
+				float keyTime = (float)(key.mTime * asmpAnim->mTicksPerSecond);
 				nodeKeyFrames.rotationKeyFrames[keyTime] = fromAssimp(key.mValue);
 			}
 
@@ -607,7 +600,7 @@ void AssimpImporter::importAnimations() {
 			for (int t = 0; t < (int)asmpNodeAnim->mNumScalingKeys; ++t) {
 				const aiVectorKey& key = asmpNodeAnim->mScalingKeys[t];
 
-				float keyTime = (float)key.mTime;
+				float keyTime = (float)(key.mTime * asmpAnim->mTicksPerSecond);
 				nodeKeyFrames.scalingKeyFrames[keyTime] = fromAssimp(key.mValue);
 			}
 

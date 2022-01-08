@@ -39,20 +39,22 @@ if(MSVC)
 	set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
 endif()
 
+# Specify Emscripten (Web builds) specific compiler and linker flags.
 if(EMSCRIPTEN)
-	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os") This flag should decrease the build size but it does not.
+	# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Os") This flag should decrease the build size, but last time I'v checked (2021) it does not in our case.
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s DISABLE_DEPRECATED_FIND_EVENT_TARGET_BEHAVIOR=1")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_WEBGL2=1")
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s FULL_ES3=1") # TODO: Does it work without this one?
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH=1") # By default Emscripten has a fixed pool size for dynamic allocations.
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s ALLOW_MEMORY_GROWTH=1") # By default Emscripten has a fixed pool size for dynamic allocations. This enables it to grow.
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0") # Emscripten debug symbols take a lot of space for disable it by default.
-	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g0") # Emscripten debug symbols take a lot of space for disable it by default. When debugging use -g3.
+	#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g3") # Here for debbuging only, disable -g0 in that case.
 endif()
 
 # Create the NoOpt configuration, which is the same as Release, but without optimizations.
 # it is useful while developing as it is faster then Debug.
+# Especially useful for 3rd party libraies as FBX SDK, as it is really slow in Debug.
 set(CMAKE_CONFIGURATION_TYPES Release RelWithDebInfo Debug NoOpt)
 
 SET(CMAKE_C_FLAGS_NOOPT ${CMAKE_C_FLAGS_RELWITHDEBINFO})
@@ -82,20 +84,25 @@ SET(CMAKE_CXX_FLAGS_NOOPT "${CMAKE_CXX_FLAGS_NOOPT} -DSGE_USE_DEBUG")
 include(./scripts/cmake/macros.cmake)
 
 # Marks the "target_name" (if exits) to be filtered as an external. 
+# This way (if supported) in IDEs the 3rd party libraries projects will be grouped together.
+# This doesn't affect the compilation at all, it is here for convinience.
 macro(sge_mark_external_target target_name)
-if(TARGET ${target_name})
-	set_target_properties (${target_name} PROPERTIES FOLDER lib_ext)
-endif()
+	if(TARGET ${target_name})
+		set_target_properties (${target_name} PROPERTIES FOLDER lib_ext)
+	endif()
 endmacro()
 
 # Marks the specified target (if exists) to be filtered in IDE as a library.
+# This way (if supported) in IDEs our libraries will be grouped tohether.
+# This doesn't affect the compilation at all, it is here for convinience.
 macro(sge_mark_internal_lib target_name)
-if(TARGET ${target_name})
-	set_target_properties (${target_name} PROPERTIES FOLDER lib)
-endif()
+	if(TARGET ${target_name})
+		set_target_properties (${target_name} PROPERTIES FOLDER lib)
+	endif()
 endmacro()
 
 # Marks the specified target (if exists) to be filtered in IDE as tools that are executable.
+# This doesn't affect the compilation at all, it is here for convinience.
 macro(sge_mark_internal_tools target_name)
 if(TARGET ${target_name})
 	set_target_properties (${target_name} PROPERTIES FOLDER tools)
@@ -103,9 +110,11 @@ endif()
 endmacro()
 
 #---------------------------------------------------------------
-# Properties and config settings that the user should specify
-# or hopefully be able to use the default.
+# Properties and config settings that the user can specify
+# or hopefully be able to use with their defaults.
 #---------------------------------------------------------------
+
+# Picking the rendering API.
 if(WIN32)
 	set(SGE_REND_API "Direct3D11" CACHE STRING "Rendering API")
 else()
@@ -113,17 +122,18 @@ else()
 endif()
 set_property(CACHE SGE_REND_API PROPERTY STRINGS Direct3D11 OpenGL)
 
-set(SGE_FBX_SDK_DIR "" CACHE PATH "The directory that contains the FBX SDK include directory.")
-
+# FBX SDK for importing FBX and DAE files in the best possible way.
+set(SGE_FBX_SDK_DIR "" CACHE PATH "The directory that contains the FBX SDK include directory. The code is tested agains version 2020.2.")
 if(SGE_FBX_SDK_DIR STREQUAL "")
-	message(WARNING "FBX SDK Is not specified! Importing FBX Files would not be possible. However the build should succeed!")
+	message(WARNING "FBX SDK Is not specified. Importing FBX/DAE files will get done with Assimp instead. (Prefferebly use FBX SDK for those).")
 endif()
 
-# Print some messages that show what configuration is being used.
+# Print the SGE variables that the user has specified.
 MESSAGE("SGE_REND_API = ${SGE_REND_API}")
 MESSAGE("SGE_FBX_SDK_DIR = ${SGE_FBX_SDK_DIR}")
 
 # Promotes and disables some warrning to make the development process a bit better.
+# TODO: add a vection for clang, gcc and emscripten.
 macro(sgePromoteWarningsOnTarget target)
 	if(MSVC)
 		set(sge_compiler_opt_warnings "/WX" "/W4"
@@ -172,22 +182,29 @@ add_subdirectory(./libs_ext/recastnavigation)
 add_subdirectory(./libs_ext/imgui)
 add_subdirectory(./libs_ext/doctest)
 add_subdirectory(./libs_ext/miniaudio)
-add_subdirectory(./libs_ext/assimp)
+
+if(NOT EMSCRIPTEN)
+	# Assimp is a big library and since we would not import models in the game there is no need to add it.
+	add_subdirectory(./libs_ext/assimp)
+endif()
 
 # Use SDL2 as a dll.
 # The code shouldn't depend on SDL2 being a DLL
 # it should work fine if it is a static library.
+# Emscripten has its own SDL embedded in it so do nothing in that case.
 if(NOT EMSCRIPTEN)
 	set(SDL_STATIC OFF CACHE BOOL "  " FORCE)
 	set(SDL_SHARED ON CACHE BOOL "  " FORCE)
 	add_subdirectory(./libs_ext/SDL2)
 endif()
 
-# Add SGEEngine and all of its targets.
+# Add SGEEngine and all of its targets to the build.
 add_subdirectory(./libs/sge_utils)
 add_subdirectory(./libs/sge_codepreproc)
 
-# Set Definitions Rendering APIs.
+# Set C++ Definitions Macros Rendering APIs.
+# TODO: these should be defined only for sge_renderer, however
+# they participate in sge_renderer public headers (for really basic stuff).
 if(SGE_REND_API STREQUAL "Direct3D11")
 	add_definitions(-DSGE_RENDERER_D3D11)
 endif()
@@ -208,14 +225,14 @@ add_subdirectory(./libs/sge_core)
 add_subdirectory(./libs/sge_engine)
 add_subdirectory(./sge_player)
 
-# In Emscripten (Web builds) we do not want to build the editor
-# only the game targets are designed to be buildable.
+# In Emscripten (Web builds) we do not want to build the editor or to import 3D models.
+# The game targets are designed to be buildable on emscripten.
 if(NOT EMSCRIPTEN)
 	add_subdirectory(./sge_editor)
 	add_subdirectory(./libs/mdlconvlib)
 endif()
 
-# No matter what the other project sets (particularly 3rd parties)
+# No matter what the other project sets (particularly the 3rd parties)
 # we do not want to used configuration postfix in the output files.
 set(CMAKE_DEBUG_POSTFIX "" CACHE STRING "" FORCE)
 set(CMAKE_NOOPT_POSTFIX "" CACHE STRING "" FORCE)
@@ -264,7 +281,6 @@ sge_mark_internal_lib(mdlconvlib)
 sge_mark_internal_tools(sge_player)
 sge_mark_internal_tools(sge_editor)
 
-#include(engine_install.cmake)
 include(copy_engine_helper.cmake)
 
 # Samples
