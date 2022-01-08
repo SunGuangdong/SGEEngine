@@ -69,9 +69,9 @@ AssetsWindow::AssetsWindow(std::string windowName)
     : m_windowName(std::move(windowName)) {
 	// Try to load the functions that will be used for importing 3D models.
 	if (mdlconvlibHandler.loadNoExt("mdlconvlib")) {
-		m_sgeImportFBXFile = reinterpret_cast<sgeImportFBXFileFn>(mdlconvlibHandler.getProcAdress("sgeImportFBXFile"));
+		m_sgeImportFBXFile = reinterpret_cast<sgeImportModel3DFileFn>(mdlconvlibHandler.getProcAdress("sgeImportModel3DFile"));
 		m_sgeImportFBXFileAsMultiple =
-		    reinterpret_cast<sgeImportFBXFileAsMultipleFn>(mdlconvlibHandler.getProcAdress("sgeImportFBXFileAsMultiple"));
+		    reinterpret_cast<sgeImportModel3DFileAsMultipleFn>(mdlconvlibHandler.getProcAdress("sgeImportModel3DFileAsMultiple"));
 	}
 
 	if (m_sgeImportFBXFile == nullptr || m_sgeImportFBXFileAsMultiple == nullptr) {

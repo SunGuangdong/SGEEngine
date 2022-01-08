@@ -172,6 +172,7 @@ add_subdirectory(./libs_ext/recastnavigation)
 add_subdirectory(./libs_ext/imgui)
 add_subdirectory(./libs_ext/doctest)
 add_subdirectory(./libs_ext/miniaudio)
+add_subdirectory(./libs_ext/assimp)
 
 # Use SDL2 as a dll.
 # The code shouldn't depend on SDL2 being a DLL
@@ -244,6 +245,9 @@ sge_mark_external_target(SDL2-static)
 sge_mark_external_target(mcpp)
 sge_mark_external_target(HLSLParser)
 sge_mark_external_target(miniaudio)
+sge_mark_external_target(zlibstatic)
+sge_mark_external_target(assimp)
+sge_mark_external_target(UpdateAssimpLibsDebugSymbolsAndDLLs)
 
 # Mark internal projects as such in order to have them grouped together.
 sge_mark_internal_lib(mdlconvlib)

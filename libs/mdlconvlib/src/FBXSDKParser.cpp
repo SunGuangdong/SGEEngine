@@ -1,18 +1,14 @@
+
 #include <set>
 
 #include "FBXSDKParser.h"
 #include "IAssetRelocationPolicy.h"
+#include "ImporterCommon.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/utils/range_loop.h"
 #include "sge_utils/utils/vector_set.h"
 
 namespace sge {
-
-struct FBXParseError : public std::logic_error {
-	FBXParseError(const char* const error = "Unknown FBXParseError")
-	    : std::logic_error(error) {
-	}
-};
 
 FbxManager* g_fbxManager = nullptr;
 
@@ -105,7 +101,7 @@ quatf quatFromFbx(const fbxsdk::FbxEuler::EOrder rotationOrder, const fbxsdk::Fb
 		} break;
 
 		default: {
-			throw FBXParseError("Unknown FBX rotation order!");
+			throw ImportExpect("Unknown FBX rotation order!");
 		} break;
 	}
 
@@ -147,7 +143,7 @@ void readGeometryElement(TFBXLayerElement* const element, int const controlPoint
 				result[t] = (float)(element->GetDirectArray().GetAt(index)[t]);
 			}
 		} else {
-			throw FBXParseError("Unknown reference mode.");
+			throw ImportExpect("Unknown reference mode.");
 		}
 	} else if (mappingMode == FbxGeometryElement::eByPolygonVertex) {
 		if (referenceMode == FbxGeometryElement::eDirect) {
@@ -161,10 +157,10 @@ void readGeometryElement(TFBXLayerElement* const element, int const controlPoint
 				result[t] = (float)(element->GetDirectArray().GetAt(index)[t]);
 			}
 		} else {
-			throw FBXParseError("Unknown reference mode.");
+			throw ImportExpect("Unknown reference mode.");
 		}
 	} else {
-		throw FBXParseError("Unknown mapping mode.");
+		throw ImportExpect("Unknown mapping mode.");
 	}
 }
 
@@ -458,7 +454,8 @@ void FBXSDKParser::importMaterials() {
 
 				int const textureCount = property.GetSrcObjectCount<FbxTexture>();
 				for (int const iTex : range_int(textureCount)) {
-					fbxsdk::FbxFileTexture* const fFileTex = fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(property.GetSrcObject<FbxTexture>(iTex));
+					fbxsdk::FbxFileTexture* const fFileTex =
+					    fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(property.GetSrcObject<FbxTexture>(iTex));
 					if (fFileTex) {
 						return fFileTex;
 					}
@@ -647,7 +644,6 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 		float boneWeight = 0.f;
 	};
 
-	const int kMaxBonesPerVertex = 4;
 	std::map<int, std::vector<BoneInfluence>> perControlPointBoneInfluence;
 
 	// Find if there is a skinning data and if so, load the bones for mesh skinning (skeletal animation).
@@ -671,10 +667,11 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 				fbxsdk::FbxCluster* const fCluster = fSkin->GetCluster(iCluster);
 				fbxsdk::FbxNode* const fNodeBone = fCluster->GetLink();
 
-				// Find the node that represents the bone. The animation on that node will represent the movement of the bone.
+				// Find the node that represents the bone. The animation on that node
+				// will represent the movement of the bone.
 				const auto& itrFindBoneNode = m_fbxNode2NodeIndex.find(fNodeBone);
 				if (itrFindBoneNode == m_fbxNode2NodeIndex.end()) {
-					throw FBXParseError();
+					throw ImportExpect();
 				}
 
 				const int boneNodeIndex = itrFindBoneNode->second;
@@ -721,11 +718,12 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 			break;
 		}
 	}
+
 	int boneIdsByteOffset = -1;
 	int boneWeightsByteOffset = -1;
 
 	// If there are bones in the mesh. Create the vertex attributres for them.
-	if (perControlPointBoneInfluence.empty() == false) {
+	if (!perControlPointBoneInfluence.empty()) {
 		for (auto& pair : perControlPointBoneInfluence) {
 			// Some control point might be infuenced by more then kMaxBonesPerVertex,
 			// if reduce the bones that amount and renormalize the weigths so they sum to 1.
@@ -739,6 +737,7 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 					}
 				}
 
+				// Cut off the lear contributing ifluences beyond kMaxBonesPerVertex.
 				pair.second.resize(kMaxBonesPerVertex);
 			}
 

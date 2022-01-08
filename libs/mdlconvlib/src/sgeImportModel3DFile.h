@@ -55,7 +55,7 @@ struct ModelImportAdditionalResult {
 /// @param [in] fbxFilename is the filename to be loaded.
 /// @param [out] pOutReferencedTextures A list of referenced textures in the specified filename (used for dependancy tracking).
 /// @return true if the import was successful.
-typedef bool (*sgeImportFBXFileFn)(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename);
+typedef bool (*sgeImportModel3DFileFn)(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename);
 
 /// A structure holding a single (ot of many) imported 3D models.
 /// The structure is used when importing one 3D Scene file (FBX for example) as multiple model files.
@@ -77,7 +77,7 @@ struct MultiModelImportResult {
 /// @param [out] pOutReferencedTextures A list of referenced textures in the specified filename (used for dependancy tracking).
 ///              This one contains the materials and textures used across all imported models.
 /// @return true if the import was successful.
-typedef bool (*sgeImportFBXFileAsMultipleFn)(std::vector<MultiModelImportResult>& result,
+typedef bool (*sgeImportModel3DFileAsMultipleFn)(std::vector<MultiModelImportResult>& result,
                                              ModelImportAdditionalResult& additionalResult,
                                              const char* fbxFilename);
 

@@ -3,7 +3,7 @@
 #include "../IImGuiWindow.h"
 #include "../ModelPreviewWindow.h"
 #include "imgui/imgui.h"
-#include "sgeImportFBXFile.h"
+#include "sgeImportModel3DFile.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_utils/utils/DLLHandler.h"
 #include <string>
@@ -88,9 +88,9 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	DLLHandler mdlconvlibHandler;
 
 	/// A pointer to the function from mdlconvlib (if available) for importing 3D models (fbx, obj, dae).
-	sgeImportFBXFileFn m_sgeImportFBXFile = nullptr;
+	sgeImportModel3DFileFn m_sgeImportFBXFile = nullptr;
 	/// A pointer to the function from mdlconvlib (if available) for importing 3D files as multiple models (fbx, dae).
-	sgeImportFBXFileAsMultipleFn m_sgeImportFBXFileAsMultiple = nullptr;
+	sgeImportModel3DFileAsMultipleFn m_sgeImportFBXFileAsMultiple = nullptr;
 
 
 	std::map<std::string, GpuHandle<FrameTarget>> assetPreviewTex;
