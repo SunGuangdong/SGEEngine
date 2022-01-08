@@ -1,13 +1,13 @@
+cmake_minimum_required(VERSION 3.0)
+
 #############################################################################
 # FBXSDK_TARGET - used to import the external prebuild FBX SDK libraries
 # and correctly link them to our tergets.
 # The tricky one is IMPORTED_LOCATION_NOOPT as it is just release withuot
 # any optimizations
 #############################################################################
-cmake_minimum_required(VERSION 3.0)
-
 if(SGE_FBX_SDK_DIR STREQUAL "")
-	message(WARNING "FBX SDK directory is not specified. Importing FBX files will not be possible")
+	message(WARNING "FBX SDK directory is not specified. Importing files will be done with Assimp")
 else()
 	# Create an imported target for FBX SDK binaries.
 	add_library(FBXSDK_TARGET STATIC IMPORTED)
@@ -62,26 +62,24 @@ else()
 			set_target_properties(FBXSDK_TARGET PROPERTIES IMPORTED_LOCATION "${SGE_FBX_SDK_DIR}/lib/gcc/x64/debug/libfbxsdk.a")
 		endif()
 	endif()
+endif()
 
-	#############################################################################
-	# MDLCONVLIB_SRC
-	#############################################################################
-	add_dir_rec_2(MDLCONVLIB_SRC "./src" 3)
-	add_library(mdlconvlib SHARED ${MDLCONVLIB_SRC})
-	target_compile_definitions(mdlconvlib PRIVATE SGE_MDLCONVLIB_BUILDING_DLL=1)
-	target_include_directories(mdlconvlib PUBLIC "./src")
-	target_link_libraries(mdlconvlib sge_core)
-	target_link_libraries(mdlconvlib assimp)
+#############################################################################
+# MDLCONVLIB_SRC
+#############################################################################
+add_dir_rec_2(MDLCONVLIB_SRC "./src" 3)
+add_library(mdlconvlib SHARED ${MDLCONVLIB_SRC})
+
+# If FBX SDK is available mark it as such and link with it.
+if(NOT SGE_FBX_SDK_DIR STREQUAL "")
+	# SGE_FBX_SDK_AVAILABLE specifies to the code that FBX SDK is avilable.
+	target_compile_definitions(mdlconvlib PRIVATE SGE_FBX_SDK_AVAILABLE=1)
+	
 	if(WIN32)
 		target_link_libraries(mdlconvlib FBXSDK_TARGET FBXSDK_XML_TARGET FBXSDK_ZLIB_TARGET)
 	else()
 		target_link_libraries(mdlconvlib FBXSDK_TARGET)
-	endif()
-
-	if(NOT WIN32)
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-		target_link_libraries(mdlconvlib ${CMAKE_PTHREAD_LIBS})
-		
+			
 		# On Linux FBX SDK still depends on zlib and libxml2 however they do not come pre-built like on Windows.
 		# Use the ones alredy installed on the system.
 
@@ -93,10 +91,20 @@ else()
 		find_package(LibXml2 REQUIRED)
 		target_link_libraries(mdlconvlib LibXml2::LibXml2)
 	endif()
-	sgePromoteWarningsOnTarget(mdlconvlib)
 endif()
 
+target_compile_definitions(mdlconvlib PRIVATE SGE_MDLCONVLIB_BUILDING_DLL=1)
+target_include_directories(mdlconvlib PUBLIC "./src")
+target_link_libraries(mdlconvlib sge_core)
+target_link_libraries(mdlconvlib assimp)
 
+# Add pthread. 
+if(NOT WIN32)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+	target_link_libraries(mdlconvlib ${CMAKE_PTHREAD_LIBS})	
+endif()
+
+sgePromoteWarningsOnTarget(mdlconvlib)
 
 
 

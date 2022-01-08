@@ -155,7 +155,6 @@ void AssimpImporter::importMaterials() {
 		importedMtlSets.emissionTextureName = asmpEmissionTexName.C_Str();
 		importedMtlSets.metallicTextureName = asmpMetallicTexName.C_Str();
 		importedMtlSets.roughnessTextureName = asmpRoughnessTexName.C_Str();
-
 		importedMtlSets.normalTextureName = normalMapTexName.C_Str();
 
 		importedMtlSets.diffuseColor = fromAssimp(asmpDiffuseColor, 1.f);
@@ -165,6 +164,18 @@ void AssimpImporter::importMaterials() {
 
 		// Finally add the material to the list of the imported materials.
 		m_additionalResult->mtlsToCreate[materialAssetName] = importedMtlSets;
+
+		// Mark the textures to get copied.
+		if (importedMtlSets.diffuseTextureName.empty() == false)
+			m_additionalResult->textureToCopy.insert(importedMtlSets.diffuseTextureName);
+		if (importedMtlSets.emissionTextureName.empty() == false)
+			m_additionalResult->textureToCopy.insert(importedMtlSets.emissionTextureName);
+		if (importedMtlSets.metallicTextureName.empty() == false)
+			m_additionalResult->textureToCopy.insert(importedMtlSets.metallicTextureName);
+		if (importedMtlSets.roughnessTextureName.empty() == false)
+			m_additionalResult->textureToCopy.insert(importedMtlSets.roughnessTextureName);
+		if (importedMtlSets.normalTextureName.empty() == false)
+			m_additionalResult->textureToCopy.insert(importedMtlSets.normalTextureName);
 	}
 }
 
@@ -312,9 +323,11 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 
 			// Find the node that represents the bone. The animation on that node
 			// will represent the movement of the bone.
-			const auto& itrFindBoneNode = m_asmpNode2NodeIndex.find(asmpBone->mNode);
+			const auto& itrFindBoneNode = m_asmpNode2NodeIndex.find(asmpBone->mNode ? asmpBone->mNode : asmpBone->mArmature);
 			if (itrFindBoneNode == m_asmpNode2NodeIndex.end()) {
-				throw ImportExpect();
+				// Assimp fails to create find the nodes for some bones.
+				// 1st found on some DAE files.
+				throw ImportExpect("Found a bone that doesn't have node associated with it.");
 			}
 
 			const int boneNodeIndex = itrFindBoneNode->second;

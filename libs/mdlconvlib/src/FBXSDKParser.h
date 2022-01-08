@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef SGE_FBX_SDK_AVAILABLE
+
 #include <fbxsdk.h>
 #include <memory>
 
@@ -37,33 +39,33 @@ struct FBXSDKParser {
 	/// needs to be parsed because they are attached to the node.
 	/// in the result model we only allocate the nodes, but we do not actually fill their data (child nodes, attachments and so on).
 	int discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode);
-	
+
 	/// Step 2:
 	/// Import the materials found in @discoverNodesRecursive.
 	void importMaterials();
-	
+
 	/// Step 3:
 	/// Import the meshes that are going to be used for rendering (not the collision ones).
 	/// @param [in] importSkinningData true if the skinning data (bones and weights) need to be imported as well.
 	void importMeshes(const bool importSkinningData);
-	
+
 	/// A helper function for @importMeshes, imports a single mesh.
 	/// @param [in] importedMeshIndex the index of the mesh in the imported result.
 	void importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshIndex, const bool importSkinningData);
 	int importMeshes_getDefaultMaterialIndex();
-	
+
 	/// Step 4:
 	/// Finally import fully the nodes. In @discoverNodesRecursive we've just allocated them but here
 	/// we load their attachments, children and so on.
 	void importNodes();
-	
+
 	/// A helper for @importNodes.
 	void importNodes_singleNode(FbxNode* fbxNode, int importNodeIndex);
-	
+
 	/// Step 5 (optional):
 	/// Imports the animations described in the FBX scene.
 	void importAnimations();
-	
+
 	/// Step 6: Import the collision geometry described by meshes attached to nodes with specific names.
 	void importCollisionGeometry();
 
@@ -98,3 +100,4 @@ struct FBXSDKParser {
 };
 
 } // namespace sge
+#endif // SGE_FBX_SDK_AVAILABLE

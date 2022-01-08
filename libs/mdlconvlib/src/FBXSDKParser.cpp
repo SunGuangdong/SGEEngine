@@ -1,4 +1,4 @@
-
+#ifdef SGE_FBX_SDK_AVAILABLE
 #include <set>
 
 #include "FBXSDKParser.h"
@@ -1378,3 +1378,4 @@ void FBXSDKParser::importCollisionGeometry() {
 }
 
 } // namespace sge
+#endif // SGE_FBX_SDK_AVAILABLE

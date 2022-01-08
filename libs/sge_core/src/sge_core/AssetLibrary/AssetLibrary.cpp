@@ -63,6 +63,18 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 		return assetIface_model3d;
 	}
 
+	if (includeExternalExtensions && sge_stricmp(ext, "gltf") == 0) { // GLTF
+		return assetIface_model3d;
+	}
+
+	if (includeExternalExtensions && sge_stricmp(ext, "gltf2") == 0) { // GLTF2
+		return assetIface_model3d;
+	}
+
+	if (includeExternalExtensions && sge_stricmp(ext, "glb") == 0) { // GLTF2 binary
+		return assetIface_model3d;
+	}
+
 	if (sge_stricmp(ext, "png") == 0 || sge_stricmp(ext, "dds") == 0 || sge_stricmp(ext, "jpg") == 0 || sge_stricmp(ext, "tga") == 0 ||
 	    sge_stricmp(ext, "bmp") == 0 || sge_stricmp(ext, "hdr") == 0) {
 		return assetIface_texture2d;

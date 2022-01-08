@@ -72,5 +72,4 @@ struct AssimpImporter {
 	Model* m_model = nullptr;
 };
 
-
 } // namespace sge
