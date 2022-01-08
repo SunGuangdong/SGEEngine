@@ -606,8 +606,7 @@ void AssimpImporter::importAnimations() {
 
 			// Save the keyframes to the animation.
 			// if there are no key frames, skip the node.
-			if (!nodeKeyFrames.positionKeyFrames.empty() || !nodeKeyFrames.rotationKeyFrames.empty() ||
-			    !nodeKeyFrames.scalingKeyFrames.empty()) {
+			if (nodeKeyFrames.hasAnyKeyFrames()) {
 				perNodeKeyFrames[nodeIndex] = std::move(nodeKeyFrames);
 			}
 		}
