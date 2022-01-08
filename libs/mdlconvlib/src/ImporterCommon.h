@@ -6,8 +6,8 @@ namespace sge {
 
 enum : int { kMaxBonesPerVertex = 4 };
 
-struct ImportExpect : public std::logic_error {
-	ImportExpect(const char* const error = "Unknown ImportExpect")
+struct ImportExcept : public std::logic_error {
+	ImportExcept(const char* const error = "Unknown ImportExcept")
 	    : std::logic_error(error) {
 	}
 };

@@ -23,6 +23,10 @@ struct ExternalPBRMaterialSettings {
 	float roughness = 1.f;
 };
 
+struct ModelImportEmbeddedTextureToCreate {
+	std::vector<char> textureFileData;
+};
+
 /// When a 3D model is imported it usually has some textures and materials
 /// that are, by default, used by it. For example this could be materials and their textures.
 /// This structure holds description to these resources so they could be copied/imported.
@@ -35,6 +39,8 @@ struct ModelImportAdditionalResult {
 	/// "key" of the map holds the asset name to be used as a filename for the material.
 	/// "value" of the map holds the description of the material.
 	std::map<std::string, ExternalPBRMaterialSettings> mtlsToCreate;
+
+	std::map<std::string, ModelImportEmbeddedTextureToCreate> texturesToCreate;
 };
 
 /// @brief Load the fuunction symbol named "m_sgeImportFBXFile" and cast it to sgeImportFBXFileFn to call the function.
@@ -78,7 +84,7 @@ struct MultiModelImportResult {
 ///              This one contains the materials and textures used across all imported models.
 /// @return true if the import was successful.
 typedef bool (*sgeImportModel3DFileAsMultipleFn)(std::vector<MultiModelImportResult>& result,
-                                             ModelImportAdditionalResult& additionalResult,
-                                             const char* fbxFilename);
+                                                 ModelImportAdditionalResult& additionalResult,
+                                                 const char* fbxFilename);
 
 } // extern "C"

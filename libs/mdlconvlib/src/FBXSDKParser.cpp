@@ -101,7 +101,7 @@ quatf quatFromFbx(const fbxsdk::FbxEuler::EOrder rotationOrder, const fbxsdk::Fb
 		} break;
 
 		default: {
-			throw ImportExpect("Unknown FBX rotation order!");
+			throw ImportExcept("Unknown FBX rotation order!");
 		} break;
 	}
 
@@ -143,7 +143,7 @@ void readGeometryElement(TFBXLayerElement* const element, int const controlPoint
 				result[t] = (float)(element->GetDirectArray().GetAt(index)[t]);
 			}
 		} else {
-			throw ImportExpect("Unknown reference mode.");
+			throw ImportExcept("readGeometryElement failed - Unknown reference mode.");
 		}
 	} else if (mappingMode == FbxGeometryElement::eByPolygonVertex) {
 		if (referenceMode == FbxGeometryElement::eDirect) {
@@ -157,10 +157,10 @@ void readGeometryElement(TFBXLayerElement* const element, int const controlPoint
 				result[t] = (float)(element->GetDirectArray().GetAt(index)[t]);
 			}
 		} else {
-			throw ImportExpect("Unknown reference mode.");
+			throw ImportExcept("readGeometryElement failed - Unknown reference mode.");
 		}
 	} else {
-		throw ImportExpect("Unknown mapping mode.");
+		throw ImportExcept("readGeometryElement failed - Unknown mapping mode.");
 	}
 }
 
@@ -252,6 +252,7 @@ bool FBXSDKParser::parse(Model* result,
 
 		// When importing a sub-tree reset the transformation of the root node,
 		// we want the sub tree to be centered.
+		// However we keep the rotation and scaling, as the exporters might do axis conversion.
 		if (enforcedRootNode != nullptr) {
 			m_model->getRootNode()->staticLocalTransform.p = vec3f(0.f);
 
@@ -260,6 +261,8 @@ bool FBXSDKParser::parse(Model* result,
 			fbxsdk::FbxAMatrix tr = enforcedRootNode->EvaluateGlobalTransform();
 			tr.SetR(FbxVector4(0.f, 0.f, 0.f));
 			tr.SetS(FbxVector4(1.f, 1.f, 1.f));
+
+			// The colision geometry needs to be shifted as well.
 			m_collision_transfromCorrection = transf3DFromFbx(tr.Inverse(), FbxEuler::eOrderXYZ);
 		}
 
@@ -294,6 +297,7 @@ int FBXSDKParser::discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode) {
 			// triangualates all the mehses and it must be specified.
 			fbxsdk::FbxMesh* const fbxMesh = fbxsdk::FbxCast<fbxsdk::FbxMesh>(fbxNodeAttrib);
 			if (fbxMesh && fbxMesh->IsTriangleMesh()) {
+				// [SGE_COLISION_GEOM_DUPLICATE]
 				// Check if the geometry attached to this node should
 				// be used for as collsion geometry and not for rendering.
 				// This is guessed by the prefix in the node name.
@@ -697,7 +701,7 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 				// will represent the movement of the bone.
 				const auto& itrFindBoneNode = m_fbxNode2NodeIndex.find(fNodeBone);
 				if (itrFindBoneNode == m_fbxNode2NodeIndex.end()) {
-					throw ImportExpect();
+					throw ImportExcept();
 				}
 
 				const int boneNodeIndex = itrFindBoneNode->second;

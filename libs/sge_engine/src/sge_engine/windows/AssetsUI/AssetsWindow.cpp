@@ -16,6 +16,7 @@
 #include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
+#include "sge_utils/utils/FileStream.h"
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/strings.h"
 
@@ -28,8 +29,6 @@
 #endif
 
 namespace sge {
-
-///
 JsonValue* createDefaultPBRFromImportedMtl(ExternalPBRMaterialSettings& externalMaterial, JsonValueBuffer& jvb) {
 	JsonValue* jMaterial = jvb(JID_MAP);
 
@@ -120,7 +119,7 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 				}
 			}
 
-			// Copy the referenced textures.
+			// Copy the referenced texture files.
 			const std::string modelInputDir = extractFileDir(aid.fileToImportPath.c_str(), true);
 			for (const std::string& texturePathLocal : modelImportAddRes.textureToCopy) {
 				const std::string textureDestDir = aid.outputDir + "/" + extractFileDir(texturePathLocal.c_str(), true);
@@ -134,6 +133,16 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 
 				AssetPtr assetTexture = assetLib->getAssetFromFile(textureDstPath.c_str());
 				assetLib->reloadAssetModified(assetTexture);
+			}
+
+			// Create the embbedded textures in the 3D model (if any).
+			for (auto& texToCreatePair : modelImportAddRes.texturesToCreate) {
+				std::string textureFilepath = aid.outputDir + "/" + texToCreatePair.first;
+
+				FileWriteStream fws;
+				if (fws.open(textureFilepath.c_str())) {
+					fws.write(texToCreatePair.second.textureFileData.data(), texToCreatePair.second.textureFileData.size());
+				}
 			}
 
 			// Create the model.
@@ -160,8 +169,6 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 		if (m_sgeImportFBXFileAsMultiple && m_sgeImportFBXFileAsMultiple(importedModels, modelImportAddRes, aid.fileToImportPath.c_str())) {
 			createDirectory(extractFileDir(aid.outputDir.c_str(), false).c_str());
 
-
-
 			// Create the needed materials.
 			JsonValueBuffer jvb;
 			for (auto mtlToCreate : modelImportAddRes.mtlsToCreate) {
@@ -187,6 +194,16 @@ bool AssetsWindow::importAsset(AssetImportData& aid) {
 
 				AssetPtr assetTexture = assetLib->getAssetFromFile(textureDstPath.c_str());
 				assetLib->reloadAssetModified(assetTexture);
+			}
+
+			// Create the embbedded textures in the 3D model (if any).
+			for (auto& texToCreatePair : modelImportAddRes.texturesToCreate) {
+				std::string textureFilepath = aid.outputDir + "/" + texToCreatePair.first;
+
+				FileWriteStream fws;
+				if (fws.open(textureFilepath.c_str())) {
+					fws.write(texToCreatePair.second.textureFileData.data(), texToCreatePair.second.textureFileData.size());
+				}
 			}
 
 			// Create the models.

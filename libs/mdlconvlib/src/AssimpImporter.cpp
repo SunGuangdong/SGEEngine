@@ -23,6 +23,122 @@ quatf fromAssimp(const aiQuaternion& q) {
 	return quatf(q.x, q.y, q.z, q.w);
 }
 
+transf3d fromAssimp(const aiMatrix4x4& m) {
+	transf3d result;
+
+	aiVector3D asmpTranslation;
+	aiVector3D asmpScaling;
+	aiQuaternion asmpRotation;
+
+	m.Decompose(asmpScaling, asmpRotation, asmpTranslation);
+
+	result = transf3d(fromAssimp(asmpTranslation), fromAssimp(asmpRotation), fromAssimp(asmpScaling));
+	return result;
+}
+
+AABox3f fromAssimp(const aiAABB& asmpBox) {
+	AABox3f box;
+
+	box.min = fromAssimp(asmpBox.mMin);
+	box.max = fromAssimp(asmpBox.mMax);
+
+	return box;
+}
+
+ModelCollisionMesh assimpMeshToCollisionMesh(const aiMesh* const asmpMesh) {
+	// Extract all vertices form all polygons and then remove the duplicate vertices and generate indices.
+	const int numPolygons = asmpMesh->mNumFaces;
+	const int numVerts = numPolygons * 3;
+
+	std::vector<vec3f> trianglesVeticesWithDuplicated(asmpMesh->mNumFaces * 3);
+
+	for (int const iPoly : range_int(asmpMesh->mNumFaces)) {
+		for (int const iVertex : range_int(3)) {
+			if (asmpMesh->mFaces[iPoly].mNumIndices != 3) {
+				throw ImportExcept("assimpMeshToCollisionMesh Expected that all faces are triangles!");
+			}
+
+			int vertexIndex = asmpMesh->mFaces[iPoly].mIndices[iVertex];
+			vec3f vertexPos = fromAssimp(asmpMesh->mVertices[vertexIndex]);
+
+			int const globalVertexIndex = iPoly * 3 + iVertex;
+
+			trianglesVeticesWithDuplicated[globalVertexIndex] = vertexPos;
+		}
+	}
+
+	// Remove the duplicates and create an index buffer.
+	std::vector<vec3f> trianglesVetices;
+	std::vector<int> trianglesIndices;
+
+	for (int iVertex = 0; iVertex < trianglesVeticesWithDuplicated.size(); iVertex++) {
+		int foundIndex = -1;
+		for (int t = 0; t < trianglesVetices.size(); ++t) {
+			if (trianglesVetices[t] == trianglesVeticesWithDuplicated[iVertex]) {
+				foundIndex = t;
+				break;
+			}
+		}
+
+		if (foundIndex == -1) {
+			trianglesVetices.push_back(trianglesVeticesWithDuplicated[iVertex]);
+			foundIndex = int(trianglesVetices.size()) - 1;
+		}
+
+		trianglesIndices.push_back(foundIndex);
+	}
+
+	sgeAssert(trianglesIndices.size() % 3 == 0);
+
+	return ModelCollisionMesh{std::move(trianglesVetices), std::move(trianglesIndices)};
+}
+
+// Assimp supports GLTF embedded textures.
+// When we ask a material for a texture assigned to it,
+// Assimp might return to us a real filename, or it can return some strnage looking string like "*0",
+// witch means that there is probably an embedded texture and the so far returned filename is not a real one.
+// If that is the case, we need to extract that emedded texture generate a filename for it and then
+// return it as a real texture name.
+//
+// @param [in] asmpScene the assimp scene being imported.
+// @param [in] asmpMtlTexName is the name returned bvy aiMaterial::Get method.
+// @return the filename to be referenced in the material for this texture.
+std::string extractTextureFilenameAndEmbeddedTex(ModelImportAdditionalResult* additionalResult,
+                                                 const aiScene* asmpScene,
+                                                 const aiString& asmpMtlTexName) {
+	const aiTexture* embeddedTexture = asmpScene->GetEmbeddedTexture(asmpMtlTexName.C_Str());
+	if (embeddedTexture) {
+		// Might seem strange, but according to the documentation in
+		// aiTexture::pcData comment:
+		//
+		// If aiTexture::mHeight is 0, then the aiTexture holds whole file data (a png, jpeg and so on),
+		// the buffer in pcData is of size mWidth (bytes I assume) and it is just a dump of that file contents.
+		// So basically if we just create a file with the specified memory we will end up with an image file.
+		if (embeddedTexture->mHeight == 0) {
+			std::string suggestedFilename = std::string(embeddedTexture->mFilename.C_Str()) + "." + embeddedTexture->achFormatHint;
+
+			// Check if the texture has already been marked for creation.
+			if (additionalResult->textureToCopy.count(suggestedFilename) == 0) {
+				std::vector<char> fileContents;
+				fileContents.resize(embeddedTexture->mWidth);
+				memcpy(fileContents.data(), (char*)embeddedTexture->pcData, fileContents.size());
+				additionalResult->texturesToCreate[suggestedFilename] = {std::move(fileContents)};
+			}
+
+			return suggestedFilename;
+		} else {
+			throw ImportExcept("Unsupported embedded texture format.");
+		}
+
+	} else {
+		// No ebedded texture the provided name seems to be a real texture filename.
+		return std::string(asmpMtlTexName.C_Str());
+	}
+}
+
+//----------------------------------------------------------------------------
+// AssimpImporter
+//----------------------------------------------------------------------------
 bool AssimpImporter::parse(Model* result,
                            ModelImportAdditionalResult& additionalResult,
                            std::string& materialsPrefix,
@@ -51,14 +167,33 @@ bool AssimpImporter::parse(Model* result,
 			importAnimations();
 		}
 
-		// TODO: Collision geometry.
+		// When importing a sub-tree reset the transformation of the root node,
+		// we want the sub tree to be centered.
+		// However we keep the rotation and scaling, as the exporters might do axis conversion.
+		if (enforcedRootNode != nullptr) {
+			m_model->getRootNode()->staticLocalTransform.p = vec3f(0.f);
+
+			// Since we are going to reposition the root node location, we aloso need to reposition
+			// the collision geometries.
+			aiVector3D asmpTranslation;
+			aiVector3D asmpScaling;
+			aiQuaternion asmpRotation;
+
+			enforcedRootNode->mTransformation.Decompose(asmpScaling, asmpRotation, asmpTranslation);
+			asmpScaling = aiVector3D(1.f, 1.f, 1.f);
+			asmpRotation = aiQuaternion(1.f, 0.f, 0.f, 0.f); // Assimp quats are in w xyz order.
+
+			// The colision geometry needs to be shifted as well.
+			m_collision_transfromCorrection = transf3d(-fromAssimp(asmpTranslation));
+		}
+
+		importCollisionGeometry();
 
 		return true;
 	} catch ([[maybe_unused]] const std::exception& except) {
 		return false;
 	}
 }
-
 
 int AssimpImporter::discoverNodesRecursive(const aiNode* const asmpNode) {
 	const int nodeIndex = m_model->makeNewNode();
@@ -67,19 +202,64 @@ int AssimpImporter::discoverNodesRecursive(const aiNode* const asmpNode) {
 
 	node->name = asmpNode->mName.C_Str();
 
+	// [SGE_COLISION_GEOM_DUPLICATE]
+	// Check if the geometry attached to this node should
+	// be used for as collsion geometry and not for rendering.
+	// This is guessed by the prefix in the node name.
+	bool const isCollisionGeometryTriMeshNode = node->name.find("SCConcave_") == 0 || node->name.find("SCTriMesh_") == 0;
+	bool const isCollisionGeometryConvexNode = node->name.find("SCConvex_") == 0;
+	bool const isCollisionGeometryBoxNode = node->name.find("SCBox_") == 0;
+	bool const isCollisionGeometryCapsuleNode = node->name.find("SCCapsule_") == 0;
+	bool const isCollisionGeometryCylinderNode = node->name.find("SCCylinder_") == 0;
+	bool const isCollisionGeometrySphereNode = node->name.find("SCSphere_") == 0;
+
+	// clang-format off
+	bool const isCollisionGeometryNode = 
+			isCollisionGeometryTriMeshNode 
+		|| isCollisionGeometryConvexNode 
+		|| isCollisionGeometryBoxNode 
+		|| isCollisionGeometryCapsuleNode 
+		|| isCollisionGeometryCylinderNode 
+		|| isCollisionGeometrySphereNode;
+	// clang-format on
+
 	// TODO: meshes for rendering and meshes for collision.
 	for (int iMesh = 0; iMesh < (int)asmpNode->mNumMeshes; ++iMesh) {
 		unsigned int assimpMeshIndex = asmpNode->mMeshes[iMesh];
-		aiMesh* asmpMesh = asmpScene->mMeshes[assimpMeshIndex];
+		const aiMesh* asmpMesh = asmpScene->mMeshes[assimpMeshIndex];
 
-		if (m_asmpMesh2MeshIndex.count(assimpMeshIndex) == 0) {
-			const int meshIndex = m_model->makeNewMesh();
-			m_asmpMesh2MeshIndex[assimpMeshIndex] = meshIndex;
-		}
+		if (isCollisionGeometryNode) {
+			// The mesh is going to be used for collision.
 
-		if (m_asmpMtl2MtlIndex.count(asmpMesh->mMaterialIndex) == 0) {
-			int materialIndex = m_model->makeNewMaterial();
-			m_asmpMtl2MtlIndex[asmpMesh->mMaterialIndex] = materialIndex;
+			const transf3d collisionPosModelSpace = fromAssimp(asmpNode->mTransformation);
+
+			if (isCollisionGeometryConvexNode) {
+				m_collision_ConvexHullMeshes[asmpMesh].push_back(collisionPosModelSpace);
+			} else if (isCollisionGeometryTriMeshNode) {
+				m_collision_BvhTriMeshes[asmpMesh].push_back(collisionPosModelSpace);
+			} else if (isCollisionGeometryBoxNode) {
+				m_collision_BoxMeshes[asmpMesh].push_back(collisionPosModelSpace);
+			} else if (isCollisionGeometryCapsuleNode) {
+				m_collision_CaplsuleMeshes[asmpMesh].push_back(collisionPosModelSpace);
+			} else if (isCollisionGeometryCylinderNode) {
+				m_collision_CylinderMeshes[asmpMesh].push_back(collisionPosModelSpace);
+			} else if (isCollisionGeometrySphereNode) {
+				m_collision_SphereMeshes[asmpMesh].push_back(collisionPosModelSpace);
+			} else {
+				sgeAssert(false);
+			}
+
+		} else {
+			// The mesh is going to be used for rendering.
+			if (m_asmpMesh2MeshIndex.count(assimpMeshIndex) == 0) {
+				const int meshIndex = m_model->makeNewMesh();
+				m_asmpMesh2MeshIndex[assimpMeshIndex] = meshIndex;
+			}
+
+			if (m_asmpMtl2MtlIndex.count(asmpMesh->mMaterialIndex) == 0) {
+				int materialIndex = m_model->makeNewMaterial();
+				m_asmpMtl2MtlIndex[asmpMesh->mMaterialIndex] = materialIndex;
+			}
 		}
 	}
 
@@ -148,14 +328,13 @@ void AssimpImporter::importMaterials() {
 		asmpMtl->GetTexture(aiTextureType_EMISSIVE, 0, &asmpRoughnessTexName);
 		asmpMtl->GetTexture(aiTextureType_NORMALS, 0, &normalMapTexName);
 
-
 		ExternalPBRMaterialSettings importedMtlSets;
 
-		importedMtlSets.diffuseTextureName = asmpBaseColorTexName.C_Str();
-		importedMtlSets.emissionTextureName = asmpEmissionTexName.C_Str();
-		importedMtlSets.metallicTextureName = asmpMetallicTexName.C_Str();
-		importedMtlSets.roughnessTextureName = asmpRoughnessTexName.C_Str();
-		importedMtlSets.normalTextureName = normalMapTexName.C_Str();
+		importedMtlSets.diffuseTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpBaseColorTexName);
+		importedMtlSets.emissionTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpEmissionTexName);
+		importedMtlSets.metallicTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpMetallicTexName);
+		importedMtlSets.roughnessTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpRoughnessTexName);
+		importedMtlSets.normalTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, normalMapTexName);
 
 		importedMtlSets.diffuseColor = fromAssimp(asmpDiffuseColor, 1.f);
 		importedMtlSets.emissionColor = fromAssimp(asmpDiffuseColor, 0.f);
@@ -327,7 +506,7 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 			if (itrFindBoneNode == m_asmpNode2NodeIndex.end()) {
 				// Assimp fails to create find the nodes for some bones.
 				// 1st found on some DAE files.
-				throw ImportExpect("Found a bone that doesn't have node associated with it.");
+				throw ImportExcept("Found a bone that doesn't have node associated with it.");
 			}
 
 			const int boneNodeIndex = itrFindBoneNode->second;
@@ -469,11 +648,10 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 		}
 	}
 
-	// Read the faces.
+	// Read the faces and create the index buffer.
 	bool isIndexBuferAllSequental = true;
 	unsigned ibSeqCnt = 0;
 	const uint32 numIndices = asmpMesh->mNumFaces * 3;
-
 
 	std::vector<char> indicesData;
 	indicesData.resize(numIndices * sizeof(uint32));
@@ -482,7 +660,7 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 		const aiFace& face = asmpMesh->mFaces[iFace];
 
 		if (face.mNumIndices != 3) {
-			throw ImportExpect("Expected that all faces are triangles!");
+			throw ImportExcept("Expected that all faces are triangles!");
 		}
 
 		// clang-format off
@@ -575,8 +753,8 @@ void AssimpImporter::importAnimations() {
 
 			const int nodeIndex = m_model->findFistNodeIndexWithName(nodeName);
 			if (nodeIndex < 0) {
-				throw ImportExpect(
-				    "Animated node not found by name. Assimp promises that the names in asimn scene and in aiNodeAnim will match but "
+				throw ImportExcept(
+				    "Animated node not found by name. Assimp promises that the names in assimp scene and in aiNodeAnim will match but "
 				    "something is wrong somewhere!");
 			}
 
@@ -616,6 +794,124 @@ void AssimpImporter::importAnimations() {
 		if (!perNodeKeyFrames.empty()) {
 			const int newAnimIndex = m_model->makeNewAnim();
 			*(m_model->animationAt(newAnimIndex)) = ModelAnimation(animationName, animationDuration, std::move(perNodeKeyFrames));
+		}
+	}
+}
+
+void AssimpImporter::importCollisionGeometry() {
+	// Convex hulls.
+	for (const auto& itrFbxMeshInstantiations : m_collision_ConvexHullMeshes) {
+		const aiMesh* const fbxMesh = itrFbxMeshInstantiations.first;
+
+		ModelCollisionMesh collisionMeshObjectSpace = assimpMeshToCollisionMesh(fbxMesh);
+
+		if (collisionMeshObjectSpace.indices.size() % 3 == 0) {
+			// For every instance transform the vertices to model (or in this context world space).
+			for (int const iInstance : range_int(int(itrFbxMeshInstantiations.second.size()))) {
+				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
+
+				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
+				for (vec3f& v : verticesWS) {
+					v = mat_mul_pos(n2w, v);
+				}
+
+				m_model->m_convexHulls.emplace_back(ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
+			}
+		} else {
+			printf("Invalid collision geometry");
+		}
+	}
+
+	// Triangle meshes.
+	for (const auto& itrFbxMeshInstantiations : m_collision_BvhTriMeshes) {
+		const aiMesh* const asmpMesh = itrFbxMeshInstantiations.first;
+
+		ModelCollisionMesh collisionMeshObjectSpace = assimpMeshToCollisionMesh(asmpMesh);
+
+		if (collisionMeshObjectSpace.indices.size() % 3 == 0) {
+			// For every instance transform the vertices to model (or in this context world space).
+			for (int const iInstance : range_int(int(itrFbxMeshInstantiations.second.size()))) {
+				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
+
+				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
+				for (vec3f& v : verticesWS) {
+					v = mat_mul_pos(n2w, v);
+				}
+
+				m_model->m_concaveHulls.emplace_back(ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
+			}
+		} else {
+			printf("Invalid collision geometry");
+		}
+	}
+
+	// Boxes
+	for (const auto& itrBoxInstantiations : m_collision_BoxMeshes) {
+		const aiMesh* const asmpMesh = itrBoxInstantiations.first;
+
+		// CAUTION: The code assumes that the mesh vertices form a box.
+		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+
+		for (int const iInstance : range_int(int(itrBoxInstantiations.second.size()))) {
+			transf3d n2w = m_collision_transfromCorrection * itrBoxInstantiations.second[iInstance];
+			n2w.p += bbox.center();
+			m_model->m_collisionBoxes.push_back(Model_CollisionShapeBox{"", n2w, bbox.halfDiagonal()});
+		}
+	}
+
+	// Capsules.
+	for (const auto& itr : m_collision_CaplsuleMeshes) {
+		const aiMesh* const asmpMesh = itr.first;
+
+		// CAUTION: The code assumes that the mesh vertices are untoched.
+		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+
+		vec3f const halfDiagonal = bbox.halfDiagonal();
+		vec3f const ssides = halfDiagonal.getSorted();
+		float halfHeight = ssides[0];
+		float const radius = maxOf(ssides[1], ssides[2]);
+
+		if_checked(2.f * radius <= halfHeight) {
+			printf("ERROR: Invalid capsule buonding box.\n");
+		}
+
+		halfHeight -= radius;
+
+		for (int const iInstance : range_int(int(itr.second.size()))) {
+			transf3d n2w = m_collision_transfromCorrection * itr.second[iInstance];
+			n2w.p += bbox.center();
+			m_model->m_collisionCapsules.push_back(Model_CollisionShapeCapsule{"", n2w, halfHeight, radius});
+		}
+	}
+
+	// Cylinders.
+	for (const auto& itrCylinderInstantiations : m_collision_CylinderMeshes) {
+		const aiMesh* const asmpMesh = itrCylinderInstantiations.first;
+
+		// CAUTION: The code assumes that the mesh vertices are untoched.
+		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+
+		vec3f const halfDiagonal = bbox.halfDiagonal();
+		for (int const iInstance : range_int(int(itrCylinderInstantiations.second.size()))) {
+			transf3d const n2w = m_collision_transfromCorrection * itrCylinderInstantiations.second[iInstance];
+
+			m_model->m_collisionCylinders.push_back(Model_CollisionShapeCylinder{"", n2w, halfDiagonal});
+		}
+	}
+
+	// Spheres.
+	for (const auto& itrSphereInstantiations : m_collision_SphereMeshes) {
+		const aiMesh* const asmpMesh = itrSphereInstantiations.first;
+
+		// CAUTION: The code assumes that the mesh vertices are untoched.
+		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+
+		vec3f const halfDiagonal = bbox.halfDiagonal();
+		float const radius = halfDiagonal.getSorted().x;
+		for (int const iInstance : range_int(int(itrSphereInstantiations.second.size()))) {
+			transf3d const n2w = m_collision_transfromCorrection * itrSphereInstantiations.second[iInstance];
+
+			m_model->m_collisionSpheres.push_back(Model_CollisionShapeSphere{"", n2w, radius});
 		}
 	}
 }

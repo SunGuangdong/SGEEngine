@@ -57,6 +57,9 @@ struct AssimpImporter {
 	/// Imports the animations described in the FBX scene.
 	void importAnimations();
 
+	/// Step 6: Import the collision geometry described by meshes attached to nodes with specific names.
+	void importCollisionGeometry();
+
   private:
 	const aiScene* asmpScene = nullptr;
 
@@ -67,6 +70,17 @@ struct AssimpImporter {
 	std::map<unsigned, int> m_asmpMtl2MtlIndex;
 	std::map<unsigned, int> m_asmpMesh2MeshIndex;
 	std::map<const aiNode*, int> m_asmpNode2NodeIndex;
+
+	/// Meshes to be used for collision geometry (if any). These do not participate in the m_fbxMesh2MeshIndex
+	/// as they aren't going to be used for rendering.
+	std::map<const aiMesh*, std::vector<transf3d>> m_collision_ConvexHullMeshes;
+	std::map<const aiMesh*, std::vector<transf3d>> m_collision_BvhTriMeshes;
+	std::map<const aiMesh*, std::vector<transf3d>> m_collision_BoxMeshes;
+	std::map<const aiMesh*, std::vector<transf3d>> m_collision_CaplsuleMeshes;
+	std::map<const aiMesh*, std::vector<transf3d>> m_collision_CylinderMeshes;
+	std::map<const aiMesh*, std::vector<transf3d>> m_collision_SphereMeshes;
+
+	transf3d m_collision_transfromCorrection;
 
 	/// The model that is going to store the imported result.
 	Model* m_model = nullptr;
