@@ -51,7 +51,7 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
 		}
 	}
 
-#if 0
+#if 0 // Old slower implementation kept for reference.
 	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
 		const ModelNode* rawNode = evalModel.m_model->nodeAt(iNode);

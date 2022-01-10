@@ -743,6 +743,74 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 				mesh.bones.push_back(ModelMeshBone(boneOffseMtx, boneNodeIndex));
 			}
 
+			// Hack:
+			// Usually in most 3D models all verices have bones that infuence them
+			// and usually they sum up to one.
+			//
+			// However... from Sketchfab I found a mesh that had a few vertices that did not
+			// have any bones infuencing them.
+			// In that case, I guess, the correct solution would be to use the transformation
+			// of the node where the mesh is attached for that vertex.
+			// This however would introduce more special cases in the code to be handled.
+			// (maybe this is what I should do).
+			//
+			// In order to avoid that, if the mesh has any bones,
+			// for each vertex that is not infuenced by anything,
+			// we find the closest bone to it and add 100% weight to it
+			// that way the vertex is going to get transformed.
+			// This is probably produce unwanted motion but it should be minimal.
+			//
+			// The same is duplicated in Assimp importer.
+			const int numControlPoints = fbxMesh->GetControlPointsCount();
+			bool hasVertsWithNoBonesAttached = perControlPointBoneInfluence.size() != numControlPoints;
+			if (clustersCount > 0 && hasVertsWithNoBonesAttached) {
+				printf("Found a skinned mesh with vertices that have no bones infuencing them. A workaround soultion will take place.");
+				for (int iCtrlPt = 0; iCtrlPt < numControlPoints; ++iCtrlPt) {
+					if (perControlPointBoneInfluence.count(iCtrlPt) == 0) {
+						// The control point doesn't have any bones infuencing it.
+						// find the closest bone to the vertex and pick that one to have 100% infuence.
+						int iBestCluster = -1;
+						float bestClosestDistanceSqr = FLT_MAX;
+						for (int iCluster = 0; iCluster < clustersCount; ++iCluster) {
+							fbxsdk::FbxCluster* const fCluster = fSkin->GetCluster(iCluster);
+
+							FbxAMatrix transformMatrix;
+							FbxAMatrix transformLinkMatrix;
+
+							// The transformation of the mesh at binding time.
+							fCluster->GetTransformMatrix(transformMatrix);
+
+							// The transformation of the cluster(joint, bone) at binding time from joint space to world space.
+							// TODO: Geometric transform. The internet applies it here, but it should be stored in the MeshAttachment IMHO.
+							fCluster->GetTransformLinkMatrix(transformLinkMatrix);
+							FbxAMatrix const globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix;
+
+							mat4f boneOffseMtx = mat4f::getIdentity();
+							for (int const t : range_int(16)) {
+								boneOffseMtx.data[t / 4][t % 4] = (float)(globalBindposeInverseMatrix.mData[t / 4].mData[t % 4]);
+							}
+
+							const vec3f ctrPointPos = vec3fFromFbx(fbxMesh->GetControlPointAt(iCtrlPt));
+							const vec3f ctrlPointPosRelToBone = mat_mul_pos(boneOffseMtx, ctrPointPos);
+							const vec3f bonePos = boneOffseMtx.c3.xyz();
+
+							float currDistanceSqr = (bonePos - ctrlPointPosRelToBone).lengthSqr();
+							if (currDistanceSqr < bestClosestDistanceSqr) {
+								iBestCluster = iCluster;
+								bestClosestDistanceSqr = currDistanceSqr;
+							}
+						}
+
+						// Append the workaround infuence.
+						if (iBestCluster >= 0) {
+							perControlPointBoneInfluence[iCtrlPt].push_back(BoneInfluence(iBestCluster, 1.f));
+						} else {
+							throw ImportExcept("Coundn't find a bone to auto assign for a skinned mesh.");
+						}
+					}
+				}
+			}
+
 			// We support so far only skin deformers. And we support only one skin deformer.
 			// This is why we break here.
 			break;

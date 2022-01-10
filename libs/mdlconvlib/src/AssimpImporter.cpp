@@ -502,7 +502,7 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 
 			// Find the node that represents the bone. The animation on that node
 			// will represent the movement of the bone.
-			const auto& itrFindBoneNode = m_asmpNode2NodeIndex.find(asmpBone->mNode ? asmpBone->mNode : asmpBone->mArmature);
+			const auto& itrFindBoneNode = m_asmpNode2NodeIndex.find(asmpBone->mNode);
 			if (itrFindBoneNode == m_asmpNode2NodeIndex.end()) {
 				// Assimp fails to create find the nodes for some bones.
 				// 1st found on some DAE files.
@@ -527,6 +527,60 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 			// Finally Add the bone to the mesh.
 			mesh.bones.push_back(ModelMeshBone(boneOffseMtx, boneNodeIndex));
 		}
+
+		// Hack:
+		// Usually in most 3D models all verices have bones that infuence them
+		// and usually they sum up to one.
+		//
+		// However... from Sketchfab I found a mesh that had a few vertices that did not
+		// have any bones infuencing them.
+		// In that case, I guess, the correct solution would be to use the transformation
+		// of the node where the mesh is attached for that vertex.
+		// This however would introduce more special cases in the code to be handled.
+		// (maybe this is what I should do).
+		//
+		// In order to avoid that, if the mesh has any bones,
+		// for each vertex that is not infuenced by anything,
+		// we find the closest bone to it and add 100% weight to it
+		// that way the vertex is going to get transformed.
+		// This is probably produce unwanted motion but it should be minimal.
+		//
+		// The same is duplicated in FBX SDK importer.
+		bool hasVertsWithNoBonesAttached = perVertexIdBoneInfuence.size() != asmpMesh->mNumVertices;
+
+		if (asmpMesh->mNumBones > 0 && hasVertsWithNoBonesAttached) {
+			printf("Found a skinned mesh with vertices that have no bones infuencing them. A workaround soultion will take place.");
+			for (int iVert = 0; iVert < (int)asmpMesh->mNumVertices; ++iVert) {
+				if (perVertexIdBoneInfuence.count(iVert) == 0) {
+					// The vertex doesn't have any bones infuencing it.
+					// find the closest bone to the vertex and pick that one to have 100% infuence.
+					int iBestBone = -1;
+					float bestClosestDistanceSqr = FLT_MAX;
+					for (int iBone = 0; iBone < (int)asmpMesh->mNumBones; ++iBone) {
+						const aiBone* asmpBone = asmpMesh->mBones[iBone];
+
+						const aiVector3D vertexPos = asmpMesh->mVertices[iVert];
+						const aiVector3D vertexPosRelToBone = asmpBone->mOffsetMatrix * vertexPos;
+
+						const aiVector3D bonePosition = aiVector3D(asmpBone->mNode->mTransformation[0][3], asmpBone->mNode->mTransformation[1][3],
+						                                     asmpBone->mNode->mTransformation[2][3]);
+
+						float currDistanceSqr = (bonePosition - vertexPosRelToBone).SquareLength();
+						if (currDistanceSqr < bestClosestDistanceSqr) {
+							iBestBone = iBone;
+							bestClosestDistanceSqr = currDistanceSqr;
+						}
+					}
+
+					// Append the workaround infuence.
+					if (iBestBone >= 0) {
+						perVertexIdBoneInfuence[iVert].push_back(BoneInfluence(iBestBone, 1.f));
+					} else {
+						throw ImportExcept("Coundn't find a bone to auto assign for a skinned mesh.");
+					}
+				}
+			}
+		}
 	}
 
 	// If there are bones in the mesh. Create the vertex attributres for them.
@@ -536,6 +590,7 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 		for (auto& pair : perVertexIdBoneInfuence) {
 			// Some control point might be infuenced by more then kMaxBonesPerVertex,
 			// if reduce the bones that amount and renormalize the weigths so they sum to 1.
+			// In addition Assimp likes to add all bones that do not infuence with 0 weight (with GLTF) for some reason.
 			if (pair.second.size() > kMaxBonesPerVertex) {
 				// Sort by weigths.
 				for (int i = 0; i < pair.second.size(); ++i) {
@@ -551,16 +606,16 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 			}
 
 			// Copied from the previously existing FBX importer, but the note sounds reasonable to get copied:
+			//
 			// Believe it or not some vertices had the sum of
-			// all weights exceed 1 (the Jammo robot form mix and jam).
-			// I'm not sure if the way we read the bones for
-			// control points is wrong but this seemed necessery.
+			// all weights exceed 1 (the Jammo robot form Mix and Jam youtube channel).
+			// I'm not sure if the way we read the bones forcontrol points is wrong but this seemed necessery.
 			float weigthSum = 0.f;
 			for (int t = 0; t < pair.second.size(); ++t) {
 				weigthSum += pair.second[t].boneWeight;
 			}
 
-			if (weigthSum > 1e-6f) {
+			if (weigthSum > 1e-6f && weigthSum != 1.f) {
 				float invSum = 1.f / weigthSum;
 				for (int t = 0; t < pair.second.size(); ++t) {
 					pair.second[t].boneWeight = pair.second[t].boneWeight * invSum;
@@ -639,6 +694,16 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 
 			int* boneIdsWriteLoc = (int*)(vertexBufferData.data() + writeOffsetBoneId);
 			float* boneWeightsWriteLoc = (float*)(vertexBufferData.data() + writeOffsetBoneWeight);
+
+			boneIdsWriteLoc[0] = 0;
+			boneIdsWriteLoc[1] = 0;
+			boneIdsWriteLoc[2] = 0;
+			boneIdsWriteLoc[3] = 0;
+
+			boneWeightsWriteLoc[0] = 0.f;
+			boneWeightsWriteLoc[1] = 0.f;
+			boneWeightsWriteLoc[2] = 0.f;
+			boneWeightsWriteLoc[3] = 0.f;
 
 			sgeAssert(pair.second.size() <= kMaxBonesPerVertex);
 			for (int iInfuence = 0; iInfuence < pair.second.size(); ++iInfuence) {
@@ -735,7 +800,7 @@ void AssimpImporter::importAnimations() {
 	for (int iAnim = 0; iAnim < (int)asmpScene->mNumAnimations; ++iAnim) {
 		const aiAnimation* const asmpAnim = asmpScene->mAnimations[iAnim];
 
-		const float animationDuration = (float)(asmpAnim->mDuration * asmpAnim->mTicksPerSecond);
+		const float animationDuration = (float)(asmpAnim->mDuration / asmpAnim->mTicksPerSecond);
 
 		std::string animationName = asmpAnim->mName.C_Str();
 		if (animationName.empty()) {
@@ -762,7 +827,7 @@ void AssimpImporter::importAnimations() {
 			for (int t = 0; t < (int)asmpNodeAnim->mNumPositionKeys; ++t) {
 				const aiVectorKey& key = asmpNodeAnim->mPositionKeys[t];
 
-				float keyTime = (float)(key.mTime * asmpAnim->mTicksPerSecond);
+				float keyTime = (float)(key.mTime / asmpAnim->mTicksPerSecond);
 				nodeKeyFrames.positionKeyFrames[keyTime] = fromAssimp(key.mValue);
 			}
 
@@ -770,7 +835,7 @@ void AssimpImporter::importAnimations() {
 			for (int t = 0; t < (int)asmpNodeAnim->mNumRotationKeys; ++t) {
 				const aiQuatKey& key = asmpNodeAnim->mRotationKeys[t];
 
-				float keyTime = (float)(key.mTime * asmpAnim->mTicksPerSecond);
+				float keyTime = (float)(key.mTime / asmpAnim->mTicksPerSecond);
 				nodeKeyFrames.rotationKeyFrames[keyTime] = fromAssimp(key.mValue);
 			}
 
@@ -778,7 +843,7 @@ void AssimpImporter::importAnimations() {
 			for (int t = 0; t < (int)asmpNodeAnim->mNumScalingKeys; ++t) {
 				const aiVectorKey& key = asmpNodeAnim->mScalingKeys[t];
 
-				float keyTime = (float)(key.mTime * asmpAnim->mTicksPerSecond);
+				float keyTime = (float)(key.mTime / asmpAnim->mTicksPerSecond);
 				nodeKeyFrames.scalingKeyFrames[keyTime] = fromAssimp(key.mValue);
 			}
 

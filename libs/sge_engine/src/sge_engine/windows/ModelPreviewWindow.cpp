@@ -84,6 +84,37 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	}
 }
 
+void ModelPreviewWindow::setPreviewModel(AssetPtr asset) {
+	m_model = asset;
+	m_eval = EvaluatedModel();
+	iPreviewAnimDonor = -1;
+	iPreviewAnimation = -1;
+	animationComboPreviewValue = "<None>";
+	animationDonors.clear();
+	previewAimationTime = 0.f;
+	autoPlayAnimation = true;
+	m_evalAnimator = ModelAnimator2();
+	nextTrackIndex = 0;
+	if (isAssetLoaded(m_model, assetIface_model3d)) {
+		m_eval.initialize(&getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
+		m_evalAnimator.create(*m_eval.m_model);
+
+		nextTrackIndex = 0;
+		for (int iAnim = 0; iAnim < m_eval.m_model->numAnimations(); ++iAnim) {
+			m_evalAnimator.trackAddAmim(nextTrackIndex, nullptr, iAnim);
+
+			trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName);
+			trackAnimDuration.push_back(m_eval.m_model->animationAt(iAnim)->durationSec);
+			nextTrackIndex++;
+		}
+
+		// If there is at least one track play it.
+		if (nextTrackIndex > 0) {
+			m_evalAnimator.playTrack(0);
+		}
+	}
+}
+
 void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is) {
 	if (isClosed()) {
 		return;
@@ -95,36 +126,10 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			m_frameTarget->create2D(64, 64);
 		}
 
-
-		if (ImGui::Button("Pick##ModeToPreview")) {
-			promptForModel(m_model);
-			m_eval = EvaluatedModel();
-			iPreviewAnimDonor = -1;
-			iPreviewAnimation = -1;
-			animationComboPreviewValue = "<None>";
-			animationDonors.clear();
-			previewAimationTime = 0.f;
-			autoPlayAnimation = true;
-			m_evalAnimator = ModelAnimator2();
-			nextTrackIndex = 0;
-			if (isAssetLoaded(m_model, assetIface_model3d)) {
-				m_eval.initialize(&getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
-				m_evalAnimator.create(*m_eval.m_model);
-
-				nextTrackIndex = 0;
-				for (int iAnim = 0; iAnim < m_eval.m_model->numAnimations(); ++iAnim) {
-					m_evalAnimator.trackAddAmim(nextTrackIndex, nullptr, iAnim);
-
-					trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName);
-					trackAnimDuration.push_back(m_eval.m_model->animationAt(iAnim)->durationSec);
-					nextTrackIndex++;
-				}
-
-				// If there is at least one track play it.
-				if (nextTrackIndex > 0) {
-					m_evalAnimator.playTrack(0);
-				}
-			}
+		if (ImGui::Button("Pick##ModelToPreview")) {
+			AssetPtr newModel;
+			promptForModel(newModel);
+			setPreviewModel(newModel);
 		}
 
 		if (isAssetLoaded(m_model)) {
@@ -156,7 +161,6 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 		ImGui::DragFloat("Time", &animationTime, 0.01f);
 
 		if (m_model.get() != NULL && m_evalAnimator.getNumTacks() > 0) {
-
 			int playingTrackId = m_evalAnimator.getPlayingTrackId();
 			static std::string none = "None";
 			const std::string& previewName = playingTrackId >= 0 ? trackDisplayName[playingTrackId] : none;

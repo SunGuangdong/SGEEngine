@@ -63,11 +63,7 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 		return assetIface_model3d;
 	}
 
-	if (includeExternalExtensions && sge_stricmp(ext, "gltf") == 0) { // GLTF
-		return assetIface_model3d;
-	}
-
-	if (includeExternalExtensions && sge_stricmp(ext, "gltf2") == 0) { // GLTF2
+	if (includeExternalExtensions && sge_stricmp(ext, "gltf") == 0) { // GLTF 1 and 2
 		return assetIface_model3d;
 	}
 

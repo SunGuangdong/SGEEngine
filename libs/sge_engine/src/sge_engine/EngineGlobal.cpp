@@ -1,7 +1,7 @@
 #include "EngineGlobal.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
-#include "sge_engine/windows/EditorWindow.h"
+#include "sge_engine/windows/EditorWindow/EditorWindow.h"
 
 namespace sge {
 

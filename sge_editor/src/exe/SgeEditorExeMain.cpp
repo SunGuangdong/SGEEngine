@@ -26,7 +26,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_engine/IPlugin.h"
 #include "sge_engine/setImGuiContextEngine.h"
 #include "sge_engine/windows/AssetsUI/AssetsWindow.h"
-#include "sge_engine/windows/EditorWindow.h"
+#include "sge_engine/windows/EditorWindow/EditorWindow.h"
 #include "sge_log/Log.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/DLLHandler.h"

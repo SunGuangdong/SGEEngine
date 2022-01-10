@@ -5,7 +5,7 @@
 #include "imgui/imgui.h"
 #include "sge_utils/utils/timer.h"
 
-#include "IImGuiWindow.h"
+#include "../IImGuiWindow.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/SceneInstance.h"
 
@@ -13,7 +13,6 @@ namespace sge {
 struct WindowBase;
 struct InputState;
 struct Asset;
-
 struct SceneWindow;
 
 /// EditorWindow is the root window of the whole application.
@@ -55,7 +54,6 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 
 	void onGamePluginPreUnload();
 	void onGamePluginChanged();
-
 
 	bool isClosed() override {
 		return false;

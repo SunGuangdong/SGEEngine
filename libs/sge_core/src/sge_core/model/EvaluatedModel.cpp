@@ -167,10 +167,14 @@ bool EvaluatedModel::evaluate_getAllGeometries() {
 
 		EvaluatedGeomInstance geomInst;
 
-		geomInst.modelSpaceTransform = evalNode.evalGlobalTransform;
 		for (const MeshAttachment& meshAttachment : m_model->nodeAt(iNode)->meshAttachments) {
 			const EvaluatedMesh& evalMesh = getEvalMesh(meshAttachment.attachedMeshIndex);
 			ModelMesh* mesh = m_model->meshAt(meshAttachment.attachedMeshIndex);
+
+			// Bones are concidered the main source of the trasformation.
+			// when a vertex is infuenced by a bone, it means that the bone needs
+			// to be oriented around that bone, not around the parent node.
+			geomInst.modelSpaceTransform = evalMesh.geometry.hasVertexSkinning() ? mat4f::getIdentity() : evalNode.evalGlobalTransform;
 
 			geomInst.geometry = evalMesh.geometry;
 			geomInst.iMaterial = meshAttachment.attachedMaterialIndex;

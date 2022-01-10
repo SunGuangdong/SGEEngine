@@ -40,6 +40,8 @@ struct ModelPreviewWindow : public IImGuiWindow {
 		return m_model;
 	}
 
+	void setPreviewModel(AssetPtr asset);
+
   private:
 	std::string m_windowName;
 	bool m_createAsChild = false;

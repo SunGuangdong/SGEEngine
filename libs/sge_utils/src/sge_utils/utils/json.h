@@ -1,9 +1,10 @@
 #pragma once
 
-#include "sge_utils/sge_utils.h"
 #include <array>
 #include <string>
 #include <vector>
+
+#include "sge_utils/sge_utils.h"
 
 namespace sge {
 

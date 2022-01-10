@@ -501,6 +501,8 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 						ImGui::EndMenu();
 					}
 
+					ImGui::Separator();
+
 					if (!m_rightClickedPath.empty()) {
 						ImGui::Separator();
 
@@ -514,6 +516,18 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 							openAssetImport_filename.clear();
 						}
 
+						if (assetIface_guessFromExtension(extractFileExtension(m_rightClickedPath.string().c_str()).c_str(), false) ==
+						    assetIface_model3d) {
+							if (ImGui::MenuItem(ICON_FK_SEARCH " Preview 3D Model")) {
+								ModelPreviewWindow* modelPreview =
+								    new ModelPreviewWindow((m_rightClickedPath.string() + " Moder Previwer").c_str());
+
+								modelPreview->setPreviewModel(
+								    getCore()->getAssetLib()->getAssetFromFile(m_rightClickedPath.string().c_str()));
+
+								getEngineGlobal()->addWindow(modelPreview);
+							}
+						}
 #ifdef WIN32
 						if (ImGui::MenuItem(ICON_FK_WINDOWS " Open in Explorer")) {
 							PIDLIST_ABSOLUTE pItem = ILCreateFromPathA(m_rightClickedPath.string().c_str());

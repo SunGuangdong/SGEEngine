@@ -2,22 +2,22 @@
 
 #include <filesystem>
 
-#include "ActorCreateWindow.h"
-#include "AssetsUI/AssetsWindow.h"
-#include "CreditsWindow.h"
+#include "../ActorCreateWindow.h"
+#include "../AssetsUI/AssetsWindow.h"
+#include "../CreditsWindow.h"
+#include "../GameInspectorWindow.h"
+#include "../GamePlayWindow.h"
+#include "../HelpWindow.h"
+#include "../InfoWindow.h"
+#include "../LogWindow.h"
+#include "../ModelPreviewWindow.h"
+#include "../OutlinerWindow.h"
+#include "../PrefabWindow.h"
+#include "../ProjectSettingsWindow.h"
+#include "../PropertyEditorWindow.h"
+#include "../SceneWindow.h"
+#include "../WorldSettingsWindow.h"
 #include "EditorWindow.h"
-#include "GameInspectorWindow.h"
-#include "GamePlayWindow.h"
-#include "HelpWindow.h"
-#include "InfoWindow.h"
-#include "LogWindow.h"
-#include "ModelPreviewWindow.h"
-#include "OutlinerWindow.h"
-#include "PrefabWindow.h"
-#include "ProjectSettingsWindow.h"
-#include "PropertyEditorWindow.h"
-#include "SceneWindow.h"
-#include "WorldSettingsWindow.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
@@ -38,6 +38,7 @@
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"
 #include "sge_utils/utils/strings.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 
 #include "IconsForkAwesome/IconsForkAwesome.h"
 
@@ -178,10 +179,9 @@ void EditorWindow::switchToInstance(int iInstance) {
 
 void EditorWindow::deleteInstance(int iInstance) {
 	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
-
 		std::string message = string_format("Closing scene %s. All unsaved changes will be lost! Do you want to continue closing?",
 		                                    getInstanceData(iInstance)->displayName.c_str());
-		
+
 		if (DialogYesNo("Closing Scene", message.c_str())) {
 			m_sceneInstances.erase(m_sceneInstances.begin() + iInstance);
 			int newActiveInst = (int)m_sceneInstances.size() - 1;
