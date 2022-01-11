@@ -21,7 +21,7 @@ struct Player : public Actor {
 
 	float wobbleAmplitude = 1.f;
 	float wobbleForce = 0.f;
-
+	 
 	float jumpButtonHeldTime = 0.f;
 	static inline const float kMaxJumpHeldTime = 1.f;
 

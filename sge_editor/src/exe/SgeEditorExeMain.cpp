@@ -15,6 +15,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #endif
 
 #include "../exe/DummyPlugin.h"
+#include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
@@ -35,7 +36,6 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_utils/utils/json.h"
 #include <filesystem>
 #include <thread>
-#include "IconsForkAwesome/IconsForkAwesome.h"
 
 #include "MiniDump.h"
 
@@ -163,22 +163,19 @@ struct SGEGameWindow : public WindowBase {
 			//	DialogYesNo("Realod DLL", "Game DLL is about to be reloaded!");
 			//}
 
-			// Save the current world into a file and then reloaded it.
-			// Do not do this if this is the 1st time we are loading the plugin (basically the engine start-up).
-			bool shouldCurrentWorldBeReloaded = false;
+			// Save the editor world as we are going to invaludated all the game function pointers
+			//  by unloading the game DLL.
+			// Save the editor state into a file in case the hot-reload-crashes.
+			bool isDoingHotReload = false;
+			SceneInstanceSerializedData hotReloadEditorData;
 			std::string workingFilename;
 			if (m_pluginInst) {
-				//shouldCurrentWorldBeReloaded = true;
-				//workingFilename = getEngineGlobal()->getEditorWindow()->getWorld().m_workingFilePath;
-				//getEngineGlobal()->getEditorWindow()->saveWorldToSpecificFile("reload_level.lvl");
-			}
+				isDoingHotReload = true;
+				// Notify that we are about to unload the plugin.
+				getEngineGlobal()->notifyOnPluginPreUnload();
 
-			// Notify that we are about to unload the plugin.
-			getEngineGlobal()->notifyOnPluginPreUnload();
-			if (m_pluginInst) {
-				// Unload all game worlds as they contain memory allocated by the game plugin
-				// as we want to unload all game owned data as all virtual pointers to it will get invalid.
-				getEngineGlobal()->getEditorWindow()->newScene();
+				getEngineGlobal()->getEditorWindow()->prepareForHotReload(hotReloadEditorData);
+				hotReloadEditorData.saveInDirectory("hot_reaload_backup");
 
 				m_pluginInst->onUnload();
 				delete m_pluginInst;
@@ -187,7 +184,10 @@ struct SGEGameWindow : public WindowBase {
 
 			// Unload the old plugin DLL and load the new one.
 			m_dllHandler.unload();
+			
+			// Hack: Sleep for a bit for the OS to have time to register that nobody references the old working_plugin.dll.
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
 			copyFile(pluginFileName.c_str(), "working_plugin.dll");
 			m_dllHandler.load("working_plugin.dll");
 			m_workingDLLModTime = modtime;
@@ -207,9 +207,8 @@ struct SGEGameWindow : public WindowBase {
 				m_pluginInst->onLoaded(SgeGlobalSingletons());
 
 				typeLib().performRegistration();
-				if (shouldCurrentWorldBeReloaded) {
-					getEngineGlobal()->getEditorWindow()->loadWorldFromFile(
-					    "reload_level.lvl", !workingFilename.empty() ? workingFilename.c_str() : nullptr, true);
+				if (isDoingHotReload) {
+					getEngineGlobal()->getEditorWindow()->recoverFromHotReload(hotReloadEditorData);
 				}
 				sgeLogCheck("Reloaded %s\n", pluginFileName.c_str());
 			}

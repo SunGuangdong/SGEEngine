@@ -18,6 +18,7 @@
 #include "../SceneWindow.h"
 #include "../WorldSettingsWindow.h"
 #include "EditorWindow.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
@@ -38,7 +39,6 @@
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"
 #include "sge_utils/utils/strings.h"
-#include "sge_core/AssetLibrary/AssetLibrary.h"
 
 #include "IconsForkAwesome/IconsForkAwesome.h"
 
@@ -924,5 +924,43 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		wnd->update(sgecon, &getActiveInstance()->getInspector(), is);
 	}
 }
+void EditorWindow::prepareForHotReload(SceneInstanceSerializedData& sceneInstancesData) {
+	sceneInstancesData = SceneInstanceSerializedData();
+
+	sceneInstancesData.iActiveInstance = iActiveInstance;
+
+	for (PerSceneInstanceData& instace : m_sceneInstances) {
+		SceneInstanceSerializedData::PerInstanceSerializedData instanceData;
+
+		instanceData.displayName = instace.displayName;
+		instanceData.filename = instace.filename;
+		instanceData.levelJson = serializeGameWorld(&instace.sceneInstace->getWorld());
+
+		sceneInstancesData.instances.emplace_back(std::move(instanceData));
+	}
+
+	// Clear all the instances, deallocated and so on, the game plugin is going to get unloaded
+	// and all function pointers will be invalidated.
+	iActiveInstance = -1;
+	m_sceneInstances.clear();
+}
+
+void EditorWindow::recoverFromHotReload(const SceneInstanceSerializedData& sceneInstancesData) {
+	for (int iInst = 0; iInst < sceneInstancesData.instances.size(); ++iInst) {
+		const SceneInstanceSerializedData::PerInstanceSerializedData& instData = sceneInstancesData.instances[iInst];
+
+		int newInstIndex = newEmptyInstance();
+		sgeAssert(newInstIndex == iInst);
+
+		PerSceneInstanceData* inst = getInstanceData(newInstIndex);
+
+		inst->displayName = instData.displayName;
+		inst->filename = instData.filename;
+		loadGameWorldFromString(&inst->sceneInstace->getWorld(), instData.levelJson.c_str());
+	}
+
+	switchToInstance(sceneInstancesData.iActiveInstance);
+}
+
 
 } // namespace sge

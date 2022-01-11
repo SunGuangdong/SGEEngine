@@ -299,7 +299,11 @@ class JsonParser : protected JsonValueBuffer {
 	}
 	void Clear();
 
+	bool parse(IReadStream& instream) {
+		parse(&instream);
+	}
 	bool parse(IReadStream* instream);
+
 	JsonValue* getRoot() {
 		return root;
 	}

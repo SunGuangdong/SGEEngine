@@ -2,17 +2,17 @@
 
 #include <string>
 
-#include "imgui/imgui.h"
-#include "sge_utils/utils/timer.h"
-
 #include "../IImGuiWindow.h"
+#include "EditorWindowHotReloadData.h"
+#include "imgui/imgui.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/SceneInstance.h"
+#include "sge_utils/utils/timer.h"
 
 namespace sge {
 struct WindowBase;
 struct InputState;
-struct Asset;
 struct SceneWindow;
 
 /// EditorWindow is the root window of the whole application.
@@ -69,6 +69,9 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	void loadWorldFromJson(const char* const json, bool disableAutoSepping, const char* const workingFileName, bool loadInNewInstance);
 	void saveInstanceToFile(int iInstance, bool forceAskForFilename);
 	void saveInstanceToSpecificFile(int iInstance, const char* filename);
+
+	void prepareForHotReload(SceneInstanceSerializedData& sceneInstancesData);
+	void recoverFromHotReload(const SceneInstanceSerializedData& sceneInstancesData);
 
 	void loadEditorSettings();
 	void saveEditorSettings();
