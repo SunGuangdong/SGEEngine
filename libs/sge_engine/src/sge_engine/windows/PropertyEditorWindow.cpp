@@ -4,6 +4,7 @@
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_core/ui/MultiCurve2DEditor.h"
 #include "sge_engine//RigidBodyEditorConfig.h"
 #include "sge_engine/AssetProperty.h"
@@ -11,16 +12,16 @@
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
+#include "sge_engine/InspectorCmds.h"
 #include "sge_engine/Physics.h"
 #include "sge_engine/traits/TraitCustomAE.h"
+#include "sge_engine/traits/TraitScriptSlot.h"
 #include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_utils/math/EulerAngles.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"
 #include "sge_utils/utils/Variant.h"
 #include "sge_utils/utils/strings.h"
-
-#include "sge_engine/traits/TraitScriptSlot.h"
 
 namespace sge {
 

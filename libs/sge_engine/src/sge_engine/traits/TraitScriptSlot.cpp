@@ -1,7 +1,8 @@
 #include "TraitScriptSlot.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/GameInspector.h"
-#include "sge_engine/InspectorCmd.h"
+#include "sge_engine/InspectorCmds.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 #include "sge_utils/utils/strings.h"
 #include <vector>

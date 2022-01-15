@@ -9,6 +9,14 @@
 #include "lib_lighting.hlsl"
 #include "lib_textureMapping.hlsl"
 
+float3 linearToSRGB(in float3 linearCol) {
+	float3 sRGBLo = linearCol * 12.92;
+	float3 sRGBHi = (pow(abs(linearCol), 1.0 / 2.4) * 1.055) - 0.055;
+	float3 sRGB = (linearCol <= 0.0031308) ? sRGBLo : sRGBHi;
+	return sRGB;
+	
+}
+
 //--------------------------------------------------------------------
 // Uniforms
 //--------------------------------------------------------------------
@@ -241,12 +249,16 @@ float4 psMain(StageVertexOut inVert)
 		ambientLightingFake += 0.25f;
 		ambientLightingFake += 0.25f * 0.5f * (mtlSample.shadeNormalWs.y + 1.f);
 		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.x));
-		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.z));
+		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.z)); 
 
 		float ambientLightAmount = lerp(1.f, ambientLightingFake, uAmbientFakeDetailAmount);
 
 		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor * ambientLightAmount;
-	}
+	} 
+	 
+	//finalColor.xyz = pow(finalColor.xyz, float3(1.f / 2.2f, 1.f / 2.2f, 1.f / 2.2f));
+	finalColor.xyz = finalColor.xyz / (finalColor.xyz + float3(1.f, 1.f, 1.f));
+	finalColor.xyz = linearToSRGB(finalColor.xyz);
 
 	// Applt the alpha multiplier.
 	finalColor.w *= alphaMultiplier;

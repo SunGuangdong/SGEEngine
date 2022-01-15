@@ -466,7 +466,7 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 
 	// Get the render items for all actors in the scene.
 	getWorld()->iterateOverPlayingObjects(
-	    [&](GameObject* object) -> bool {
+	    [this, &drawSets, &drawReason](GameObject* object) -> bool {
 		    // TODO: Skip this check for whole types. We know they are not actors...
 		    if (Actor* actor = object->getActor()) {
 			    AABox3f actorBboxOS = actor->getBBoxOS();

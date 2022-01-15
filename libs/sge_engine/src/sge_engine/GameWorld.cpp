@@ -5,9 +5,11 @@
 #include "IWorldScript.h"
 #include "InspectorCmd.h"
 #include "sge_core/ICore.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_utils/utils/strings.h"
 #include "sge_utils/utils/timer.h"
 #include "traits/TraitCamera.h"
+#include "sge_engine/InspectorCmds.h"
 #include <functional>
 #include <thread>
 

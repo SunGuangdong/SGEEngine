@@ -10,9 +10,10 @@
 
 namespace sge {
 
-/// @brief GameInspector is a class that takes care of all the data 
+
+/// @brief GameInspector is a class that takes care of all the data
 /// that is not needed by the GameWorld when editing a level.
-/// It is the central hub for editor specific data about the game world, 
+/// It is the central hub for editor specific data about the game world,
 /// like the undo/redo commands, seleted objects, viewport tools
 /// (to be removed from here) and more.
 struct SGE_ENGINE_API GameInspector {
@@ -21,8 +22,12 @@ struct SGE_ENGINE_API GameInspector {
 	GameInspector(const GameInspector&) = delete;
 	GameInspector& operator=(const GameInspector&) = delete;
 
-	GameWorld* getWorld() { return m_world; }
-	const GameWorld* getWorld() const { return m_world; }
+	GameWorld* getWorld() {
+		return m_world;
+	}
+	const GameWorld* getWorld() const {
+		return m_world;
+	}
 
 	bool isSteppingAllowed() const;
 
@@ -32,10 +37,14 @@ struct SGE_ENGINE_API GameInspector {
 	void appendCommand(InspectorCmd* const cmd, bool shouldApply);
 
 	// Selection.
-	bool hasSelection() const { return m_selection.size() != 0; }
+	bool hasSelection() const {
+		return m_selection.size() != 0;
+	}
 	bool isSelected(ObjectId const id, bool* const outIsPrimary = nullptr) const;
 	bool isPrimarySelected(ObjectId const id) const;
-	const std::vector<SelectedItem>& getSelection() const { return m_selection; }
+	const std::vector<SelectedItem>& getSelection() const {
+		return m_selection;
+	}
 	ObjectId getPrimarySelection() const;
 	ObjectId getSecondarySelection() const;
 	ObjectId getSecondarySelectedActor() const;

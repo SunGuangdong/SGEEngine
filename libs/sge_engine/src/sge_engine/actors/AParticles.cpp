@@ -1,5 +1,6 @@
 #include "AParticles.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 #include "sge_utils/utils/strings.h"

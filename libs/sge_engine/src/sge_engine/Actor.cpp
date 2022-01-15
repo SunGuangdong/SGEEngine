@@ -1,6 +1,6 @@
 #include "Actor.h"
 #include "GameWorld.h"
-#include "InspectorCmd.h"
+#include "InspectorCmds.h"
 
 #include "sge_engine/traits/TraitRigidBody.h"
 

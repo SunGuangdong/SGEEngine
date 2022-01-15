@@ -108,7 +108,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	ParamsCbFWDDefaultShading paramsCb;
 	memset(&paramsCb, 0, sizeof(paramsCb));
 
-	if (shadingPermutFWDShading.isValid() == false) {
+	if (shadingPermutFWDShading.isValid() == false || shaderFilesWatcher.update()) {
 		shadingPermutFWDShading = ShadingProgramPermuator();
 
 		// clang-format off
@@ -160,8 +160,12 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		    {uParamsCbFWDDefaultShading_pixel, "ParamsCbFWDDefaultShading", ShaderType::PixelShader},
 		};
 
+		std::set<std::string> includedFilesByShaders;
+		shadingPermutFWDShading->createFromFile(sgedev, "core_shaders/FWDDefault_shading.hlsl",
+		                                        "shader_cache/FWDDefault_shading.shadercache", compileTimeOptions, uniformsToCache,
+		                                        &includedFilesByShaders);
 
-		shadingPermutFWDShading->createFromFile(sgedev, "core_shaders/FWDDefault_shading.hlsl", "shader_cache/FWDDefault_shading.shadercache", compileTimeOptions, uniformsToCache);
+		shaderFilesWatcher.initialize(includedFilesByShaders);
 	}
 
 	// Find the values of the shader options that are going to be used.

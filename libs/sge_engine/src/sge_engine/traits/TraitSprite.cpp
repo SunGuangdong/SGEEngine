@@ -2,6 +2,7 @@
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/Camera.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitSpriteRrenderItem.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"

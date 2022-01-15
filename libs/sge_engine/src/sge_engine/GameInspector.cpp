@@ -2,7 +2,7 @@
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/traits/TraitCamera.h"
 #include "sge_utils/utils/strings.h"
-
+#include "sge_engine/InspectorCmds.h"
 
 namespace sge {
 

@@ -7,6 +7,7 @@
 #include "sge_core/typelib/typeLib.h"
 #include "sge_engine/ui/UIAssetPicker.h"
 #include "sge_renderer/renderer/renderer.h"
+#include "sge_core/typelib/MemberChain.h"
 
 namespace sge {
 

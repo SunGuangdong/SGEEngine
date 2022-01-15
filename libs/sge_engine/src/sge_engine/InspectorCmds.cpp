@@ -2,7 +2,7 @@
 
 #include "GameInspector.h"
 #include "GameSerialization.h"
-#include "InspectorCmd.h"
+#include "InspectorCmds.h"
 #include "sge_core/ICore.h"
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/DynamicProperties.h"

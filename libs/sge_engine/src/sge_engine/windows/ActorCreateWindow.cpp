@@ -2,6 +2,7 @@
 #include "sge_core/ICore.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
+#include "sge_engine/InspectorCmds.h"
 
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"

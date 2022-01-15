@@ -1,16 +1,18 @@
-#include "TransformTool.h"
-#include "GameInspector.h"
-#include "sge_core/AssetLibrary/AssetLibrary.h"
+
 #include <imgui/imgui.h>
 
-#include "sge_engine/GameDrawer/GameDrawer.h"
+#include "GameInspector.h"
+#include "TransformTool.h"
+#include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/TrasnformGizmos/Gizmo3DDraw.h"
+#include "sge_engine/GameDrawer/GameDrawer.h"
+#include "sge_engine/InspectorCmds.h"
 
 namespace sge {
 
 //---------------------------------------------------------------
-//
+// TransformTool
 //---------------------------------------------------------------
 void TransformTool::onSetActive(GameInspector* const inspector) {
 	GameWorld* const world = inspector->m_world;

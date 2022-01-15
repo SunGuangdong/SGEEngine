@@ -2,7 +2,6 @@
 
 #include "sge_engine/Actor.h"
 #include "sge_engine/GameInspector.h"
-#include "sge_engine/InspectorCmd.h"
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitPath.h"

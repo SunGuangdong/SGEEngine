@@ -5,10 +5,11 @@
 #include "sge_core/DebugDraw.h"
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
-#include "sge_engine/InspectorCmd.h"
+#include "sge_engine/InspectorCmds.h"
 #include "sge_engine/PhysicsHelpers.h"
 #include "sge_engine/traits/TraitRigidBody.h"
 #include "sge_engine/typelibHelper.h"
@@ -83,9 +84,13 @@ struct TimelineWindow final : public IImGuiWindow {
 		}
 	}
 
-	bool isClosed() override { return !m_isOpened; }
+	bool isClosed() override {
+		return !m_isOpened;
+	}
 	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
-	const char* getWindowName() const override { return m_windowName.c_str(); }
+	const char* getWindowName() const override {
+		return m_windowName.c_str();
+	}
 
   private:
 	bool m_isOpened = true;

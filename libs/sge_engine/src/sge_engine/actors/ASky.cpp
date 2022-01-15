@@ -1,4 +1,5 @@
 #include "ASky.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 

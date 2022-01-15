@@ -72,7 +72,7 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameIn
 
 			if (ImGui::BeginPopup("Game Camera Picker")) {
 				world->iterateOverPlayingObjects(
-				    [&](const GameObject* object) -> bool {
+				    [&world](const GameObject* object) -> bool {
 					    if (getTrait<TraitCamera>(object)) {
 						    bool selected = false;
 						    if (ImGui::Selectable(object->getDisplayNameCStr(), &selected)) {

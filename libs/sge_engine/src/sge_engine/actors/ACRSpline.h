@@ -6,7 +6,7 @@
 #include "sge_engine/traits/TraitPath.h"
 #include "sge_engine/traits/TraitViewportIcon.h"
 
-#include "sge_engine/InspectorCmd.h"
+#include "sge_engine/InspectorCmds.h"
 
 namespace sge {
 

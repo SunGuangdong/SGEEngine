@@ -4,7 +4,7 @@
 #include "sge_engine/traits/TraitViewportIcon.h"
 #include <string>
 
-#include "sge_engine/InspectorCmd.h"
+#include "sge_engine/InspectorCmds.h"
 
 namespace sge {
 

@@ -7,6 +7,7 @@
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/PhysicsHelpers.h"
 #include "sge_engine/traits/TraitCamera.h"
+#include "sge_engine/InspectorCmds.h"
 
 namespace sge {
 

@@ -2,6 +2,7 @@
 #include "sge_core/DebugDraw.h"
 #include "sge_core/ICore.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 #include "sge_utils/math/FABRIKSolver.h"

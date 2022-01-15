@@ -5,9 +5,9 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
+#include "sge_engine/InspectorCmds.h"
 #include "sge_utils/utils/ScopeGuard.h"
 #include "sge_utils/utils/strings.h"
-
 
 #include "imgui/imgui_internal.h"
 
@@ -171,7 +171,7 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 
 		// Recursivley display tree nodes which represent the actors that are playing in the scene.
 		inspector->getWorld()->iterateOverPlayingObjects(
-		    [&](GameObject* object) -> bool {
+		    [&world, &addChildObjects](GameObject* object) -> bool {
 			    if (world->getParentId(object->m_id).isNull()) {
 				    addChildObjects(object, false);
 			    }

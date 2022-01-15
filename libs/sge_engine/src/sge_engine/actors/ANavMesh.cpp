@@ -7,6 +7,7 @@
 #include "RecastDetourWrapper.h"
 #include "imgui/imgui.h"
 #include "sge_core/ICore.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/traits/TraitRigidBody.h"
 #include "sge_log/Log.h"

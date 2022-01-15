@@ -8,6 +8,7 @@
 #include "sge_utils/math/mat4.h"
 #include "sge_utils/utils/OptionPermutator.h"
 #include "sge_utils/utils/optional.h"
+#include "sge_utils/utils/FileWatcher.h"
 
 namespace sge {
 
@@ -30,6 +31,8 @@ struct SGE_CORE_API DefaultPBRMtlGeomDrawer : public IGeometryDrawer {
 	Optional<ShadingProgramPermuator> shadingPermutFWDShading;
 	GpuHandle<Buffer> paramsBuffer;
 	StateGroup stateGroup;
+
+	FilesWatcher shaderFilesWatcher;
 };
 
 } // namespace sge

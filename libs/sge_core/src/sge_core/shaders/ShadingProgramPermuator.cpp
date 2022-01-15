@@ -24,7 +24,7 @@ bool ShadingProgramPermuator::createFromFile(SGEDevice* sgedev,
 
 		dependantFilesForShaderCachemaking.insert(filename);
 
-		return create(sgedev, fileContents.data(), filename, precompiledCacheFile, compileTimeOptions, uniformsToCacheInLUT,
+		return createInternal(sgedev, fileContents.data(), filename, precompiledCacheFile, compileTimeOptions, uniformsToCacheInLUT,
 		              outIncludedFiles);
 	}
 

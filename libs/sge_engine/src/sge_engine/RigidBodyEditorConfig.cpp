@@ -2,6 +2,7 @@
 #include "Actor.h"
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/SGEImGui.h"
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/RigidBodyFromModel.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"

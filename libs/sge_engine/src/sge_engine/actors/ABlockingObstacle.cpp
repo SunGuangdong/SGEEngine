@@ -2,10 +2,10 @@
 
 #include "ABlockingObstacle.h"
 #include "sge_core/ICore.h"
-
+#include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
-
+#include "sge_engine/InspectorCmds.h"
 #include "sge_engine/windows/PropertyEditorWindow.h"
 
 namespace sge {
@@ -161,9 +161,9 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 
 	material = DefaultPBRMtlData();
 
-	//material.diffuseTextureX = m_textureX.getAssetTexture() ? m_textureX.getAssetTexture()->tex.GetPtr() : nullptr;
-	//material.diffuseTextureY = m_textureY.getAssetTexture() ? m_textureY.getAssetTexture()->tex.GetPtr() : nullptr;
-	//material.diffuseTextureZ = material.diffuseTextureX;
+	// material.diffuseTextureX = m_textureX.getAssetTexture() ? m_textureX.getAssetTexture()->tex.GetPtr() : nullptr;
+	// material.diffuseTextureY = m_textureY.getAssetTexture() ? m_textureY.getAssetTexture()->tex.GetPtr() : nullptr;
+	// material.diffuseTextureZ = material.diffuseTextureX;
 
 	material.diffuseTexXYZScaling = vec3f(1.f / m_textureXScale, 1.f / m_textureYScale, 1.f / m_textureXScale);
 }

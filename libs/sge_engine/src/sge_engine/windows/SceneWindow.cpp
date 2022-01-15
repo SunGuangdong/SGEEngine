@@ -7,10 +7,11 @@
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/GameInspector.h"
+#include "sge_engine/GameSerialization.h"
+#include "sge_engine/InspectorCmds.h"
 #include "sge_engine/ui/ImGuiDragDrop.h"
 #include "sge_utils/math/color.h"
 #include "sge_utils/utils/Wildcard.h"
-#include "sge_engine/GameSerialization.h"
 
 #include "SceneWindow.h"
 #include "sge_engine/EngineGlobal.h"
@@ -317,8 +318,6 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 		}
 
 		if (ImGui::MenuItem(ICON_FK_FILES_O " Copy")) {
-			
-
 			vector_set<ObjectId> objectsToDuplicate;
 			for (int t = 0; t < inspector->m_selection.size(); ++t) {
 				if (inspector->m_selection[t].editMode == editMode_actors) {

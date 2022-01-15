@@ -5,15 +5,14 @@
 #include "sge_utils/utils/hash_combine.h"
 #include "sge_utils/utils/vector_map.h"
 #include <cstring>
-#include <functional>
-#include <initializer_list>
 #include <map>
-#include <set>
 #include <string>
 #include <type_traits>
 #include <vector>
 
 namespace sge {
+
+struct MemberChain;
 
 struct TypeId {
 #if 0 // [SGE_AUTOMATIC_TYPE_ID_NON_COMPILER_CONSISTENT]
@@ -291,11 +290,9 @@ struct SGE_CORE_API TypeDesc {
 		sgeAssert(sgeTypeId(T) == typeId);
 
 		constructorFn = [](void* dest) { new ((T*)dest) T(); };
-
 		destructorFn = [](void* dest) { ((T*)dest)->~T(); };
 
 		newFn = []() -> void* { return new T(); };
-
 		deleteFn = [](void* ptr) -> void {
 			if (ptr) {
 				delete ((T*)ptr);
@@ -696,74 +693,6 @@ struct MemberFieldChainKnot {
 	int arrayIdx = -1;
 };
 
-/// MemberChain
-/// Is a way to refer to a remote member (member of a member of a member ...)
-/// in some memory. The structure belives you that the chain start from the correct type.
-struct SGE_CORE_API MemberChain {
-	MemberChain() = default;
-
-	MemberChain(std::initializer_list<MemberFieldChainKnot> l) {
-		for (const MemberFieldChainKnot& k : l) {
-			const bool success = add(k);
-			if (success == false) {
-				sgeAssert(false);
-				knots.clear();
-				break;
-			}
-		}
-	}
-
-	MemberChain(const MemberDesc* mfd, int arrayIdx = -1) {
-		knots.emplace_back(MemberFieldChainKnot(mfd, arrayIdx));
-	}
-
-	const TypeDesc* getType() const {
-		if (knots.size() == 0)
-			return nullptr;
-		const TypeDesc* const type = typeLib().find(knots.back().mfd->typeId);
-		if (type == nullptr)
-			return nullptr;
-
-		if (knots.back().arrayIdx != -1 && type->stdVectorUnderlayingType.isValid())
-			return typeLib().find(type->stdVectorUnderlayingType);
-
-		return type;
-	}
-
-	TypeId getTypeId() const {
-		const TypeDesc* type = getType();
-		if (type == nullptr) {
-			sgeAssert(false && "Is the chain broken? or is the reflection missing something?");
-			return TypeId();
-		}
-
-		return type->typeId;
-	}
-
-	bool add(const MemberDesc* mfd, int idx = -1) {
-		return add(MemberFieldChainKnot(mfd, idx));
-	}
-	bool add(const MemberFieldChainKnot& knot);
-
-	const MemberDesc* getMemberDescIfNotIndexing() const {
-		if (knots.size() == 0 || knots.back().arrayIdx >= 0)
-			return nullptr;
-
-		return knots.back().mfd;
-	}
-
-	void pop();
-	void clear();
-
-	void* follow(void* root) const;
-
-	void forEachMember(void* root, std::function<void(void* root, const MemberChain&)>& lambda);
-
-  public:
-	void forEachMemberInternal(void* root, MemberChain chain, std::function<void(void* root, const MemberChain&)>& lambda);
-
-	std::vector<MemberFieldChainKnot> knots;
-};
 
 ///-------------------------------------------------------------------------------------------
 /// A set of helper macros, used to create type definitions (TypeDesc).
