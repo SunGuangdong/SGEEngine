@@ -12,18 +12,16 @@
 
 namespace sge {
 
+/// A widget to be embedded when previweing a 3D model in an ImGui window.
 struct SGE_ENGINE_API ModelPreviewWidget {
 	orbit_camera camera;
 	GpuHandle<FrameTarget> m_frameTarget;
-
 	void doWidget(SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize = NullOptional());
 };
 
-
 struct ModelPreviewWindow : public IImGuiWindow {
-	ModelPreviewWindow(std::string windowName, bool createAsChild = false)
-	    : m_windowName(std::move(windowName))
-	    , m_createAsChild(createAsChild) {
+	ModelPreviewWindow(std::string windowName)
+	    : m_windowName(std::move(windowName)) {
 	}
 
 	bool isClosed() override {
@@ -35,7 +33,7 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	}
 
 	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
-	
+
 	AssetPtr& getModel() {
 		return m_model;
 	}
@@ -43,31 +41,35 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	void setPreviewModel(AssetPtr asset);
 
   private:
+	struct AnimationDisplayInfo {
+		std::string name;
+		float duration = 0.f;
+	};
+
 	std::string m_windowName;
-	bool m_createAsChild = false;
 	bool m_isOpened = true;
 
+	/// The asset being previwed.
 	AssetPtr m_model;
-	bool m_autoPlay = true;
-	GpuHandle<FrameTarget> m_frameTarget;
 
-	orbit_camera camera;
-
-	int iPreviewAnimDonor = -1;
-	int iPreviewAnimation = -1;
-	bool autoPlayAnimation = true;
-	float previewAimationTime = 0;
-	std::string animationComboPreviewValue = "<None>";
-	std::vector<AssetPtr> animationDonors;
-
+	/// The evaluated model state used for render.
 	EvaluatedModel m_eval;
+	// The animator that computes the nodes transforms for a perticualr animation.
 	ModelAnimator2 m_evalAnimator;
 
+	/// For preview puropuses each animation is added in a separate animation track.
+	/// If the user wants to add more tracks for another 3D model (as we can share animations)
+	/// this index should be used to identify the animations.
 	int nextTrackIndex = 0;
-	float animationTime = 0.f;
-	std::vector<std::string> trackDisplayName;
-	std::vector<float> trackAnimDuration;
-};
 
+	bool autoPlayAnimation = true;
+	float animationTime = 0.f;
+
+	std::vector<AnimationDisplayInfo> previewAnimationsInfo;
+
+	// The texture we are rendering to.
+	GpuHandle<FrameTarget> m_frameTarget;
+	orbit_camera camera;
+};
 
 } // namespace sge

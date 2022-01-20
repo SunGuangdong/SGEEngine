@@ -257,8 +257,8 @@ float4 psMain(StageVertexOut inVert)
 	} 
 	 
 	//finalColor.xyz = pow(finalColor.xyz, float3(1.f / 2.2f, 1.f / 2.2f, 1.f / 2.2f));
-	finalColor.xyz = finalColor.xyz / (finalColor.xyz + float3(1.f, 1.f, 1.f));
-	finalColor.xyz = linearToSRGB(finalColor.xyz);
+	//finalColor.xyz = finalColor.xyz / (finalColor.xyz + float3(1.f, 1.f, 1.f));
+	//finalColor.xyz = linearToSRGB(finalColor.xyz);
 
 	// Applt the alpha multiplier.
 	finalColor.w *= alphaMultiplier;

@@ -1,4 +1,5 @@
 #include "ModelPreviewWindow.h"
+#include "IconsForkAwesome/IconsForkAwesome.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/Camera.h"
 #include "sge_core/ICore.h"
@@ -9,6 +10,8 @@
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include <imgui/imgui.h>
+
+#include <functional>
 
 namespace sge {
 
@@ -24,6 +27,9 @@ static bool promptForModel(AssetPtr& asset) {
 	return false;
 }
 
+//--------------------------------------------------------------------------
+// ModelPreviewWidget
+//--------------------------------------------------------------------------
 void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize) {
 	if (m_frameTarget.IsResourceValid() == false) {
 		m_frameTarget = sgecon->getDevice()->requestResource<FrameTarget>();
@@ -87,14 +93,11 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 void ModelPreviewWindow::setPreviewModel(AssetPtr asset) {
 	m_model = asset;
 	m_eval = EvaluatedModel();
-	iPreviewAnimDonor = -1;
-	iPreviewAnimation = -1;
-	animationComboPreviewValue = "<None>";
-	animationDonors.clear();
-	previewAimationTime = 0.f;
 	autoPlayAnimation = true;
 	m_evalAnimator = ModelAnimator2();
+	previewAnimationsInfo.clear();
 	nextTrackIndex = 0;
+
 	if (isAssetLoaded(m_model, assetIface_model3d)) {
 		m_eval.initialize(&getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
 		m_evalAnimator.create(*m_eval.m_model);
@@ -103,8 +106,12 @@ void ModelPreviewWindow::setPreviewModel(AssetPtr asset) {
 		for (int iAnim = 0; iAnim < m_eval.m_model->numAnimations(); ++iAnim) {
 			m_evalAnimator.trackAddAmim(nextTrackIndex, nullptr, iAnim);
 
-			trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName);
-			trackAnimDuration.push_back(m_eval.m_model->animationAt(iAnim)->durationSec);
+			AnimationDisplayInfo animInfo;
+			animInfo.name = m_eval.m_model->animationAt(iAnim)->animationName;
+			animInfo.duration = m_eval.m_model->animationAt(iAnim)->durationSec;
+
+			previewAnimationsInfo.push_back(animInfo);
+
 			nextTrackIndex++;
 		}
 
@@ -115,6 +122,9 @@ void ModelPreviewWindow::setPreviewModel(AssetPtr asset) {
 	}
 }
 
+//--------------------------------------------------------------------------
+// ModelPreviewWindow
+//--------------------------------------------------------------------------
 void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is) {
 	if (isClosed()) {
 		return;
@@ -126,28 +136,39 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			m_frameTarget->create2D(64, 64);
 		}
 
-		if (ImGui::Button("Pick##ModelToPreview")) {
+		if (ImGui::Button(ICON_FK_FILE " Pick a Model File##ModelToPreview")) {
 			AssetPtr newModel;
 			promptForModel(newModel);
 			setPreviewModel(newModel);
 		}
 
+		ImGui::Columns(2);
+
 		if (isAssetLoaded(m_model)) {
-			if (ImGui::Button("Add Animation from other model")) {
+			if (ImGui::Button(ICON_FK_FILE_O " Add animation from another Model")) {
 				AssetPtr animSrcModel;
 				if (promptForModel(animSrcModel)) {
 					if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(animSrcModel)) {
 						Model& srcModel = modelIface->getModel3D();
 
+						// Add all animations each in a separate track.
 						for (int iAnim = 0; iAnim < srcModel.numAnimations(); ++iAnim) {
 							m_evalAnimator.trackAddAmim(nextTrackIndex, &srcModel, iAnim);
 
-							trackDisplayName.push_back(m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath());
-							trackAnimDuration.push_back(srcModel.animationAt(iAnim)->durationSec);
+							AnimationDisplayInfo animInfo;
+							animInfo.name = m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath();
+							animInfo.duration = srcModel.animationAt(iAnim)->durationSec;
+
+							previewAnimationsInfo.push_back(animInfo);
+
 							nextTrackIndex++;
 						}
 					}
 				}
+			}
+
+			if (ImGui::IsItemHovered()) {
+				ImGui::SetTooltip("You can apply animations for other models to this one, as long as they have identical node hierarchy.");
 			}
 		}
 
@@ -158,21 +179,27 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			ImGui::Text("Pick a Model");
 		}
 
-		ImGui::DragFloat("Time", &animationTime, 0.01f);
-
-		if (m_model.get() != NULL && m_evalAnimator.getNumTacks() > 0) {
+		if (m_model.get()) {
 			int playingTrackId = m_evalAnimator.getPlayingTrackId();
-			static std::string none = "None";
-			const std::string& previewName = playingTrackId >= 0 ? trackDisplayName[playingTrackId] : none;
 
-			if (ImGui::BeginCombo("Animation", previewName.c_str())) {
-				for (int t = 0; t < trackDisplayName.size(); ++t) {
-					if (ImGui::Selectable(trackDisplayName[t].c_str())) {
-						m_evalAnimator.playTrack(t);
+			if (m_evalAnimator.getNumTacks() > 0) {
+				static std::string none = "None";
+				const std::string& previewAnimName = playingTrackId >= 0 ? previewAnimationsInfo[playingTrackId].name : none;
+
+				ImGui::SliderFloat("Time", &animationTime, 0.f, previewAnimationsInfo[playingTrackId].duration);
+
+				/// Drop down for picking an animation track (we add one track per animation).
+				if (ImGui::BeginCombo(ICON_FK_FILM " Animation", previewAnimName.c_str())) {
+					for (int t = 0; t < previewAnimationsInfo.size(); ++t) {
+						if (ImGui::Selectable(previewAnimationsInfo[t].name.c_str())) {
+							m_evalAnimator.playTrack(t);
+						}
 					}
-				}
 
-				ImGui::EndCombo();
+					ImGui::EndCombo();
+				}
+			} else {
+				ImGui::Text("No animation found.");
 			}
 
 			m_evalAnimator.forceTrack(m_evalAnimator.getPlayingTrackId(), animationTime);
@@ -233,6 +260,96 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			draw_list->AddRect(canvas_pos, canvasMax, ImColor(255, 255, 255));
 		}
 	}
+
+	ImGui::NextColumn();
+
+	ImGui::Text("info");
+
+	// Do the information side bar.
+	AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(m_model);
+	Model& model = modelIface->getModel3D();
+	{
+		ImGui::Text(ICON_FK_FILM " Animation Count: %d", model.numAnimations());
+		ImGui::Text(ICON_FK_CUBES " Node Count: %d", model.numNodes());
+		ImGui::Text(ICON_FK_CUBE " Mesh Count: %d", model.numMeshes());
+		ImGui::Text(ICON_FK_PICTURE_O " Material Count: %d", model.numMaterials());
+
+		if (ImGui::CollapsingHeader(ICON_FK_FILM " Animations", ImGuiTreeNodeFlags_DefaultOpen)) {
+			for (int iAnim = 0; iAnim < model.numAnimations(); ++iAnim) {
+				ImGui::Text("\t%s duration=%f", model.animationAt(iAnim)->animationName.c_str(), model.animationAt(iAnim)->durationSec);
+			}
+		}
+
+		if (ImGui::CollapsingHeader(ICON_FK_CUBES " Nodes")) {
+			std::function<void(int)> recusiveDoNodeInfo = [&](int nodeIndex) {
+				const ModelNode* node = model.nodeAt(nodeIndex);
+
+				ImGuiTreeNodeFlags treeNodeFlags =
+				    ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
+
+				if (node->childNodes.size() == 0) {
+					treeNodeFlags |= ImGuiTreeNodeFlags_Leaf;
+				}
+
+				bool isTreeNodeOpen = ImGui::TreeNodeEx(node->name.c_str(), treeNodeFlags);
+
+				if (isTreeNodeOpen) {
+					bool hasAnythingBelow = false;
+					for (int childNodeIndex : node->childNodes) {
+						recusiveDoNodeInfo(childNodeIndex);
+
+						hasAnythingBelow = true;
+					}
+
+					for (const MeshAttachment& attachment : node->meshAttachments) {
+						const int meshIndex = attachment.attachedMeshIndex;
+						const int mtlIndex = attachment.attachedMeshIndex;
+						const ModelMesh* mesh = model.meshAt(meshIndex);
+						const ModelMaterial* mtl = model.materialAt(mtlIndex);
+						ImGui::Text("Attached Mesh [index=%d] %s", meshIndex, mesh->name.c_str());
+						ImGui::Text("Attached Material [index=%d] %s", meshIndex, mtl->name.c_str());
+						
+
+						hasAnythingBelow = true;
+					}
+
+					ImGui::TreePop();
+				}
+			};
+
+			recusiveDoNodeInfo(model.getRootNodeIndex());
+		}
+
+		if (ImGui::CollapsingHeader(ICON_FK_CUBES " Meshes")) {
+			for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
+				const ModelMesh* mesh = model.meshAt(iMesh);
+
+				ImGui::Text("Mesh [index=%d] %s", iMesh, mesh->name.c_str());
+				ImGui::Text("\tNum Vertices: %d", mesh->numVertices);
+				ImGui::Text("\tNum Element(indices): %d", mesh->numElements);
+				ImGui::Text("\tNum Vertex Stride: %d", mesh->stride);
+
+				ImGui::Text("\tVertex Declaration (with index %d): ", mesh->vertexDeclIndex);
+				for (const VertexDecl& vertexDecl : mesh->vertexDecl) {
+					ImGui::NewLine();
+					ImGui::Text("\t\tName: %s", vertexDecl.semantic.c_str());
+					ImGui::Text("\t\tBuffer Slot: %d", (int)vertexDecl.bufferSlot);
+					ImGui::Text("\t\tBuffer format: %d", (int)vertexDecl.format);
+					ImGui::Text("\t\tByte Offset: %d", (int)vertexDecl.byteOffset);
+				}
+				ImGui::NewLine();
+			}
+		}
+
+		if (ImGui::CollapsingHeader(ICON_FK_PICTURE_O " Materials")) {
+			for (int iMtl = 0; iMtl < model.numMaterials(); ++iMtl) {
+				ModelMaterial* mtl = model.materialAt(iMtl);
+				ImGui::Text("Material [index=%d] %s", iMtl, mtl->name.c_str());
+				ImGui::Text("\tAsset for Material: %s", mtl->assetForThisMaterial.c_str());
+			}
+		}
+	}
+
 	ImGui::End();
 }
 

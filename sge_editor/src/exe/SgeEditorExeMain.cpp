@@ -103,7 +103,7 @@ struct SGEGameWindow : public WindowBase {
 				getEngineGlobal()->addWindow(wnd);
 			}
 
-			wnd->openAssetImport(filedropData.filename);
+			wnd->openAssetImportPopUp_importFile(filedropData.filename);
 		}
 	}
 

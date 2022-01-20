@@ -30,9 +30,9 @@ struct EvaluatedMesh {
 
 /// Usually when we render a model, we do not care about the hierarchy
 /// we just wanna draw the meshes in it at correct locations.
-/// This class represents a single mesh instance and its location
+/// This struct represents a single mesh instance in a model and its location
 /// so we could just draw it with any nodes traversal.
-struct EvaluatedGeomInstance {
+struct EvaluatedMeshInstance {
 	/// An assembled set of geometry ready for rendering.
 	Geometry geometry;
 
@@ -62,6 +62,7 @@ struct SGE_CORE_API EvaluatedModel {
 	bool evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount);
 
 	/// Evaluates the model with no animation applied.
+	/// If you want an animation to play use @ModelAnimator2.
 	void evaluateStatic();
 
 	int getNumEvalMeshes() const {
@@ -93,8 +94,8 @@ struct SGE_CORE_API EvaluatedModel {
 		return -1;
 	}
 
-	const std::vector<EvaluatedGeomInstance>& getEvalGeoms() const {
-		return m_allEvalGeometries;
+	const std::vector<EvaluatedMeshInstance>& getEvalMeshInstances() const {
+		return m_evalAllMeshInstances;
 	}
 
   private:
@@ -103,6 +104,7 @@ struct SGE_CORE_API EvaluatedModel {
 	bool evaluate_getAllGeometries();
 
   public:
+	/// The model being animated.
 	Model* m_model = nullptr;
 
 	/// Stores the state of each node, the index in this array corresponts to the index of the node in the @Model::m_nodes array.
@@ -123,7 +125,8 @@ struct SGE_CORE_API EvaluatedModel {
 	/// -1 if there are no bones for that mesh.
 	std::vector<int> m_perMeshSkinningBonesTransformOFfsetInTex;
 
-	std::vector<EvaluatedGeomInstance> m_allEvalGeometries;
+	/// A list of all instances and their transforms to be rendered.
+	std::vector<EvaluatedMeshInstance> m_evalAllMeshInstances;
 
 	AABox3f aabox;
 

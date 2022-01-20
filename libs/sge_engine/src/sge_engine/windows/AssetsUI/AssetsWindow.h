@@ -48,9 +48,15 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 		return m_windowName.c_str();
 	}
 
-	void openAssetImport(const std::string& filename);
+	//
+	void openAssetImportPopUp();
+	void openAssetImportPopUp_importFile(const std::string& fileNameToImport);
+	void openAssetImportPopUp_importOverFile(const std::string& importOverFilename);
 
   private:
+
+	void doImportPopUp();
+
 	/// @brief Imports the specified asset with the specified settings.
 	bool importAsset(AssetImportData& aid);
 
@@ -58,10 +64,29 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	void doPreviewAssetTexture2D(AssetIface_Texture2D* texIface);
 	void doPreviewAssetMaterial(AssetIface_Material* texIface);
 
+	/// Returns the current path that is being explored in the editor.
+	std::filesystem::path getCurrentExplorePath() const;
 
   private:
+
+	/// True if the Import Asset pop up should appear.
 	bool shouldOpenImportPopup = false;
-	std::string openAssetImport_filename;
+
+	struct AssetImportPopupInitState {
+		/// If specified, when 1st opened, this will be the default filename
+		/// that will be shown as a file being imported.
+		/// Otherwise the textfield will be empty.
+		std::string initialFilePathToImport;
+
+		/// May be empty. if specified the, imported filename will be this one.
+		std::string forcedImportedFilename;
+	};
+
+	/// When opening the Asset Import popup sometimes we want to specify some
+	/// inital state to it.
+	/// Maybe the user has drag-dropped a file over the window and wants to import it
+	/// Maybe the user wants to override an existing asset.
+	AssetImportPopupInitState importPopUpInitState;
 
 	bool m_isOpened = true;
 	std::string m_windowName;

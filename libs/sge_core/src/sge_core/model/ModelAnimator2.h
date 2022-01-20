@@ -57,12 +57,12 @@ struct SGE_CORE_API ModelAnimator2 {
 
 	/// @param [out] outNodeTransforms a pre-allocated array holding a trasnform for each node.
 	/// The size could be obtained by @getNumNodes.
-	void computeModleNodesTrasnforms(mat4f* outNodeTransforms);
+	void computeModleNodesTrasnforms(mat4f* outNodeTransforms, int outNodeTransformsSize);
 
 	/// @param [out] outNodeTransforms will be automatically resized to hold a transform for each node.
 	void computeModleNodesTrasnforms(std::vector<mat4f>& outNodeTransforms) {
 		outNodeTransforms.resize(getNumNodes());
-		computeModleNodesTrasnforms(outNodeTransforms.data());
+		computeModleNodesTrasnforms(outNodeTransforms.data(), (int)outNodeTransforms.size());
 	}
 
 	int getNumNodes() const;

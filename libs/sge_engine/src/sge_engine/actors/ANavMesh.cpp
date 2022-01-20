@@ -136,6 +136,30 @@ bool ANavMesh::findPath(std::vector<vec3f>& outPath,
 	return false;
 }
 
+vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end) {
+	if (m_detourNavMeshQuery.object == nullptr || m_detourNavMeshQuery->getNodePool() == nullptr) {
+		// The navmesh isn't initialzied yet or no navmesh was generated for the input geometry.
+		return start;
+	}
+
+	vec3f searchBox = vec3f(10.f);
+	vec3f nearestPoint;
+	dtQueryFilter queryPolyFilter;
+	dtPolyRef nearestPolyRef;
+	if (!dtStatusSucceed(
+	        m_detourNavMeshQuery->findNearestPoly(start.data, searchBox.data, &queryPolyFilter, &nearestPolyRef, nearestPoint.data))) {
+		return start;
+	}
+
+	vec3f result;
+	if (dtStatusSucceed(m_detourNavMeshQuery->moveAlongSurface(nearestPolyRef, start.data, end.data, &queryPolyFilter, result.data, nullptr,
+	                                                           nullptr, 0))) {
+		return result;
+	}
+
+	return start;
+}
+
 
 void ANavMesh::update(const GameUpdateSets& UNUSED(updateSets)) {
 }

@@ -237,7 +237,7 @@ void KeyFrames::evaluate(transf3d& result, const float t) const {
 		}
 	}
 
-	// Evaluate the translation.
+	// Evaluate the rotation.
 	if (rotationKeyFrames.empty() == false) {
 		const auto& keyItr = rotationKeyFrames.upper_bound(t);
 		if (keyItr == rotationKeyFrames.end()) {
@@ -253,7 +253,7 @@ void KeyFrames::evaluate(transf3d& result, const float t) const {
 				const float dt = t1 - t0;
 
 				if (dt > 1e-6f) {
-					result.r = lerp(prevKeyItr->second, keyItr->second, (t - t0) / dt);
+					result.r = slerp(prevKeyItr->second, keyItr->second, (t - t0) / dt);
 				} else {
 					result.r = keyItr->second;
 				}

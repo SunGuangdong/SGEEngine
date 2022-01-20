@@ -261,18 +261,7 @@ struct BlendState : public RAIResource {
 //
 //-----------------------------------------------------------------------
 struct SGEDevice {
-	struct StaticCaps {
-		// True if UV coords origin of the currently selected rendering API is at the bottom left (example is OpenGL).
-		bool uvBottomLeft;
-
-		// True if the native NDC depth varies form -1 to 1.
-		bool depthHomo;
-	};
-
 	static SGEDevice* create(const MainFrameTargetDesc& frameTargetDesc);
-
-	// Returns statically determinated capabilites of the currently selected redering API.
-	static const StaticCaps& staticCaps();
 
 	// Returns the immediate context attached to this device.
 	virtual SGEContext* getContext() = 0;

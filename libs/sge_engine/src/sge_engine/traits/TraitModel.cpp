@@ -139,21 +139,21 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRende
 		}
 
 		if (evalModel) {
-			for (const EvaluatedGeomInstance& geomInst : evalModel->getEvalGeoms()) {
+			for (const EvaluatedMeshInstance& meshInst : evalModel->getEvalMeshInstances()) {
 				IMaterial* mtl = nullptr;
 
 				// Check if there is a material override specified.
-				if (geomInst.iMaterial < modelSets.mtlOverrides.size()) {
-					if (modelSets.mtlOverrides[geomInst.iMaterial]) {
-						if (modelSets.mtlOverrides[geomInst.iMaterial]) {
-							mtl = modelSets.mtlOverrides[geomInst.iMaterial]->getMaterial().get();
+				if (meshInst.iMaterial < modelSets.mtlOverrides.size()) {
+					if (modelSets.mtlOverrides[meshInst.iMaterial]) {
+						if (modelSets.mtlOverrides[meshInst.iMaterial]) {
+							mtl = modelSets.mtlOverrides[meshInst.iMaterial]->getMaterial().get();
 						}
 					}
 				}
 
 				// If there isn't material override use the default one in the model.
 				if (mtl == nullptr) {
-					mtl = evalModel->m_model->loadedMaterialAt(geomInst.iMaterial);
+					mtl = evalModel->m_model->loadedMaterialAt(meshInst.iMaterial);
 				}
 
 				if (mtl) {
@@ -161,12 +161,12 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRende
 
 					if (imtlData) {
 						GeometryRenderItem ri;
-						ri.geometry = &geomInst.geometry;
+						ri.geometry = &meshInst.geometry;
 						ri.pMtlData = imtlData;
-						ri.worldTransform = actor2world * modelSets.m_additionalTransform * geomInst.modelSpaceTransform;
-						ri.bboxWs = geomInst.modelSpaceBBox.getTransformed(ri.worldTransform);
+						ri.worldTransform = actor2world * modelSets.m_additionalTransform * meshInst.modelSpaceTransform;
+						ri.bboxWs = meshInst.modelSpaceBBox.getTransformed(ri.worldTransform);
 
-						ri.zSortingPositionWs = mat_mul_pos(ri.worldTransform, geomInst.modelSpaceBBox.center());
+						ri.zSortingPositionWs = mat_mul_pos(ri.worldTransform, meshInst.modelSpaceBBox.center());
 						ri.needsAlphaSorting = imtlData->needsAlphaSorting;
 
 						renderItems.push_back(ri);

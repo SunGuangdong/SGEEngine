@@ -77,9 +77,6 @@ JsonValue* SimpleTriplanarMtl::toJson(JsonValueBuffer& jvb, const char* localDir
 	jMaterial->setMember("forceNoLighting", jvb(forceNoLighting));
 	jMaterial->setMember("ignoreTranslation", jvb(ignoreTranslation));
 
-	static_assert(sizeof(diffuseColor) == sizeof(vec4f));
-	jMaterial->setMember("diffuseColor", jvb(diffuseColor.data, 4)); // An array of 4 floats rgba.
-
 
 	auto setMemberFromTexIface = [&jvb, &jMaterial, &localDir](const char* memberName,
 	                                                           std::shared_ptr<AssetIface_Texture2D>& texIface) -> void {
@@ -95,6 +92,15 @@ JsonValue* SimpleTriplanarMtl::toJson(JsonValueBuffer& jvb, const char* localDir
 	setMemberFromTexIface("texDiffuseX", texDiffuseX);
 	setMemberFromTexIface("texDiffuseY", texDiffuseY);
 	setMemberFromTexIface("texDiffuseZ", texDiffuseZ);
+
+	static_assert(sizeof(diffuseColor) == sizeof(vec4f));
+	static_assert(sizeof(uvwShift) == sizeof(vec3f));
+	static_assert(sizeof(uvwScale) == sizeof(vec3f));
+
+	jMaterial->setMember("diffuseColor", jvb(diffuseColor.data, 4)); // An array of 4 floats rgba.
+	jMaterial->setMember("sharpness", jvb(sharpness));
+	jMaterial->setMember("uvwShift", jvb(uvwShift.data, 3)); // An array of 3 floats rgba.
+	jMaterial->setMember("uvwScale", jvb(uvwScale.data, 3)); // An array of 3 floats rgba.
 
 	return jMaterial;
 }
@@ -118,8 +124,6 @@ bool SimpleTriplanarMtl::fromJson(const JsonValue* jMaterial, const char* localD
 		sharpness = jVal->getNumberAs<float>();
 	}
 
-	jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(diffuseColor.data, 4);
-
 	if (const JsonValue* jTex = jMaterial->getMember("texDiffuseX")) {
 		texDiffuseX =
 		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
@@ -136,6 +140,26 @@ bool SimpleTriplanarMtl::fromJson(const JsonValue* jMaterial, const char* localD
 		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
+
+	if (const JsonValue* j = jMaterial->getMember("diffuseColor")) {
+		j->getNumberArrayAs<float>(diffuseColor.data, 4);
+	}
+
+	if (const JsonValue* j = jMaterial->getMember("sharpness")) {
+		sharpness = j->getNumberAs<float>();
+	}
+
+	if (const JsonValue* j = jMaterial->getMember("diffuseColor")) {
+		j->getNumberArrayAs<float>(diffuseColor.data, 4);
+	}
+
+	if (const JsonValue* j = jMaterial->getMember("uvwShift")) {
+		j->getNumberArrayAs<float>(uvwShift.data, 3);
+	}
+
+	if (const JsonValue* j = jMaterial->getMember("uvwScale")) {
+		j->getNumberArrayAs<float>(uvwScale.data, 3);
+	}
 
 	return true;
 }

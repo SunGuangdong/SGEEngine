@@ -7,7 +7,6 @@
 
 namespace sge {
 
-
 void ModelAnimator2::create(Model& modelToBeAnimated) {
 	*this = ModelAnimator2();
 	this->m_modelToAnimate = &modelToBeAnimated;
@@ -69,8 +68,6 @@ void ModelAnimator2::trackAddAmimPath(int trackId, const char* modelAssetPath, c
 	}
 }
 
-
-
 void ModelAnimator2::createNodeToNodeRemapForModel(Model& srcModel) {
 	if (m_perModel_srcNode_toNode.count(&srcModel) > 0) {
 		return;
@@ -125,14 +122,16 @@ void ModelAnimator2::playTrack(int trackIdToPlay) {
 void ModelAnimator2::forceTrack(int trackIdToPlay, float animTime) {
 	m_playbacks.clear();
 
-	TrackPlayback playback;
-	playback.trackId = trackIdToPlay;
-	playback.timeInAnimation = animTime;
-	playback.trackAnimationIndex = 0;
-	playback.mixingWeight = 1.f;
-	playback.normWeight = 1.f;
+	if (m_tracks.count(trackIdToPlay)) {
+		TrackPlayback playback;
+		playback.trackId = trackIdToPlay;
+		playback.timeInAnimation = animTime;
+		playback.trackAnimationIndex = 0; // TODO: randomize this.
+		playback.mixingWeight = 1.f;
+		playback.normWeight = 1.f;
 
-	m_playbacks.emplace_back(playback);
+		m_playbacks.emplace_back(playback);
+	}
 }
 
 void ModelAnimator2::advanceAnimation(const float dt) {
@@ -255,13 +254,32 @@ int ModelAnimator2::getNumNodes() const {
 	return m_modelToAnimate ? m_modelToAnimate->numNodes() : 0;
 }
 
-void ModelAnimator2::computeModleNodesTrasnforms(mat4f* outNodeTransforms) {
-	// if (outNodeTransforms.size() < m_modelToAnimate->numNodes()) {
-	//	sgeAssertFalse("The outNodeTransforms is not big enough!");
-	//	return;
-	//}
+void ModelAnimator2::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int outNodeTransformsSize) {
+	if (outNodeTransformsSize < m_modelToAnimate->numNodes()) {
+		sgeAssertFalse("The outNodeTransformsSize is not big enough!");
+		return;
+	}
 
-	bool isSingleTrackPlaying = m_playbacks.size() == 1;
+	// If no tracks are playing then just use the static state.
+	if (m_playbacks.size() == 0) {
+		std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode, const mat4f& parentGlobalTform) -> void {
+			ModelNode* rawNode = m_modelToAnimate->nodeAt(iNode);
+			mat4f ownGlobalTransform = parentGlobalTform * rawNode->staticLocalTransform.toMatrix();
+
+			outNodeTransforms[iNode] = ownGlobalTransform;
+
+			for (int childIndex : rawNode->childNodes) {
+				evalGlobalTransform(childIndex, ownGlobalTransform);
+			}
+		};
+
+		const int iRoot = m_modelToAnimate->getRootNodeIndex();
+		evalGlobalTransform(iRoot, mat4f::getIdentity());
+
+		return;
+	}
+
+	const bool isSingleTrackPlaying = m_playbacks.size() == 1;
 
 	if (!isSingleTrackPlaying) {
 		for (int t = 0; t < getNumNodes(); ++t) {

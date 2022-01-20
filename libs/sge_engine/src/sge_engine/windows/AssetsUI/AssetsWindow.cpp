@@ -78,9 +78,24 @@ AssetsWindow::AssetsWindow(std::string windowName)
 	}
 }
 
-void AssetsWindow::openAssetImport(const std::string& filename) {
+void AssetsWindow::openAssetImportPopUp() {
 	shouldOpenImportPopup = true;
-	openAssetImport_filename = filename;
+
+	importPopUpInitState = AssetImportPopupInitState();
+}
+
+void AssetsWindow::openAssetImportPopUp_importFile(const std::string& filename) {
+	shouldOpenImportPopup = true;
+
+	importPopUpInitState = AssetImportPopupInitState();
+	importPopUpInitState.initialFilePathToImport = filename;
+}
+
+void AssetsWindow::openAssetImportPopUp_importOverFile(const std::string& importOverFilename) {
+	shouldOpenImportPopup = true;
+
+	importPopUpInitState = AssetImportPopupInitState();
+	importPopUpInitState.forcedImportedFilename = importOverFilename;
 }
 
 bool AssetsWindow::importAsset(AssetImportData& aid) {
@@ -333,6 +348,8 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 	AssetLibrary* const assetLib = getCore()->getAssetLib();
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened)) {
+		doImportPopUp();
+
 		namespace fs = std::filesystem;
 
 		if (ImGui::Button(ICON_FK_BACKWARD)) {
@@ -443,11 +460,13 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 						if (assetType != assetIface_unknown) {
 							bool showAsSelected = isAssetLoaded(explorePreviewAsset) && explorePreviewAsset->getPath() == localAssetPath;
 
+#if 1
 							Texture* thumbnailTex = getThumbnailForAsset(localAssetPath);
 							if (thumbnailTex) {
 								ImGui::Image(thumbnailTex, ImVec2(64.f, 64.f));
 								ImGui::SameLine();
 							}
+#endif
 
 							if (ImGui::Selectable(label.c_str(), &showAsSelected)) {
 								explorePreviewAssetChanged = true;
@@ -486,8 +505,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 				fs::path importOverAsset;
 				if (ImGui::BeginPopup("RightClickMenuAssets")) {
 					if (ImGui::MenuItem(ICON_FK_DOWNLOAD " Import here...")) {
-						shouldOpenImportPopup = true;
-						openAssetImport_filename.clear();
+						openAssetImportPopUp();
 					}
 
 					if (ImGui::MenuItem(ICON_FK_FOLDER " New Folder")) {
@@ -511,9 +529,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 						}
 
 						if (ImGui::MenuItem(ICON_FK_REFRESH " Import Over")) {
-							importOverAsset = m_rightClickedPath;
-							shouldOpenImportPopup = true;
-							openAssetImport_filename.clear();
+							openAssetImportPopUp_importOverFile(m_rightClickedPath.string());
 						}
 
 						if (assetIface_guessFromExtension(extractFileExtension(m_rightClickedPath.string().c_str()).c_str(), false) ==
@@ -537,147 +553,6 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 							}
 						}
 #endif
-					}
-
-					ImGui::EndPopup();
-				}
-
-				// Import Popup
-				if (shouldOpenImportPopup) {
-					ImGui::OpenPopup("SGE Assets Window Import Popup");
-				}
-
-				if (ImGui::BeginPopup("SGE Assets Window Import Popup")) {
-					if (shouldOpenImportPopup) {
-						shouldOpenImportPopup = false;
-						// If this is still true then the popup has just been opened.
-						// Initialize it with the information about the asset we are about to import.
-						m_importAssetToImportInPopup = AssetImportData();
-
-						// If openAssetImport_filename is specified then we must use it, it means that the popup was somehow forced
-						// externally like a drag-and-drop.
-						if (openAssetImport_filename.empty()) {
-							m_importAssetToImportInPopup.fileToImportPath =
-							    FileOpenDialog("Pick a file to import", true, "*.*\0*.*\0", nullptr);
-						} else {
-							m_importAssetToImportInPopup.fileToImportPath = openAssetImport_filename;
-							openAssetImport_filename.clear();
-						}
-
-						// If the user clicked over an assed and clicked import over, use the name of already imported asset,
-						// otherwise create a new name based on the input name.
-						m_importAssetToImportInPopup.outputDir = pathToAssets.string();
-						if (importOverAsset.empty()) {
-							m_importAssetToImportInPopup.outputFilename =
-							    extractFileNameWithExt(m_importAssetToImportInPopup.fileToImportPath.c_str());
-						} else {
-							m_importAssetToImportInPopup.outputFilename = importOverAsset.filename().string();
-							importOverAsset.clear();
-						}
-
-						// Guess the type of the inpute asset.
-						const std::string inputExtension = extractFileExtension(m_importAssetToImportInPopup.fileToImportPath.c_str());
-						m_importAssetToImportInPopup.assetType = assetIface_guessFromExtension(inputExtension.c_str(), true);
-
-						// If the asset type is None, maybe the asset has a commonly used extension
-						// like Aseprite json sprite sheet descriptors, or they might be just generic
-						// files that the user wants to copy. Try to guess the type of this generic file
-						// for convinice of the user.
-						if (m_importAssetToImportInPopup.assetType == assetIface_unknown) {
-							if (inputExtension == "json") {
-								SpriteAnimation tempSpriteAnimation;
-								if (SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(
-								        tempSpriteAnimation, m_importAssetToImportInPopup.fileToImportPath.c_str())) {
-									m_importAssetToImportInPopup.assetType = assetIface_spriteAnim;
-								}
-							}
-						}
-
-						// Change the extension of the imported file based on the asset type.
-						if (m_importAssetToImportInPopup.assetType == assetIface_model3d) {
-							m_importAssetToImportInPopup.outputFilename =
-							    replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "mdl");
-						}
-
-						if (m_importAssetToImportInPopup.assetType == assetIface_spriteAnim) {
-							m_importAssetToImportInPopup.outputFilename =
-							    replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "sprite");
-						}
-
-						if (m_importAssetToImportInPopup.fileToImportPath.empty()) {
-							ImGui::CloseCurrentPopup();
-						}
-					}
-
-					// The UI of the pop-up itself:
-					if (m_importAssetToImportInPopup.assetType == assetIface_model3d) {
-						ImGui::Text(ICON_FK_CUBE " 3D Model");
-						ImGui::Checkbox(ICON_FK_CUBES " Import As Multiple Models",
-						                &m_importAssetToImportInPopup.importModelsAsMultipleFiles);
-						ImGuiEx::TextTooltip(
-						    "When multiple game objects are defined in one 3D model file. You can import them as a separate 3D "
-						    "models using this option!");
-					} else if (m_importAssetToImportInPopup.assetType == assetIface_texture2d) {
-						ImGui::Text(ICON_FK_PICTURE_O " Texture");
-					} else if (m_importAssetToImportInPopup.assetType == assetIface_text) {
-						ImGui::Text(ICON_FK_FILE " Text");
-					} else if (m_importAssetToImportInPopup.assetType == assetIface_spriteAnim) {
-						ImGui::Text(ICON_FK_FILM " Sprite");
-					} else if (m_importAssetToImportInPopup.assetType == assetIface_mtl) {
-						ImGui::Text(ICON_FK_FLASK " Material");
-					} else {
-						ImGui::Text(ICON_FK_FILE_TEXT_O " Unknown, the file is going to be copyied!");
-						ImGui::Text("If you know the type of the asset you can override it below.");
-
-						const char* assetTypeNames[int(assetIface_count)] = {nullptr};
-						assetTypeNames[int(assetIface_unknown)] = ICON_FK_FILE_TEXT_O " Unknown";
-						assetTypeNames[int(assetIface_model3d)] = ICON_FK_CUBE " 3D Model";
-						assetTypeNames[int(assetIface_texture2d)] = ICON_FK_PICTURE_O " Texture";
-						assetTypeNames[int(assetIface_text)] = ICON_FK_FILE " Text";
-						assetTypeNames[int(assetIface_spriteAnim)] = ICON_FK_FILM " Sprite";
-						assetTypeNames[int(assetIface_mtl)] = ICON_FK_FLASK " Material";
-
-						ImGuiEx::Label("Import As:");
-						if (ImGui::BeginCombo("##Import As: ", assetTypeNames[int(m_importAssetToImportInPopup.assetType)])) {
-							for (int t = 0; t < SGE_ARRSZ(assetTypeNames); ++t) {
-								if (assetTypeNames[t] != nullptr) {
-									if (ImGui::Selectable(assetTypeNames[t])) {
-										m_importAssetToImportInPopup.assetType = AssetIfaceType(t);
-										if (t == int(assetIface_model3d)) {
-											m_importAssetToImportInPopup.outputFilename =
-											    replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "mdl");
-										}
-										if (t == int(assetIface_spriteAnim)) {
-											m_importAssetToImportInPopup.outputFilename =
-											    replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "sprite");
-										}
-									}
-								}
-							}
-
-							ImGui::EndCombo();
-						}
-					}
-
-					ImGuiEx::InputText("Read From", m_importAssetToImportInPopup.fileToImportPath, ImGuiInputTextFlags_ReadOnly);
-
-					if (m_importAssetToImportInPopup.importModelsAsMultipleFiles == false) {
-						ImGuiEx::InputText("Import As", m_importAssetToImportInPopup.outputFilename);
-					}
-
-					// Show a warning that the import will fail if mdlconvlib is not loaded.
-					if (m_sgeImportFBXFile == nullptr && m_importAssetToImportInPopup.assetType == assetIface_model3d) {
-						ImGui::TextColored(ImVec4(1.f, 1.f, 0.f, 1.f), "Importing 3D files cannot be done! mdlconvlib is missing!");
-					}
-
-
-					if (ImGui::Button(ICON_FK_DOWNLOAD " Import")) {
-						importAsset(m_importAssetToImportInPopup);
-						ImGui::CloseCurrentPopup();
-					}
-					ImGui::SameLine();
-					if (ImGui::Button(ICON_FK_DOWNLOAD " Cancel")) {
-						ImGui::CloseCurrentPopup();
 					}
 
 					ImGui::EndPopup();
@@ -807,6 +682,148 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 	ImGui::End();
 }
 
+void AssetsWindow::doImportPopUp() {
+	if (shouldOpenImportPopup) {
+		ImGui::OpenPopup("SGE Assets Window Import Popup");
+	}
+
+	if (ImGui::BeginPopup("SGE Assets Window Import Popup")) {
+		if (shouldOpenImportPopup) {
+			shouldOpenImportPopup = false;
+			// If this is still true then the popup has just been opened.
+			// Initialize it with the information about the asset we are about to import.
+			m_importAssetToImportInPopup = AssetImportData();
+
+			// If openAssetImport_filename is specified then we must use it, it means that the popup was somehow forced
+			// externally like a drag-and-drop.
+			if (importPopUpInitState.forcedImportedFilename.empty()) {
+				m_importAssetToImportInPopup.fileToImportPath = FileOpenDialog("Pick a file to import", true, "*.*\0*.*\0", nullptr);
+			} else {
+				m_importAssetToImportInPopup.fileToImportPath = importPopUpInitState.forcedImportedFilename;
+
+				// Clear it so we not reset the UI on the next update.
+				importPopUpInitState.forcedImportedFilename.clear();
+			}
+
+			// If the user clicked over an assed and clicked import over, use the name of already imported asset,
+			// otherwise create a new name based on the input name.
+			m_importAssetToImportInPopup.outputDir = getCurrentExplorePath().string();
+			if (importPopUpInitState.forcedImportedFilename.empty()) {
+				m_importAssetToImportInPopup.outputFilename = extractFileNameWithExt(m_importAssetToImportInPopup.fileToImportPath.c_str());
+			} else {
+				m_importAssetToImportInPopup.outputFilename = importPopUpInitState.forcedImportedFilename;
+
+				// Clear it so we not reset the UI on the next update.
+				importPopUpInitState.forcedImportedFilename.clear();
+			}
+
+			// Guess the type of the inpute asset.
+			const std::string inputExtension = extractFileExtension(m_importAssetToImportInPopup.fileToImportPath.c_str());
+			m_importAssetToImportInPopup.assetType = assetIface_guessFromExtension(inputExtension.c_str(), true);
+
+			// If the asset type is None, maybe the asset has a commonly used extension
+			// like Aseprite json sprite sheet descriptors, or they might be just generic
+			// files that the user wants to copy. Try to guess the type of this generic file
+			// for convinice of the user.
+			if (m_importAssetToImportInPopup.assetType == assetIface_unknown) {
+				if (inputExtension == "json") {
+					SpriteAnimation tempSpriteAnimation;
+					if (SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(tempSpriteAnimation,
+					                                                           m_importAssetToImportInPopup.fileToImportPath.c_str())) {
+						m_importAssetToImportInPopup.assetType = assetIface_spriteAnim;
+					}
+				}
+			}
+
+			// Change the extension of the imported file based on the asset type.
+			if (m_importAssetToImportInPopup.assetType == assetIface_model3d) {
+				m_importAssetToImportInPopup.outputFilename = replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "mdl");
+			}
+
+			if (m_importAssetToImportInPopup.assetType == assetIface_spriteAnim) {
+				m_importAssetToImportInPopup.outputFilename =
+				    replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "sprite");
+			}
+
+			if (m_importAssetToImportInPopup.fileToImportPath.empty()) {
+				ImGui::CloseCurrentPopup();
+			}
+		}
+
+		// The UI of the pop-up itself:
+		if (m_importAssetToImportInPopup.assetType == assetIface_model3d) {
+			ImGui::Text(ICON_FK_CUBE " 3D Model");
+			ImGui::Checkbox(ICON_FK_CUBES " Import As Multiple Models", &m_importAssetToImportInPopup.importModelsAsMultipleFiles);
+			ImGuiEx::TextTooltip(
+			    "When multiple game objects are defined in one 3D model file. You can import them as a separate 3D "
+			    "models using this option!");
+		} else if (m_importAssetToImportInPopup.assetType == assetIface_texture2d) {
+			ImGui::Text(ICON_FK_PICTURE_O " Texture");
+		} else if (m_importAssetToImportInPopup.assetType == assetIface_text) {
+			ImGui::Text(ICON_FK_FILE " Text");
+		} else if (m_importAssetToImportInPopup.assetType == assetIface_spriteAnim) {
+			ImGui::Text(ICON_FK_FILM " Sprite");
+		} else if (m_importAssetToImportInPopup.assetType == assetIface_mtl) {
+			ImGui::Text(ICON_FK_FLASK " Material");
+		} else {
+			ImGui::Text(ICON_FK_FILE_TEXT_O " Unknown, the file is going to be copyied!");
+			ImGui::Text("If you know the type of the asset you can override it below.");
+
+			const char* assetTypeNames[int(assetIface_count)] = {nullptr};
+			assetTypeNames[int(assetIface_unknown)] = ICON_FK_FILE_TEXT_O " Unknown";
+			assetTypeNames[int(assetIface_model3d)] = ICON_FK_CUBE " 3D Model";
+			assetTypeNames[int(assetIface_texture2d)] = ICON_FK_PICTURE_O " Texture";
+			assetTypeNames[int(assetIface_text)] = ICON_FK_FILE " Text";
+			assetTypeNames[int(assetIface_spriteAnim)] = ICON_FK_FILM " Sprite";
+			assetTypeNames[int(assetIface_mtl)] = ICON_FK_FLASK " Material";
+
+			ImGuiEx::Label("Import As:");
+			if (ImGui::BeginCombo("##Import As: ", assetTypeNames[int(m_importAssetToImportInPopup.assetType)])) {
+				for (int t = 0; t < SGE_ARRSZ(assetTypeNames); ++t) {
+					if (assetTypeNames[t] != nullptr) {
+						if (ImGui::Selectable(assetTypeNames[t])) {
+							m_importAssetToImportInPopup.assetType = AssetIfaceType(t);
+							if (t == int(assetIface_model3d)) {
+								m_importAssetToImportInPopup.outputFilename =
+								    replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "mdl");
+							}
+							if (t == int(assetIface_spriteAnim)) {
+								m_importAssetToImportInPopup.outputFilename =
+								    replaceExtension(m_importAssetToImportInPopup.outputFilename.c_str(), "sprite");
+							}
+						}
+					}
+				}
+
+				ImGui::EndCombo();
+			}
+		}
+
+		ImGuiEx::InputText("Read From", m_importAssetToImportInPopup.fileToImportPath, ImGuiInputTextFlags_ReadOnly);
+
+		if (m_importAssetToImportInPopup.importModelsAsMultipleFiles == false) {
+			ImGuiEx::InputText("Import As", m_importAssetToImportInPopup.outputFilename);
+		}
+
+		// Show a warning that the import will fail if mdlconvlib is not loaded.
+		if (m_sgeImportFBXFile == nullptr && m_importAssetToImportInPopup.assetType == assetIface_model3d) {
+			ImGui::TextColored(ImVec4(1.f, 1.f, 0.f, 1.f), "Importing 3D files cannot be done! mdlconvlib is missing!");
+		}
+
+
+		if (ImGui::Button(ICON_FK_DOWNLOAD " Import")) {
+			importAsset(m_importAssetToImportInPopup);
+			ImGui::CloseCurrentPopup();
+		}
+		ImGui::SameLine();
+		if (ImGui::Button(ICON_FK_DOWNLOAD " Cancel")) {
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+}
+
 void AssetsWindow::openMaterialEditWindow(sge::AssetIface_Material* mtlIface) {
 	std::shared_ptr<IMaterial> mtl = mtlIface->getMaterial();
 
@@ -843,8 +860,7 @@ void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreview
 		ImGui::Text("\t%s", model.animationAt(iAnim)->animationName.c_str());
 	}
 
-	ImGui::Text("Node Count: %d", model.numNodes());
-	ImGui::Text("Mesh Count: %d", model.numMeshes());
+
 
 	for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
 		ImGui::Text("\t%s", model.meshAt(iMesh)->name.c_str());
@@ -960,6 +976,15 @@ void AssetsWindow::doPreviewAssetTexture2D(AssetIface_Texture2D* texIface) {
 			sgeAssertFalse("It is expected that explorePreviewAsset is a AssetTexture2d");
 		}
 	}
+}
+
+std::filesystem::path AssetsWindow::getCurrentExplorePath() const {
+	std::filesystem::path pathToAssets = getCore()->getAssetLib()->getAssetsDirAbs();
+	for (auto& p : directoryTree) {
+		pathToAssets.append(p);
+	}
+
+	return pathToAssets;
 }
 
 } // namespace sge

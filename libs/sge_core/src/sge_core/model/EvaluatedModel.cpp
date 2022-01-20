@@ -160,12 +160,12 @@ bool EvaluatedModel::evaluate_Skinning() {
 }
 
 bool EvaluatedModel::evaluate_getAllGeometries() {
-	m_allEvalGeometries.clear();
+	m_evalAllMeshInstances.clear();
 
 	for (int iNode = 0; iNode < getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = getEvalNode(iNode);
 
-		EvaluatedGeomInstance geomInst;
+		EvaluatedMeshInstance geomInst;
 
 		for (const MeshAttachment& meshAttachment : m_model->nodeAt(iNode)->meshAttachments) {
 			const EvaluatedMesh& evalMesh = getEvalMesh(meshAttachment.attachedMeshIndex);
@@ -180,7 +180,7 @@ bool EvaluatedModel::evaluate_getAllGeometries() {
 			geomInst.iMaterial = meshAttachment.attachedMaterialIndex;
 			geomInst.modelSpaceBBox = mesh->aabox.getTransformed(geomInst.modelSpaceTransform);
 
-			m_allEvalGeometries.push_back(geomInst);
+			m_evalAllMeshInstances.push_back(geomInst);
 		}
 	}
 

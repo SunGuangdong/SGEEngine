@@ -33,8 +33,8 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
                                 const ObjectLighting& lighting,
                                 const EvaluatedModel& evalModel,
                                 const InstanceDrawMods& instDrawMods) {
-	for (const EvaluatedGeomInstance& geomInst : evalModel.getEvalGeoms()) {
-		IMaterial* mtl = evalModel.m_model->loadedMaterialAt(geomInst.iMaterial);
+	for (const EvaluatedMeshInstance& meshInst : evalModel.getEvalMeshInstances()) {
+		IMaterial* mtl = evalModel.m_model->loadedMaterialAt(meshInst.iMaterial);
 		IMaterialData* mdlData = mtl ? mtl->getMaterialDataLocalStorage() : nullptr;
 
 		if_checked(mdlData) {
@@ -43,15 +43,15 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
 
 			// If there is skinning the node transformation is already applied in the bones of that mesh.
 			const mat4f finalTrasform =
-			    (geomInst.geometry.hasVertexSkinning()) ? geomWorldTransfrom : geomWorldTransfrom * geomInst.modelSpaceTransform;
+			    (meshInst.geometry.hasVertexSkinning()) ? geomWorldTransfrom : geomWorldTransfrom * meshInst.modelSpaceTransform;
 
 			if_checked(family && family->geometryDrawer) {
-				family->geometryDrawer->drawGeometry(rdest, camera, finalTrasform, lighting, geomInst.geometry, mdlData, instDrawMods);
+				family->geometryDrawer->drawGeometry(rdest, camera, finalTrasform, lighting, meshInst.geometry, mdlData, instDrawMods);
 			}
 		}
 	}
 
-#if 0 // Old slower implementation kept for reference.
+#if 0 // Old slower implementation kept as a reference.
 	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
 		const ModelNode* rawNode = evalModel.m_model->nodeAt(iNode);
