@@ -45,7 +45,6 @@ struct IEngineGlobal {
 	virtual EventSubscription subscribeOnPluginChange(std::function<void()> fn) = 0;
 	virtual EventSubscription subscribeOnPluginPreUnload(std::function<void()> fn) = 0;
 
-	///
 	virtual void addPropertyEditorIUGeneratorForType(TypeId type, PropertyEditorGeneratorForTypeFn function) = 0;
 	virtual PropertyEditorGeneratorForTypeFn getPropertyEditorIUGeneratorForType(TypeId type) = 0;
 
@@ -109,8 +108,8 @@ SGE_ENGINE_API IEngineGlobal* createAndInitializeEngineGlobal();
 SGE_ENGINE_API IEngineGlobal* getEngineGlobal();
 SGE_ENGINE_API void setEngineGlobal(IEngineGlobal* global);
 
-/// A macro that if followed by a block of statements (like a normal function basically)
-/// that is going to get called when the game plugin gets loaded.
+/// A macro that should be followed by a block of statements (like a normal function basically)
+/// that is going to get called when any game plugin gets loaded.
 #define SgePluginOnLoad() PluginRegisterBlock_Impl(SGE_ANONYMOUS(_SGE_ENGINE_BLOCK_ANON__FUNC))
 
 #define PluginRegisterBlock_Impl(fnName)                                                   \

@@ -115,6 +115,7 @@ struct SGE_CORE_API QuickDraw {
 	// The queue is executed(and then cleared by) drawWired_Execute
 	void drawWiredAdd_Line(const vec3f& a, const vec3f& b, const uint32 rgba);
 	void drawWiredAdd_Arrow(const vec3f& from, const vec3f& to, const uint32 rgba);
+	void drawWiredAdd_EllipseXZ(const mat4f& transformMtx, float xSize, float ySize, const uint32 rgba);
 	void drawWiredAdd_Box(const mat4f& world, const uint32 rgba);
 	void drawWiredAdd_Box(const AABox3f& aabb, const uint32 rgba);
 	void drawWiredAdd_Box(const mat4f& world, const AABox3f& aabb, const uint32 rgba);

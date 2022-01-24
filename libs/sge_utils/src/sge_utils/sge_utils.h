@@ -87,6 +87,7 @@ int assertAskDisable(const char* const file, const int line, const char* expr);
 /// a function does not need an input argumnet. Just wrap the name of the unused variable with
 /// this macro to solve the error.
 #define UNUSED(x)
+#define MAYBE_UNUSED [[maybe_unused]]
 
 #define SGE_CAT_IMPL(s1, s2) s1##s2
 #define SGE_CAT(s1, s2) SGE_CAT_IMPL(s1, s2)

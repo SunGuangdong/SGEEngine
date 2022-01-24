@@ -15,108 +15,214 @@ ReflBlock() {
 	;
 }
 
-ReflAddTypeId(ParticleGroupDesc::SpawnShape, 20'03'02'0046);
-ReflBlock() {
-	ReflAddType(ParticleGroupDesc::SpawnShape)
-		ReflEnumVal(ParticleGroupDesc::spawnShape_sphere, "sphere")
-		ReflEnumVal(ParticleGroupDesc::spawnShape_box, "box")
-		ReflEnumVal(ParticleGroupDesc::spawnShape_rect, "rect")
-		ReflEnumVal(ParticleGroupDesc::spawnShape_disc, "disc")
-	;
-}
-
-ReflAddTypeId(ParticleGroupDesc::BirthType, 20'03'02'0047);
-ReflBlock() {
-	ReflAddType(ParticleGroupDesc::BirthType)
-		ReflEnumVal(ParticleGroupDesc::birthType_constant, "Constant")
-		ReflEnumVal(ParticleGroupDesc::birthType_fromCurve, "Curve")
-	;
-}
-
-ReflAddTypeId(ParticleGroupDesc::Visualization, 20'03'02'0048);
-ReflBlock() {
-	ReflAddType(ParticleGroupDesc::Visualization)
-		ReflEnumVal(ParticleGroupDesc::vis_model3D, "Model")
-		ReflEnumVal(ParticleGroupDesc::vis_sprite, "Sprite")
-	;
-}
-
-ReflAddTypeId(ParticleGroupDesc::VelocityType, 20'03'06'0007);
-ReflBlock() {
-	ReflAddType(ParticleGroupDesc::VelocityType) ReflEnumVal(ParticleGroupDesc::velocityType_directional, "directional")
-	    ReflEnumVal(ParticleGroupDesc::velocityType_radial, "radial") ReflEnumVal(ParticleGroupDesc::velocityType_cone, "cone");
-}
-
-
 ReflAddTypeId(ParticleGroupDesc, 20'03'02'0049);
 ReflAddTypeId(std::vector<ParticleGroupDesc>, 20'03'02'0050);
 
+ReflAddTypeId(, 22'01'22'0001);
+
 ReflBlock() {
+
+	// Particle birth and shapes.
+	ReflAddType(ParticleBirthCount)
+		ReflMember(ParticleBirthCount, instantBirthCount).uiRange(0, 10000, 0.01f)
+		ReflMember(ParticleBirthCount, continiousBirthCount).uiRange(0, 10000, 0.01f)
+		ReflMember(ParticleBirthCount, continiousBirthDuration).uiRange(0.f, 1000.f, 0.01f)
+		ReflMember(ParticleBirthCount, passiveBirthCountPerSecond).uiRange(0, 10000, 0.01f)
+		ReflMember(ParticleBirthCount, maxLife).uiRange(0.f, 10000.f, 0.01f)
+		ReflMember(ParticleBirthCount, maxLifeVariation).uiRange(0.f, 10000.f, 0.01f)
+		ReflMember(ParticleBirthCount, sizeScale).uiRange(0.f, 10000.f, 0.01f)
+		ReflMember(ParticleBirthCount, sizeScaleVariation).uiRange(0.f, 10000.f, 0.01f)
+	;
+
+	ReflAddType(SphereBirthShape)
+		ReflMember(SphereBirthShape, sphereIsVolume)
+		ReflMember(SphereBirthShape, sphereCenter)
+		ReflMember(SphereBirthShape, sphereRadius).uiRange(0.f, 1000.f, 0.01f)
+	;
+
+	ReflAddType(PlaneBirthShape)
+		ReflMember(PlaneBirthShape, planePosition)
+		ReflMember(PlaneBirthShape, planeRotation)
+		ReflMember(PlaneBirthShape, planeSize)
+	;
+
+	ReflAddType(PointBirthShape)
+		ReflMember(PointBirthShape, pointLocation)
+	;
+	
+	ReflAddType(LineBirthShape)
+		ReflMember(LineBirthShape, lineFrom)
+		ReflMember(LineBirthShape, lineTo)
+	;
+
+	ReflAddType(CircleBirthShape)
+		ReflMember(CircleBirthShape, circleAsDisk)
+		ReflMember(CircleBirthShape, circlePosition)
+		ReflMember(CircleBirthShape, circleRadius).uiRange(0.f, 1000.f, 0.01f)
+		ReflMember(CircleBirthShape, circleRotation)
+	;
+
+	ReflAddType(BirthShape)
+		ReflEnumVal(birthShape_sphere, "Sphere")
+		ReflEnumVal(birthShape_plane, "Plane")
+		ReflEnumVal(birthShape_point, "Point")
+		ReflEnumVal(birthShape_line, "Line")
+		ReflEnumVal(birthShape_circle, "Circle/Disk")
+	;
+
+	ReflAddType(BirthShapeDesc)
+		ReflMember(BirthShapeDesc, shapeType)
+		ReflMember(BirthShapeDesc, sphere)
+		ReflMember(BirthShapeDesc, plane)
+		ReflMember(BirthShapeDesc, point)
+		ReflMember(BirthShapeDesc, line)
+		ReflMember(BirthShapeDesc, circle)
+	;
+
+	// Velocity
+	ReflAddType(VelocityDirectionalVelocty)
+		ReflMember(VelocityDirectionalVelocty, directon)
+		ReflMember(VelocityDirectionalVelocty, velocityAmount).uiRange(-1000.f, 1000.f, 0.01f)
+	;
+
+	ReflAddType(VelocityTowardsPoint)
+		ReflMember(VelocityTowardsPoint, pointLocation)
+		ReflMember(VelocityTowardsPoint, velocityAmount).uiRange(-1000.f, 1000.f, 0.01f)
+	;
+
+	ReflAddType(VelocitySpherical)
+		ReflMember(VelocitySpherical, sphereCenter)
+		ReflMember(VelocitySpherical, velocityAmount).uiRange(-1000.f, 1000.f, 0.01f)
+	;
+
+	ReflAddType(VeloctyForce)
+		ReflEnumVal(VelictyForce_directional, "Directional")
+		ReflEnumVal(VelictyForce_towardsPoint, "Point")
+		ReflEnumVal(VelictyForce_spherical, "Spherical")
+	;
+
+	ReflAddType(Velocity)
+		ReflMember(Velocity, forceType)
+		ReflMember(Velocity, directional)
+		ReflMember(Velocity, towardsPoint)
+		ReflMember(Velocity, spherical)
+	;
+	
+	ReflAddType(ParticlesAlpha)
+		ReflMember(ParticlesAlpha, fadeInTimeAfterBirth)
+		ReflMember(ParticlesAlpha, fadeOutTimeBeforeDeath)
+	;
+
+	ReflAddType(std::vector<Velocity>);
+
 	ReflAddType(ParticleGroupDesc)
 		ReflMember(ParticleGroupDesc, m_name)
-		ReflMember(ParticleGroupDesc, m_timeMultiplier)
-		ReflMember(ParticleGroupDesc, m_birthType)
-		ReflMember(ParticleGroupDesc, m_lifecycle)
-		ReflMember(ParticleGroupDesc, m_cleanLifecycle)
-		ReflMember(ParticleGroupDesc, m_visMethod)
-		ReflMember(ParticleGroupDesc, m_particleModel)
+		ReflMember(ParticleGroupDesc, simulationSpeed)
 		ReflMember(ParticleGroupDesc, m_particlesSprite)
 		ReflMember(ParticleGroupDesc, m_spriteGrid)
 		ReflMember(ParticleGroupDesc, m_spriteFPS)
 		ReflMember(ParticleGroupDesc, m_spritePixelsPerUnit)
-		ReflMember(ParticleGroupDesc, m_spawnRate)
-		ReflMember(ParticleGroupDesc, m_particleSpawnOnSecond)
-		ReflMember(ParticleGroupDesc, m_spawnShape)
-		ReflMember(ParticleGroupDesc, m_shapeRadius)
-		ReflMember(ParticleGroupDesc, m_spawnScale)
-		ReflMember(ParticleGroupDesc, m_veclotiyType)
-		ReflMember(ParticleGroupDesc, m_coneHalfAngle).addMemberFlag(MFF_FloatAsDegrees)
-		ReflMember(ParticleGroupDesc, m_particleLife)
-		ReflMember(ParticleGroupDesc, alphaFadeInAfterBirthSeconds)
-		ReflMember(ParticleGroupDesc, alphaFadeOutAfterBeforeDeath)
-		ReflMember(ParticleGroupDesc, m_particleVelocity)
-		ReflMember(ParticleGroupDesc, m_gravity)
-		ReflMember(ParticleGroupDesc, m_xzDrag)
-		ReflMember(ParticleGroupDesc, m_yDrag)
-		ReflMember(ParticleGroupDesc, m_useNoise)
-		ReflMember(ParticleGroupDesc, m_noiseVelocityStr)
-		ReflMember(ParticleGroupDesc, m_noiseScaleStr)
-		ReflMember(ParticleGroupDesc, m_noiseScaling)
-		ReflMember(ParticleGroupDesc, m_noiseDetail)
+		ReflMember(ParticleGroupDesc, birth)
+		ReflMember(ParticleGroupDesc, birthShape)
+		ReflMember(ParticleGroupDesc, initialVelocty)
+		ReflMember(ParticleGroupDesc, velocityForces)
+		ReflMember(ParticleGroupDesc, velocityDrag)
+		ReflMember(ParticleGroupDesc, alpha)
 	;
 
 	ReflAddType(std::vector<ParticleGroupDesc>);
 }
 // clang-format on
 
+
+/// Computes the random point inside a sphere or on the surface of the sphere.
+/// it is importatnt that u and v are picked randomly.
+///
+/// In short if you want random point on the surfaces call getRandomOnSphere(rnd0, rnd1, 0.f, 0.f)
+/// In short if you want random point in the volume call getRandomOnSphere(rnd0, rnd1, maxRadius, rnd3)
+///
+/// @param [in] uRandom a number in range [0;1]
+/// @param [in] vRandom a number in range [0;1]
+/// @param [in] maxRadius is the radius in the sphere where the random points might be located.
+///                       if 0.f than the points would be generated only on the surface of the sphere.
+/// @param [in] radiusRandom If @maxRadius is != 0, than this would be the random number in [0;1] range
+///                          used to pick a point inside the volume of the sphere, otherwise unused.
+///
+/// @return the direction on the sphere.
+vec3f getRandomOnSphere(float uRandom, float vRandom, float maxRadius, float radiusRandom)
+{
+	float theta = uRandom * two_pi();
+	float phi = acosf(2.f * vRandom - 1.f);
+	float r = 0.f;
+	if (maxRadius > 0.f) {
+		r = std::max(1e-3f, cbrtf(radiusRandom) * maxRadius);
+	}
+	else {
+		r = 1.f;
+	}
+	float sinTheta = sinf(theta);
+	float cosTheta = cosf(theta);
+	float sinPhi = sinf(phi);
+	float cosPhi = cosf(phi);
+
+	vec3f randomPoint;
+
+	randomPoint.x = r * cosPhi;
+	randomPoint.y = r * sinPhi * sinTheta;
+	randomPoint.z = r * sinPhi * cosTheta;
+
+	return randomPoint;
+}
+
 //--------------------------------------------------------------
 // ParticleGroupState
 //--------------------------------------------------------------
-void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, const ParticleGroupDesc& pdesc, float dt) {
+vec3f computeAddedVelocity(Random& rnd, const vec3f& particlePosition, const Velocity& velDesc)
+{
+	vec3f velocity = vec3f(0.f);
+
+	switch (velDesc.forceType) {
+		case VelictyForce_directional: {
+			// TODO: precalculate this.
+			vec3f dir = quat_mul_pos(velDesc.directional.directon, vec3f(0.f, -1.f, 0.f));
+
+			velocity += dir * velDesc.directional.velocityAmount;
+		} break;
+		case VelictyForce_towardsPoint: {
+			vec3f dir = normalized0(velDesc.towardsPoint.pointLocation - particlePosition);
+
+			velocity += dir * velDesc.towardsPoint.velocityAmount;
+		} break;
+		case VelictyForce_spherical: {
+			vec3f dir = particlePosition - velDesc.spherical.sphereCenter;
+			float dirLenSqr = dir.lengthSqr();
+			if (dirLenSqr < 1e-6f) {
+				// The point is at the velocity source position.
+				// pick a random point direction based on a sphere.
+				getRandomOnSphere(rnd.next01(), rnd.next01(), 0.f, 0.f);
+			}
+			else {
+				dir *= 1.f / sqrtf(dirLenSqr);
+			}
+
+			velocity = dir * velDesc.spherical.velocityAmount;
+
+		} break;
+		default:
+			sgeAssert(false);
+			break;
+	}
+
+	return velocity;
+}
+
+void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, const ParticleGroupDesc& pgDesc, float dt)
+{
 	m_bboxFromLastUpdate = AABox3f();
 	m_isInWorldSpace = isInWorldSpace;
 	m_n2w = node2world;
 
-	dt *= pdesc.m_timeMultiplier;
-
-	// Update the Noise if needed.
-	if (pdesc.m_useNoise) {
-		if (!m_noise.isValid() || m_noise->getNumPointsPerSide() != pdesc.m_noiseDetail) {
-			m_noise = PerlinNoise3D(pdesc.m_noiseDetail);
-		}
-	} else {
-		m_noise = NullOptional();
-	}
-
-	if (pdesc.m_lifecycle > 0.f && m_timeRunning > pdesc.m_lifecycle) {
-		if (pdesc.m_cleanLifecycle) {
-			*this = ParticleGroupState();
-		} else {
-			m_lastSpawnTime = 0.f;
-			m_timeRunning = 0.f;
-			m_particlesSpawnedSoFar = 0;
-		}
-	}
+	dt *= pgDesc.simulationSpeed;
 
 	const Optional<mat4f> spawnLocationMtx = m_isInWorldSpace ? Optional<mat4f>(node2world) : NullOptional();
 
@@ -130,94 +236,105 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 	}
 
 	// Spawn the new particles.
-	int numParticleToSpawn = 0;
-	if (pdesc.m_birthType == ParticleGroupDesc::birthType_constant) {
-		const float spawnRate = float(pdesc.m_spawnRate);
-		const int numParticleToSpawnSoFar = int(m_lastSpawnTime * spawnRate);
-		const int toBeSpawnedTotalWithThisUpdate = int(m_timeRunning * spawnRate);
-		numParticleToSpawn = toBeSpawnedTotalWithThisUpdate - numParticleToSpawnSoFar;
-	} else if (pdesc.m_birthType == ParticleGroupDesc::birthType_fromCurve) {
-		// Integrate the function.
-		float numTotalParticlesExpectedToSpawn = 0.f;
-		const float kIntegrationStep = 0.01f;
-		for (float time = 0; time < m_timeRunning + dt; time += kIntegrationStep) {
-			float fn = std::max(0.f, pdesc.m_particleSpawnOnSecond.sample(time));
-			numTotalParticlesExpectedToSpawn += fn * kIntegrationStep;
+	int numParticlesToSpawn = 0;
+	if (pgDesc.birth.passiveBirthCountPerSecond > 0) {
+		m_passiveParticleBirthAccumulator += float(pgDesc.birth.passiveBirthCountPerSecond) * dt;
+
+		if (m_passiveParticleBirthAccumulator >= 1.f) {
+			numParticlesToSpawn += (int)floorf(m_passiveParticleBirthAccumulator);
+			m_passiveParticleBirthAccumulator = m_passiveParticleBirthAccumulator - floorf(m_passiveParticleBirthAccumulator);
 		}
-		numParticleToSpawn = int(numTotalParticlesExpectedToSpawn) - m_particlesSpawnedSoFar;
 	}
 
-	if (numParticleToSpawn > 0) {
-		m_lastSpawnTime = m_timeRunning;
+	if (m_timeRunning == 0.f) {
+		numParticlesToSpawn += pgDesc.birth.instantBirthCount;
 	}
 
-	for (int t = 0; t < numParticleToSpawn; ++t) {
+	if (pgDesc.birth.continiousBirthCount > 0 && pgDesc.birth.continiousBirthDuration > 0.f &&
+	    pgDesc.birth.continiousBirthDuration <= m_timeRunning) {
+		float particlesPerSecond = float(pgDesc.birth.continiousBirthCount) / pgDesc.birth.continiousBirthDuration;
+
+		m_contiiousParticleBirthAccumulator += particlesPerSecond * dt;
+
+		if (m_contiiousParticleBirthAccumulator >= 1.f) {
+			numParticlesToSpawn += (int)floorf(m_contiiousParticleBirthAccumulator);
+			m_contiiousParticleBirthAccumulator = m_contiiousParticleBirthAccumulator - floorf(m_contiiousParticleBirthAccumulator);
+		}
+	}
+
+	// To avoid needless allocations, preallocate.
+	m_particles.reserve(m_particles.size() + numParticlesToSpawn);
+
+	// Spawm the new particles and compute their position.
+	for (int t = 0; t < numParticlesToSpawn; ++t) {
 		vec3f spawnPos = vec3f(0.f);
-		switch (pdesc.m_spawnShape) {
-			case ParticleGroupDesc::spawnShape_sphere: {
+		switch (pgDesc.birthShape.shapeType) {
+			case birthShape_sphere: {
 				float u = m_rnd.next01();
 				float v = m_rnd.next01();
-				float theta = u * two_pi();
-				float phi = acosf(2.f * v - 1.f);
-				float r = std::max(1e-3f, cbrtf(m_rnd.next01()) * pdesc.m_shapeRadius);
-				float sinTheta = sinf(theta);
-				float cosTheta = cosf(theta);
-				float sinPhi = sinf(phi);
-				float cosPhi = cosf(phi);
-				spawnPos.x = r * cosPhi;
-				spawnPos.y = r * sinPhi * sinTheta;
-				spawnPos.z = r * sinPhi * cosTheta;
+				if (pgDesc.birthShape.sphere.sphereIsVolume) {
+					spawnPos = getRandomOnSphere(u, v, pgDesc.birthShape.sphere.sphereRadius, m_rnd.next01());
+				}
+				else {
+					spawnPos = getRandomOnSphere(u, v, 0.f, 0.f);
+				}
+
+				spawnPos += pgDesc.birthShape.sphere.sphereCenter;
 			} break;
-			case ParticleGroupDesc::spawnShape_box: {
-				spawnPos.x = m_rnd.next01() * 2.f - 1.f;
-				spawnPos.y = m_rnd.next01() * 2.f - 1.f;
-				spawnPos.z = m_rnd.next01() * 2.f - 1.f;
+			case birthShape_plane: {
+				sgeAssert(false);
 			} break;
-			case ParticleGroupDesc::spawnShape_disc: {
-				float rho = std::max(1e-3f, sqrtf(m_rnd.next01()) * pdesc.m_shapeRadius);
-				float theta = m_rnd.next01() * two_pi();
-				spawnPos = vec3f(0.f, sin(theta), cosf(theta)) * rho;
+			case birthShape_point: {
+				spawnPos = pgDesc.birthShape.point.pointLocation;
 			} break;
-			case ParticleGroupDesc::spawnShape_rect: {
-				spawnPos.x = m_rnd.next01() * 2.f - 1.f;
-				spawnPos.y = m_rnd.next01() * 2.f - 1.f;
-				spawnPos.z = 0.f;
+			case birthShape_line: {
+				spawnPos = lerp(pgDesc.birthShape.line.lineFrom, pgDesc.birthShape.line.lineTo, m_rnd.next01());
+			} break;
+			case birthShape_circle: {
+				if (pgDesc.birthShape.circle.circleAsDisk) {
+					float rho = std::max(1e-3f, sqrtf(m_rnd.next01()) * pgDesc.birthShape.circle.circleRadius);
+					float theta = m_rnd.next01() * two_pi();
+					spawnPos = vec3f(0.f, sin(theta), cosf(theta)) * rho;
+				}
+				else {
+					float angle = m_rnd.next01() * two_pi();
+					spawnPos.x = pgDesc.birthShape.circle.circleRadius * cosf(angle);
+					spawnPos.y = 0.f;
+					spawnPos.z = pgDesc.birthShape.circle.circleRadius * sinf(angle);
+				}
+
+				spawnPos = quat_mul_pos(pgDesc.birthShape.circle.circleRotation, spawnPos);
+				spawnPos += pgDesc.birthShape.circle.circlePosition;
 			} break;
 			default: {
-				sgeAssert(false && "Unimplemented spawn shape!");
-			}
-		};
-
-		vec3f velocity = vec3f(1.f, 0.f, 0.f);
-		switch (pdesc.m_veclotiyType) {
-			case ParticleGroupDesc::velocityType_directional: {
-				velocity = vec3f(pdesc.m_particleVelocity.sample(m_rnd.next01()), 0.f, 0.f);
-			} break;
-			case ParticleGroupDesc::velocityType_radial: {
-				velocity = (spawnPos.normalized0()) * (pdesc.m_particleVelocity.sample(m_rnd.next01()));
-			} break;
-			case ParticleGroupDesc::velocityType_cone: {
-				float discSize = sinf(pdesc.m_coneHalfAngle);
-				const float angle = m_rnd.nextInRange(two_pi());
-				const float radius = m_rnd.nextInRange(discSize);
-				const float y = sinf(angle) * radius;
-				const float z = -cosf(angle) * radius;
-				velocity = vec3f(discSize, y, z).normalized0() * pdesc.m_particleVelocity.sample(m_rnd.next01());
-			} break;
-			default:
 				sgeAssert(false);
+			}
 		}
 
+		// Apply the initial Velocity.
+		vec3f initalVelocity = computeAddedVelocity(m_rnd, spawnPos, pgDesc.initialVelocty);
+
+		// If the particle sumlation is in world space, convert the parties to world space.
 		if (spawnLocationMtx.isValid()) {
 			spawnPos = mat_mul_pos(spawnLocationMtx.get(), spawnPos);
-			velocity = mat_mul_dir(spawnLocationMtx.get(), velocity);
+			initalVelocity = mat_mul_dir(spawnLocationMtx.get(), initalVelocity);
 		}
 
-		const float life = (pdesc.m_particleLife.sample(m_rnd.next01()));
-		const float scale = (pdesc.m_spawnScale.sample(m_rnd.next01()));
+		// Compute the lifetime of the particle.
+		float life = pgDesc.birth.maxLife;
+		if (pgDesc.birth.maxLifeVariation > 0.f) {
+			life += m_rnd.nextInRange(pgDesc.birth.maxLifeVariation);
+		}
+
+		// Compute the scale of the particles.
+		float scale = pgDesc.birth.sizeScale;
+		if (pgDesc.birth.sizeScaleVariation > 0.f) {
+			scale += m_rnd.nextInRange(pgDesc.birth.sizeScaleVariation);
+		}
+
 		const ParticleState newParticle = {
 		    spawnPos,
-		    velocity,
+		    initalVelocity,
 		    scale,
 		    life,
 		};
@@ -225,47 +342,37 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 		m_particles.emplace_back(newParticle);
 	}
 
-	// Update the particles.
-	// Compute the alpha of the particle.
+	// Update the particles - their position, velocity, scale and alpha.
 	for (ParticleState& particle : m_particles) {
 		// Compute the opacity of the particle.
 		particle.opacity = 1.f;
 
 		// Fade-in after birth.
-		if (pdesc.alphaFadeInAfterBirthSeconds > 1e-3f && particle.m_timeSpendAlive < pdesc.alphaFadeInAfterBirthSeconds) {
-			particle.opacity *= sqr(clamp01(particle.m_timeSpendAlive / pdesc.alphaFadeInAfterBirthSeconds));
+		if (pgDesc.alpha.fadeInTimeAfterBirth > 1e-3f && particle.m_timeSpendAlive < pgDesc.alpha.fadeInTimeAfterBirth) {
+			particle.opacity *= sqr(clamp01(particle.m_timeSpendAlive / pgDesc.alpha.fadeInTimeAfterBirth));
 		}
 
 		// Fade-out before death.
-		if (pdesc.alphaFadeOutAfterBeforeDeath > 1e-3f &&
-		    (particle.m_timeSpendAlive > particle.m_maxLife - pdesc.alphaFadeOutAfterBeforeDeath)) {
-			particle.opacity *= sqr(clamp01((particle.m_maxLife - particle.m_timeSpendAlive) / pdesc.alphaFadeOutAfterBeforeDeath));
+		if (pgDesc.alpha.fadeOutTimeBeforeDeath > 1e-3f &&
+		    (particle.m_timeSpendAlive > particle.m_maxLife - pgDesc.alpha.fadeOutTimeBeforeDeath)) {
+			particle.opacity *= sqr(clamp01((particle.m_maxLife - particle.m_timeSpendAlive) / pgDesc.alpha.fadeOutTimeBeforeDeath));
 		}
 
-		// Apply gravity and drag.
-		particle.velocity -= particle.velocity.x0z() * pdesc.m_xzDrag * dt + particle.velocity.yOnly() * pdesc.m_yDrag * dt;
-		particle.velocity += pdesc.m_gravity * dt;
-
-		// Apply vecloty noise.
-		if (m_noise.isValid() && pdesc.m_noiseScaling > 1e-6f) {
-			const float dPos = 1e-2f;
-			float f = 2.f * m_noise->sample(particle.pos / pdesc.m_noiseScaling) - 1.f;
-			float fx = 2.f * m_noise->sample(particle.pos / pdesc.m_noiseScaling + vec3f::getAxis(0, dPos) * pdesc.m_noiseScaling) - 1.f;
-			float fy = 2.f * m_noise->sample(particle.pos / pdesc.m_noiseScaling + vec3f::getAxis(1, dPos) * pdesc.m_noiseScaling) - 1.f;
-			float fz = 2.f * m_noise->sample(particle.pos / pdesc.m_noiseScaling + vec3f::getAxis(2, dPos) * pdesc.m_noiseScaling) - 1.f;
-			vec3f noiseVelocity(fx - f, fy - f, fz - f);
-			noiseVelocity = normalized0(noiseVelocity) * f * pdesc.m_noiseVelocityStr;
-
-			particle.velocity += noiseVelocity * dt;
+		vec3f addedVelocity = vec3f(0.f);
+		
+		for (const Velocity& vel : pgDesc.velocityForces) {
+			addedVelocity += computeAddedVelocity(m_rnd, particle.pos, vel);
+		}
+		
+		if (spawnLocationMtx.isValid()) {
+			addedVelocity = mat_mul_dir(spawnLocationMtx.get(), addedVelocity);
 		}
 
-		// Apply scaling noise.
-		if (m_noise.isValid() && pdesc.m_noiseScaleStr > 1e-6f) {
-			float f = 2.f * m_noise->sample(particle.pos * pdesc.m_noiseScaleStr) - 1.f;
-			particle.scale += f * pdesc.m_noiseScaleStr * dt;
-		}
+		particle.velocity += addedVelocity;
 
-		particle.m_fSpriteIndex += dt * pdesc.m_spriteFPS;
+		particle.velocity -= particle.velocity * pgDesc.velocityDrag * dt;
+
+		particle.m_fSpriteIndex += dt * pgDesc.m_spriteFPS;
 
 		// Apply the velocity and acommodate the time change.
 		particle.pos += particle.velocity * dt;
@@ -273,12 +380,12 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 		m_bboxFromLastUpdate.expand(particle.pos);
 	}
 
-	m_particlesSpawnedSoFar += numParticleToSpawn;
 	m_timeRunning += dt;
 }
 
 ParticleGroupState::SpriteRendData*
-    ParticleGroupState::computeSpriteRenderData(SGEContext& sgecon, const ParticleGroupDesc& pdesc, const ICamera& camera) {
+    ParticleGroupState::computeSpriteRenderData(SGEContext& sgecon, const ParticleGroupDesc& pdesc, const ICamera& camera)
+{
 	struct Vertex {
 		vec3f pos = vec3f(0.f);
 		vec4f color = vec4f(1.f);
@@ -402,7 +509,8 @@ ParticleGroupState::SpriteRendData*
 		BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(neededVtxBufferByteSize, ResourceUsage::Dynamic);
 		spriteRenderData->vertexBuffer = sgecon.getDevice()->requestResource<Buffer>();
 		spriteRenderData->vertexBuffer->create(vbDesc, vertices.data());
-	} else {
+	}
+	else {
 		// The vertex buffer is large enough, just update it's contents.
 		void* mappedMem = sgecon.map(spriteRenderData->vertexBuffer, Map::WriteDiscard);
 		if (mappedMem) {
@@ -434,14 +542,15 @@ ParticleGroupState::SpriteRendData*
 //--------------------------------------------------------------
 // TraitParticlesSimple
 //--------------------------------------------------------------
-
-void TraitParticlesSimple::update(const GameUpdateSets& u) {
-	if (u.isSimulationPaused() || !m_isEnabled) {
+void TraitParticlesSimple::update(const GameUpdateSets& u)
+{
+	bool simulateBecauseWeArePlaying = u.isSimulationPaused() && !m_isEnabled;
+	bool simulateBecauseWeAreEditing = m_isPreviewPlaying;
+	if (!simulateBecauseWeArePlaying && !simulateBecauseWeAreEditing) {
 		return;
 	}
 
 	for (ParticleGroupDesc& desc : m_pgroups) {
-		desc.m_particleModel.update();
 		desc.m_particlesSprite.update();
 
 		// TODO: handle duplicated names!
@@ -449,7 +558,8 @@ void TraitParticlesSimple::update(const GameUpdateSets& u) {
 	}
 }
 
-AABox3f TraitParticlesSimple::getBBoxOS() const {
+AABox3f TraitParticlesSimple::getBBoxOS() const
+{
 	if (m_isInWorldSpace) {
 		const mat4f ownerWorld2Object = inverse(getActor()->getTransformMtx());
 		AABox3f bbox;
@@ -457,7 +567,8 @@ AABox3f TraitParticlesSimple::getBBoxOS() const {
 			bbox.expand(pair.second.getBBox().getTransformed(ownerWorld2Object));
 		}
 		return bbox;
-	} else {
+	}
+	else {
 		AABox3f bbox;
 		for (auto& pair : m_pgroupState) {
 			bbox.expand(pair.second.getBBox());
@@ -466,7 +577,8 @@ AABox3f TraitParticlesSimple::getBBoxOS() const {
 	}
 }
 
-void TraitParticlesSimple::getRenderItems(std::vector<TraitParticlesSimpleRenderItem>& renderItems) {
+void TraitParticlesSimple::getRenderItems(std::vector<TraitParticlesSimpleRenderItem>& renderItems)
+{
 	TraitParticlesSimpleRenderItem renderItem;
 
 	renderItem.traitParticles = this;
@@ -479,13 +591,12 @@ void TraitParticlesSimple::getRenderItems(std::vector<TraitParticlesSimpleRender
 	renderItems.push_back(renderItem);
 }
 
-
 //--------------------------------------------------------------
 // TraitParticlesProgrammable
 //--------------------------------------------------------------
-void TraitParticlesProgrammable::getRenderItems(std::vector<TraitParticlesProgrammableRenderItem>& renderItems) {
+void TraitParticlesProgrammable::getRenderItems(std::vector<TraitParticlesProgrammableRenderItem>& renderItems)
+{
 	// TODO: add separate render item for each group.
-
 	TraitParticlesProgrammableRenderItem renderItem;
 
 	renderItem.traitParticles = this;
@@ -494,12 +605,7 @@ void TraitParticlesProgrammable::getRenderItems(std::vector<TraitParticlesProgra
 	// TODO: We do not really always need alpha sorting for particles. Add some logic to determine if we need it.
 	renderItem.needsAlphaSorting = false;
 
-
-
 	// renderItem.zSortingPositionWs = mat_mul_pos(getActor()->getTransformMtx(), getBBoxOS().center());
-
-
-
 	renderItems.push_back(renderItem);
 }
 
@@ -510,24 +616,27 @@ ReflAddTypeId(TraitParticlesProgrammable, 20'11'23'0001);
 bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleGroup& particles,
                                      SGEContext& sgecon,
                                      const ICamera& camera,
-                                     const mat4f& n2w) {
+                                     const mat4f& n2w)
+{
 	if (particles.allParticles.empty()) {
 		return false;
 	}
 
 	// Sort the particles along the ray, so the generated vertex buffer have them sorted
 	// so they could be blender correctly during rendering.
-	vec3f const camPosWs = camera.getCameraPosition();
-	vec3f const camLookWs = camera.getCameraLookDir();
+	{
+		vec3f const camPosWs = camera.getCameraPosition();
+		vec3f const camLookWs = camera.getCameraLookDir();
 
-	indicesForSorting.resize(particles.allParticles.size());
-	for (int t = 0; t < int(indicesForSorting.size()); ++t) {
-		indicesForSorting[t].index = t;
-		indicesForSorting[t].distanceAlongRay = projectPointOnLine(camPosWs, camLookWs, particles.allParticles[t].position);
+		indicesForSorting.resize(particles.allParticles.size());
+		for (int t = 0; t < int(indicesForSorting.size()); ++t) {
+			indicesForSorting[t].index = t;
+			indicesForSorting[t].distanceAlongRay = projectPointOnLine(camPosWs, camLookWs, particles.allParticles[t].position);
+		}
+
+		std::sort(indicesForSorting.begin(), indicesForSorting.end(),
+		          [&](const SortingData& a, const SortingData& b) { return a.distanceAlongRay > b.distanceAlongRay; });
 	}
-
-	std::sort(indicesForSorting.begin(), indicesForSorting.end(),
-	          [&](const SortingData& a, const SortingData& b) { return a.distanceAlongRay > b.distanceAlongRay; });
 
 	// Obtain the sprite texture and check if it is valid.
 	Texture* const sprite = getLoadedAssetIface<AssetIface_Texture2D>(particles.spriteTexture)->getTexture();
@@ -613,7 +722,8 @@ bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleG
 		BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(neededVtxBufferByteSize, ResourceUsage::Dynamic);
 		vertexBuffer = sgecon.getDevice()->requestResource<Buffer>();
 		vertexBuffer->create(vbDesc, vertices.data());
-	} else {
+	}
+	else {
 		// The vertex buffer is large enough, just update it's contents.
 		void* mappedMem = sgecon.map(vertexBuffer, Map::WriteDiscard);
 		if (mappedMem) {

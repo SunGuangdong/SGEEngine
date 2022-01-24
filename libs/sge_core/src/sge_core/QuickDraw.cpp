@@ -670,6 +670,43 @@ void QuickDraw::drawWiredAdd_Arrow(const vec3f& from, const vec3f& to, const uin
 	m_wireframeVerts.push_back(GeomGen::PosColorVert(to - perp1 + toBack, rgba));
 }
 
+void QuickDraw::drawWiredAdd_EllipseXZ(const mat4f& transformMtx, float xSize, float ySize, const uint32 rgba)
+{
+	const int numSegments = 32;
+	const float segmentAngle = two_pi() / float(numSegments);
+
+	// Construct a 2x2 matrix represnting a rotation between segment points.
+	// column 0
+	float m00 = cosf(segmentAngle);
+	float m01 = -sinf(segmentAngle);
+	
+	// column 1
+	float m10 = sinf(segmentAngle);
+	float m11 = cosf(segmentAngle);
+	
+	vec3f arm = vec3f(1.f, 0.f, 0.f);
+	vec3f armScaledPrev = vec3f(0.f);
+	for (int iSeg = 0; iSeg < (numSegments); ++iSeg) {
+		vec3f armScaled = arm;
+		armScaled.x *= xSize;
+		armScaled.z *= ySize;
+
+		if (iSeg > 0) {
+			armScaled = mat_mul_pos(transformMtx, armScaled);
+			m_wireframeVerts.push_back(GeomGen::PosColorVert(armScaledPrev, rgba));
+			m_wireframeVerts.push_back(GeomGen::PosColorVert(armScaled, rgba));
+		}
+
+		// Rotate the arm.
+		arm = vec3f(
+			arm.x * m00 + arm.z * m01, 
+			0.f, 
+			arm.x * m10 + arm.z * m11);
+		armScaledPrev = armScaled;
+	}
+
+}
+
 void QuickDraw::drawWiredAdd_Box(const mat4f& world, const uint32 rgba) {
 	GeomGen::wiredBox(m_wireframeVerts, world, rgba);
 }

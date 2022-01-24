@@ -47,7 +47,8 @@ ReflBlock() {
 //--------------------------------------------------------
 // ANavMesh
 //--------------------------------------------------------
-void ANavMesh::create() {
+void ANavMesh::create()
+{
 	registerTrait(m_traitViewportIcon);
 	registerTrait(static_cast<IActorCustomAttributeEditorTrait&>(*this));
 	m_traitViewportIcon.setTexture("assets/editor/textures/icons/obj/ANavMesh.png", true);
@@ -61,11 +62,13 @@ void ANavMesh::create() {
 	});
 }
 
-AABox3f ANavMesh::getBBoxOS() const {
+AABox3f ANavMesh::getBBoxOS() const
+{
 	return AABox3f::getFromHalfDiagonal(vec3f(1.f));
 }
 
-void ANavMesh::doAttributeEditor(GameInspector* inspector) {
+void ANavMesh::doAttributeEditor(GameInspector* inspector)
+{
 	MemberChain chain;
 
 	chain.clear();
@@ -85,7 +88,8 @@ void ANavMesh::doAttributeEditor(GameInspector* inspector) {
 bool ANavMesh::findPath(std::vector<vec3f>& outPath,
                         const vec3f& startPos,
                         const vec3f& targetEndPos,
-                        const vec3f nearestPointSearchHalfDiagonal) {
+                        const vec3f nearestPointSearchHalfDiagonal)
+{
 	const int kMaxPathPolyCount = 256; // TODO: Fine tune this variable.
 
 	outPath.clear();
@@ -136,7 +140,8 @@ bool ANavMesh::findPath(std::vector<vec3f>& outPath,
 	return false;
 }
 
-vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end) {
+vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end)
+{
 	if (m_detourNavMeshQuery.object == nullptr || m_detourNavMeshQuery->getNodePool() == nullptr) {
 		// The navmesh isn't initialzied yet or no navmesh was generated for the input geometry.
 		return start;
@@ -151,9 +156,18 @@ vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end) {
 		return start;
 	}
 
+	dtPolyRef visited[32];
+	int actualVisited = 0;
+
 	vec3f result;
-	if (dtStatusSucceed(m_detourNavMeshQuery->moveAlongSurface(nearestPolyRef, start.data, end.data, &queryPolyFilter, result.data, nullptr,
-	                                                           nullptr, 0))) {
+	if (dtStatusSucceed(m_detourNavMeshQuery->moveAlongSurface(nearestPolyRef, start.data, end.data, &queryPolyFilter, result.data, visited,
+	                                                           &actualVisited, SGE_ARRSZ(visited)))) {
+
+		/// The result so far if correct in xz plane but, it is not projected on the navmesh.
+		float height = 0.f;
+		m_detourNavMeshQuery->getPolyHeight(visited[actualVisited - 1], result.data, &height);
+		result.y = height;
+
 		return result;
 	}
 
@@ -161,10 +175,12 @@ vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end) {
 }
 
 
-void ANavMesh::update(const GameUpdateSets& UNUSED(updateSets)) {
+void ANavMesh::update(const GameUpdateSets& UNUSED(updateSets))
+{
 }
 
-void ANavMesh::build() {
+void ANavMesh::build()
+{
 	// Generate triangles representing each object that could be used as a walkable area by the navmesh.
 	std::vector<vec3f> trianglesVerticesWorldSpace;
 	std::vector<int> trianglesIndices;
@@ -330,7 +346,8 @@ void ANavMesh::build() {
 		sgeAssert(false && "recastCfg.maxVertsPerPoly > DT_VERTS_PER_POLYGON failed");
 		clearRecastAndDetourState();
 		return;
-	} else {
+	}
+	else {
 		dtNavMeshCreateParams params;
 		memset(&params, 0, sizeof(params));
 		params.verts = m_recastPolyMesh->verts;

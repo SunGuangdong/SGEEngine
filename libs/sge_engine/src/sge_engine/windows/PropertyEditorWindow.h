@@ -18,12 +18,19 @@ namespace ProperyEditorUIGen {
 	/// Does the user interface specified game object.
 	SGE_ENGINE_API void doGameObjectUI(GameInspector& inspector, GameObject* const gameObject);
 
+	enum DoMemberUIFlags : int { 
+		DoMemberUIFlags_none = 0,
+		DoMemberUIFlags_structInNoHeader = 1 << 0,
+
+	};
+
 	/// Does the user interface for the speicfied member of the @gameObject.
 	/// Useful if we want to have custom UI for some type,
 	/// but we still want to use the auto generated UI for its members.
 	/// @param [in, out] gameObject is the owner of the member that we are doing UI for.
 	/// @param [in] chain points to the member (starting form @gameObject) that we are going to generate  UI for.
-	SGE_ENGINE_API void doMemberUI(GameInspector& inspector, GameObject* const gameObject, MemberChain chain);
+	/// @param [in] flags a bitmask made from @DoMemberUIFlags
+	SGE_ENGINE_API void doMemberUI(GameInspector& inspector, GameObject* const gameObject, MemberChain chain, int flags = 0);
 
 	SGE_ENGINE_API void editFloat(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
 	SGE_ENGINE_API void editInt(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);

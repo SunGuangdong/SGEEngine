@@ -18,74 +18,132 @@ struct TraitParticlesProgrammableRenderItem;
 //--------------------------------------------------------------
 // ParticleGroupDesc
 //--------------------------------------------------------------
+struct ParticleBirthCount {
+	int instantBirthCount = 0;
+
+	int continiousBirthCount = 0;
+	float continiousBirthDuration = 0.f;
+
+	int passiveBirthCountPerSecond = 0;
+
+	float maxLife = 10.f;
+	float maxLifeVariation = 0.f;
+
+	float sizeScale = 1.f;
+	float sizeScaleVariation = 0.f;
+};
+
+
+//------------------------------------------------------------
+// Particle birth shapes.
+//------------------------------------------------------------
+struct SphereBirthShape {
+	// Sphere birth shape settings.
+	bool sphereIsVolume = false;
+	vec3f sphereCenter = vec3f(0.f);
+	float sphereRadius = 0.f;
+};
+
+struct PlaneBirthShape {
+	// Plane birth shape settings.
+	vec3f planePosition = vec3f(0.f);
+	quatf planeRotation = quatf::getIdentity(); ///< Identity means it is facing -y.
+	vec2f planeSize = vec2f(1.f);
+};
+
+struct PointBirthShape {
+	// Point shape settings.
+	vec3f pointLocation = vec3f(0.f);
+};
+
+struct LineBirthShape {
+	// Line shape settings.
+	vec3f lineFrom = vec3f(0.f, 0.f, 0.f);
+	vec3f lineTo = vec3f(0.f, 1.f, 0.f);
+};
+
+struct CircleBirthShape {
+	// Circle shape setting.
+	bool circleAsDisk = false;
+	vec3f circlePosition = vec3f(0.f);
+	float circleRadius = 1.f;
+	quatf circleRotation = quatf::getIdentity(); ///< Identity means it is in the xz plane.
+};
+
+enum BirthShape {
+	birthShape_sphere,
+	birthShape_plane,
+	birthShape_point,
+	birthShape_line,
+	birthShape_circle,
+};
+
+struct BirthShapeDesc {
+	BirthShape shapeType = birthShape_sphere;
+
+	SphereBirthShape sphere;
+	PlaneBirthShape plane;
+	PointBirthShape point;
+	LineBirthShape line;
+	CircleBirthShape circle;
+};
+
+//------------------------------------------------------------
+// Velocity forces sources.
+//------------------------------------------------------------
+struct VelocityDirectionalVelocty {
+	quatf directon = quatf::getIdentity(); // identity means -y
+	float velocityAmount = 1.f;
+
+	// working variables, updated internally.
+};
+
+struct VelocityTowardsPoint {
+	vec3f pointLocation = vec3f(0.f);
+	float velocityAmount = 1.f;
+};
+
+
+struct VelocitySpherical {
+	vec3f sphereCenter = vec3f(0.f);
+	float velocityAmount = 1.f;
+};
+
+enum VeloctyForce : int {
+	VelictyForce_directional,
+	VelictyForce_towardsPoint,
+	VelictyForce_spherical,
+};
+
+struct Velocity {
+	VeloctyForce forceType = VelictyForce_directional;
+
+	VelocityDirectionalVelocty directional;
+	VelocityTowardsPoint towardsPoint;
+	VelocitySpherical spherical;
+};
+
+struct ParticlesAlpha {
+	float fadeInTimeAfterBirth = 0.f;
+	float fadeOutTimeBeforeDeath = 0.f;
+
+};
+
 struct ParticleGroupDesc {
-	enum BirthType : int {
-		birthType_constant,
-		birthType_fromCurve,
-	};
+	ParticleBirthCount birth;
+	BirthShapeDesc birthShape;
+	Velocity initialVelocty;
+	std::vector<Velocity> velocityForces;
+	vec3f velocityDrag = vec3f(0.f);
+	ParticlesAlpha alpha;
 
-	enum SpawnShape : int {
-		spawnShape_sphere,
-		spawnShape_box,
-		spawnShape_rect,
-		spawnShape_disc,
-	};
-
-	enum VelocityType : int {
-		velocityType_directional,
-		velocityType_radial,
-		velocityType_cone,
-	};
-
-	enum Visualization { vis_model3D, vis_sprite };
-
-  public:
 	std::string m_name;
-	float m_timeMultiplier = 1.f;
-	float m_lifecycle = 0.f;
-	bool m_cleanLifecycle = false; // True if the lifecylcle should delete all of it's remaining particles at the end.
+	float simulationSpeed = 1.f;
 
-	// Model and sprites.
-	Visualization m_visMethod = vis_model3D;
-	AssetProperty m_particleModel = AssetProperty(assetIface_model3d);
 	AssetProperty m_particlesSprite = AssetProperty(assetIface_texture2d);
 	vec2i m_spriteGrid = vec2i(1); // The number of sub images in the specified texture by x and y. They go row-wise left to right.
 	float m_spritePixelsPerUnit = 32.f;
 	float m_spriteFPS = 30.f;
-
-	BirthType m_birthType = birthType_constant;
-	int m_spawnRate = 10; // Number of spawned particle per second.
-	MultiCurve2D m_particleSpawnOnSecond;
-
-	Rangef m_particleLife = Rangef(1.f);
-
-	float alphaFadeInAfterBirthSeconds = 0.5f;
-	float alphaFadeOutAfterBeforeDeath = 0.5f;
-
-	// Shape
-	SpawnShape m_spawnShape = spawnShape_sphere;
-	float m_shapeRadius = 1.f;
-
-	// Scale
-	Rangef m_spawnScale = Rangef(1.f);
-
-	// Velocity
-	VelocityType m_veclotiyType = velocityType_radial;
-	Rangef m_particleVelocity = Rangef(1.f);
-	float m_coneHalfAngle = deg2rad(15.f);
-
-	// Forces
-	vec3f m_gravity = vec3f(0.f, -9.8f, 0.f);
-	float m_xzDrag = 0.05f;
-	float m_yDrag = 0.0f;
-
-	// Noise over velocity, size and anything else.
-	bool m_useNoise = false;
-	float m_noiseVelocityStr = 1.f;
-	float m_noiseScaleStr = 0.f;
-	float m_noiseScaling = 1.f;
-	int m_noiseDetail = 5; // Translates to number of octaves.
-	                       // bool m_useNoiseForVelocity = false;
 };
 
 //--------------------------------------------------------------
@@ -94,7 +152,7 @@ struct ParticleGroupDesc {
 struct SGE_ENGINE_API ParticleGroupState {
 	struct ParticleState {
 		vec3f pos = vec3f(0.f);
-		vec3f velocity = vec3f::getAxis(0);
+		vec3f velocity = vec3f(0.f);
 		float scale = 1.f;
 		float m_maxLife = 0.f;
 		float opacity = 1.f;
@@ -102,7 +160,8 @@ struct SGE_ENGINE_API ParticleGroupState {
 		float m_timeSpendAlive = 0.f;
 		float m_fSpriteIndex = 0.f; // The sprites are used for rendering this points to the sub-image being used for visualization.
 
-		bool isDead() const {
+		bool isDead() const
+		{
 			return m_timeSpendAlive >= m_maxLife;
 		}
 	};
@@ -116,7 +175,8 @@ struct SGE_ENGINE_API ParticleGroupState {
 		DefaultPBRMtlData material;
 	};
 
-	mat4f getParticlesToWorldMtx() const {
+	mat4f getParticlesToWorldMtx() const
+	{
 		return m_isInWorldSpace ? mat4f::getIdentity() : m_n2w;
 	}
 
@@ -124,9 +184,11 @@ struct SGE_ENGINE_API ParticleGroupState {
 	AABox3f m_bboxFromLastUpdate;
 	Random m_rnd;
 
-	float m_lastSpawnTime = 0.f;
+
+	float m_passiveParticleBirthAccumulator = 0.f;
+	float m_contiiousParticleBirthAccumulator = 0.f;
+
 	float m_timeRunning = 0.f; // Time in seconds the simulation went running.
-	int m_particlesSpawnedSoFar = 0;
 
 	std::vector<ParticleState> m_particles;
 	Optional<PerlinNoise3D> m_noise;
@@ -149,12 +211,14 @@ struct SGE_ENGINE_API ParticleGroupState {
 	/// @param camera the camera to be used to billboard the particles.
 	SpriteRendData* computeSpriteRenderData(SGEContext& sgecon, const ParticleGroupDesc& pdesc, const ICamera& camera);
 
-	const std::vector<ParticleState>& getParticles() const {
+	const std::vector<ParticleState>& getParticles() const
+	{
 		return m_particles;
 	}
 
 	/// Returns the bounding box in the space they are being simulated (world or node).
-	AABox3f getBBox() const {
+	AABox3f getBBox() const
+	{
 		return m_bboxFromLastUpdate;
 	}
 };
@@ -166,7 +230,15 @@ ReflAddTypeIdExists(TraitParticlesSimple);
 struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 	SGE_TraitDecl_Full(TraitParticlesSimple);
 
+	/// Updates the particles state.
 	void update(const GameUpdateSets& u);
+
+	/// Clear the particles simulation state.
+	void clearParticleState()
+	{
+		m_pgroupState.clear();
+	}
+	
 	AABox3f getBBoxOS() const;
 
 	void getRenderItems(std::vector<TraitParticlesSimpleRenderItem>& renderItems);
@@ -176,6 +248,10 @@ struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 	bool m_isInWorldSpace = false; // if true, the particles are in world space, false is node space of the owning actor.
 	std::vector<ParticleGroupDesc> m_pgroups;
 	std::unordered_map<std::string, ParticleGroupState> m_pgroupState;
+
+	// For user interface. Used as the currently edited particle group.
+	int m_uiSelectedGroup = 0;
+	bool m_isPreviewPlaying = false;
 };
 
 //--------------------------------------------------------------
@@ -211,13 +287,16 @@ struct SGE_ENGINE_API TraitParticlesProgrammable : public Trait {
 
 	void getRenderItems(std::vector<TraitParticlesProgrammableRenderItem>& renderItems);
 
-	virtual int getNumPGroups() const {
+	virtual int getNumPGroups() const
+	{
 		return 0;
 	}
-	virtual ParticleGroup* getPGroup(const int UNUSED(idx)) {
+	virtual ParticleGroup* getPGroup(const int UNUSED(idx))
+	{
 		return nullptr;
 	}
-	virtual void update(const GameUpdateSets& UNUSED(u)) {
+	virtual void update(const GameUpdateSets& UNUSED(u))
+	{
 	}
 };
 

@@ -179,7 +179,7 @@ struct SelectedItemDirect {
 	GameObject* gameObject = nullptr;
 	int index = 0; // The index of the item. Depends on the edit mode.
 
-	static SelectedItemDirect formSelectedItem(const SelectedItem& item, GameWorld& world);
+	static SelectedItemDirect fromSelectedItem(const SelectedItem& item, GameWorld& world);
 };
 
 /// @brief Traits are properties that can be attached to any game object.

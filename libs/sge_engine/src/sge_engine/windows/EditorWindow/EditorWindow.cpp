@@ -744,12 +744,6 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		}
 		ImGuiEx::TextTooltip("Align the preview camera to +Z axis.");
 
-		// Add a little message showing that we are currently debugging.
-		if (isVSDebuggerPresent()) {
-			ImGui::SameLine();
-			ImGui::Text(ICON_FK_BUG " Debugging");
-		}
-
 		ImGui::SameLine();
 		ImGui::Separator();
 		ImGui::SameLine();
@@ -943,6 +937,8 @@ void EditorWindow::prepareForHotReload(SceneInstanceSerializedData& sceneInstanc
 	// and all function pointers will be invalidated.
 	iActiveInstance = -1;
 	m_sceneInstances.clear();
+
+	// TODO: Close all gameplay windows.
 }
 
 void EditorWindow::recoverFromHotReload(const SceneInstanceSerializedData& sceneInstancesData) {

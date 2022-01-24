@@ -105,7 +105,7 @@ const Actor* Trait::getActor() const {
 	return actor;
 }
 
-SelectedItemDirect SelectedItemDirect::formSelectedItem(const SelectedItem& item, GameWorld& world) {
+SelectedItemDirect SelectedItemDirect::fromSelectedItem(const SelectedItem& item, GameWorld& world) {
 	SelectedItemDirect result;
 	result.editMode = item.editMode;
 	result.index = item.index;

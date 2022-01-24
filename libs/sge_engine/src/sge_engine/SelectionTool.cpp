@@ -128,7 +128,7 @@ int SelectionToolModePoints::getNumItems(GameInspector* UNUSED(inspector)) {
 }
 
 void SelectionToolModePoints::drawItem(GameInspector* inspector, int const itemIndex, const GameDrawSets& gameDrawSets) {
-	SelectedItemDirect selItem = SelectedItemDirect::formSelectedItem(items[itemIndex], *inspector->m_world);
+	SelectedItemDirect selItem = SelectedItemDirect::fromSelectedItem(items[itemIndex], *inspector->m_world);
 	if (selItem.gameObject) {
 		gameDrawSets.gameDrawer->drawItem(gameDrawSets, selItem, drawReason_selectionTool);
 	}

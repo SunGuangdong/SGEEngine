@@ -1,4 +1,5 @@
 ﻿---
+AlignAfterOpenBracket: Align 
 AlignEscapedNewlinesLeft: 'true'
 AllowAllParametersOfDeclarationOnNextLine: 'true'
 AllowShortBlocksOnASingleLine: 'false'
@@ -8,7 +9,7 @@ AllowShortLoopsOnASingleLine: 'false'
 AlwaysBreakBeforeMultilineStrings: 'true'
 AlwaysBreakTemplateDeclarations: 'true'
 BinPackParameters: 'false'
-BreakBeforeBraces: Attach
+BreakBeforeBraces: Stroustrup
 BreakConstructorInitializersBeforeComma: 'true'
 BreakBeforeTernaryOperators: 'true'
 ColumnLimit: '140'

@@ -12,8 +12,8 @@
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/mat4.h"
 
-#include "sge_engine/GameDrawer/RenderItems/HelperDrawRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/GeometryRenderItem.h"
+#include "sge_engine/GameDrawer/RenderItems/HelperDrawRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitParticlesRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitSpriteRrenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitViewportIconRenderItem.h"
@@ -24,6 +24,7 @@ struct TraitRenderGeometry;
 struct TraitParticlesSimple;
 struct TraitParticlesProgrammable;
 struct ANavMesh;
+struct AParticlesSimple;
 
 struct LightShadowInfo {
 	ShadowMapBuildInfo buildInfo;
@@ -88,6 +89,12 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	                                  const DrawReason drawReason,
 	                                  const vec4f wireframeColor);
 
+	void drawHelperActor_drawAParticlesSimple(AParticlesSimple& particles,
+	                                          const GameDrawSets& drawSets,
+	                                          const ObjectLighting& lighting,
+	                                          const DrawReason drawReason,
+	                                          const vec4f wireframeColor);
+
   private:
 	/// @brief Returns true if the bounding box of the actor (Actor::getBBoxOs) is in the specified
 	/// draw camera frustum.
@@ -95,7 +102,8 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	void getActorObjectLighting(Actor* actor, ObjectLighting& lighting);
 	void getLightingForLocation(const AABox3f& bboxWs, ObjectLighting& lighting);
 
-	void clearRenderItems() {
+	void clearRenderItems()
+	{
 		m_RIs_opaque.clear();
 		m_RIs_alphaSorted.clear();
 
