@@ -16,7 +16,7 @@
 #include "sge_engine/Physics.h"
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitScriptSlot.h"
-#include "sge_engine/ui/UIAssetPicker.h"
+#include "sge_engine_ui/ui/UIAssetPicker.h"
 #include "sge_utils/math/EulerAngles.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"

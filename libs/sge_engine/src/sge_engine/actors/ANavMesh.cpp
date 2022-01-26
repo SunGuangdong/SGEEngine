@@ -13,7 +13,7 @@
 #include "sge_log/Log.h"
 #include "sge_utils/utils/ScopeGuard.h"
 
-#include "sge_engine/windows/PropertyEditorWindow.h"
+#include "sge_engine_ui/windows/PropertyEditorWindow.h"
 
 namespace sge {
 

@@ -5,7 +5,7 @@
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
 #include "sge_core/typelib/typeLib.h"
-#include "sge_engine/ui/UIAssetPicker.h"
+#include "sge_engine_ui/ui/UIAssetPicker.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_core/typelib/MemberChain.h"
 

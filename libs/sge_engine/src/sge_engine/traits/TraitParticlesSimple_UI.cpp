@@ -3,7 +3,7 @@
 #include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/traits/TraitParticles.h"
-#include "sge_engine/windows/PropertyEditorWindow.h"
+#include "sge_engine_ui/windows/PropertyEditorWindow.h"
 #include "sge_utils/utils/strings.h"
 
 namespace sge {

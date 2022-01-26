@@ -9,7 +9,7 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameSerialization.h"
 #include "sge_engine/InspectorCmds.h"
-#include "sge_engine/ui/ImGuiDragDrop.h"
+#include "sge_engine_ui/ui/ImGuiDragDrop.h"
 #include "sge_utils/math/color.h"
 #include "sge_utils/utils/Wildcard.h"
 

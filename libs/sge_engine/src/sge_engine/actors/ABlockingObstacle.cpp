@@ -6,7 +6,7 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/InspectorCmds.h"
-#include "sge_engine/windows/PropertyEditorWindow.h"
+#include "sge_engine_ui/windows/PropertyEditorWindow.h"
 
 namespace sge {
 

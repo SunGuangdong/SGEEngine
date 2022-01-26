@@ -5,7 +5,7 @@
 #include "sge_core/typelib/MemberChain.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/RigidBodyFromModel.h"
-#include "sge_engine/windows/PropertyEditorWindow.h"
+#include "sge_engine_ui/windows/PropertyEditorWindow.h"
 #include "traits/TraitModel.h"
 #include "traits/TraitRigidBody.h"
 #include "typelibHelper.h"

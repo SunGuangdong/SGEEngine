@@ -6,7 +6,7 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/traits/TraitCamera.h"
-#include "sge_engine/ui/UIAssetPicker.h"
+#include "sge_engine_ui/ui/UIAssetPicker.h"
 #include "sge_utils/sge_utils.h"
 #include "sge_utils/utils/strings.h"
 

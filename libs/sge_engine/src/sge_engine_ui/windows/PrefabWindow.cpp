@@ -12,7 +12,7 @@
 #include "sge_engine//GameSerialization.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
-#include "sge_engine/ui/ImGuiDragDrop.h"
+#include "sge_engine_ui/ui/ImGuiDragDrop.h"
 #include "sge_utils/tiny/FileOpenDialog.h"
 #include "sge_utils/utils/Path.h"
 #include "sge_utils/utils/json.h"

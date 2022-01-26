@@ -12,7 +12,7 @@
 #include "imgui/imgui_internal.h"
 
 #include "sge_core/SGEImGui.h"
-#include "sge_engine/ui/ImGuiDragDrop.h"
+#include "sge_engine_ui/ui/ImGuiDragDrop.h"
 
 namespace sge {
 
