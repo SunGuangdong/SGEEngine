@@ -17,13 +17,12 @@ ReflBlock()
 		ReflInherits(Actor, GameObject)
 		ReflMember(Actor, m_logicTransform)
 		ReflMember(Actor, m_bindingToParentTransform).addMemberFlag(MFF_NonEditable)
-		ReflMember(Actor, m_bindingIgnoreRotation)
-		ReflMember(Actor, m_forceAlphaZSort)
 	;
 }
 // clang-format on
 
-const mat4f& Actor::getTransformMtx() const {
+const mat4f& Actor::getTransformMtx() const
+{
 	if (!m_isTrasformAsMtxValid) {
 		m_isTrasformAsMtxValid = true;
 		m_trasformAsMtx = m_logicTransform.toMatrix();
@@ -41,8 +40,9 @@ const mat4f& Actor::getTransformMtx() const {
 //	setTransformEx(newTransf, false, false, false);
 //}
 
-void Actor::setTransform(const transf3d& transform, bool killVelocity) {
-	// Recompute binding is making alot of trouble, if the child object has 
+void Actor::setTransform(const transf3d& transform, bool killVelocity)
+{
+	// Recompute binding is making alot of trouble, if the child object has
 	// self moving logic e do want to recompute binding when we call
 	// setTransform.
 	// When then object is static we usually do not call this at all, except in the editor.
@@ -51,30 +51,35 @@ void Actor::setTransform(const transf3d& transform, bool killVelocity) {
 	setTransformEx(transform, killVelocity, recomputeBinding, true);
 }
 
-void Actor::setLocalTransform(const transf3d& localTransform, bool killVelocity) {
+void Actor::setLocalTransform(const transf3d& localTransform, bool killVelocity)
+{
 	const Actor* parentActor = getWorld()->getActorById(getWorld()->getParentId(getId()));
 	if (parentActor) {
 		// TODO: should it be done with binding magic?
 		transf3d newWorldTransform = parentActor->getTransform() * localTransform;
 		setTransformEx(newWorldTransform, killVelocity, true, true);
-	} else {
+	}
+	else {
 		setTransformEx(localTransform, killVelocity, true, true);
 	}
 }
 
-void Actor::setPosition(const vec3f& p, bool killVelocity) {
+void Actor::setPosition(const vec3f& p, bool killVelocity)
+{
 	transf3d newTr = getTransform();
 	newTr.p = p;
 	setTransform(newTr, killVelocity);
 }
 
-void Actor::setOrientation(const quatf& r, bool killVelocity) {
+void Actor::setOrientation(const quatf& r, bool killVelocity)
+{
 	transf3d newTr = getTransform();
 	newTr.r = r;
 	setTransform(newTr, killVelocity);
 }
 
-void Actor::setTransformEx(const transf3d& newTransform, bool killVelocity, bool recomputeBinding, bool shouldChangeRigidBodyTransform) {
+void Actor::setTransformEx(const transf3d& newTransform, bool killVelocity, bool recomputeBinding, bool shouldChangeRigidBodyTransform)
+{
 	transf3d oldTransform = m_logicTransform;
 	m_isTrasformAsMtxValid = false;
 	m_logicTransform = newTransform;
@@ -107,15 +112,8 @@ void Actor::setTransformEx(const transf3d& newTransform, bool killVelocity, bool
 		for (int t = 0; t < pAllChildren->size(); ++t) {
 			Actor* const child = getWorld()->getActorById(pAllChildren->data()[t]);
 			if (child) {
-				transf3d childNewTransformWS;
-				if (child->m_bindingIgnoreRotation) {
-					childNewTransformWS = child->getTransform();
-					childNewTransformWS.p = m_logicTransform.s * child->m_bindingToParentTransform.p + m_logicTransform.p;
-				} else {
-					childNewTransformWS = transf3d::applyBindingTransform(child->m_bindingToParentTransform, m_logicTransform);
-				}
+				transf3d childNewTransformWS = transf3d::applyBindingTransform(child->m_bindingToParentTransform, m_logicTransform);
 				child->setTransformEx(childNewTransformWS, killVelocity, recomputeBinding, true);
-				//}
 			}
 		}
 	}
@@ -127,7 +125,8 @@ void Actor::setTransformEx(const transf3d& newTransform, bool killVelocity, bool
 InspectorCmd* Actor::generateDeleteItemCmd(GameInspector* UNUSED(inspector),
                                            const SelectedItem* items,
                                            int numItems,
-                                           bool UNUSED(ifActorModeShouldDeleteActorsUnder)) {
+                                           bool UNUSED(ifActorModeShouldDeleteActorsUnder))
+{
 	if (numItems == 1 && items[0].editMode == editMode_actors) {
 		CmdObjectDeletion* const cmdDel = new CmdObjectDeletion;
 		vector_set<ObjectId> objToDel;
@@ -144,7 +143,8 @@ InspectorCmd* Actor::generateItemSetTransformCmd(GameInspector* UNUSED(inspector
                                                  EditMode const mode,
                                                  int UNUSED(itemIndex),
                                                  const transf3d& initalTrasform,
-                                                 const transf3d& newTransform) {
+                                                 const transf3d& newTransform)
+{
 	if (mode == editMode_actors) {
 		CmdMemberChange* cmd = new CmdMemberChange;
 		cmd->setupLogicTransformChange(*this, initalTrasform, newTransform);

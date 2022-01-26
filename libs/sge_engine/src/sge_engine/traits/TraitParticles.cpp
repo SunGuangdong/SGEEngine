@@ -96,6 +96,7 @@ ReflBlock() {
 	;
 
 	ReflAddType(VeloctyForce)
+		ReflEnumVal(VelictyForce_none, "None")
 		ReflEnumVal(VelictyForce_directional, "Directional")
 		ReflEnumVal(VelictyForce_towardsPoint, "Point")
 		ReflEnumVal(VelictyForce_spherical, "Spherical")
@@ -135,31 +136,44 @@ ReflBlock() {
 // clang-format on
 
 
-/// Computes the random point inside a sphere or on the surface of the sphere.
-/// it is importatnt that u and v are picked randomly.
-///
-/// In short if you want random point on the surfaces call getRandomOnSphere(rnd0, rnd1, 0.f, 0.f)
-/// In short if you want random point in the volume call getRandomOnSphere(rnd0, rnd1, maxRadius, rnd3)
-///
+/// Computes the random point on the surface of a sphere.
+/// it is importatnt that u and v are picked uniformly.
 /// @param [in] uRandom a number in range [0;1]
 /// @param [in] vRandom a number in range [0;1]
-/// @param [in] maxRadius is the radius in the sphere where the random points might be located.
-///                       if 0.f than the points would be generated only on the surface of the sphere.
-/// @param [in] radiusRandom If @maxRadius is != 0, than this would be the random number in [0;1] range
-///                          used to pick a point inside the volume of the sphere, otherwise unused.
-///
 /// @return the direction on the sphere.
-vec3f getRandomOnSphere(float uRandom, float vRandom, float maxRadius, float radiusRandom)
+vec3f getRandomOnSphereSurface(float uRandom, float vRandom)
 {
 	float theta = uRandom * two_pi();
 	float phi = acosf(2.f * vRandom - 1.f);
-	float r = 0.f;
-	if (maxRadius > 0.f) {
-		r = std::max(1e-3f, cbrtf(radiusRandom) * maxRadius);
-	}
-	else {
-		r = 1.f;
-	}
+	float r = 1.f;
+	
+	float sinTheta = sinf(theta);
+	float cosTheta = cosf(theta);
+	float sinPhi = sinf(phi);
+	float cosPhi = cosf(phi);
+
+	vec3f randomPoint;
+
+	randomPoint.x = r * cosPhi;
+	randomPoint.y = r * sinPhi * sinTheta;
+	randomPoint.z = r * sinPhi * cosTheta;
+
+	return randomPoint;
+}
+
+/// Computes the random point inside a sphere.
+/// it is importatnt that u, v and radiusRandom are picked uniformly.
+/// @param [in] uRandom a number in range [0;1]
+/// @param [in] vRandom a number in range [0;1]
+/// @param [in] radiusRandom a number in range [0;1]
+/// @param [in] maxRadius is the radius of the sphere where the random points will be located.
+/// @return the random point in the sphere.
+vec3f getRandomInSphereVolume(float uRandom, float vRandom, float radiusRandom, float maxRadius)
+{
+	float theta = uRandom * two_pi();
+	float phi = acosf(2.f * vRandom - 1.f);
+	float r = std::max(1e-3f, cbrtf(radiusRandom) * maxRadius);
+
 	float sinTheta = sinf(theta);
 	float cosTheta = cosf(theta);
 	float sinPhi = sinf(phi);
@@ -182,9 +196,11 @@ vec3f computeAddedVelocity(Random& rnd, const vec3f& particlePosition, const Vel
 	vec3f velocity = vec3f(0.f);
 
 	switch (velDesc.forceType) {
+		case VelictyForce_none: {
+		} break;
 		case VelictyForce_directional: {
 			// TODO: precalculate this.
-			vec3f dir = quat_mul_pos(velDesc.directional.directon, vec3f(0.f, -1.f, 0.f));
+			vec3f dir = velDesc.directional.directon.getDirection();
 
 			velocity += dir * velDesc.directional.velocityAmount;
 		} break;
@@ -199,7 +215,7 @@ vec3f computeAddedVelocity(Random& rnd, const vec3f& particlePosition, const Vel
 			if (dirLenSqr < 1e-6f) {
 				// The point is at the velocity source position.
 				// pick a random point direction based on a sphere.
-				getRandomOnSphere(rnd.next01(), rnd.next01(), 0.f, 0.f);
+				getRandomOnSphereSurface(rnd.next01(), rnd.next01());
 			}
 			else {
 				dir *= 1.f / sqrtf(dirLenSqr);
@@ -273,10 +289,11 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 				float u = m_rnd.next01();
 				float v = m_rnd.next01();
 				if (pgDesc.birthShape.sphere.sphereIsVolume) {
-					spawnPos = getRandomOnSphere(u, v, pgDesc.birthShape.sphere.sphereRadius, m_rnd.next01());
+					float rRnd = m_rnd.next01();
+					spawnPos = getRandomInSphereVolume(u, v, rRnd, pgDesc.birthShape.sphere.sphereRadius);
 				}
 				else {
-					spawnPos = getRandomOnSphere(u, v, 0.f, 0.f);
+					spawnPos = getRandomOnSphereSurface(u, v) * pgDesc.birthShape.sphere.sphereRadius;
 				}
 
 				spawnPos += pgDesc.birthShape.sphere.sphereCenter;
@@ -294,7 +311,7 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 				if (pgDesc.birthShape.circle.circleAsDisk) {
 					float rho = std::max(1e-3f, sqrtf(m_rnd.next01()) * pgDesc.birthShape.circle.circleRadius);
 					float theta = m_rnd.next01() * two_pi();
-					spawnPos = vec3f(0.f, sin(theta), cosf(theta)) * rho;
+					spawnPos = vec3f(sin(theta), 0.f, cosf(theta)) * rho;
 				}
 				else {
 					float angle = m_rnd.next01() * two_pi();
@@ -303,7 +320,7 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 					spawnPos.z = pgDesc.birthShape.circle.circleRadius * sinf(angle);
 				}
 
-				spawnPos = quat_mul_pos(pgDesc.birthShape.circle.circleRotation, spawnPos);
+				spawnPos = pgDesc.birthShape.circle.circleRotation.transformPt(spawnPos);
 				spawnPos += pgDesc.birthShape.circle.circlePosition;
 			} break;
 			default: {

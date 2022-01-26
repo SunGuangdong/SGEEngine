@@ -457,7 +457,7 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 				drawRenderItem_TraitViewportIcon(*riTraitViewportIcon, drawSets, drawReason);
 			}
 			else if (auto riTraitParticles = dynamic_cast<TraitParticlesSimpleRenderItem*>(riRaw)) {
-				drawRenderItem_TraitParticlesSimple(*riTraitParticles, drawSets, lighting);
+				drawRenderItem_TraitParticlesSimple(*riTraitParticles, drawSets, drawReason, lighting);
 			}
 			else if (auto riTraitParticlesProgrammable = dynamic_cast<TraitParticlesProgrammableRenderItem*>(riRaw)) {
 				drawRenderItem_TraitParticlesProgrammable(*riTraitParticlesProgrammable, drawSets, lighting);
@@ -657,6 +657,7 @@ void DefaultGameDrawer::drawRenderItem_TraitViewportIcon(TraitViewportIconRender
 
 void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimpleRenderItem& ri,
                                                             const GameDrawSets& drawSets,
+                                                            DrawReason drawReason,
                                                             const ObjectLighting& lighting)
 {
 	TraitParticlesSimple* ttParticles = ri.traitParticles;
@@ -678,11 +679,102 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 		}
 	}
 
-	
+	if (drawReason_IsVisualizeSelection(drawReason)) {
+		QuickDraw* qdraw = drawSets.quickDraw;
+		qdraw->drawWired_Clear();
 
-	bool hasPreviewGroup = ttParticles->m_uiSelectedGroup >= 0 && ttParticles->m_uiSelectedGroup < ttParticles->m_pgroups.size();
-	if (hasPreviewGroup) {
+		Actor* ownerActor = dynamic_cast<Actor*>(ri.traitParticles->getObject());
+		bool hasPreviewGroup = ttParticles->m_uiSelectedGroup >= 0 && ttParticles->m_uiSelectedGroup < ttParticles->m_pgroups.size();
 
+		if (hasPreviewGroup) {
+			ParticleGroupDesc& pgdesc = ttParticles->m_pgroups[ttParticles->m_uiSelectedGroup];
+
+			mat4f n2w = ownerActor->getTransformMtx();
+
+			switch (pgdesc.birthShape.shapeType) {
+				case birthShape_sphere: {
+					qdraw->drawWiredAdd_Sphere(n2w * mat4f::getTranslation(pgdesc.birthShape.sphere.sphereCenter), 0x00ff00ff,
+					                           pgdesc.birthShape.sphere.sphereRadius);
+				} break;
+				case birthShape_plane: {
+					vec3f planeOrigin = mat_mul_pos(n2w, pgdesc.birthShape.plane.planePosition);
+					vec3f planeX = mat_mul_dir(n2w, vec3f::axis_x(pgdesc.birthShape.plane.planeSize.x));
+					vec3f planeZ = mat_mul_dir(n2w, vec3f::axis_z(pgdesc.birthShape.plane.planeSize.y));
+					float arrowLen = pgdesc.birthShape.plane.planeSize.length();
+					vec3f planeNormal = pgdesc.birthShape.plane.planeRotation.getDirection() * arrowLen;
+					planeNormal = mat_mul_dir(n2w, planeNormal);
+
+					qdraw->drawWiredAdd_Grid(planeOrigin, planeX, planeZ, 2, 2, 0x00ff00ff);
+					qdraw->drawWiredAdd_Arrow(planeOrigin, planeNormal, 0x00ff00ff);
+				} break;
+				case birthShape_point: {
+				} break;
+				case birthShape_line: {
+				} break;
+				case birthShape_circle: {
+					mat4f circleTform = n2w * mat4f::getTRS(pgdesc.birthShape.circle.circlePosition,
+					                                        pgdesc.birthShape.circle.circleRotation.toQuaternion(), vec3f(1.f));
+
+					qdraw->drawWiredAdd_EllipseXZ(circleTform, pgdesc.birthShape.circle.circleRadius, pgdesc.birthShape.circle.circleRadius,
+					                              0xffff0000);
+				} break;
+			}
+
+			auto drawParticleForce = [](QuickDraw* qdraw, const mat4f& n2w, const Velocity& vel, uint32 color) -> void {
+				switch (vel.forceType) {
+					case VelictyForce_directional: {
+						vec3f arrowFrom = mat_mul_pos(n2w, vec3f(0.f));
+						vec3f arrowTo = vel.directional.directon.getDirection() * vel.directional.velocityAmount;
+
+						arrowTo = mat_mul_dir(n2w, arrowTo) + arrowFrom;
+						qdraw->drawWiredAdd_Arrow(arrowFrom, arrowTo, color);
+					} break;
+					case VelictyForce_towardsPoint: {
+						mat4f n2wSphere = n2w;
+						n2wSphere.c3.x = vel.towardsPoint.pointLocation.x;
+						n2wSphere.c3.y = vel.towardsPoint.pointLocation.y;
+						n2wSphere.c3.z = vel.towardsPoint.pointLocation.z;
+						qdraw->drawWiredAdd_Sphere(n2w, color, 0.1f, 2);
+					} break;
+					case VelictyForce_spherical: {
+						mat4f n2wSphere = n2w;
+
+						vec3f arrowEnds[] = {
+						    vec3f(1.732f, 1.732f, 1.732f),   vec3f(1.732f, -1.732f, 1.732f),
+						    vec3f(-1.732f, 1.732f, 1.732f),  vec3f(-1.732f, -1.732f, 1.732f),
+
+						    vec3f(1.732f, 1.732f, -1.732f),  vec3f(1.732f, -1.732f, -1.732f),
+						    vec3f(-1.732f, 1.732f, -1.732f), vec3f(-1.732f, -1.732f, -1.732f),
+						};
+
+						for (vec3f& v : arrowEnds) {
+							v = mat_mul_pos(n2w, v);
+						}
+
+						vec3f arrowOrigin = vel.spherical.sphereCenter;
+						arrowOrigin = mat_mul_pos(n2w, arrowOrigin);
+
+						for (const vec3f& arrowEnd : arrowEnds) {
+							qdraw->drawWiredAdd_Arrow(arrowOrigin, arrowEnd, color);
+						}
+
+						n2wSphere.c3.x = vel.spherical.sphereCenter.x;
+						n2wSphere.c3.y = vel.spherical.sphereCenter.y;
+						n2wSphere.c3.z = vel.spherical.sphereCenter.z;
+						qdraw->drawWiredAdd_Sphere(n2w, color, vel.spherical.velocityAmount, 2);
+
+					} break;
+				}
+			};
+
+			drawParticleForce(qdraw, n2w, pgdesc.initialVelocty, 0xffffff00);
+
+			for (auto& vel : pgdesc.velocityForces) {
+				drawParticleForce(qdraw, n2w, vel, 0xff00ff00);
+			}
+
+			qdraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+		}
 	}
 }
 

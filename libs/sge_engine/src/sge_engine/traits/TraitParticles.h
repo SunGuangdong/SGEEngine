@@ -4,6 +4,7 @@
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Random.h"
 #include "sge_utils/math/Rangef.h"
+#include "sge_utils/math/SphericalCoordinates.h"
 #include "sge_utils/utils/optional.h"
 
 #include "sge_engine/Actor.h"
@@ -41,13 +42,13 @@ struct SphereBirthShape {
 	// Sphere birth shape settings.
 	bool sphereIsVolume = false;
 	vec3f sphereCenter = vec3f(0.f);
-	float sphereRadius = 0.f;
+	float sphereRadius = 1.f;
 };
 
 struct PlaneBirthShape {
 	// Plane birth shape settings.
 	vec3f planePosition = vec3f(0.f);
-	quatf planeRotation = quatf::getIdentity(); ///< Identity means it is facing -y.
+	SphericalRotation planeRotation = SphericalRotation::axis_neg_y();
 	vec2f planeSize = vec2f(1.f);
 };
 
@@ -67,7 +68,7 @@ struct CircleBirthShape {
 	bool circleAsDisk = false;
 	vec3f circlePosition = vec3f(0.f);
 	float circleRadius = 1.f;
-	quatf circleRotation = quatf::getIdentity(); ///< Identity means it is in the xz plane.
+	SphericalRotation circleRotation = SphericalRotation::axis_neg_y();
 };
 
 enum BirthShape {
@@ -92,7 +93,7 @@ struct BirthShapeDesc {
 // Velocity forces sources.
 //------------------------------------------------------------
 struct VelocityDirectionalVelocty {
-	quatf directon = quatf::getIdentity(); // identity means -y
+	SphericalRotation directon = SphericalRotation::axis_neg_y();
 	float velocityAmount = 1.f;
 
 	// working variables, updated internally.
@@ -110,13 +111,14 @@ struct VelocitySpherical {
 };
 
 enum VeloctyForce : int {
+	VelictyForce_none,
 	VelictyForce_directional,
 	VelictyForce_towardsPoint,
 	VelictyForce_spherical,
 };
 
 struct Velocity {
-	VeloctyForce forceType = VelictyForce_directional;
+	VeloctyForce forceType = VelictyForce_none;
 
 	VelocityDirectionalVelocty directional;
 	VelocityTowardsPoint towardsPoint;

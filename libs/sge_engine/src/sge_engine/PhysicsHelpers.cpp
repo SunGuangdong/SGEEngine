@@ -7,7 +7,8 @@ namespace sge {
 //-------------------------------------------------------------------------
 // RayResultCollisionObject
 //-------------------------------------------------------------------------
-btScalar RayResultCollisionObject::addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool normalInWorldSpace) {
+btScalar RayResultCollisionObject::addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool normalInWorldSpace)
+{
 	// Caller already does the filter on the m_closestHitFraction.
 	if (rayResult.m_hitFraction > m_closestHitFraction) {
 		return 1.f;
@@ -39,7 +40,8 @@ btScalar RayResultCollisionObject::addSingleResult(btDynamicsWorld::LocalRayResu
 void RayResultActor::setup(const Actor* const igonreActor,
                            const btVector3& rayFromWorld,
                            const btVector3& rayToWorld,
-                           std::function<bool(const Actor*)> customFilter) {
+                           std::function<bool(const Actor*)> customFilter)
+{
 	m_customFilter = customFilter;
 	m_ignoreActor = igonreActor;
 	m_rayFromWorld = rayFromWorld;
@@ -51,7 +53,8 @@ void RayResultActor::setup(const Actor* const igonreActor,
 //-------------------------------------------------------------------------
 // RayResultActor
 //-------------------------------------------------------------------------
-btScalar RayResultActor::addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool normalInWorldSpace) {
+btScalar RayResultActor::addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool normalInWorldSpace)
+{
 	// Caller already does the filter on the m_closestHitFraction.
 	if (rayResult.m_hitFraction > m_closestHitFraction) {
 		return 1.f;
@@ -84,7 +87,8 @@ btScalar RayResultActor::addSingleResult(btDynamicsWorld::LocalRayResult& rayRes
 //-------------------------------------------------------------------------
 //
 //-------------------------------------------------------------------------
-void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* const rootActor) {
+void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* const rootActor)
+{
 	GameWorld& world = *rootActor->getWorld();
 	vector_set<const RigidBody*> processedRigidBodies;
 
@@ -140,8 +144,8 @@ void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* c
 				continue;
 			}
 
-			result[contactedActor].ignoreRotation = parentIgnoreRotation || contactedActor->m_bindingIgnoreRotation;
-			processManifolds(contactedRigidBody, parentIgnoreRotation || contactedActor->m_bindingIgnoreRotation);
+			result[contactedActor].ignoreRotation = parentIgnoreRotation;
+			processManifolds(contactedRigidBody, parentIgnoreRotation);
 		}
 
 		// Now process the contacts of our children.
@@ -153,8 +157,7 @@ void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* c
 				if (child) {
 					TraitRigidBody* childRBTrait = getTrait<TraitRigidBody>(child);
 					if (childRBTrait) {
-						processManifolds(childRBTrait->getRigidBody(),
-						                 parentIgnoreRotation || rbContactsToProcess->actor->m_bindingIgnoreRotation);
+						processManifolds(childRBTrait->getRigidBody(), parentIgnoreRotation);
 					}
 				}
 			}
@@ -174,7 +177,7 @@ void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* c
 			if (child) {
 				TraitRigidBody* childRBTrait = getTrait<TraitRigidBody>(child);
 				if (childRBTrait) {
-					processManifolds(childRBTrait->getRigidBody(), rootActor->m_bindingIgnoreRotation || child->m_bindingIgnoreRotation);
+					processManifolds(childRBTrait->getRigidBody(), false);
 				}
 			}
 		}

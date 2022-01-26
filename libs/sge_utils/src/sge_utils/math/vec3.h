@@ -590,4 +590,15 @@ typedef vec3<unsigned int> vec3u;
 typedef vec3<float> vec3f;
 typedef vec3<double> vec3d;
 
+// Rotates a point @pt around @axisNormalized (witch needs to be normalized) with @angle radians.
+// https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+inline vec3f rotateAround(const vec3f& axisNormalized, float angle, const vec3f& pt)
+{
+	float s, c;
+	SinCos(angle, s, c);
+	vec3f ptRotated = pt * c + cross(axisNormalized, pt) * s + axisNormalized * (dot(axisNormalized, pt)) * (1.f - c);
+
+	return ptRotated;
+}
+
 } // namespace sge

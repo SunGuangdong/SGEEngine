@@ -20,6 +20,7 @@
 #include "sge_utils/math/EulerAngles.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"
+#include "sge_utils/math/SphericalCoordinates.h"
 #include "sge_utils/utils/Variant.h"
 #include "sge_utils/utils/strings.h"
 
@@ -76,7 +77,6 @@ void ProperyEditorUIGen::doGameObjectUI(GameInspector& inspector, GameObject* co
 				ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(GameObject, m_displayName));
 				if (gameObject->isActor()) {
 					ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(Actor, m_logicTransform));
-					ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(Actor, m_forceAlphaZSort));
 				}
 
 				actorCustomAETrait->doAttributeEditor(&inspector);
@@ -215,7 +215,7 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		for (int t = 0; t < 3; t++) {
 			eulerAngles[t] = deg2rad(eulerAngles[t]);
 		}
-		
+
 		v.r = eulerToQuaternion(eulerAngles);
 
 		// If the user has just started interacting with this widget remember the inial value of the member.
@@ -538,6 +538,52 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			if (*g_propWidgetState.widgetSavedData.get<vec4f>() != v4ref) {
 				CmdMemberChange* cmd = new CmdMemberChange;
 				cmd->setup(gameObject, chain, g_propWidgetState.widgetSavedData.get<vec4f>(), &v4edit, nullptr);
+				inspector.appendCommand(cmd, true);
+
+				g_propWidgetState.widgetSavedData.Destroy();
+			}
+		}
+	}
+	else if (memberTypeDesc->typeId == sgeTypeId(SphericalRotation)) {
+		SphericalRotation& v3ref = *(SphericalRotation*)(pMember);
+		SphericalRotation v3edit;
+		v3edit.aroundY = rad2deg(v3ref.aroundY);
+		v3edit.fromY = rad2deg(v3ref.fromY);
+
+		
+		bool change = false;
+
+
+		ImGuiEx::BeginGroupPanel(memberName);
+		ImGuiEx::Label("Angle From +Y");
+		bool justReleased0 = false;
+		bool justActivated0 = false;
+		change |= SGEImGui::DragFloats("##SphericalRotation_RotationAroundY123", &v3edit.aroundY, 1, &justReleased0, &justActivated0);
+		ImGuiEx::Label("Angle Around +Y");
+		bool justReleased1 = false;
+		bool justActivated1 = false;
+		change |= SGEImGui::DragFloats("##SphericalRotation_RotationFromY", &v3edit.fromY, 1, &justReleased1, &justActivated1);
+		ImGuiEx::EndGroupPanel();
+
+		bool justReleased = justReleased0 || justReleased1;
+		bool justActivated = justActivated0 || justActivated1;
+
+		v3edit.aroundY = deg2rad(v3edit.aroundY);
+		v3edit.fromY = deg2rad(v3edit.fromY);
+
+		if (justActivated) {
+			g_propWidgetState.widgetSavedData.resetVariantToValue<SphericalRotation>(v3ref);
+		}
+
+		if (change) {
+			v3ref = v3edit;
+		}
+
+		if (justReleased) {
+			// Check if the new data is actually different, as the UI may fire a lot of updates at us.
+			if (*g_propWidgetState.widgetSavedData.get<SphericalRotation>() != v3ref) {
+				CmdMemberChange* cmd = new CmdMemberChange;
+				cmd->setup(gameObject, chain, g_propWidgetState.widgetSavedData.get<SphericalRotation>(), &v3edit, nullptr);
 				inspector.appendCommand(cmd, true);
 
 				g_propWidgetState.widgetSavedData.Destroy();

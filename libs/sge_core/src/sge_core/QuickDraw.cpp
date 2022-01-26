@@ -686,13 +686,14 @@ void QuickDraw::drawWiredAdd_EllipseXZ(const mat4f& transformMtx, float xSize, f
 	
 	vec3f arm = vec3f(1.f, 0.f, 0.f);
 	vec3f armScaledPrev = vec3f(0.f);
-	for (int iSeg = 0; iSeg < (numSegments); ++iSeg) {
+	for (int iSeg = 0; iSeg < (numSegments + 1); ++iSeg) {
 		vec3f armScaled = arm;
 		armScaled.x *= xSize;
 		armScaled.z *= ySize;
 
+		armScaled = mat_mul_pos(transformMtx, armScaled);
+
 		if (iSeg > 0) {
-			armScaled = mat_mul_pos(transformMtx, armScaled);
 			m_wireframeVerts.push_back(GeomGen::PosColorVert(armScaledPrev, rgba));
 			m_wireframeVerts.push_back(GeomGen::PosColorVert(armScaled, rgba));
 		}

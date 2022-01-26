@@ -1,9 +1,9 @@
 #include "sge_utils/math/Box.h"
+#include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"
+#include "sge_utils/math/SphericalCoordinates.h"
 #include "sge_utils/math/mat4.h"
 #include "sge_utils/math/transform.h"
-
-#include "sge_utils/math/MultiCurve2D.h"
 
 #include <string>
 #include <vector>
@@ -90,10 +90,12 @@ ReflBlock() {
 	ReflAddType(vec2i)
 		ReflMember(vec2i, x)
 		ReflMember(vec2i, y);
+
 	ReflAddType(vec3i)
 		ReflMember(vec3i, x)
 		ReflMember(vec3i, y)
 		ReflMember(vec3i, z);
+
 	ReflAddType(vec4i)
 		ReflMember(vec4i, x)
 		ReflMember(vec4i, y)
@@ -104,10 +106,12 @@ ReflBlock() {
 	ReflAddType(vec2f)
 		ReflMember(vec2f, x)
 		ReflMember(vec2f, y);
+	
 	ReflAddType(vec3f)
 		ReflMember(vec3f, x)
 		ReflMember(vec3f, y)
 		ReflMember(vec3f, z);
+
 	ReflAddType(vec4f)
 		ReflMember(vec4f, x)
 		ReflMember(vec4f, y)
@@ -120,6 +124,17 @@ ReflBlock() {
 		ReflMember(quatf, z)
 		ReflMember(quatf, w);
 	
+	ReflAddType(SphericalRotation)
+		ReflMember(SphericalRotation, fromY)
+		ReflMember(SphericalRotation, aroundY)
+	;
+
+	ReflAddType(SphericalCoord)
+		ReflMember(SphericalCoord, fromY)
+		ReflMember(SphericalCoord, aroundY)
+		ReflMember(SphericalCoord, radius)
+	;
+
 	ReflAddType(std::vector<vec2i>);
 	ReflAddType(std::vector<vec3i>);
 	ReflAddType(std::vector<vec4i>);

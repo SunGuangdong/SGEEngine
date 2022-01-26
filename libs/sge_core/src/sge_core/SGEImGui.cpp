@@ -507,7 +507,7 @@ bool SGEImGui::DragFloats(const char* label,
 
 	bool value_changed = false;
 	ImGui::BeginGroup();
-	ImGui::PushID(label);
+	ImGuiEx::IDGuard idGuard(label);
 	ImGui::PushMultiItemsWidths(numFloats, ImGui::CalcItemWidth());
 	for (int i = 0; i < numFloats; i++) {
 		ImGui::PushID(i);
@@ -516,6 +516,7 @@ bool SGEImGui::DragFloats(const char* label,
 		ImGui::SameLine(0, style.ItemInnerSpacing.x);
 		ImGui::PopItemWidth();
 
+		// Middle click reset.
 		if (ImGui::IsItemClicked(2)) {
 			floats[i] = middleClickResetValue;
 			value_changed = true;
@@ -537,7 +538,7 @@ bool SGEImGui::DragFloats(const char* label,
 			*pJustActivated |= IsItemJustActivated();
 		}
 	}
-	ImGui::PopID();
+
 	ImGui::EndGroup();
 
 	return value_changed;
@@ -560,7 +561,7 @@ bool SGEImGui::DragInts(const char* label,
 
 	bool value_changed = false;
 	ImGui::BeginGroup();
-	ImGui::PushID(label);
+	ImGuiEx::IDGuard idGuard(label);
 	ImGui::PushMultiItemsWidths(numInts, ImGui::CalcItemWidth());
 	for (int i = 0; i < numInts; i++) {
 		ImGui::PushID(i);
@@ -578,7 +579,6 @@ bool SGEImGui::DragInts(const char* label,
 			*pJustActivated |= IsItemJustActivated();
 		}
 	}
-	ImGui::PopID();
 	ImGui::EndGroup();
 
 	return value_changed;
@@ -594,6 +594,9 @@ bool SGEImGui::ColorPicker4(const char* label,
                             bool* const pJustActivated,
                             ImGuiColorEditFlags flags,
                             const float* ref_col) {
+
+
+
 	const auto RenderArrowsForVerticalBar = [](ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, float bar_w) -> void {
 		const auto RenderArrow = [](ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, ImGuiDir direction, ImU32 col) -> void {
 			switch (direction) {

@@ -68,6 +68,7 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 
 	void drawRenderItem_TraitParticlesSimple(TraitParticlesSimpleRenderItem& ri,
 	                                         const GameDrawSets& drawSets,
+	                                         DrawReason drawReason,
 	                                         const ObjectLighting& generalMods);
 
 	void drawRenderItem_TraitParticlesProgrammable(TraitParticlesProgrammableRenderItem& ri,
