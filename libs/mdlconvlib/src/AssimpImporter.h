@@ -7,7 +7,7 @@
 #include "sge_core/AssetLibrary/AssetMaterial.h"
 #include "sge_core/model/Model.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/optional.h"
+#include "sge_utils/containers/Optional.h"
 
 namespace sge {
 

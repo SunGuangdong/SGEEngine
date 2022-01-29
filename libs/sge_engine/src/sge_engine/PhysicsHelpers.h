@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_engine/Physics.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/containers/vector_set.h"
 #include <functional>
 #include <iosfwd>
 

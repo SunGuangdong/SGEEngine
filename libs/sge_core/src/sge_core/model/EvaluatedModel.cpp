@@ -3,7 +3,7 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/range_loop.h"
+#include "sge_utils/containers/Range.h"
 
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 
@@ -43,14 +43,14 @@ void EvaluatedModel::evaluateStatic() {
 
 
 bool EvaluatedModel::evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount) {
-	span<const mat4f> nodesTrasfSpan = span<const mat4f>(nodesGlobalTransform, nodesGlobalTransformCount);
+	ArrayView<const mat4f> nodesTrasfSpan = ArrayView<const mat4f>(nodesGlobalTransform, nodesGlobalTransformCount);
 	evaluate_ApplyNodeGlobalTransforms(nodesTrasfSpan);
 	evaluate_Skinning();
 	evaluate_getAllGeometries();
 	return true;
 }
 
-bool EvaluatedModel::evaluate_ApplyNodeGlobalTransforms(const span<const mat4f>& boneGlobalTrasnformOverrides) {
+bool EvaluatedModel::evaluate_ApplyNodeGlobalTransforms(const ArrayView<const mat4f>& boneGlobalTrasnformOverrides) {
 	aabox.setEmpty();
 	m_evaluatedNodes.resize(m_model->numNodes());
 

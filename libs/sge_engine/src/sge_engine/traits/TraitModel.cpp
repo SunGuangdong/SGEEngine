@@ -13,10 +13,10 @@
 #include "sge_engine/actors/ALocator.h"
 #include "sge_engine_ui/ui/UIAssetPicker.h"
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
-#include "sge_utils/loop.h"
+#include "sge_utils/containers/vector_set.h"
+#include "sge_utils/containers/Range.h"
 #include "sge_utils/stl_algorithm_ex.h"
-#include "sge_utils/utils/strings.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/text/format.h"
 
 namespace sge {
 
@@ -42,12 +42,14 @@ ReflBlock() {
 //-----------------------------------------------------------------
 // TraitModel::ModelEntry
 //-----------------------------------------------------------------
-void ModelEntry::setModel(const char* assetPath, bool setupCustomEvalState) {
+void ModelEntry::setModel(const char* assetPath, bool setupCustomEvalState)
+{
 	AssetPtr asset = getCore()->getAssetLib()->getAssetFromFile(assetPath);
 	setModel(asset, setupCustomEvalState);
 }
 
-void ModelEntry::setModel(AssetPtr& asset, bool setupCustomEvalState) {
+void ModelEntry::setModel(AssetPtr& asset, bool setupCustomEvalState)
+{
 	customEvalModel = NullOptional();
 	m_assetProperty.setAsset(asset);
 
@@ -62,7 +64,8 @@ void ModelEntry::setModel(AssetPtr& asset, bool setupCustomEvalState) {
 	changeIndex.markAChange();
 }
 
-void ModelEntry::onAssetModelChanged() {
+void ModelEntry::onAssetModelChanged()
+{
 	customEvalModel = NullOptional();
 
 	if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(m_assetProperty.getAsset())) {
@@ -70,13 +73,15 @@ void ModelEntry::onAssetModelChanged() {
 	}
 }
 
-AABox3f ModelEntry::getBBoxOS(const mat4f& invWorldTrasnform) const {
+AABox3f ModelEntry::getBBoxOS(const mat4f& invWorldTrasnform) const
+{
 	AABox3f bbox;
 
 	// If the attached asset is a model use it to compute the bounding box.
 	if (customEvalModel) {
 		bbox = customEvalModel->aabox.getTransformed(m_additionalTransform);
-	} else {
+	}
+	else {
 		const AssetIface_Model3D* const modelIface = m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 		if (modelIface) {
 			bbox = modelIface->getStaticEval().aabox.getTransformed(m_additionalTransform);
@@ -94,17 +99,20 @@ AABox3f ModelEntry::getBBoxOS(const mat4f& invWorldTrasnform) const {
 //-----------------------------------------------------------------
 // TraitModel
 //-----------------------------------------------------------------
-void TraitModel::addModel(const char* assetPath, bool setupCustomEvalState) {
+void TraitModel::addModel(const char* assetPath, bool setupCustomEvalState)
+{
 	m_models.push_back(ModelEntry());
 	m_models.back().setModel(assetPath, setupCustomEvalState);
 }
 
-void TraitModel::addModel(AssetPtr& asset, bool setupCustomEvalState) {
+void TraitModel::addModel(AssetPtr& asset, bool setupCustomEvalState)
+{
 	m_models.push_back(ModelEntry());
 	m_models.back().setModel(asset, setupCustomEvalState);
 }
 
-AABox3f TraitModel::getBBoxOS() const {
+AABox3f TraitModel::getBBoxOS() const
+{
 	AABox3f bbox;
 	for (const ModelEntry& mdl : m_models) {
 		bbox.expand(mdl.getBBoxOS(mat4f::getIdentity()));
@@ -113,7 +121,8 @@ AABox3f TraitModel::getBBoxOS() const {
 	return bbox;
 }
 
-void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRenderItem>& renderItems) {
+void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRenderItem>& renderItems)
+{
 	if (isRenderable == false) {
 		return;
 	}
@@ -134,7 +143,8 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRende
 		const EvaluatedModel* evalModel = nullptr;
 		if (modelSets.customEvalModel.hasValue()) {
 			evalModel = &modelSets.customEvalModel.get();
-		} else if (modelIface) {
+		}
+		else if (modelIface) {
 			evalModel = &modelIface->getStaticEval();
 		}
 
@@ -177,13 +187,15 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRende
 	}
 }
 
-void TraitModel::invalidateCachedAssets() {
+void TraitModel::invalidateCachedAssets()
+{
 	for (ModelEntry& modelSets : m_models) {
 		modelSets.invalidateCachedAssets();
 	}
 }
 
-bool TraitModel::updateAssetProperties() {
+bool TraitModel::updateAssetProperties()
+{
 	bool hasChange = false;
 	for (ModelEntry& model : m_models) {
 		hasChange |= model.updateAssetProperty();
@@ -193,7 +205,8 @@ bool TraitModel::updateAssetProperties() {
 }
 
 /// TraitModel user interface that appears in the property editor.
-void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberChain chain) {
+void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberChain chain)
+{
 	TraitModel& traitModel = *(TraitModel*)chain.follow(actor);
 
 	if (ImGui::CollapsingHeader(ICON_FK_CUBE " 3D Models", ImGuiTreeNodeFlags_DefaultOpen)) {
@@ -235,7 +248,7 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 
 					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Materials")) {
 						ImGuiEx::IndentGuard indentCollapsHeaderCotent;
-						for (int iMtl : rng_int(loadedModelIface->getModel3D().numMaterials())) {
+						for (int iMtl : RangeInt(loadedModelIface->getModel3D().numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
 
 							const ModelMaterial* mtl = loadedModelIface->getModel3D().materialAt(iMtl);
@@ -301,7 +314,8 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 	}
 }
 
-SgePluginOnLoad() {
+SgePluginOnLoad()
+{
 	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitModel), editUI_for_TraitModel);
 }
 

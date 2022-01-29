@@ -1,5 +1,5 @@
 #include "ANavMesh_btCollisionShapeToTriangles.h"
-#include "sge_utils/utils/range_loop.h"
+#include "sge_utils/containers/Range.h"
 
 namespace sge {
 
@@ -158,7 +158,7 @@ void btCylinderShapeToTriangles(const btCylinderShape* cylinderShape,
 	// Add the indices forming the triangles around the cylinder.
 	// the last quad of triangles, that connects the last column of vertices to the first one
 	// if written manually.
-	for (const int iSegment : range_int(numHorizontalSegments - 1)) {
+	for (const int iSegment : RangeInt(numHorizontalSegments - 1)) {
 		const int segment1stVertex = iSegment * 2 + newIndicesStart;
 
 		outIndices.push_back(segment1stVertex + 0);
@@ -195,7 +195,7 @@ void btCylinderShapeToTriangles(const btCylinderShape* cylinderShape,
 		outVertices.push_back(mat_mul_pos(transformNoScaling, vec3f(0.f, kHalfHeight, 0.f) * extents));
 
 		// Bottom cap triangles.
-		for (const int iSegment : range_int(numHorizontalSegments)) {
+		for (const int iSegment : RangeInt(numHorizontalSegments)) {
 			const int segment1stVertex = iSegment * 2 + newIndicesStart;
 			const int nextSegmentVertex = newIndicesStart + ((iSegment * 2 + 2) % (numHorizontalSegments * 2));
 			outIndices.push_back(bottomCapVertexIdx);
@@ -204,7 +204,7 @@ void btCylinderShapeToTriangles(const btCylinderShape* cylinderShape,
 		}
 
 		// Top cap triangles.
-		for (const int iSegment : range_int(numHorizontalSegments)) {
+		for (const int iSegment : RangeInt(numHorizontalSegments)) {
 			const int segment1stVertex = iSegment * 2 + newIndicesStart + 1;
 			const int nextSegmentVertex = newIndicesStart + ((iSegment * 2 + 2) % (numHorizontalSegments * 2)) + 1;
 			outIndices.push_back(topCapVertexIdx);

@@ -5,10 +5,10 @@
 #include "sge_engine/GameDrawer/GameDrawer.h"
 
 #include "sge_core/model/EvaluatedModel.h"
-#include "sge_core/model/ModelAnimator2.h"
+#include "sge_core/model/ModelAnimator.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/tiny/orbit_camera.h"
-#include "sge_utils/utils/optional.h"
+#include "sge_utils/other/SimpleOrbitCamera.h"
+#include "sge_utils/containers/Optional.h"
 
 namespace sge {
 
@@ -55,7 +55,7 @@ struct ModelPreviewWindow : public IImGuiWindow {
 	/// The evaluated model state used for render.
 	EvaluatedModel m_eval;
 	// The animator that computes the nodes transforms for a perticualr animation.
-	ModelAnimator2 m_evalAnimator;
+	ModelAnimator m_evalAnimator;
 
 	/// For preview puropuses each animation is added in a separate animation track.
 	/// If the user wants to add more tracks for another 3D model (as we can share animations)

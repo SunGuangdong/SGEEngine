@@ -1,6 +1,6 @@
 #include "IAssetRelocationPolicy.h"
 
-#include "sge_utils/utils/Path.h"
+#include "sge_utils/text/Path.h"
 
 namespace sge {
 

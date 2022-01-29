@@ -3,7 +3,7 @@
 #include "IImGuiWindow.h"
 #include "imgui/imgui.h"
 
-#include "sge_utils/utils/timer.h"
+#include "sge_utils/time/Timer.h"
 
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/SceneInstance.h"

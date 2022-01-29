@@ -21,8 +21,8 @@
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"
 #include "sge_utils/math/SphericalCoordinates.h"
-#include "sge_utils/utils/Variant.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/containers/Variant.h"
+#include "sge_utils/text/format.h"
 
 namespace sge {
 

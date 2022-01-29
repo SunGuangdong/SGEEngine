@@ -3,7 +3,7 @@
 #include "Box.h"
 #include "mat4.h"
 #include "primitives.h"
-#include "sge_utils/utils/optional.h"
+#include "sge_utils/containers/Optional.h"
 
 namespace sge {
 

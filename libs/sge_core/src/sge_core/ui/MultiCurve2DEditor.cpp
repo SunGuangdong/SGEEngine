@@ -1,7 +1,7 @@
 #include "MultiCurve2DEditor.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_utils/math/Box.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 
 #include <unordered_set>
 #include <vector>

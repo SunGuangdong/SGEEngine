@@ -5,9 +5,9 @@
 #include "imgui/imgui.h"
 #include "sgeImportModel3DFile.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
-#include "sge_utils/utils/DLLHandler.h"
-#include <string>
+#include "sge_utils/DLL/DLLHandler.h"
 #include <filesystem>
+#include <string>
 
 namespace sge {
 struct InputState;
@@ -36,15 +36,17 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 
   public:
 	AssetsWindow(std::string windowName);
-	bool isClosed() override {
+	bool isClosed() override
+	{
 		return !m_isOpened;
 	}
-	
+
 	Texture* getThumbnailForAsset(const std::string& localAssetPath);
 	Texture* getThumbnailForModel3D(const std::string& localAssetPath);
 	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
 	void openMaterialEditWindow(sge::AssetIface_Material* mtlIface);
-	const char* getWindowName() const override {
+	const char* getWindowName() const override
+	{
 		return m_windowName.c_str();
 	}
 
@@ -54,7 +56,6 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	void openAssetImportPopUp_importOverFile(const std::string& importOverFilename);
 
   private:
-
 	void doImportPopUp();
 
 	/// @brief Imports the specified asset with the specified settings.
@@ -68,7 +69,6 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	std::filesystem::path getCurrentExplorePath() const;
 
   private:
-
 	/// True if the Import Asset pop up should appear.
 	bool shouldOpenImportPopup = false;
 

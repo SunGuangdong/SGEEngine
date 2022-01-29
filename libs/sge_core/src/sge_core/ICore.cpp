@@ -11,8 +11,8 @@
 #include "sge_core/materials/SimpleTriplanar/SimpleTriplanarMtlGeomDrawer.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/common.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/sge_utils.h"
 
 namespace sge {
 
@@ -23,52 +23,63 @@ struct Core : public ICore {
 
 	void setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) final;
 
-	AssetLibrary* getAssetLib() final {
+	AssetLibrary* getAssetLib() final
+	{
 		return m_assetLibrary.get();
 	}
 
-	MaterialFamilyLibrary* getMaterialLib() final {
+	MaterialFamilyLibrary* getMaterialLib() final
+	{
 		return m_materialFamilyLib.get();
 	}
 
-	QuickDraw& getQuickDraw() final {
+	QuickDraw& getQuickDraw() final
+	{
 		return m_quickDraw;
 	}
 
-	DebugDraw& getDebugDraw() final {
+	DebugDraw& getDebugDraw() final
+	{
 		return m_debugDraw;
 	}
 
-	SGEDevice* getDevice() final {
+	SGEDevice* getDevice() final
+	{
 		return m_sgedev;
 	}
 
-	AudioDevice* getAudioDevice() final {
+	AudioDevice* getAudioDevice() final
+	{
 		return m_audioDevice;
 	}
 
-	GraphicsResources& getGraphicsResources() final {
+	GraphicsResources& getGraphicsResources() final
+	{
 		return m_graphicsResources;
 	}
 
-	void setInputState(const InputState& is) final {
+	void setInputState(const InputState& is) final
+	{
 		m_inputState = is;
 	}
 
-	const InputState& getInputState() const final {
+	const InputState& getInputState() const final
+	{
 		return m_inputState;
 	}
 
-	const FrameStatistics& getLastFrameStatistics() const final {
+	const FrameStatistics& getLastFrameStatistics() const final
+	{
 		return lastFrameStatistics;
 	}
 
-	void setLastFrameStatistics(const FrameStatistics& stats) final {
+	void setLastFrameStatistics(const FrameStatistics& stats) final
+	{
 		lastFrameStatistics = stats;
 	}
 
   public:
-	SGEDevice* m_sgedev = nullptr;  // The sge device attached to the main window.
+	SGEDevice* m_sgedev = nullptr; // The sge device attached to the main window.
 
 	std::unique_ptr<AssetLibrary> m_assetLibrary;
 	std::unique_ptr<MaterialFamilyLibrary> m_materialFamilyLib;
@@ -85,7 +96,8 @@ struct Core : public ICore {
 	AudioDevice* m_audioDevice = nullptr;
 };
 
-void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) {
+void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice)
+{
 	sgeAssert(sgedev);
 	sgeAssert(sgeAudioDevice);
 	m_sgedev = sgedev;
@@ -209,11 +221,13 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) {
 Core g_moduleLocalCore;
 ICore* g_pWorkingCore = &g_moduleLocalCore;
 
-ICore* getCore() {
+ICore* getCore()
+{
 	return g_pWorkingCore;
 }
 
-void setCore(ICore* core) {
+void setCore(ICore* core)
+{
 	sgeAssert(core);
 	g_pWorkingCore = core;
 }

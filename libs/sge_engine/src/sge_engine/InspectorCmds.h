@@ -6,7 +6,7 @@
 #include "sge_engine/InspectorCmd.h"
 #include "sge_engine_api.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/containers/vector_set.h"
 #include <memory>
 #include <set>
 #include <string>

@@ -56,7 +56,8 @@ ReflBlock()
 //---------------------------------------------------------------------
 // RigidBodyConfigurator
 //---------------------------------------------------------------------
-void RigidBodyPropertiesConfigurator::applyProperties(Actor& actor) const {
+void RigidBodyPropertiesConfigurator::applyProperties(Actor& actor) const
+{
 	TraitRigidBody* const traitRb = getTrait<TraitRigidBody>(&actor);
 
 	if (traitRb && traitRb->getRigidBody()) {
@@ -64,7 +65,8 @@ void RigidBodyPropertiesConfigurator::applyProperties(Actor& actor) const {
 	}
 }
 
-void RigidBodyPropertiesConfigurator::applyProperties(RigidBody& rb) const {
+void RigidBodyPropertiesConfigurator::applyProperties(RigidBody& rb) const
+{
 	rb.setFriction(friction);
 	rb.setRollingFriction(rollingFriction);
 	rb.setSpinningFriction(spinningFriction);
@@ -72,12 +74,17 @@ void RigidBodyPropertiesConfigurator::applyProperties(RigidBody& rb) const {
 	rb.setCanMove(!noMoveX, !noMoveY, !noMoveZ);
 	rb.setCanRotate(!noRotationX, !noRotationY, !noRotationZ);
 	rb.setDamping(movementDamping, rotationDamping);
+
+	rb.setMaskIdentifiesAs(identifiesAs);
+	rb.setMaskCollidesWith(collidesWith);
+
 	if (specifyGravity) {
 		rb.setGravity(gravity);
 	}
 }
 
-void RigidBodyPropertiesConfigurator::extractPropsFromRigidBody(const RigidBody& rb) {
+void RigidBodyPropertiesConfigurator::extractPropsFromRigidBody(const RigidBody& rb)
+{
 	mass = rb.getMass();
 	friction = rb.getFriction();
 	rollingFriction = rb.getRollingFriction();
@@ -102,7 +109,8 @@ void RigidBodyPropertiesConfigurator::extractPropsFromRigidBody(const RigidBody&
 //---------------------------------------------------------------------
 // RigidBodyConfigurator
 //---------------------------------------------------------------------
-bool RigidBodyConfigurator::apply(Actor& actor, bool addToWorldNow) const {
+bool RigidBodyConfigurator::apply(Actor& actor, bool addToWorldNow) const
+{
 	TraitRigidBody* const traitRb = getTrait<TraitRigidBody>(&actor);
 
 	if (traitRb == nullptr) {
@@ -173,7 +181,8 @@ bool RigidBodyConfigurator::apply(Actor& actor, bool addToWorldNow) const {
 //---------------------------------------------------------------------
 // User Interface
 //---------------------------------------------------------------------
-void edit_CollisionShapeDesc(GameInspector& inspector, GameObject* gameObject, MemberChain chain) {
+void edit_CollisionShapeDesc(GameInspector& inspector, GameObject* gameObject, MemberChain chain)
+{
 	CollsionShapeDesc& sdesc = *reinterpret_cast<CollsionShapeDesc*>(chain.follow(gameObject));
 
 	const ImGuiEx::IDGuard idGuard(&sdesc);
@@ -213,7 +222,8 @@ void edit_CollisionShapeDesc(GameInspector& inspector, GameObject* gameObject, M
 	}
 }
 
-void edit_RigidBodyPropertiesConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain) {
+void edit_RigidBodyPropertiesConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain)
+{
 	RigidBodyPropertiesConfigurator& rbpc = *reinterpret_cast<RigidBodyPropertiesConfigurator*>(chain.follow(gameObject));
 
 	auto doMemberUIFn = [&](const MemberDesc* const md) -> void {
@@ -230,6 +240,89 @@ void edit_RigidBodyPropertiesConfigurator(GameInspector& inspector, GameObject* 
 	if (rbpc.dontShowDynamicProperties == false) {
 		doMemberUIFn(sgeFindMember(RigidBodyPropertiesConfigurator, mass));
 	}
+
+	ImGuiEx::BeginGroupPanel("CollisionFilter");
+	{
+		{
+			ImGuiEx::IDGuard guard("indetify as");
+			ImGuiEx::Label("Indentified as");
+
+			const char* icons[4] = {
+			    ICON_FK_CUBE,
+			    ICON_FK_CIRCLE,
+			    ICON_FK_STAR,
+			    ICON_FK_BOMB,
+			};
+
+			for (int bit = 0; bit < 4; ++bit) {
+				bool changed = false;
+				if (rbpc.identifiesAs & (1 << bit)) {
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
+					changed = ImGui::Button(icons[bit]);
+					ImGui::PopStyleColor();
+				}
+				else {
+					changed = ImGui::Button(icons[bit]);
+				}
+
+				if (bit != 3) {
+					ImGui::SameLine();
+				}
+
+				if (changed) {
+					ubyte value = rbpc.identifiesAs & (1 << bit);
+
+					if (value) {
+						rbpc.identifiesAs = rbpc.identifiesAs & ~(1 << bit);
+					}
+					else {
+						rbpc.identifiesAs = rbpc.identifiesAs | (1 << bit);
+					}
+				}
+			}
+		}
+
+		{
+			ImGuiEx::IDGuard guard("Collides with");
+			ImGuiEx::Label("Collides with");
+
+			const char* icons[4] = {
+			    ICON_FK_CUBE,
+			    ICON_FK_CIRCLE,
+			    ICON_FK_STAR,
+			    ICON_FK_BOMB,
+			};
+
+			for (int bit = 0; bit < 4; ++bit) {
+				bool changed = false;
+				if (rbpc.collidesWith & (1 << bit)) {
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
+					changed = ImGui::Button(icons[bit]);
+					ImGui::PopStyleColor();
+				}
+				else {
+					changed = ImGui::Button(icons[bit]);
+				}
+
+				if (bit != 3) {
+					ImGui::SameLine();
+				}
+
+				if (changed) {
+					ubyte value = rbpc.collidesWith & (1 << bit);
+
+					if (value) {
+						rbpc.collidesWith = rbpc.collidesWith & ~(1 << bit);
+					}
+					else {
+						rbpc.collidesWith = rbpc.collidesWith | (1 << bit);
+					}
+				}
+			}
+		}
+	}
+	ImGuiEx::EndGroupPanel();
+
 
 	doMemberUIFn(sgeFindMember(RigidBodyPropertiesConfigurator, friction));
 	doMemberUIFn(sgeFindMember(RigidBodyPropertiesConfigurator, rollingFriction));
@@ -262,7 +355,8 @@ void edit_RigidBodyPropertiesConfigurator(GameInspector& inspector, GameObject* 
 	ImGuiEx::EndGroupPanel();
 }
 
-SGE_ENGINE_API void edit_RigidBodyConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain) {
+SGE_ENGINE_API void edit_RigidBodyConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain)
+{
 	RigidBodyConfigurator& rbec = *reinterpret_cast<RigidBodyConfigurator*>(chain.follow(gameObject));
 
 	const ImGuiEx::IDGuard idGuard(&rbec);
@@ -276,6 +370,89 @@ SGE_ENGINE_API void edit_RigidBodyConfigurator(GameInspector& inspector, GameObj
 			chain.pop();
 		}
 	};
+
+	ImGuiEx::BeginGroupPanel("CollisionFilter");
+	{
+		{
+			ImGuiEx::IDGuard guard("indetify as");
+			ImGuiEx::Label("Indentified as");
+
+			const char* icons[4] = {
+			    ICON_FK_CUBE,
+			    ICON_FK_CIRCLE,
+			    ICON_FK_STAR,
+			    ICON_FK_BOMB,
+			};
+
+			for (int bit = 0; bit < 4; ++bit) {
+				bool changed = false;
+				if (rbec.identifiesAs & (1 << bit)) {
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
+					changed = ImGui::Button(icons[bit]);
+					ImGui::PopStyleColor();
+				}
+				else {
+					changed = ImGui::Button(icons[bit]);
+				}
+
+				if (bit != 3) {
+					ImGui::SameLine();
+				}
+
+				if (changed) {
+					ubyte value = rbec.identifiesAs & (1 << bit);
+
+					if (value) {
+						rbec.identifiesAs = rbec.identifiesAs & ~(1 << bit);
+					}
+					else {
+						rbec.identifiesAs = rbec.identifiesAs | (1 << bit);
+					}
+				}
+			}
+		}
+
+		{
+			ImGuiEx::IDGuard guard("Collides with");
+			ImGuiEx::Label("Collides with");
+
+			const char* icons[4] = {
+			    ICON_FK_CUBE,
+			    ICON_FK_CIRCLE,
+			    ICON_FK_STAR,
+			    ICON_FK_BOMB,
+			};
+
+			for (int bit = 0; bit < 4; ++bit) {
+				bool changed = false;
+				if (rbec.collidesWith & (1 << bit)) {
+					ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.f, 1.f, 0.f, 1.f));
+					changed = ImGui::Button(icons[bit]);
+					ImGui::PopStyleColor();
+				}
+				else {
+					changed = ImGui::Button(icons[bit]);
+				}
+
+				if (bit != 3) {
+					ImGui::SameLine();
+				}
+
+				if (changed) {
+					ubyte value = rbec.collidesWith & (1 << bit);
+
+					if (value) {
+						rbec.collidesWith = rbec.collidesWith & ~(1 << bit);
+					}
+					else {
+						rbec.collidesWith = rbec.collidesWith | (1 << bit);
+					}
+				}
+			}
+		}
+	}
+	ImGuiEx::EndGroupPanel();
+
 
 	if (rbec.dontShowDynamicProperties == false) {
 		doMemberUIFn(sgeFindMember(RigidBodyConfigurator, mass));
@@ -309,13 +486,16 @@ SGE_ENGINE_API void edit_RigidBodyConfigurator(GameInspector& inspector, GameObj
 		if (gameObject->findTraitByFamily(sgeTypeId(TraitModel)) == nullptr) {
 			ImGui::TextEx("The current objects needs to have TraitModel for this option to work.");
 		}
-	} else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_manuallySpecify) {
+	}
+	else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_manuallySpecify) {
 		ImGui::Text("Manually specify the shapes that will form the rigid body below!");
 		doMemberUIFn(sgeFindMember(RigidBodyConfigurator, collisionShapes));
-	} else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_fromModel) {
+	}
+	else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_fromModel) {
 		ImGui::Text("Model to be the source of collision geometry.");
 		doMemberUIFn(sgeFindMember(RigidBodyConfigurator, m_sourceModel));
-	} else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_fromModelRenderGeometry) {
+	}
+	else if (rbec.shapeSource == RigidBodyConfigurator::shapeSource_fromModelRenderGeometry) {
 		ImGui::Text("Model to be the source of collision geometry. Usable of Static Objects only");
 		doMemberUIFn(sgeFindMember(RigidBodyConfigurator, m_sourceModel));
 	}

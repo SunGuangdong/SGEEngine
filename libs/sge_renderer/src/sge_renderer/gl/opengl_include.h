@@ -1,16 +1,16 @@
 #pragma once
 
-#include "sge_utils/utils/TypeTraits.h"
+#include "sge_utils/sge_utils.h"
 #include <memory>
 
 #if !defined(__EMSCRIPTEN__)
-// clang-format off
+    // clang-format off
 // Clang Format is turned off here as the include order matters.
 #include <GL/glew.h>
 #include <GL/gl.h>
 // clang-format on
 #else
-#include <GLES3/gl3.h>
+	#include <GLES3/gl3.h>
 #endif
 
 #define SGE_GL_UNKNOWN GL_ZERO
@@ -20,7 +20,8 @@ namespace sge {
 void DumpGLError(const GLenum opengl_error_code);
 void DumpAllGLErrors();
 
-inline GLenum GLUniformTypeToTextureType(const GLenum uniformType) {
+inline GLenum GLUniformTypeToTextureType(const GLenum uniformType)
+{
 	switch (uniformType) {
 		// 1D
 #if !defined(__EMSCRIPTEN__)
@@ -120,11 +121,19 @@ struct GLViewport {
 	    : x(_x)
 	    , y(_y)
 	    , width(w)
-	    , height(h) {}
+	    , height(h)
+	{
+	}
 
-	bool operator==(const GLViewport& other) { return x == other.x && y == other.y && width == other.width && height == other.height; }
+	bool operator==(const GLViewport& other)
+	{
+		return x == other.x && y == other.y && width == other.width && height == other.height;
+	}
 
-	bool operator!=(const GLViewport& other) { return !(*this == other); }
+	bool operator!=(const GLViewport& other)
+	{
+		return !(*this == other);
+	}
 
 	GLint x;
 	GLint y;

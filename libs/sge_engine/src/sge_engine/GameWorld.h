@@ -11,9 +11,9 @@
 #include "sge_core/application/input.h"
 #include "sge_engine/Physics.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/utils/Event.h"
-#include "sge_utils/utils/span.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/react/Event.h"
+#include "sge_utils/containers/ArrayView.h"
+#include "sge_utils/containers/vector_set.h"
 
 namespace sge {
 
@@ -269,7 +269,7 @@ struct SGE_ENGINE_API GameWorld {
 	/// @brief A shortcut for addPostSceneTask. Useful for changeing the levels.
 	void addPostSceneTaskLoadWorldFormFile(const char* filename);
 
-	span<const btPersistentManifold* const> getRigidBodyManifolds(const RigidBody* rb) const;
+	ArrayView<const btPersistentManifold* const> getRigidBodyManifolds(const RigidBody* rb) const;
 
 	/// @brief Removes all manifold for the specified rigid body.
 	///        Used if for some reason the rigid body is invalidated during updates.

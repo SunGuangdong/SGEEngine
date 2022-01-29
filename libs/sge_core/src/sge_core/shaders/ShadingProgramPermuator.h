@@ -2,8 +2,8 @@
 
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/utils/OptionPermutator.h"
-#include "sge_utils/utils/StaticArray.h"
+#include "sge_utils/containers/StaticArray.h"
+#include "sge_utils/other/OptionPermutator.h"
 
 namespace sge {
 
@@ -38,7 +38,8 @@ struct SGE_CORE_API ShadingProgramPermuator {
 		/// Using the cached bind locations for each uniforms, binds the input data to the specified uniform
 		/// in in the @uniforms.
 		template <size_t N>
-		void bind(StaticArray<BoundUniform, N>& uniforms, const int uniformEnumId, void* const dataPointer) const {
+		void bind(StaticArray<BoundUniform, N>& uniforms, const int uniformEnumId, void* const dataPointer) const
+		{
 			if (uniformLUT[uniformEnumId].isNull() == false) {
 				[[maybe_unused]] bool bindSucceeded = uniforms.push_back(BoundUniform(uniformLUT[uniformEnumId], (dataPointer)));
 				sgeAssert(bindSucceeded);
@@ -70,10 +71,12 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	            std::set<std::string>* outIncludedFiles = nullptr);
 
 
-	const OptionPermuataor getCompileTimeOptionsPerm() const {
+	const OptionPermuataor getCompileTimeOptionsPerm() const
+	{
 		return compileTimeOptionsPermutator;
 	}
-	const std::vector<Permutation>& getShadersPerPerm() const {
+	const std::vector<Permutation>& getShadersPerPerm() const
+	{
 		return perPermutationShadingProg;
 	}
 

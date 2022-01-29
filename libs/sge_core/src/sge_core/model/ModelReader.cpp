@@ -1,6 +1,6 @@
-#include "sge_utils/utils/vector_map.h"
-#include <sge_utils/utils/FileStream.h>
-#include <sge_utils/utils/json.h>
+#include "sge_utils/containers/vector_map.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/json/json.h"
 #include <stdexcept>
 
 #include "Model.h"
@@ -10,12 +10,14 @@ namespace sge {
 
 struct ModelParseExcept : public std::logic_error {
 	ModelParseExcept(const char* msg)
-	    : std::logic_error(msg) {
+	    : std::logic_error(msg)
+	{
 	}
 };
 
 
-PrimitiveTopology::Enum PrimitiveTolologyFromString(const char* str) {
+PrimitiveTopology::Enum PrimitiveTolologyFromString(const char* str)
+{
 	if (strcmp(str, "TriangleList") == 0)
 		return PrimitiveTopology::TriangleList;
 	if (strcmp(str, "TriangleStrip") == 0)
@@ -31,7 +33,8 @@ PrimitiveTopology::Enum PrimitiveTolologyFromString(const char* str) {
 	throw ModelParseExcept("Unknown primitive topology!");
 }
 
-UniformType::Enum UniformTypeFromString(const char* str) {
+UniformType::Enum UniformTypeFromString(const char* str)
+{
 	if (strcmp(str, "uint16") == 0)
 		return UniformType::Uint16;
 	if (strcmp(str, "uint32") == 0)
@@ -58,7 +61,8 @@ UniformType::Enum UniformTypeFromString(const char* str) {
 }
 
 template <typename T>
-void ModelReader::loadDataChunk(std::vector<T>& resultBuffer, const int chunkId) {
+void ModelReader::loadDataChunk(std::vector<T>& resultBuffer, const int chunkId)
+{
 	const DataChunkDesc* chunkDesc = nullptr;
 	for (const auto& desc : dataChunksDesc) {
 		if (desc.chunkId == chunkId) {
@@ -87,7 +91,8 @@ void ModelReader::loadDataChunk(std::vector<T>& resultBuffer, const int chunkId)
 	irs->seek(SeekOrigin::Begining, firstChunkDataLocation);
 }
 
-void ModelReader::loadDataChunkRaw(void* const ptr, const size_t ptrExpectedSize, const int chunkId) {
+void ModelReader::loadDataChunkRaw(void* const ptr, const size_t ptrExpectedSize, const int chunkId)
+{
 	const DataChunkDesc* chunkDesc = nullptr;
 	for (const auto& desc : dataChunksDesc) {
 		if (desc.chunkId == chunkId) {
@@ -114,7 +119,8 @@ void ModelReader::loadDataChunkRaw(void* const ptr, const size_t ptrExpectedSize
 	irs->seek(SeekOrigin::Begining, firstChunkDataLocation);
 }
 
-const ModelReader::DataChunkDesc& ModelReader::FindDataChunkDesc(const int chunkId) const {
+const ModelReader::DataChunkDesc& ModelReader::FindDataChunkDesc(const int chunkId) const
+{
 	for (const auto& desc : dataChunksDesc) {
 		if (desc.chunkId == chunkId) {
 			return desc;
@@ -124,7 +130,8 @@ const ModelReader::DataChunkDesc& ModelReader::FindDataChunkDesc(const int chunk
 	throw ModelParseExcept("Chunk desc not found!");
 }
 
-bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const iReadStream, Model& model) {
+bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const iReadStream, Model& model)
+{
 	try {
 		dataChunksDesc.clear();
 		irs = iReadStream;
@@ -257,8 +264,8 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 		// Load the materials.
 		auto jMaterials = jRoot->getMember("materials");
 		if (jMaterials) {
-			for (size_t t = 0; t < jMaterials->arrSize(); ++t) {
-				const JsonValue* const jMaterial = jMaterials->arrAt(t);
+			for (size_t iMaterial = 0; iMaterial < jMaterials->arrSize(); ++iMaterial) {
+				const JsonValue* const jMaterial = jMaterials->arrAt(iMaterial);
 
 				int newMaterialIndex = model.makeNewMaterial();
 				ModelMaterial* material = model.materialAt(newMaterialIndex);
@@ -269,7 +276,8 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 
 				if (jMtlAssetPath) {
 					material->assetForThisMaterial = jMtlAssetPath->GetString();
-				} else {
+				}
+				else {
 					jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->oldInplaceMtl.diffuseColor.data, 4);
 					jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->oldInplaceMtl.emissionColor.data, 4);
 					material->oldInplaceMtl.metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
@@ -351,13 +359,17 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 					// Cache some commonly used semantics offsets.
 					if (decl.semantic == "a_position") {
 						mesh->vbPositionOffsetBytes = (int)decl.byteOffset;
-					} else if (decl.semantic == "a_normal") {
+					}
+					else if (decl.semantic == "a_normal") {
 						mesh->vbNormalOffsetBytes = (int)decl.byteOffset;
-					} else if (decl.semantic == "a_uv") {
+					}
+					else if (decl.semantic == "a_uv") {
 						mesh->vbUVOffsetBytes = (int)decl.byteOffset;
-					} else if (decl.semantic == "a_tangent") {
+					}
+					else if (decl.semantic == "a_tangent") {
 						mesh->vbTangetOffsetBytes = (int)decl.byteOffset;
-					} else if (decl.semantic == "a_binormal") {
+					}
+					else if (decl.semantic == "a_binormal") {
 						mesh->vbBinormalOffsetBytes = (int)decl.byteOffset;
 					}
 				}
@@ -378,28 +390,6 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 						                 jBone->getMember("offsetMatrixChunkId")->getNumberAs<int>());
 					}
 				}
-
-				// Finally Create the GPU resources.
-				// const ResourceUsage::Enum usage = (hasBones) ? ResourceUsage::Dynamic : ResourceUsage::Immutable;
-
-				// meshData.vertexBuffer = sgedev->requestResource<Buffer>();
-				// const BufferDesc vbd = BufferDesc::GetDefaultVertexBuffer((uint32)meshData.vertexBufferRaw.size(), usage);
-				// meshData.vertexBuffer->create(vbd, meshData.vertexBufferRaw.data());
-
-				//// The index buffer is any.
-				// if (meshData.indexBufferRaw.size() != 0) {
-				//	meshData.indexBuffer = sgedev->requestResource<Buffer>();
-				//	const BufferDesc ibd = BufferDesc::GetDefaultIndexBuffer((uint32)meshData.indexBufferRaw.size(), usage);
-				//	meshData.indexBuffer->create(ibd, meshData.indexBufferRaw.data());
-				//}
-
-				// const bool shouldKeepCPUBuffers = (loadSets.cpuMeshData == ModelLoadSettings::KeepMeshData_Skin && hasBones) ||
-				//                                  (loadSets.cpuMeshData == ModelLoadSettings::KeepMeshData_All);
-
-				// if (shouldKeepCPUBuffers == false) {
-				//	meshData.vertexBufferRaw = std::vector<char>();
-				//	meshData.indexBufferRaw = std::vector<char>();
-				//}
 			}
 		}
 
@@ -573,12 +563,14 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				}
 			}
 		}
-	} catch (const ModelParseExcept& UNUSED(except)) {
+	}
+	catch (const ModelParseExcept& UNUSED(except)) {
 		// sgeLogError("%s: Failed with exception:\n", __func__);
 		// sgeLogError(except.what());
 
 		return false;
-	} catch (...) {
+	}
+	catch (...) {
 		// sgeLogError("%s: Failed with unknown exception:\n", __func__);
 		return false;
 	}

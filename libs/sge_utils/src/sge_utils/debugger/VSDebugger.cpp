@@ -1,7 +1,7 @@
 #include "VSDebugger.h"
 
 #ifdef WIN32
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 
 #define NOMINMAX
 #include <Windows.h>

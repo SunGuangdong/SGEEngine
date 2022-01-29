@@ -6,8 +6,8 @@
 #include "sge_core/shaders/ShadingProgramPermuator.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/mat4.h"
-#include "sge_utils/utils/OptionPermutator.h"
-#include "sge_utils/utils/optional.h"
+#include "sge_utils/other/OptionPermutator.h"
+#include "sge_utils/containers/Optional.h"
 
 namespace sge {
 

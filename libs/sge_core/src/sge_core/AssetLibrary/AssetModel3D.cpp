@@ -2,8 +2,8 @@
 #include "sge_core/ICore.h"
 #include "sge_core/model/ModelReader.h"
 #include "sge_log/Log.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/Path.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/text/Path.h"
 
 namespace sge {
 bool AssetModel3D::loadAssetFromFile(const char* const path) {

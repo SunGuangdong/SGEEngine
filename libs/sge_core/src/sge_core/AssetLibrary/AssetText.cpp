@@ -1,5 +1,5 @@
 #include "AssetText.h"
-#include "sge_utils/utils/FileStream.h"
+#include "sge_utils/io/FileStream.h"
 
 namespace sge {
 bool AssetText::loadAssetFromFile(const char* const path) {

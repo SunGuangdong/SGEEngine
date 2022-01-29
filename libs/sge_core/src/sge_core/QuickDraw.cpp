@@ -1,9 +1,10 @@
 #include "QuickDraw.h"
 
 #include "sge_core/ICore.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/math/Box.h"
 #include "sge_utils/math/color.h"
-#include <sge_utils/math/Box.h>
-#include <sge_utils/utils/FileStream.h>
+
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <stb_truetype.h>
 
@@ -122,7 +123,8 @@ namespace sge {
 //////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////
-bool DebugFont::Create(SGEDevice* sgedev, const char* const ttfFilename, float heightPixels) {
+bool DebugFont::Create(SGEDevice* sgedev, const char* const ttfFilename, float heightPixels)
+{
 	Destroy();
 
 	// Read the ttf file data.
@@ -166,7 +168,8 @@ bool DebugFont::Create(SGEDevice* sgedev, const char* const ttfFilename, float h
 	return true;
 }
 
-vec2f DebugFont::computeTextDimensions(const char* text, float textHeight) const {
+vec2f DebugFont::computeTextDimensions(const char* text, float textHeight) const
+{
 	float kLineStartX = 0.f;
 
 	float x = kLineStartX;
@@ -208,14 +211,16 @@ vec2f DebugFont::computeTextDimensions(const char* text, float textHeight) const
 	return bbox.size();
 }
 
-void DebugFont::Destroy() {
+void DebugFont::Destroy()
+{
 	texture.Release();
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 //////////////////////////////////////////////////////////////////////
-bool QuickDraw::initialize(SGEContext* sgecon) {
+bool QuickDraw::initialize(SGEContext* sgecon)
+{
 	sgeAssert(sgecon);
 
 	initalize2DDrawResources(sgecon);
@@ -231,7 +236,8 @@ bool QuickDraw::initialize(SGEContext* sgecon) {
 }
 
 
-void QuickDraw::initalize2DDrawResources(SGEContext* context) {
+void QuickDraw::initalize2DDrawResources(SGEContext* context)
+{
 	SGEDevice* sgedev = context->getDevice();
 
 	std::vector<Vertex2D> vbData;
@@ -348,7 +354,8 @@ void QuickDraw::initalize2DDrawResources(SGEContext* context) {
 	vertexDeclIndex_pos2d_uv = sgedev->getVertexDeclIndex(vtxDecl_pos2d_uv, SGE_ARRSZ(vtxDecl_pos2d_uv));
 }
 
-void QuickDraw::initalize3DDrawResources(SGEContext* context) {
+void QuickDraw::initalize3DDrawResources(SGEContext* context)
+{
 	SGEDevice* sgedev = context->getDevice();
 
 	m_effect3DVertexColored = sgedev->requestResource<ShadingProgram>();
@@ -389,13 +396,15 @@ void QuickDraw::initalize3DDrawResources(SGEContext* context) {
 	vertexDeclIndex_pos3d_rgba_int = sgedev->getVertexDeclIndex(vtxDecl_pos3d_rgba_int, SGE_ARRSZ(vtxDecl_pos3d_rgba_int));
 }
 
-void QuickDraw::drawRect(const RenderDestination& rdest, const AABox2f& boxPixels, const vec4f& rgba, BlendState* blendState) {
+void QuickDraw::drawRect(const RenderDestination& rdest, const AABox2f& boxPixels, const vec4f& rgba, BlendState* blendState)
+{
 	const vec2f boxSize = boxPixels.size();
 	drawRect(rdest, boxPixels.min.x, boxPixels.min.y, boxSize.x, boxSize.y, rgba, blendState);
 }
 
 void QuickDraw::drawRect(
-    const RenderDestination& rdest, float xPixels, float yPixels, float width, float height, const vec4f& rgba, BlendState* blendState) {
+    const RenderDestination& rdest, float xPixels, float yPixels, float width, float height, const vec4f& rgba, BlendState* blendState)
+{
 	const mat4f sizeScaling = mat4f::getScaling(width / 2.f, height / 2.f, 1.f);
 	const mat4f transl = mat4f::getTranslation(xPixels + width / 2.f, yPixels + height / 2.f, 0.f);
 	const mat4f world = transl * sizeScaling;
@@ -426,7 +435,8 @@ void QuickDraw::drawRect(
 }
 
 void QuickDraw::drawTriLeft(
-    const RenderDestination& rdest, const AABox2f& boxPixels, float rotation, const vec4f& rgba, BlendState* blendState) {
+    const RenderDestination& rdest, const AABox2f& boxPixels, float rotation, const vec4f& rgba, BlendState* blendState)
+{
 	const vec2f size = boxPixels.size();
 
 	const mat4f sizeScaling = mat4f::getScaling(size.x / 2.f, size.y / 2.f, 1.f);
@@ -467,7 +477,8 @@ void QuickDraw::drawRectTexture(const RenderDestination& rdest,
                                 BlendState* blendState,
                                 vec2f topUV,
                                 vec2f bottomUV,
-                                float alphaMult) {
+                                float alphaMult)
+{
 	if (texture && !texture->isValid()) {
 		return;
 	}
@@ -509,7 +520,8 @@ void QuickDraw::drawRectTexture(const RenderDestination& rdest,
                                 BlendState* blendState,
                                 vec2f topUV,
                                 vec2f bottomUV,
-                                float alphaMult) {
+                                float alphaMult)
+{
 	vec2f size = boxPixels.size();
 	drawRectTexture(rdest, boxPixels.min.x, boxPixels.min.y, size.x, size.y, texture, blendState, topUV, bottomUV, alphaMult);
 }
@@ -522,7 +534,8 @@ void QuickDraw::drawTexture(const RenderDestination& rdest,
                             BlendState* blendState,
                             vec2f topUV,
                             vec2f bottomUV,
-                            float alphaMult) {
+                            float alphaMult)
+{
 	if (!texture || !texture->isValid()) {
 		return;
 	}
@@ -549,7 +562,8 @@ void QuickDraw::drawTextLazy(const RenderDestination& rdest,
                              const vec4f& rgba,
                              const char* text,
                              float height,
-                             const Rect2s* scissors) {
+                             const Rect2s* scissors)
+{
 	float alphaMult = 1.f;
 
 	RasterizerState* rs = scissors == nullptr ? rsDefault : rsNoCullUseScissors;
@@ -623,17 +637,20 @@ void QuickDraw::drawTextLazy(const RenderDestination& rdest,
 	}
 }
 
-void QuickDraw::drawWiredAdd_Line(const vec3f& a, const vec3f& b, const uint32 rgba) {
+void QuickDraw::drawWiredAdd_Line(const vec3f& a, const vec3f& b, const uint32 rgba)
+{
 	m_wireframeVerts.push_back(GeomGen::PosColorVert(a, rgba));
 	m_wireframeVerts.push_back(GeomGen::PosColorVert(b, rgba));
 }
 
-void QuickDraw::drawWiredAdd_Arrow(const vec3f& from, const vec3f& to, const uint32 rgba) {
+void QuickDraw::drawWiredAdd_Arrow(const vec3f& from, const vec3f& to, const uint32 rgba)
+{
 	const vec3f diff = to - from;
 	vec3f ax;
 	if (isEpsEqual(diff.x, diff.z)) {
 		ax = vec3f(diff.x, diff.z, -diff.y);
-	} else {
+	}
+	else {
 		ax = vec3f(-diff.z, diff.y, diff.x);
 	}
 
@@ -679,11 +696,11 @@ void QuickDraw::drawWiredAdd_EllipseXZ(const mat4f& transformMtx, float xSize, f
 	// column 0
 	float m00 = cosf(segmentAngle);
 	float m01 = -sinf(segmentAngle);
-	
+
 	// column 1
 	float m10 = sinf(segmentAngle);
 	float m11 = cosf(segmentAngle);
-	
+
 	vec3f arm = vec3f(1.f, 0.f, 0.f);
 	vec3f armScaledPrev = vec3f(0.f);
 	for (int iSeg = 0; iSeg < (numSegments + 1); ++iSeg) {
@@ -699,24 +716,23 @@ void QuickDraw::drawWiredAdd_EllipseXZ(const mat4f& transformMtx, float xSize, f
 		}
 
 		// Rotate the arm.
-		arm = vec3f(
-			arm.x * m00 + arm.z * m01, 
-			0.f, 
-			arm.x * m10 + arm.z * m11);
+		arm = vec3f(arm.x * m00 + arm.z * m01, 0.f, arm.x * m10 + arm.z * m11);
 		armScaledPrev = armScaled;
 	}
-
 }
 
-void QuickDraw::drawWiredAdd_Box(const mat4f& world, const uint32 rgba) {
+void QuickDraw::drawWiredAdd_Box(const mat4f& world, const uint32 rgba)
+{
 	GeomGen::wiredBox(m_wireframeVerts, world, rgba);
 }
 
-void QuickDraw::drawWiredAdd_Box(const AABox3f& aabb, const uint32 rgba) {
+void QuickDraw::drawWiredAdd_Box(const AABox3f& aabb, const uint32 rgba)
+{
 	GeomGen::wiredBox(m_wireframeVerts, aabb, rgba);
 }
 
-void QuickDraw::drawWiredAdd_Box(const mat4f& world, const AABox3f& aabb, const uint32 rgba) {
+void QuickDraw::drawWiredAdd_Box(const mat4f& world, const AABox3f& aabb, const uint32 rgba)
+{
 	const size_t newBoxStart = m_wireframeVerts.size();
 
 	GeomGen::wiredBox(m_wireframeVerts, aabb, rgba);
@@ -725,27 +741,33 @@ void QuickDraw::drawWiredAdd_Box(const mat4f& world, const AABox3f& aabb, const 
 	}
 }
 
-void QuickDraw::drawWiredAdd_Capsule(const mat4f& world, const uint32 rgba, float height, float radius, int numSides) {
+void QuickDraw::drawWiredAdd_Capsule(const mat4f& world, const uint32 rgba, float height, float radius, int numSides)
+{
 	GeomGen::wiredCapsule(m_wireframeVerts, world, rgba, height, radius, numSides, GeomGen::center);
 }
 
-void QuickDraw::drawWiredAdd_Sphere(const mat4f& world, const uint32 rgba, float radius, int numSides) {
+void QuickDraw::drawWiredAdd_Sphere(const mat4f& world, const uint32 rgba, float radius, int numSides)
+{
 	GeomGen::wiredSphere(m_wireframeVerts, world, rgba, radius, numSides);
 }
 
-void QuickDraw::drawWiredAdd_Cylinder(const mat4f& world, const uint32 rgba, float height, float radius, int numSides) {
+void QuickDraw::drawWiredAdd_Cylinder(const mat4f& world, const uint32 rgba, float height, float radius, int numSides)
+{
 	GeomGen::wiredCylinder(m_wireframeVerts, world, rgba, height, radius, numSides, GeomGen::center);
 }
 
-void QuickDraw::drawWiredAdd_ConeBottomAligned(const mat4f& world, const uint32 rgba, float height, float radius, int numSides) {
+void QuickDraw::drawWiredAdd_ConeBottomAligned(const mat4f& world, const uint32 rgba, float height, float radius, int numSides)
+{
 	GeomGen::wiredCone(m_wireframeVerts, world, rgba, height, radius, numSides, GeomGen::Bottom);
 }
 
-void QuickDraw::drawWiredAdd_Basis(const mat4f& world) {
+void QuickDraw::drawWiredAdd_Basis(const mat4f& world)
+{
 	GeomGen::wiredBasis(m_wireframeVerts, world);
 }
 
-void QuickDraw::drawWiredAdd_Bone(const mat4f& n2w, float length, float radius, const vec4f& color) {
+void QuickDraw::drawWiredAdd_Bone(const mat4f& n2w, float length, float radius, const vec4f& color)
+{
 	const int startVertex = int(m_wireframeVerts.size());
 
 	int intColor = colorToIntRgba(color);
@@ -799,11 +821,13 @@ void QuickDraw::drawWiredAdd_Bone(const mat4f& n2w, float length, float radius, 
 }
 
 void QuickDraw::drawWiredAdd_Grid(
-    const vec3f& origin, const vec3f& xAxis, const vec3f& zAxis, const int xLines, const int yLines, const int color) {
+    const vec3f& origin, const vec3f& xAxis, const vec3f& zAxis, const int xLines, const int yLines, const int color)
+{
 	GeomGen::wiredGrid(m_wireframeVerts, origin, xAxis, zAxis, xLines, yLines, color);
 }
 
-void QuickDraw::drawWiredAdd_triangle(const vec3f& a, const vec3f& b, const vec3f& c, const int color) {
+void QuickDraw::drawWiredAdd_triangle(const vec3f& a, const vec3f& b, const vec3f& c, const int color)
+{
 	m_wireframeVerts.push_back(GeomGen::PosColorVert(a, color));
 	m_wireframeVerts.push_back(GeomGen::PosColorVert(b, color));
 	m_wireframeVerts.push_back(GeomGen::PosColorVert(b, color));
@@ -812,11 +836,13 @@ void QuickDraw::drawWiredAdd_triangle(const vec3f& a, const vec3f& b, const vec3
 	m_wireframeVerts.push_back(GeomGen::PosColorVert(a, color));
 }
 
-void QuickDraw::drawWired_Clear() {
+void QuickDraw::drawWired_Clear()
+{
 	m_wireframeVerts.clear();
 }
 
-void QuickDraw::drawWired_Execute(const RenderDestination& rdest, const mat4f& projView, BlendState* blendState, DepthStencilState* dss) {
+void QuickDraw::drawWired_Execute(const RenderDestination& rdest, const mat4f& projView, BlendState* blendState, DepthStencilState* dss)
+{
 	if (m_wireframeVerts.size() == 0) {
 		return;
 	}
@@ -857,25 +883,26 @@ void QuickDraw::drawWired_Execute(const RenderDestination& rdest, const mat4f& p
 	drawWired_Clear();
 }
 
-void QuickDraw::drawSolidAdd_Triangle(const vec3f a, const vec3f b, const vec3f c, const uint32 rgba) {
+void QuickDraw::drawSolidAdd_Triangle(const vec3f a, const vec3f b, const vec3f c, const uint32 rgba)
+{
 	m_solidColorVerts.push_back(GeomGen::PosColorVert(a, rgba));
 	m_solidColorVerts.push_back(GeomGen::PosColorVert(b, rgba));
 	m_solidColorVerts.push_back(GeomGen::PosColorVert(c, rgba));
 }
 
-void QuickDraw::drawSolidAdd_Quad(const vec3f& origin, const vec3f& ex, const vec3f& ey, const uint32 rgba) {
+void QuickDraw::drawSolidAdd_Quad(const vec3f& origin, const vec3f& ex, const vec3f& ey, const uint32 rgba)
+{
 	drawSolidAdd_Triangle(origin, origin + ex, origin + ey, rgba);
 	drawSolidAdd_Triangle(origin + ey, origin + ex, origin + ex + ey, rgba);
 }
 
-void QuickDraw::drawSolidAdd_QuadCentered(const vec3f& center, const vec3f& exHalf, const vec3f& eyHalf, const uint32 rgba) {
+void QuickDraw::drawSolidAdd_QuadCentered(const vec3f& center, const vec3f& exHalf, const vec3f& eyHalf, const uint32 rgba)
+{
 	drawSolidAdd_Quad(center - exHalf - eyHalf, 2.f * exHalf, 2.f * eyHalf, rgba);
 }
 
-void QuickDraw::drawSolid_Execute(const RenderDestination& rdest,
-                                  const mat4f& projViewWorld,
-                                  bool shouldUseCulling,
-                                  BlendState* blendState) {
+void QuickDraw::drawSolid_Execute(const RenderDestination& rdest, const mat4f& projViewWorld, bool shouldUseCulling, BlendState* blendState)
+{
 	if (m_solidColorVerts.size() == 0) {
 		return;
 	}

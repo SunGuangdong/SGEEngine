@@ -4,7 +4,8 @@
 
 namespace sge {
 
-/// @brief A simple helper function for std::vector that adds element at the front of the specified vector.
+/// @brief A simple helper function for std::vector 
+/// that adds element at the front of the specified vector.
 template <typename TStdVector>
 void push_front(TStdVector& vec, const typename TStdVector::value_type& v) {
 	if (vec.size() == 0)

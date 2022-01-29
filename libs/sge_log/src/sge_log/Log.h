@@ -5,11 +5,11 @@
 #include <string>
 #include <vector>
 
-#include "sge_utils/utils/basetypes.h"
+#include "sge_utils/types.h"
 
 namespace sge {
 
-struct SGE_LOG_API Log : public Noncopyable {
+struct SGE_LOG_API Log : public NoCopy {
 	enum MessageType : int {
 		/// Just a message that something has been done.
 		messageType_log,

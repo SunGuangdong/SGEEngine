@@ -2,9 +2,10 @@
 #include "IAssetRelocationPolicy.h"
 #include "ImporterCommon.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/range_loop.h"
-#include "sge_utils/utils/strings.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/containers/Range.h"
+#include "sge_utils/containers/Range.h"
+#include "sge_utils/text/format.h"
+#include "sge_utils/containers/vector_set.h"
 
 #include <set>
 #include <stdexcept>
@@ -52,8 +53,8 @@ ModelCollisionMesh assimpMeshToCollisionMesh(const aiMesh* const asmpMesh) {
 
 	std::vector<vec3f> trianglesVeticesWithDuplicated(asmpMesh->mNumFaces * 3);
 
-	for (int const iPoly : range_int(asmpMesh->mNumFaces)) {
-		for (int const iVertex : range_int(3)) {
+	for (int const iPoly : RangeInt(asmpMesh->mNumFaces)) {
+		for (int const iVertex : RangeInt(3)) {
 			if (asmpMesh->mFaces[iPoly].mNumIndices != 3) {
 				throw ImportExcept("assimpMeshToCollisionMesh Expected that all faces are triangles!");
 			}
@@ -519,7 +520,7 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 			boneOffseMtx = boneOffseMtx.transposed();
 
 			// Read the affected vertices.
-			for (const int iWeight : range_int(asmpBone->mNumWeights)) {
+			for (const int iWeight : RangeInt(asmpBone->mNumWeights)) {
 				const aiVertexWeight& asmpWeight = asmpBone->mWeights[iWeight];
 				perVertexIdBoneInfuence[asmpWeight.mVertexId].push_back(BoneInfluence(iBone, asmpWeight.mWeight));
 			}
@@ -872,7 +873,7 @@ void AssimpImporter::importCollisionGeometry() {
 
 		if (collisionMeshObjectSpace.indices.size() % 3 == 0) {
 			// For every instance transform the vertices to model (or in this context world space).
-			for (int const iInstance : range_int(int(itrFbxMeshInstantiations.second.size()))) {
+			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
 				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
@@ -895,7 +896,7 @@ void AssimpImporter::importCollisionGeometry() {
 
 		if (collisionMeshObjectSpace.indices.size() % 3 == 0) {
 			// For every instance transform the vertices to model (or in this context world space).
-			for (int const iInstance : range_int(int(itrFbxMeshInstantiations.second.size()))) {
+			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
 				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
@@ -917,7 +918,7 @@ void AssimpImporter::importCollisionGeometry() {
 		// CAUTION: The code assumes that the mesh vertices form a box.
 		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
 
-		for (int const iInstance : range_int(int(itrBoxInstantiations.second.size()))) {
+		for (int const iInstance : RangeInt(int(itrBoxInstantiations.second.size()))) {
 			transf3d n2w = m_collision_transfromCorrection * itrBoxInstantiations.second[iInstance];
 			n2w.p += bbox.center();
 			m_model->m_collisionBoxes.push_back(Model_CollisionShapeBox{"", n2w, bbox.halfDiagonal()});
@@ -942,7 +943,7 @@ void AssimpImporter::importCollisionGeometry() {
 
 		halfHeight -= radius;
 
-		for (int const iInstance : range_int(int(itr.second.size()))) {
+		for (int const iInstance : RangeInt(int(itr.second.size()))) {
 			transf3d n2w = m_collision_transfromCorrection * itr.second[iInstance];
 			n2w.p += bbox.center();
 			m_model->m_collisionCapsules.push_back(Model_CollisionShapeCapsule{"", n2w, halfHeight, radius});
@@ -957,7 +958,7 @@ void AssimpImporter::importCollisionGeometry() {
 		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
 
 		vec3f const halfDiagonal = bbox.halfDiagonal();
-		for (int const iInstance : range_int(int(itrCylinderInstantiations.second.size()))) {
+		for (int const iInstance : RangeInt(int(itrCylinderInstantiations.second.size()))) {
 			transf3d const n2w = m_collision_transfromCorrection * itrCylinderInstantiations.second[iInstance];
 
 			m_model->m_collisionCylinders.push_back(Model_CollisionShapeCylinder{"", n2w, halfDiagonal});
@@ -973,7 +974,7 @@ void AssimpImporter::importCollisionGeometry() {
 
 		vec3f const halfDiagonal = bbox.halfDiagonal();
 		float const radius = halfDiagonal.getSorted().x;
-		for (int const iInstance : range_int(int(itrSphereInstantiations.second.size()))) {
+		for (int const iInstance : RangeInt(int(itrSphereInstantiations.second.size()))) {
 			transf3d const n2w = m_collision_transfromCorrection * itrSphereInstantiations.second[iInstance];
 
 			m_model->m_collisionSpheres.push_back(Model_CollisionShapeSphere{"", n2w, radius});

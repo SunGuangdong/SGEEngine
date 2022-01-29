@@ -2,9 +2,9 @@
 
 #include "ShadingProgramPermuator.h"
 #include "sge_core/sgecore_api.h"
+#include "sge_utils/containers/Optional.h"
+#include "sge_utils/io/FileWatcher.h"
 #include "sge_utils/math/mat4.h"
-#include "sge_utils/utils/FileWatcher.h"
-#include "sge_utils/utils/optional.h"
 
 namespace sge {
 
@@ -16,7 +16,7 @@ struct SkyShaderSettings {
 		mode_textureSphericalMapped = 1,
 		mode_textureCubeMapped = 2,
 		mode_stillTexture = 3,
-		
+
 	};
 
 	Mode mode = mode_colorGradinet;
@@ -26,7 +26,8 @@ struct SkyShaderSettings {
 };
 
 struct SGE_CORE_API SkyShader {
-	void draw(const RenderDestination& rdest, const vec3f& cameraPosition, const mat4f view, const mat4f proj, const SkyShaderSettings& sets);
+	void draw(
+	    const RenderDestination& rdest, const vec3f& cameraPosition, const mat4f view, const mat4f proj, const SkyShaderSettings& sets);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermut;

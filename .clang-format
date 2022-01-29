@@ -10,6 +10,7 @@ AlwaysBreakBeforeMultilineStrings: 'true'
 AlwaysBreakTemplateDeclarations: 'true'
 BinPackParameters: 'false'
 BreakBeforeBraces: Stroustrup
+IndentPPDirectives: BeforeHash
 BreakConstructorInitializersBeforeComma: 'true'
 BreakBeforeTernaryOperators: 'true'
 ColumnLimit: '140'

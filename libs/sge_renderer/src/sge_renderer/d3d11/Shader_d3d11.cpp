@@ -4,7 +4,7 @@
 #include "Shader_d3d11.h"
 #include "sge_log/Log.h"
 #include "sge_renderer/renderer/HLSLTranslator.h"
-#include "sge_utils/utils/timer.h"
+#include "sge_utils/time/Timer.h"
 #include <d3dcompiler.h>
 
 namespace sge {

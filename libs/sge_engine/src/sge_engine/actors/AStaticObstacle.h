@@ -9,12 +9,6 @@
 
 namespace sge {
 
-//enum class CollisionShapeSource : int {
-//	FromBoundingBox,
-//	FromConvexHulls,
-//	FromConcaveHulls,
-//};
-
 //--------------------------------------------------------------------
 // AStaticObstacle
 //--------------------------------------------------------------------
@@ -28,6 +22,5 @@ struct SGE_ENGINE_API AStaticObstacle : public Actor {
 	TraitModel m_traitModel;
 	TraitSprite m_traitSprite;
 };
-
 
 } // namespace sge

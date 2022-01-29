@@ -13,13 +13,14 @@
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine_ui/ui/ImGuiDragDrop.h"
-#include "sge_utils/tiny/FileOpenDialog.h"
-#include "sge_utils/utils/Path.h"
-#include "sge_utils/utils/json.h"
+#include "sge_utils/json/json.h"
+#include "sge_utils/other/FileOpenDialog.h"
+#include "sge_utils/text/Path.h"
 
 namespace sge {
 
-void PrefabWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
+void PrefabWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+{
 	if (isClosed()) {
 		return;
 	}
@@ -68,7 +69,8 @@ void PrefabWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector
 					getEngineGlobal()->showNotification("Created prefab " + prefabFilePath);
 
 					m_availablePrefabs = NullOptional(); // force prefab window to refresh.
-				} else {
+				}
+				else {
 					const char* const errorMsg = "Please selected object to create a prefab!";
 					getEngineGlobal()->showNotification(errorMsg);
 					sgeLogWarn(errorMsg);

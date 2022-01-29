@@ -2,7 +2,7 @@
 
 #include "sge_utils/math/Box.h"
 #include "sge_utils/math/vec4.h"
-#include "sge_utils/utils/optional.h"
+#include "sge_utils/containers/Optional.h"
 
 namespace sge::gamegui {
 

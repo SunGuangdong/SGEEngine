@@ -8,7 +8,7 @@
 #include "sge_core/application/input.h"
 #include "sge_core/materials/IGeometryDrawer.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/tiny/FileOpenDialog.h"
+#include "sge_utils/other/FileOpenDialog.h"
 #include <imgui/imgui.h>
 
 #include <functional>
@@ -16,7 +16,8 @@
 namespace sge {
 
 /// Opens a file-open dialog asking the user to pik a mdl file.
-static bool promptForModel(AssetPtr& asset) {
+static bool promptForModel(AssetPtr& asset)
+{
 	AssetLibrary* const assetLib = getCore()->getAssetLib();
 
 	const std::string filename = FileOpenDialog("Pick a model", true, "*.mdl\0*.mdl\0", nullptr);
@@ -30,7 +31,8 @@ static bool promptForModel(AssetPtr& asset) {
 //--------------------------------------------------------------------------
 // ModelPreviewWidget
 //--------------------------------------------------------------------------
-void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize) {
+void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize)
+{
 	if (m_frameTarget.IsResourceValid() == false) {
 		m_frameTarget = sgecon->getDevice()->requestResource<FrameTarget>();
 		m_frameTarget->create2D(64, 64);
@@ -81,7 +83,8 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 
 	if (kIsTexcoordStyleD3D) {
 		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y));
-	} else {
+	}
+	else {
 		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y), ImVec2(0, 1), ImVec2(1, 0));
 	}
 
@@ -90,11 +93,12 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	}
 }
 
-void ModelPreviewWindow::setPreviewModel(AssetPtr asset) {
+void ModelPreviewWindow::setPreviewModel(AssetPtr asset)
+{
 	m_model = asset;
 	m_eval = EvaluatedModel();
 	autoPlayAnimation = true;
-	m_evalAnimator = ModelAnimator2();
+	m_evalAnimator = ModelAnimator();
 	previewAnimationsInfo.clear();
 	nextTrackIndex = 0;
 
@@ -125,7 +129,8 @@ void ModelPreviewWindow::setPreviewModel(AssetPtr asset) {
 //--------------------------------------------------------------------------
 // ModelPreviewWindow
 //--------------------------------------------------------------------------
-void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is) {
+void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is)
+{
 	if (isClosed()) {
 		return;
 	}
@@ -175,7 +180,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 		ImGui::SameLine();
 		if (isAssetLoaded(m_model)) {
 			ImGui::Text("%s", m_model->getPath().c_str());
-		} else {
+		}
+		else {
 			ImGui::Text("Pick a Model");
 		}
 
@@ -198,7 +204,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 
 					ImGui::EndCombo();
 				}
-			} else {
+			}
+			else {
 				ImGui::Text("No animation found.");
 			}
 
@@ -284,8 +291,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			std::function<void(int)> recusiveDoNodeInfo = [&](int nodeIndex) {
 				const ModelNode* node = model.nodeAt(nodeIndex);
 
-				ImGuiTreeNodeFlags treeNodeFlags =
-				    ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
+				ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
 
 				if (node->childNodes.size() == 0) {
 					treeNodeFlags |= ImGuiTreeNodeFlags_Leaf;
@@ -308,7 +314,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 						const ModelMaterial* mtl = model.materialAt(mtlIndex);
 						ImGui::Text("Attached Mesh [index=%d] %s", meshIndex, mesh->name.c_str());
 						ImGui::Text("Attached Material [index=%d] %s", meshIndex, mtl->name.c_str());
-						
+
 
 						hasAnythingBelow = true;
 					}

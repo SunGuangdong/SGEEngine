@@ -1,7 +1,7 @@
 #include "AParticles.h"
 
 #include "sge_engine/Actor.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 
 namespace sge {
 

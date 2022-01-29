@@ -1,9 +1,9 @@
 #pragma once
 
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/utils/TypeTraits.h"
-#include "sge_utils/utils/hash_combine.h"
-#include "sge_utils/utils/vector_map.h"
+#include "sge_utils/TypeTraits.h"
+#include "sge_utils/hash/hash_combine.h"
+#include "sge_utils/containers/vector_map.h"
 #include <cstring>
 #include <map>
 #include <string>

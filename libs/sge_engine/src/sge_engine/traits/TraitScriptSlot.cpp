@@ -4,7 +4,7 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/InspectorCmds.h"
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 #include <vector>
 
 namespace sge {

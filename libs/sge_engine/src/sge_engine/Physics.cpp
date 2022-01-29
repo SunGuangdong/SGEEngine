@@ -1,4 +1,5 @@
 #include "Physics.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "sge_core/model/Model.h"
 #include "sge_engine/Actor.h"
 
@@ -42,7 +43,30 @@ ReflBlock()
 //-------------------------------------------------------------------------
 // PhysicsWorld
 //-------------------------------------------------------------------------
-void PhysicsWorld::create() {
+void sgeNearCallback(btBroadphasePair& collisionPair, btCollisionDispatcher& dispatcher, const btDispatcherInfo& dispatchInfo)
+{
+	btCollisionObject* colObj0 = (btCollisionObject*)collisionPair.m_pProxy0->m_clientObject;
+	btCollisionObject* colObj1 = (btCollisionObject*)collisionPair.m_pProxy1->m_clientObject;
+
+	RigidBody* rb0 = (RigidBody*)colObj0->getUserPointer();
+	RigidBody* rb1 = (RigidBody*)colObj1->getUserPointer();
+
+	bool needsToCollide = true;
+	if (rb0 && rb1) {
+		bool agree0 = rb0->getMaskIdentifiesAs() & rb1->getMaskCollidesWith();
+		bool agree1 = rb1->getMaskIdentifiesAs() & rb0->getMaskCollidesWith();
+
+		needsToCollide = agree0 || agree1;
+	}
+
+	// Should be called we want a collision to occur.
+	if (needsToCollide) {
+		dispatcher.defaultNearCallback(collisionPair, dispatcher, dispatchInfo);
+	}
+}
+
+void PhysicsWorld::create()
+{
 	destroy();
 
 	broadphase.reset(new btDbvtBroadphase());
@@ -50,11 +74,13 @@ void PhysicsWorld::create() {
 	dispatcher.reset(new btCollisionDispatcher(collisionConfiguration.get()));
 	solver.reset(new btSequentialImpulseConstraintSolver());
 
+	dispatcher->setNearCallback(sgeNearCallback);
 	dynamicsWorld.reset(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
 	dynamicsWorld->setForceUpdateAllAabbs(false);
 }
 
-void PhysicsWorld::destroy() {
+void PhysicsWorld::destroy()
+{
 	dynamicsWorld.reset();
 	solver.reset();
 	dispatcher.reset();
@@ -62,15 +88,18 @@ void PhysicsWorld::destroy() {
 	broadphase.reset();
 }
 
-void PhysicsWorld::addPhysicsObject(RigidBody& obj) {
+void PhysicsWorld::addPhysicsObject(RigidBody& obj)
+{
 	if (obj.getBulletRigidBody()) {
 		dynamicsWorld->addRigidBody(obj.getBulletRigidBody());
-	} else {
+	}
+	else {
 		dynamicsWorld->addCollisionObject(obj.m_collisionObject.get());
 	}
 }
 
-void PhysicsWorld::removePhysicsObject(RigidBody& obj) {
+void PhysicsWorld::removePhysicsObject(RigidBody& obj)
+{
 	if (obj.getBulletRigidBody()) {
 		if (obj.isInWorld()) {
 			dynamicsWorld->removeRigidBody(obj.getBulletRigidBody());
@@ -78,13 +107,15 @@ void PhysicsWorld::removePhysicsObject(RigidBody& obj) {
 	}
 }
 
-void PhysicsWorld::setGravity(const vec3f& gravity) {
+void PhysicsWorld::setGravity(const vec3f& gravity)
+{
 	if (dynamicsWorld) {
 		dynamicsWorld->setGravity(toBullet(gravity));
 	}
 }
 
-vec3f PhysicsWorld::getGravity() const {
+vec3f PhysicsWorld::getGravity() const
+{
 	if (dynamicsWorld) {
 		return fromBullet(dynamicsWorld->getGravity());
 	}
@@ -92,14 +123,18 @@ vec3f PhysicsWorld::getGravity() const {
 	return vec3f(0.f);
 }
 
-void PhysicsWorld::rayTest(const vec3f& from, const vec3f& to, std::function<void(btDynamicsWorld::LocalRayResult&)> lambda) {
+void PhysicsWorld::rayTest(const vec3f& from, const vec3f& to, std::function<void(btDynamicsWorld::LocalRayResult&)> lambda)
+{
 	struct RayCallback : public btDynamicsWorld::RayResultCallback {
 		RayCallback(std::function<void(btDynamicsWorld::LocalRayResult&)>& lambda)
-		    : lambda(lambda) {}
+		    : lambda(lambda)
+		{
+		}
 
 		std::function<void(btDynamicsWorld::LocalRayResult&)>& lambda;
 
-		btScalar addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool UNUSED(normalInWorldSpace)) override {
+		btScalar addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool UNUSED(normalInWorldSpace)) override
+		{
 			lambda(rayResult);
 			return rayResult.m_hitFraction;
 		}
@@ -120,7 +155,8 @@ void PhysicsWorld::rayTest(const vec3f& from, const vec3f& to, std::function<voi
 //-------------------------------------------------------------------------
 // CollsionShapeDesc
 //-------------------------------------------------------------------------
-CollsionShapeDesc CollsionShapeDesc::createBox(const vec3f& halfDiagonal, const transf3d& offset) {
+CollsionShapeDesc CollsionShapeDesc::createBox(const vec3f& halfDiagonal, const transf3d& offset)
+{
 	CollsionShapeDesc r;
 	r.type = type_box;
 	r.boxHalfDiagonal = halfDiagonal * offset.s;
@@ -129,7 +165,8 @@ CollsionShapeDesc CollsionShapeDesc::createBox(const vec3f& halfDiagonal, const 
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createBox(const AABox3f& box) {
+CollsionShapeDesc CollsionShapeDesc::createBox(const AABox3f& box)
+{
 	sgeAssert(box.IsEmpty() == false);
 
 	CollsionShapeDesc r;
@@ -140,7 +177,8 @@ CollsionShapeDesc CollsionShapeDesc::createBox(const AABox3f& box) {
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createSphere(const float radius, const transf3d& offset) {
+CollsionShapeDesc CollsionShapeDesc::createSphere(const float radius, const transf3d& offset)
+{
 	CollsionShapeDesc r;
 	r.type = type_sphere;
 	r.sphereRadius = radius * offset.s.hsum() / 3.f;
@@ -149,7 +187,8 @@ CollsionShapeDesc CollsionShapeDesc::createSphere(const float radius, const tran
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createCapsule(const float height, const float radius, const transf3d& offset) {
+CollsionShapeDesc CollsionShapeDesc::createCapsule(const float height, const float radius, const transf3d& offset)
+{
 	CollsionShapeDesc r;
 	r.type = type_capsule;
 	r.capsuleHeight = height * offset.s.y;
@@ -159,7 +198,8 @@ CollsionShapeDesc CollsionShapeDesc::createCapsule(const float height, const flo
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createCylinder(const vec3f& halfDiagonal, const transf3d& offset) {
+CollsionShapeDesc CollsionShapeDesc::createCylinder(const vec3f& halfDiagonal, const transf3d& offset)
+{
 	CollsionShapeDesc r;
 	r.type = type_cylinder;
 	r.cylinderHalfDiagonal = halfDiagonal * offset.s;
@@ -168,17 +208,20 @@ CollsionShapeDesc CollsionShapeDesc::createCylinder(const vec3f& halfDiagonal, c
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createCylinder(float height, float radius, const transf3d& offset) {
+CollsionShapeDesc CollsionShapeDesc::createCylinder(float height, float radius, const transf3d& offset)
+{
 	vec3f halfDiagonal = vec3f(radius, height * 0.5f, radius);
 	return createCylinder(halfDiagonal, offset);
 }
 
-CollsionShapeDesc CollsionShapeDesc::createCylinderBottomAligned(float height, float radius, transf3d offset) {
+CollsionShapeDesc CollsionShapeDesc::createCylinderBottomAligned(float height, float radius, transf3d offset)
+{
 	offset.p.y += height * 0.5f;
 	return createCylinder(height, radius, offset);
 }
 
-CollsionShapeDesc CollsionShapeDesc::createCone(const float height, const float radius, const transf3d& offset) {
+CollsionShapeDesc CollsionShapeDesc::createCone(const float height, const float radius, const transf3d& offset)
+{
 	CollsionShapeDesc r;
 	r.type = type_cone;
 	r.coneHeight = height * offset.s.y;
@@ -188,7 +231,8 @@ CollsionShapeDesc CollsionShapeDesc::createCone(const float height, const float 
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createConvexPoly(std::vector<vec3f> verts, std::vector<int> indices) {
+CollsionShapeDesc CollsionShapeDesc::createConvexPoly(std::vector<vec3f> verts, std::vector<int> indices)
+{
 	CollsionShapeDesc r;
 	r.type = type_convexPoly;
 
@@ -198,7 +242,8 @@ CollsionShapeDesc CollsionShapeDesc::createConvexPoly(std::vector<vec3f> verts, 
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createTriMesh(std::vector<vec3f> verts, std::vector<int> indices) {
+CollsionShapeDesc CollsionShapeDesc::createTriMesh(std::vector<vec3f> verts, std::vector<int> indices)
+{
 	CollsionShapeDesc r;
 	r.type = type_triangleMesh;
 
@@ -208,7 +253,8 @@ CollsionShapeDesc CollsionShapeDesc::createTriMesh(std::vector<vec3f> verts, std
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createInfinitePlane(vec3f planeNormal, float planeConstant) {
+CollsionShapeDesc CollsionShapeDesc::createInfinitePlane(vec3f planeNormal, float planeConstant)
+{
 	CollsionShapeDesc r;
 	r.type = type_infinitePlane;
 
@@ -222,7 +268,8 @@ CollsionShapeDesc CollsionShapeDesc::createInfinitePlane(vec3f planeNormal, floa
 //-------------------------------------------------------------------------
 // CollisionShape
 //-------------------------------------------------------------------------
-void CollisionShape::create(const CollsionShapeDesc* shapeDescriptors, const int numShapeDescriptors) {
+void CollisionShape::create(const CollsionShapeDesc* shapeDescriptors, const int numShapeDescriptors)
+{
 	destroy();
 	m_desc.clear();
 	m_desc.reserve(numShapeDescriptors);
@@ -308,12 +355,14 @@ void CollisionShape::create(const CollsionShapeDesc* shapeDescriptors, const int
 	if (createdShapes.size() == 1) {
 		if (createdShapes[0].offset == transf3d()) {
 			m_btShape.reset(createdShapes[0].shape);
-		} else {
+		}
+		else {
 			btCompoundShape* const compound = new btCompoundShape();
 			compound->addChildShape(toBullet(createdShapes[0].offset), createdShapes[0].shape);
 			m_btShape.reset(compound);
 		}
-	} else {
+	}
+	else {
 		btCompoundShape* const compound = new btCompoundShape();
 		for (const CreatedShape& shape : createdShapes) {
 			btTransform localTransform = toBullet(shape.offset);
@@ -327,7 +376,8 @@ void CollisionShape::create(const CollsionShapeDesc* shapeDescriptors, const int
 //-------------------------------------------------------------------------
 // SgeCustomMoutionState
 //-------------------------------------------------------------------------
-void SgeCustomMoutionState::getWorldTransform(btTransform& centerOfMassWorldTrans) const {
+void SgeCustomMoutionState::getWorldTransform(btTransform& centerOfMassWorldTrans) const
+{
 #if 0
 	if (m_pRigidBody) {
 		centerOfMassWorldTrans = m_pRigidBody->getBulletRigidBody()->getWorldTransform();
@@ -339,7 +389,8 @@ void SgeCustomMoutionState::getWorldTransform(btTransform& centerOfMassWorldTran
 
 /// synchronizes world transform from physics to user
 /// Bullet only calls the update of worldtransform for active objects
-void SgeCustomMoutionState::setWorldTransform(const btTransform& UNUSED(centerOfMassWorldTrans)) {
+void SgeCustomMoutionState::setWorldTransform(const btTransform& UNUSED(centerOfMassWorldTrans))
+{
 	if (m_pRigidBody && m_pRigidBody->isValid()) {
 #if 0
 			m_pRigidBody->actor->setTransformInternal(fromBullet(centerOfMassWorldTrans.getOrigin()), fromBullet(centerOfMassWorldTrans.getRotation()));
@@ -358,19 +409,22 @@ void SgeCustomMoutionState::setWorldTransform(const btTransform& UNUSED(centerOf
 //-------------------------------------------------------------------------
 // RigidBody
 //-------------------------------------------------------------------------
-void RigidBody::create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce) {
+void RigidBody::create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce)
+{
 	CollisionShape* collisionShape = new CollisionShape();
 	collisionShape->create(shapeDesc, numShapeDescs);
 	create(actor, collisionShape, mass, noResponce);
 }
 
-void RigidBody::create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce) {
+void RigidBody::create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce)
+{
 	CollisionShape* collisionShape = new CollisionShape();
 	collisionShape->create(&desc, 1);
 	create(actor, collisionShape, mass, noResponce);
 }
 
-void RigidBody::create(Actor* const actor, CollisionShape* collisionShapeToBeOwned, float const mass, bool noResponce) {
+void RigidBody::create(Actor* const actor, CollisionShape* collisionShapeToBeOwned, float const mass, bool noResponce)
+{
 	// isGhost = false;
 	destroy();
 
@@ -391,7 +445,8 @@ void RigidBody::create(Actor* const actor, CollisionShape* collisionShapeToBeOwn
 	if (mass == 0.f) {
 		getBulletRigidBody()->setActivationState(ISLAND_SLEEPING);
 		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
-	} else {
+	}
+	else {
 		getBulletRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	}
 
@@ -403,17 +458,39 @@ void RigidBody::create(Actor* const actor, CollisionShape* collisionShapeToBeOwn
 	m_collisionObject->setUserPointer(static_cast<RigidBody*>(this));
 }
 
-void RigidBody::setNoCollisionResponse(bool dontRespontToCollisions) {
+void RigidBody::createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs, bool noResponse)
+{
+	destroy();
+	CollisionShape* collisionShapeToBeOwned = new CollisionShape();
+	collisionShapeToBeOwned->create(descs, numDescs);
+
+	m_collisionShape.reset(collisionShapeToBeOwned);
+	btPairCachingGhostObject* ghostBullet = new btPairCachingGhostObject();
+	ghostBullet->setCollisionShape(m_collisionShape->getBulletShape());
+	m_collisionObject.reset(ghostBullet);
+
+	if (noResponse) {
+		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+	}
+
+	this->actor = actor;
+	m_collisionObject->setUserPointer(static_cast<RigidBody*>(this));
+}
+
+void RigidBody::setNoCollisionResponse(bool dontRespontToCollisions)
+{
 	if (dontRespontToCollisions) {
 		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
-	} else {
+	}
+	else {
 		int flags = m_collisionObject->getCollisionFlags();
 		flags = flags & ~int(btCollisionObject::CF_NO_CONTACT_RESPONSE);
 		m_collisionObject->setCollisionFlags(flags);
 	}
 }
 
-bool RigidBody::hasNoCollisionResponse() const {
+bool RigidBody::hasNoCollisionResponse() const
+{
 	if (m_collisionObject == nullptr) {
 		return true;
 	}
@@ -421,7 +498,8 @@ bool RigidBody::hasNoCollisionResponse() const {
 	return (m_collisionObject->getCollisionFlags() & btCollisionObject::CF_NO_CONTACT_RESPONSE) != 0;
 }
 
-float RigidBody::getMass() const {
+float RigidBody::getMass() const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		float invMass = btrb->getInvMass();
@@ -431,7 +509,8 @@ float RigidBody::getMass() const {
 	return 0.f;
 }
 
-void RigidBody::setMass(float mass) {
+void RigidBody::setMass(float mass)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	btCollisionShape* btCollsionShape = btrb->getCollisionShape();
 	if (btrb && btCollsionShape) {
@@ -442,14 +521,16 @@ void RigidBody::setMass(float mass) {
 	}
 }
 
-void RigidBody::setCanMove(bool x, bool y, bool z) {
+void RigidBody::setCanMove(bool x, bool y, bool z)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setLinearFactor(btVector3(x ? 1.f : 0.f, y ? 1.f : 0.f, z ? 1.f : 0.f));
 	}
 }
 
-void RigidBody::getCanMove(bool& x, bool& y, bool& z) const {
+void RigidBody::getCanMove(bool& x, bool& y, bool& z) const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btVector3 linearFactor = btrb->getLinearFactor();
@@ -460,14 +541,16 @@ void RigidBody::getCanMove(bool& x, bool& y, bool& z) const {
 	}
 }
 
-void RigidBody::setCanRotate(bool x, bool y, bool z) {
+void RigidBody::setCanRotate(bool x, bool y, bool z)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setAngularFactor(btVector3(x ? 1.f : 0.f, y ? 1.f : 0.f, z ? 1.f : 0.f));
 	}
 }
 
-void RigidBody::getCanRotate(bool& x, bool& y, bool& z) const {
+void RigidBody::getCanRotate(bool& x, bool& y, bool& z) const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btVector3 linearFactor = btrb->getAngularFactor();
@@ -478,14 +561,16 @@ void RigidBody::getCanRotate(bool& x, bool& y, bool& z) const {
 	}
 }
 
-void RigidBody::setBounciness(float v) {
+void RigidBody::setBounciness(float v)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setRestitution(v);
 	}
 }
 
-float RigidBody::getBounciness() const {
+float RigidBody::getBounciness() const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->getRestitution();
@@ -494,14 +579,16 @@ float RigidBody::getBounciness() const {
 	return 0.f;
 }
 
-void RigidBody::setDamping(float linearDamping, float angularDamping) {
+void RigidBody::setDamping(float linearDamping, float angularDamping)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setDamping(linearDamping, angularDamping);
 	}
 }
 
-void RigidBody::getDamping(float& linearDamping, float& angularDamping) const {
+void RigidBody::getDamping(float& linearDamping, float& angularDamping) const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		linearDamping = btrb->getLinearDamping();
@@ -509,14 +596,16 @@ void RigidBody::getDamping(float& linearDamping, float& angularDamping) const {
 	}
 }
 
-void RigidBody::setFriction(float f) {
+void RigidBody::setFriction(float f)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setFriction(f);
 	}
 }
 
-float RigidBody::getFriction() const {
+float RigidBody::getFriction() const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		return btrb->getFriction();
@@ -525,14 +614,16 @@ float RigidBody::getFriction() const {
 	return 0.f;
 }
 
-void RigidBody::setRollingFriction(float f) {
+void RigidBody::setRollingFriction(float f)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setRollingFriction(f);
 	}
 }
 
-float RigidBody::getRollingFriction() const {
+float RigidBody::getRollingFriction() const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		return btrb->getRollingFriction();
@@ -541,13 +632,15 @@ float RigidBody::getRollingFriction() const {
 	return 0.f;
 }
 
-void RigidBody::setSpinningFriction(float f) {
+void RigidBody::setSpinningFriction(float f)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setSpinningFriction(f);
 	}
 }
-float RigidBody::getSpinningFriction() const {
+float RigidBody::getSpinningFriction() const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		return btrb->getSpinningFriction();
@@ -556,14 +649,16 @@ float RigidBody::getSpinningFriction() const {
 	return 0.f;
 }
 
-void RigidBody::setGravity(const vec3f& gravity) {
+void RigidBody::setGravity(const vec3f& gravity)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setGravity(toBullet(gravity));
 	}
 }
 
-vec3f RigidBody::getGravity() const {
+vec3f RigidBody::getGravity() const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		fromBullet(btrb->getGravity());
@@ -572,7 +667,8 @@ vec3f RigidBody::getGravity() const {
 	return vec3f(0.f);
 }
 
-void RigidBody::applyLinearVelocity(const vec3f& v) {
+void RigidBody::applyLinearVelocity(const vec3f& v)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		float invMass = btrb->getInvMass();
@@ -582,14 +678,16 @@ void RigidBody::applyLinearVelocity(const vec3f& v) {
 	}
 }
 
-void RigidBody::setLinearVelocity(const vec3f& v) {
+void RigidBody::setLinearVelocity(const vec3f& v)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setLinearVelocity(toBullet(v));
 	}
 }
 
-void RigidBody::applyAngularVelocity(const vec3f& v) {
+void RigidBody::applyAngularVelocity(const vec3f& v)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btVector3 initalAngularVel = btrb->getAngularVelocity();
@@ -597,42 +695,48 @@ void RigidBody::applyAngularVelocity(const vec3f& v) {
 	}
 }
 
-void RigidBody::setAngularVelocity(const vec3f& v) {
+void RigidBody::setAngularVelocity(const vec3f& v)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->setAngularVelocity(toBullet(v));
 	}
 }
 
-void RigidBody::applyTorque(const vec3f& torque) {
+void RigidBody::applyTorque(const vec3f& torque)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->applyTorque(toBullet(torque));
 	}
 }
 
-void RigidBody::applyForce(const vec3f& f, const vec3f& forcePosition) {
+void RigidBody::applyForce(const vec3f& f, const vec3f& forcePosition)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->applyForce(toBullet(f), toBullet(forcePosition));
 	}
 }
 
-void RigidBody::applyForceCentral(const vec3f& f) {
+void RigidBody::applyForceCentral(const vec3f& f)
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->applyCentralForce(toBullet(f));
 	}
 }
 
-void RigidBody::clearForces() {
+void RigidBody::clearForces()
+{
 	btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		btrb->clearForces();
 	}
 }
 
-vec3f RigidBody::getForces() const {
+vec3f RigidBody::getForces() const
+{
 	const btRigidBody* btrb = getBulletRigidBody();
 	if (btrb) {
 		return fromBullet(btrb->getTotalForce());
@@ -641,7 +745,8 @@ vec3f RigidBody::getForces() const {
 	return vec3f(0.f);
 }
 
-void RigidBody::destroy() {
+void RigidBody::destroy()
+{
 	if (getBulletRigidBody()) {
 		sgeAssert(getBulletRigidBody()->isInWorld() == false);
 	}
@@ -652,7 +757,8 @@ void RigidBody::destroy() {
 }
 
 
-transf3d RigidBody::getTransformAndScaling() const {
+transf3d RigidBody::getTransformAndScaling() const
+{
 	btVector3 const scaling = m_collisionObject->getCollisionShape()->getLocalScaling();
 	transf3d tr = fromBullet(m_collisionObject->getWorldTransform());
 
@@ -663,24 +769,28 @@ transf3d RigidBody::getTransformAndScaling() const {
 	return tr;
 }
 
-bool operator==(const btVector3& b, const vec3f& s) {
+bool operator==(const btVector3& b, const vec3f& s)
+{
 	return b.x() == s.x && b.y() == s.y && b.z() == s.z;
 }
 
-bool operator!=(const btVector3& b, const vec3f& s) {
+bool operator!=(const btVector3& b, const vec3f& s)
+{
 	return !(b == s);
 }
 
-bool operator==(const btQuaternion& b, const quatf& s) {
+bool operator==(const btQuaternion& b, const quatf& s)
+{
 	return b.x() == s.x && b.y() == s.y && b.z() == s.z && b.w() == s.w;
 }
 
-bool operator!=(const btQuaternion& b, const quatf& s) {
+bool operator!=(const btQuaternion& b, const quatf& s)
+{
 	return !(b == s);
 }
 
-void RigidBody::setTransformAndScaling(const transf3d& tr, bool killVelocity) {
-
+void RigidBody::setTransformAndScaling(const transf3d& tr, bool killVelocity)
+{
 	if (m_collisionObject == nullptr) {
 		return;
 	}
@@ -689,9 +799,16 @@ void RigidBody::setTransformAndScaling(const transf3d& tr, bool killVelocity) {
 
 	if (currentWorldTransform.getOrigin() != tr.p || currentWorldTransform.getRotation() != tr.r) {
 		m_collisionObject->setWorldTransform(toBullet(tr));
-		auto ms = getBulletRigidBody()->getMotionState();
-		if (ms)
-			ms->setWorldTransform(toBullet(tr));
+		btRigidBody* rigidBodyBullet = getBulletRigidBody();
+		if (rigidBodyBullet) {
+			rigidBodyBullet->getMotionState()->setWorldTransform(toBullet(tr));
+		}
+		else {
+			btPairCachingGhostObject* ghostBullet = getBulletGhostObject();
+			if (ghostBullet) {
+				ghostBullet->setWorldTransform(toBullet(tr));
+			}
+		}
 	}
 
 	// Change the scaling only if needed.
@@ -710,21 +827,32 @@ void RigidBody::setTransformAndScaling(const transf3d& tr, bool killVelocity) {
 	}
 }
 
-bool RigidBody::isInWorld() const {
+btPairCachingGhostObject* RigidBody::getBulletGhostObject()
+{
+	if (m_collisionObject.get()) {
+		return (btPairCachingGhostObject*)btPairCachingGhostObject::upcast(m_collisionObject.get());
+	}
+	return nullptr;
+}
+
+bool RigidBody::isInWorld() const
+{
 	if (getBulletRigidBody()) {
 		return getBulletRigidBody()->isInWorld();
 	}
 	return false;
 }
 
-AABox3f RigidBody::getBBoxWs() const {
+AABox3f RigidBody::getBBoxWs() const
+{
 	btVector3 btMin, btMax;
 	getBulletRigidBody()->getAabb(btMin, btMax);
 	AABox3f result(fromBullet(btMin), fromBullet(btMax));
 	return result;
 }
 
-const Actor* getOtherActorFromManifold(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx) {
+const Actor* getOtherActorFromManifold(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx)
+{
 	const Actor* const a0 = getActorFromPhysicsObject(manifold->getBody0());
 	const Actor* const a1 = getActorFromPhysicsObject(manifold->getBody1());
 
@@ -732,7 +860,8 @@ const Actor* getOtherActorFromManifold(const btPersistentManifold* const manifol
 		if (youIdx)
 			*youIdx = 0;
 		return a1;
-	} else if (you == a1) {
+	}
+	else if (you == a1) {
 		if (youIdx)
 			*youIdx = 1;
 		return a0;
@@ -743,7 +872,8 @@ const Actor* getOtherActorFromManifold(const btPersistentManifold* const manifol
 	return nullptr;
 }
 
-Actor* getOtherActorFromManifoldMutable(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx) {
+Actor* getOtherActorFromManifoldMutable(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx)
+{
 	Actor* const a0 = getActorFromPhysicsObjectMutable(manifold->getBody0());
 	Actor* const a1 = getActorFromPhysicsObjectMutable(manifold->getBody1());
 
@@ -751,7 +881,8 @@ Actor* getOtherActorFromManifoldMutable(const btPersistentManifold* const manifo
 		if (youIdx)
 			*youIdx = 0;
 		return a1;
-	} else if (you == a1) {
+	}
+	else if (you == a1) {
 		if (youIdx)
 			*youIdx = 1;
 		return a0;
@@ -762,7 +893,8 @@ Actor* getOtherActorFromManifoldMutable(const btPersistentManifold* const manifo
 	return nullptr;
 }
 
-const btCollisionObject* getOtherFromManifold(const btPersistentManifold* const manifold, const btCollisionObject* const you, int* youIdx) {
+const btCollisionObject* getOtherFromManifold(const btPersistentManifold* const manifold, const btCollisionObject* const you, int* youIdx)
+{
 	const btCollisionObject* const a0 = manifold->getBody0();
 	const btCollisionObject* const a1 = manifold->getBody1();
 
@@ -770,7 +902,8 @@ const btCollisionObject* getOtherFromManifold(const btPersistentManifold* const 
 		if (youIdx)
 			*youIdx = 0;
 		return a1;
-	} else if (you == a1) {
+	}
+	else if (you == a1) {
 		if (youIdx)
 			*youIdx = 1;
 		return a0;
@@ -781,7 +914,8 @@ const btCollisionObject* getOtherFromManifold(const btPersistentManifold* const 
 	return nullptr;
 }
 
-const btCollisionObject* getOtherBodyFromManifold(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx) {
+const btCollisionObject* getOtherBodyFromManifold(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx)
+{
 	const Actor* const a0 = getActorFromPhysicsObject(manifold->getBody0());
 	const Actor* const a1 = getActorFromPhysicsObject(manifold->getBody1());
 
@@ -789,7 +923,8 @@ const btCollisionObject* getOtherBodyFromManifold(const btPersistentManifold* co
 		if (youIdx)
 			*youIdx = 0;
 		return manifold->getBody1();
-	} else if (you == a1) {
+	}
+	else if (you == a1) {
 		if (youIdx)
 			*youIdx = 1;
 		return manifold->getBody0();

@@ -18,6 +18,9 @@ struct SGE_ENGINE_API RigidBodyPropertiesConfigurator {
 	RigidBodyPropertiesConfigurator() = default;
 	~RigidBodyPropertiesConfigurator() = default;
 
+	ubyte identifiesAs = 1;
+	ubyte collidesWith = 1;
+
 	float mass = 1.f;
 	float friction = 1.f; // TODO: Should we add spinning and rolling friction?
 	float rollingFriction = 0.5f;
@@ -74,6 +77,7 @@ struct SGE_ENGINE_API RigidBodyConfigurator : public RigidBodyPropertiesConfigur
 	bool apply(Actor& actor, bool addToWorldNow = false) const;
 
   public:
+
 	ShapeSource shapeSource = shapeSource_fromTraitModel;
 	AssetProperty assetPropery = AssetProperty(assetIface_model3d);
 	std::vector<CollsionShapeDesc> collisionShapes;

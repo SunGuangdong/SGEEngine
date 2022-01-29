@@ -12,8 +12,8 @@
 #include "opengl_include.h"
 
 #include "sge_renderer/renderer/GraphicsCommon.h"
-#include "sge_utils/utils/Pair.h"
-#include <sge_utils/utils/StaticArray.h>
+#include "sge_utils/containers/Pair.h"
+#include "sge_utils/containers/StaticArray.h"
 
 #include <sge_utils/math/Box.h>
 
@@ -48,7 +48,9 @@ struct GLContextStateCache {
 		    , type(a_type)
 		    , normalized(a_normalized)
 		    , stride(a_stride)
-		    , byteOffset(a_byteOffset) {}
+		    , byteOffset(a_byteOffset)
+		{
+		}
 
 		bool isEnabled;
 		GLuint buffer;
@@ -67,7 +69,8 @@ struct GLContextStateCache {
 	};
 
   public:
-	GLContextStateCache() {
+	GLContextStateCache()
+	{
 		//[TODO] Proper default OpenGL states.
 		m_rasterDesc.backFaceCCW = false;
 		m_rasterDesc.fillMode = FillMode::Solid;
@@ -154,7 +157,10 @@ struct GLContextStateCache {
 	void GenFrameBuffers(const GLsizei n, GLuint* ids);
 	void DeleteFrameBuffers(const GLsizei n, GLuint* ids);
 
-	GLuint CreateProgram() { return glCreateProgram(); }
+	GLuint CreateProgram()
+	{
+		return glCreateProgram();
+	}
 	void DeleteProgram(GLuint program);
 
   private:

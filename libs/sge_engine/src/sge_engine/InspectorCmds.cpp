@@ -7,7 +7,7 @@
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/DynamicProperties.h"
 #include "sge_engine/EngineGlobal.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 
 namespace sge {
 

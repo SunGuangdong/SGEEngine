@@ -6,7 +6,7 @@
 #include <string>
 
 #include "sge_renderer/renderer/GraphicsCommon.h"
-#include "sge_utils/utils/Pair.h"
+#include "sge_utils/types.h"
 
 namespace sge {
 
@@ -21,16 +21,23 @@ struct CBufferFiller {
 		size_t offsetBytes = 0;
 	};
 
-	void setFloat4(const unsigned nameStrIdx, const float v[4]) { SetData(nameStrIdx, UniformType::Float4, v, sizeof(float) * 4); }
+	void setFloat4(const unsigned nameStrIdx, const float v[4])
+	{
+		SetData(nameStrIdx, UniformType::Float4, v, sizeof(float) * 4);
+	}
 
-	void setFloat4x4(const unsigned nameStrIdx, const float v[16]) { SetData(nameStrIdx, UniformType::Float4x4, v, sizeof(float) * 16); }
+	void setFloat4x4(const unsigned nameStrIdx, const float v[16])
+	{
+		SetData(nameStrIdx, UniformType::Float4x4, v, sizeof(float) * 16);
+	}
 
 	ValueDesc& getValueDesc(const unsigned nameStrIdx, const UniformType::Enum type);
 	void DeleteValue(const int idx);
 
 	void updateCBuffer(SGEContext* context, Buffer* cbuffer, const CBufferFiller& cbRefl);
 
-	void clear() {
+	void clear()
+	{
 		values.clear();
 		data.clear();
 	}
@@ -46,7 +53,9 @@ struct CBufferFiller {
 //----------------------------------------------------------------------------
 struct DrawExecDesc {
 	DrawExecDesc()
-	    : m_type(Type_Invalid) {}
+	    : m_type(Type_Invalid)
+	{
+	}
 
 	enum Type : char {
 		Type_Invalid,
@@ -68,7 +77,8 @@ struct DrawExecDesc {
 		uint32 numInstances;
 	};
 
-	void Draw(const uint32 numVerts, const uint32 startVert, const uint32 instanceCount) {
+	void Draw(const uint32 numVerts, const uint32 startVert, const uint32 instanceCount)
+	{
 		m_type = Type_Linear;
 
 		m_linear.numVerts = numVerts;
@@ -76,7 +86,8 @@ struct DrawExecDesc {
 		m_linear.numInstances = instanceCount;
 	}
 
-	void DrawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVertex, const uint32 instanceCount) {
+	void DrawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVertex, const uint32 instanceCount)
+	{
 		m_type = Type_Indexed;
 
 		m_indexed.numIndices = numIndices;
@@ -85,11 +96,23 @@ struct DrawExecDesc {
 		m_indexed.numInstances = instanceCount;
 	}
 
-	bool IsValid() const { return m_type != Type_Invalid; }
-	Type GetType() const { return m_type; }
+	bool IsValid() const
+	{
+		return m_type != Type_Invalid;
+	}
+	Type GetType() const
+	{
+		return m_type;
+	}
 
-	const Linear& LinearCall() const { return m_linear; }
-	const Indexed& IndexedCall() const { return m_indexed; }
+	const Linear& LinearCall() const
+	{
+		return m_linear;
+	}
+	const Indexed& IndexedCall() const
+	{
+		return m_indexed;
+	}
 
 	union {
 		Linear m_linear;
@@ -108,8 +131,14 @@ struct StateGroup {
 	void setPrimitiveTopology(const PrimitiveTopology::Enum pt);
 	void setIB(Buffer* pBuffer, const UniformType::Enum format, const uint32 byteOffset);
 
-	void setRasterizerState(RasterizerState* state) { m_rasterState = state; }
-	void setDepthStencilState(DepthStencilState* state) { m_depthStencilState = state; }
+	void setRasterizerState(RasterizerState* state)
+	{
+		m_rasterState = state;
+	}
+	void setDepthStencilState(DepthStencilState* state)
+	{
+		m_depthStencilState = state;
+	}
 
 	void setRenderState(RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState = nullptr);
 
@@ -132,19 +161,27 @@ struct StateGroup {
 
 struct BoundUniform {
 	BoundUniform()
-	    : data(nullptr) {}
+	    : data(nullptr)
+	{
+	}
 
 	BoundUniform(BindLocation bindLocation, void* data)
 	    : bindLocation(bindLocation)
-	    , data(data) {}
+	    , data(data)
+	{
+	}
 
 	BoundUniform(BindLocation bindLocation, Texture** textures)
 	    : bindLocation(bindLocation)
-	    , textures(textures) {}
+	    , textures(textures)
+	{
+	}
 
 	BoundUniform(BindLocation bindLocation, Buffer* buffer)
 	    : bindLocation(bindLocation)
-	    , buffer(buffer) {}
+	    , buffer(buffer)
+	{
+	}
 
 	BindLocation bindLocation;
 	union {
@@ -167,12 +204,16 @@ struct DrawCall {
 	BoundUniform* uniforms = nullptr;
 	int numUniforms = 0;
 
-	void setUniforms(BoundUniform* const uniformsNew, int const numUniformsNew) {
+	void setUniforms(BoundUniform* const uniformsNew, int const numUniformsNew)
+	{
 		this->uniforms = uniformsNew;
 		this->numUniforms = numUniformsNew;
 	}
 
-	void setStateGroup(StateGroup* const stateGroup) { m_pStateGroup = stateGroup; }
+	void setStateGroup(StateGroup* const stateGroup)
+	{
+		m_pStateGroup = stateGroup;
+	}
 
 	void draw(const uint32 numVerts, const uint32 startVert, const uint32 numInstances = 1);
 	void drawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances = 1);

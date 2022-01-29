@@ -4,8 +4,8 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/utils/optional.h"
-#include "sge_utils/utils/timer.h"
+#include "sge_utils/containers/Optional.h"
+#include "sge_utils/time/Timer.h"
 #include "sgecore_api.h"
 
 namespace sge {

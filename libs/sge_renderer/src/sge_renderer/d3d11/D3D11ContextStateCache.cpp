@@ -1,11 +1,13 @@
 #include "D3D11ContextStateCache.h"
 #include "sge_log/Log.h"
-#include "sge_utils/utils/comptr.h"
-#include "sge_utils/utils/range_loop.h"
+#include "sge_utils/containers/ArrayView.h"
+#include "sge_utils/containers/Range.h"
+#include "sge_utils/microsoft/comptr.h"
 
 namespace sge {
 
-D3D11ContextStateCache::D3D11ContextStateCache(ID3D11DeviceContext* dx11Context) {
+D3D11ContextStateCache::D3D11ContextStateCache(ID3D11DeviceContext* dx11Context)
+{
 	m_d3dcon = dx11Context;
 
 	m_primitiveTopology = D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
@@ -33,20 +35,23 @@ D3D11ContextStateCache::D3D11ContextStateCache(ID3D11DeviceContext* dx11Context)
 	m_viewport.first = false;
 }
 
-void D3D11ContextStateCache::setPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY topology) {
+void D3D11ContextStateCache::setPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY topology)
+{
 	if (UPDATE_ON_DIFF(m_primitiveTopology, topology)) {
 		m_d3dcon->IASetPrimitiveTopology(topology);
 	}
 }
 
-void D3D11ContextStateCache::SetInputLayout(ID3D11InputLayout* inputLayout) {
+void D3D11ContextStateCache::SetInputLayout(ID3D11InputLayout* inputLayout)
+{
 	if (UPDATE_ON_DIFF(m_inputLayout, inputLayout)) {
 		m_d3dcon->IASetInputLayout(inputLayout);
 	}
 }
 
 void D3D11ContextStateCache::BindVertexBuffers(
-    ID3D11Buffer** ppBuffers, UINT* pStrides, UINT* pOffsetsByte, const UINT numBuffers, const UINT startSlot) {
+    ID3D11Buffer** ppBuffers, UINT* pStrides, UINT* pOffsetsByte, const UINT numBuffers, const UINT startSlot)
+{
 #if 0
 	// Just as a note, this performed better ony my AMD 7700, but not that well on GeForce 960M.
 	m_d3dcon->IASetVertexBuffers(
@@ -93,7 +98,8 @@ void D3D11ContextStateCache::BindVertexBuffers(
 	}
 }
 
-void D3D11ContextStateCache::BindIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format, UINT byteOffset) {
+void D3D11ContextStateCache::BindIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format, UINT byteOffset)
+{
 	if (m_indexBuffer == buffer && m_indexBufferFromat == format && m_indexBufferByteOffset == byteOffset) {
 		// nothing to update
 		return;
@@ -112,19 +118,22 @@ void D3D11ContextStateCache::BindIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT f
 	m_d3dcon->IASetIndexBuffer(buffer, format, byteOffset);
 }
 
-void D3D11ContextStateCache::SetVS(ID3D11VertexShader* vertShader) {
+void D3D11ContextStateCache::SetVS(ID3D11VertexShader* vertShader)
+{
 	if (UPDATE_ON_DIFF(m_vertexShader, vertShader)) {
 		m_d3dcon->VSSetShader(vertShader, 0, 0);
 	}
 }
 
-void D3D11ContextStateCache::SetPS(ID3D11PixelShader* pixelShader) {
+void D3D11ContextStateCache::SetPS(ID3D11PixelShader* pixelShader)
+{
 	if (UPDATE_ON_DIFF(m_pixelShader, pixelShader)) {
 		m_d3dcon->PSSetShader(pixelShader, 0, 0);
 	}
 }
 
-void D3D11ContextStateCache::BindConstantBuffers(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11Buffer** pBuffers) {
+void D3D11ContextStateCache::BindConstantBuffers(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11Buffer** pBuffers)
+{
 	bool shouldCallAPI = false;
 	for (unsigned int t = startSlot; t < numElements; ++t) {
 		if (m_boundResources[stage].cbuffers[t] != pBuffers[t]) {
@@ -184,7 +193,8 @@ void D3D11ContextStateCache::BindConstantBuffers(const ShaderType::Enum stage, U
 }
 
 // Check if the "resource" is already bound as a render target or a depth stencil.
-bool D3D11ContextStateCache::IsResourceBoundAsRTVorDSV(const ID3D11Resource* resource) {
+bool D3D11ContextStateCache::IsResourceBoundAsRTVorDSV(const ID3D11Resource* resource)
+{
 	// Check against all RTVs.
 	for (size_t iRtv = 0; iRtv < m_rtvs.size(); ++iRtv) {
 		if (m_rtvs[iRtv] != NULL) {
@@ -210,7 +220,8 @@ bool D3D11ContextStateCache::IsResourceBoundAsRTVorDSV(const ID3D11Resource* res
 	return false;
 }
 
-void D3D11ContextStateCache::BindSRVs(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11ShaderResourceView** pSRVs) {
+void D3D11ContextStateCache::BindSRVs(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11ShaderResourceView** pSRVs)
+{
 	UINT bindSlotStartAccum = startSlot;
 	UINT bindNumElems = 0;
 
@@ -258,7 +269,8 @@ void D3D11ContextStateCache::BindSRVs(const ShaderType::Enum stage, UINT startSl
 	}
 }
 
-void D3D11ContextStateCache::BindSamplers(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11SamplerState** pSamplers) {
+void D3D11ContextStateCache::BindSamplers(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11SamplerState** pSamplers)
+{
 	UINT bindSlotStartAccum = startSlot;
 	UINT bindNumElems = 0;
 
@@ -294,13 +306,15 @@ void D3D11ContextStateCache::BindSamplers(const ShaderType::Enum stage, UINT sta
 	}
 }
 
-void D3D11ContextStateCache::SetRasterizerState(ID3D11RasterizerState* rasterState) {
+void D3D11ContextStateCache::SetRasterizerState(ID3D11RasterizerState* rasterState)
+{
 	if (UPDATE_ON_DIFF(m_rasterState, rasterState)) {
 		m_d3dcon->RSSetState(rasterState);
 	}
 }
 
-void D3D11ContextStateCache::SetScissors(const D3D11_RECT* rects, UINT numRects) {
+void D3D11ContextStateCache::SetScissors(const D3D11_RECT* rects, UINT numRects)
+{
 	bool shouldCallAPIFunc = numRects != m_scissorsRects.size();
 
 	if (shouldCallAPIFunc == false) {
@@ -317,20 +331,23 @@ void D3D11ContextStateCache::SetScissors(const D3D11_RECT* rects, UINT numRects)
 	}
 }
 
-void D3D11ContextStateCache::SetDepthStencilState(ID3D11DepthStencilState* depthStencilState) {
+void D3D11ContextStateCache::SetDepthStencilState(ID3D11DepthStencilState* depthStencilState)
+{
 	if (UPDATE_ON_DIFF(m_depthStencilState, depthStencilState)) {
 		m_d3dcon->OMSetDepthStencilState(depthStencilState, 0);
 	}
 }
 
-void D3D11ContextStateCache::SetBlendState(ID3D11BlendState* bs) {
+void D3D11ContextStateCache::SetBlendState(ID3D11BlendState* bs)
+{
 	if (UPDATE_ON_DIFF(m_blendState, bs)) {
 		m_d3dcon->OMSetBlendState(m_blendState, NULL, 0xffffffff);
 	}
 }
 
 // Searches is any bound SRV matches a value from resources and unbinds it.
-void D3D11ContextStateCache::ResolveBindRTVorDSVHazzard(ID3D11Resource* const* resources, const int numResources) {
+void D3D11ContextStateCache::ResolveBindRTVorDSVHazzard(ID3D11Resource* const* resources, const int numResources)
+{
 	if (resources == NULL)
 		return;
 
@@ -361,7 +378,8 @@ void D3D11ContextStateCache::ResolveBindRTVorDSVHazzard(ID3D11Resource* const* r
 void D3D11ContextStateCache::SetRenderTargetsAndDepthStencil(const UINT startSlot,
                                                              const UINT numRenderTargets,
                                                              ID3D11RenderTargetView** rtvs,
-                                                             ID3D11DepthStencilView* dsv) {
+                                                             ID3D11DepthStencilView* dsv)
+{
 	bool shouldCallAPIFunc = false;
 
 	int lastRTVDiffIndex = -1;
@@ -415,7 +433,8 @@ void D3D11ContextStateCache::SetRenderTargetsAndDepthStencil(const UINT startSlo
 }
 
 
-void D3D11ContextStateCache::setViewport(const D3D11_VIEWPORT& viewport) {
+void D3D11ContextStateCache::setViewport(const D3D11_VIEWPORT& viewport)
+{
 	if (memcmp(&viewport, &m_viewport.second, sizeof(m_viewport)) == 0)
 		return;
 
@@ -425,7 +444,8 @@ void D3D11ContextStateCache::setViewport(const D3D11_VIEWPORT& viewport) {
 	m_d3dcon->RSSetViewports(1, &m_viewport.second);
 }
 
-void D3D11ContextStateCache::BufferUnbind(ID3D11Buffer* const buffer) {
+void D3D11ContextStateCache::BufferUnbind(ID3D11Buffer* const buffer)
+{
 	for (int t = 0; t < BoundVertexBuffers::NUM_BUFFERS; ++t) {
 		if (m_boundVertBuffers.buffer[t] == buffer) {
 			m_boundVertBuffers.buffer[t] = 0;
@@ -450,9 +470,10 @@ void D3D11ContextStateCache::TextureUnbind(ID3D11ShaderResourceView* const srvs[
                                            ID3D11RenderTargetView* const rtvs[],
                                            const int rtvCnt,
                                            ID3D11DepthStencilView* const dsvs[],
-                                           const int dsvCnt) {
+                                           const int dsvCnt)
+{
 	if (srvs && srvCnt) {
-		for (const auto srv : LoopCArray<ID3D11ShaderResourceView* const>(srvs, srvCnt))
+		for (const auto srv : ArrayView<ID3D11ShaderResourceView* const>(srvs, srvCnt))
 			for (int iStage = 0; iStage < ShaderType::NumElems; ++iStage)
 				for (int iSlot = 0; iSlot < m_boundResources[iStage].srvs.size(); ++iSlot) {
 					if (srv == m_boundResources[iStage].srvs[iSlot]) {
@@ -465,7 +486,7 @@ void D3D11ContextStateCache::TextureUnbind(ID3D11ShaderResourceView* const srvs[
 	if (rtvs && rtvCnt) {
 		ID3D11RenderTargetView* rtv_null_array[] = {NULL};
 
-		for (const auto rtv : LoopCArray<ID3D11RenderTargetView* const>(rtvs, rtvCnt))
+		for (const auto rtv : ArrayView<ID3D11RenderTargetView* const>(rtvs, rtvCnt))
 			for (int iSlot = 0; iSlot < m_rtvs.size(); ++iSlot) {
 				if (rtv == m_rtvs[iSlot]) {
 					SetRenderTargetsAndDepthStencil(iSlot, 1, rtv_null_array, NULL);
@@ -474,7 +495,7 @@ void D3D11ContextStateCache::TextureUnbind(ID3D11ShaderResourceView* const srvs[
 	}
 
 	if (dsvs && dsvCnt)
-		for (const auto dsv : LoopCArray<ID3D11DepthStencilView* const>(dsvs, dsvCnt)) {
+		for (const auto dsv : ArrayView<ID3D11DepthStencilView* const>(dsvs, dsvCnt)) {
 			if (dsv == m_dsv) {
 				SetRenderTargetsAndDepthStencil(0, 0, NULL, NULL);
 				break;
@@ -482,7 +503,8 @@ void D3D11ContextStateCache::TextureUnbind(ID3D11ShaderResourceView* const srvs[
 		}
 }
 
-void D3D11ContextStateCache::InputLayoutUnbind(ID3D11InputLayout* const inputLayout) {
+void D3D11ContextStateCache::InputLayoutUnbind(ID3D11InputLayout* const inputLayout)
+{
 	if (inputLayout == m_inputLayout) {
 		m_d3dcon->IASetInputLayout(NULL);
 		m_inputLayout = NULL;

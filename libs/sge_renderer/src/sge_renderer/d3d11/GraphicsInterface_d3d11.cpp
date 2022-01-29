@@ -1,5 +1,5 @@
 #include "GraphicsInterface_d3d11.h"
-#include "sge_utils/utils/timer.h"
+#include "sge_utils/time/Timer.h"
 #include "sge_log/Log.h"
 
 #include "Buffer_d3d11.h"

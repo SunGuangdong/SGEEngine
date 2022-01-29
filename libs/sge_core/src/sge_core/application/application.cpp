@@ -3,7 +3,7 @@
 #include "imgui/imgui.h"
 #include "sge_core/ICore.h"
 #include "sge_utils/sge_utils.h"
-#include "sge_utils/utils/StaticArray.h"
+#include "sge_utils/containers/StaticArray.h"
 
 #ifdef SGE_RENDERER_GL
 #include "sge_renderer/gl/opengl_include.h"

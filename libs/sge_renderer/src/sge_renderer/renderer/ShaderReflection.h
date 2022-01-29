@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_utils/sge_utils.h"
-#include "sge_utils/utils/vector_map.h"
+#include "sge_utils/containers/vector_map.h"
 #include <unordered_map>
 
 #include "GraphicsCommon.h"

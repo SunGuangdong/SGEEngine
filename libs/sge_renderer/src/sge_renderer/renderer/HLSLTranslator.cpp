@@ -1,8 +1,8 @@
 #include "HLSLTranslator.h"
 #include "sge_codepreproc/sge_codepreproc.h"
 #include "sge_log/Log.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/text/format.h"
 #include <Engine.h>
 #include <GLSLGenerator.h>
 #include <HLSLGenerator.h>

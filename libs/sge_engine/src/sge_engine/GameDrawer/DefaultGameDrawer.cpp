@@ -27,7 +27,7 @@
 #include "sge_engine/traits/TraitViewportIcon.h"
 #include "sge_utils/math/Frustum.h"
 #include "sge_utils/math/color.h"
-#include "sge_utils/utils/FileStream.h"
+#include "sge_utils/io/FileStream.h"
 
 // Caution:
 // this include is an exception do not include anything else like it.
@@ -344,14 +344,7 @@ vec4f getSelectionTintColor(DrawReason drawReason)
 
 void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, DrawReason drawReason, bool shouldDrawSky)
 {
-	// ObjectLighting is overused for multiple things.
 	ObjectLighting lighting;
-	// const bool useWireframe = drawReason_IsVisualizeSelection(drawReason);
-	// const vec4f wireframeColor =
-	//    (drawReason == drawReason_visualizeSelectionPrimary) ? getPrimarySelectionColor() : kSecondarySelectionColor;
-	// const int wireframeColorInt = colorToIntRgba(wireframeColor);
-	// vec4f selectionTint = useWireframe ? wireframeColor : vec4f(0.f);
-	// selectionTint.w = useWireframe ? 1.f : 0.f;
 
 	lighting.ambientLightColor = getWorld()->m_ambientLight * getWorld()->m_ambientLightIntensity;
 	lighting.ambientFakeDetailBias = getWorld()->m_ambientLightFakeDetailAmount;

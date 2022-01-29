@@ -1,6 +1,6 @@
 #include "sge_engine/GameWorld.h"
 #include "sge_core/typelib/typeLib.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 
 #include "Actor.h"
 

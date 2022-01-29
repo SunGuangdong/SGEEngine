@@ -6,8 +6,8 @@
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/InspectorCmds.h"
-#include "sge_utils/utils/ScopeGuard.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/ScopeGuard.h"
+#include "sge_utils/text/format.h"
 
 #include "imgui/imgui_internal.h"
 
@@ -16,7 +16,8 @@
 
 namespace sge {
 
-void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
+void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+{
 	const ImVec4 kPrimarySelectionColor(0.f, 1.f, 0.f, 1.f);
 
 	if (isClosed()) {
@@ -101,7 +102,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 				if (m_displayObjectIds) {
 					std::string treeNodeName = string_format("%s [%d]", currentEntity->getDisplayNameCStr(), currentEntity->getId().id);
 					isTreeNodeOpen = ImGui::TreeNodeEx(treeNodeId, treeNodeFlags, treeNodeName.c_str());
-				} else {
+				}
+				else {
 					isTreeNodeOpen = ImGui::TreeNodeEx(treeNodeId, treeNodeFlags, currentEntity->getDisplayNameCStr());
 				}
 
@@ -114,10 +116,12 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 				if (ImGui::IsMouseReleased(0) && ImGui::IsItemHovered(ImGuiHoveredFlags_None)) {
 					if (ImGui::GetIO().KeyCtrl) {
 						inspector->deselect(currentEntity->getId());
-					} else if (ImGui::GetIO().KeyShift) {
+					}
+					else if (ImGui::GetIO().KeyShift) {
 						bool shouldSelectAsPrimary = inspector->isSelected(currentEntity->getId());
 						inspector->select(currentEntity->getId(), shouldSelectAsPrimary);
-					} else {
+					}
+					else {
 						inspector->deselectAll();
 						inspector->select(currentEntity->getId());
 					}
@@ -150,7 +154,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 					ImGui::SameLine();
 					ImGui::TextColored(kPrimarySelectionColor, "[Primery Selection]");
 				}
-			} else {
+			}
+			else {
 				shouldShowChildren = true;
 			}
 

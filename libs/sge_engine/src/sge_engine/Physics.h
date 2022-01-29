@@ -11,39 +11,47 @@
 #include "sge_utils/sge_utils.h"
 
 SGE_NO_WARN_BEGIN
+#include <BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <BulletCollision/CollisionShapes/btTriangleMesh.h>
 #include <BulletCollision/CollisionShapes/btTriangleMeshShape.h>
 #include <btBulletDynamicsCommon.h>
 SGE_NO_WARN_END
+
 
 namespace sge {
 
 struct Actor;
 struct RigidBody;
 
-inline btVector3 toBullet(const vec3f& v) {
+inline btVector3 toBullet(const vec3f& v)
+{
 	return btVector3(v.x, v.y, v.z);
 }
 
-inline vec3f fromBullet(const btVector3& bt) {
+inline vec3f fromBullet(const btVector3& bt)
+{
 	return vec3f(bt.x(), bt.y(), bt.z());
 }
 
-inline btQuaternion toBullet(const quatf v) {
+inline btQuaternion toBullet(const quatf v)
+{
 	return btQuaternion(v.x, v.y, v.z, v.w);
 }
 
-inline quatf fromBullet(const btQuaternion& bt) {
+inline quatf fromBullet(const btQuaternion& bt)
+{
 	return quatf(bt.x(), bt.y(), bt.z(), bt.w());
 }
 
-inline btTransform toBullet(const transf3d& tr) {
+inline btTransform toBullet(const transf3d& tr)
+{
 	return btTransform(toBullet(tr.r), toBullet(tr.p));
 }
 
 /// Caution:
 /// Scaling in bullet is applied on the rigid body itself, it's not part of the transform!
-inline transf3d fromBullet(const btTransform& btTr) {
+inline transf3d fromBullet(const btTransform& btTr)
+{
 	btVector3 const btP = btTr.getOrigin();
 	btQuaternion btR;
 	btTr.getBasis().getRotation(btR);
@@ -57,7 +65,8 @@ inline transf3d fromBullet(const btTransform& btTr) {
 /// CAUTION: Do not forget to update the destroy() method!!!
 struct SGE_ENGINE_API PhysicsWorld {
 	PhysicsWorld() = default;
-	~PhysicsWorld() {
+	~PhysicsWorld()
+	{
 		destroy();
 	}
 
@@ -146,21 +155,25 @@ struct SGE_ENGINE_API CollsionShapeDesc {
 /// Do not share it between multiple rigid bodies, as this is possible but not supported by our wrappers yet!
 struct SGE_ENGINE_API CollisionShape {
 	CollisionShape() = default;
-	~CollisionShape() {
+	~CollisionShape()
+	{
 		destroy();
 	}
 
 	void create(const CollsionShapeDesc* desc, const int numDesc);
-	void destroy() {
+	void destroy()
+	{
 		m_triangleMeshes.clear();
 		m_btShape.reset(nullptr);
 		m_desc.clear();
 	}
 
-	btCollisionShape* getBulletShape() {
+	btCollisionShape* getBulletShape()
+	{
 		return m_btShape.get();
 	}
-	const btCollisionShape* getBulletShape() const {
+	const btCollisionShape* getBulletShape() const
+	{
 		return m_btShape.get();
 	}
 
@@ -179,7 +192,8 @@ struct SGE_ENGINE_API CollisionShape {
 struct RigidBody;
 struct SGE_ENGINE_API SgeCustomMoutionState : public btMotionState {
 	SgeCustomMoutionState(RigidBody* rbTrait)
-	    : m_pRigidBody(rbTrait) {
+	    : m_pRigidBody(rbTrait)
+	{
 	}
 
 	/// synchronizes world transform from user to physics
@@ -193,14 +207,26 @@ struct SGE_ENGINE_API SgeCustomMoutionState : public btMotionState {
 	RigidBody* m_pRigidBody = nullptr;
 };
 
+enum RigidBodyFilterMask : ubyte {
+	RigidBodyFilterMask_bitDefault = 1 << 0,
+	RigidBodyFilterMask_bit1 = 1 << 1,
+	RigidBodyFilterMask_bit2 = 1 << 2,
+	RigidBodyFilterMask_bit3 = 1 << 3,
+	RigidBodyFilterMask_bit4 = 1 << 4,
+	RigidBodyFilterMask_bit5 = 1 << 5,
+	RigidBodyFilterMask_bit6 = 1 << 6,
+	RigidBodyFilterMask_bit7 = 1 << 7,
+};
 
 /// RigidBody
 /// This class represents our own wrapper around bullet rigid bodies.
 struct SGE_ENGINE_API RigidBody {
 	RigidBody()
-	    : m_motionState(this) {
+	    : m_motionState(this)
+	{
 	}
-	~RigidBody() {
+	~RigidBody()
+	{
 		destroy();
 	}
 
@@ -220,13 +246,17 @@ struct SGE_ENGINE_API RigidBody {
 	void create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce);
 	void create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce);
 
+
+	void createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs, bool noResponse);
+
 	/// Specifies if the rigid body should not respond to collsions with other objects.
 	/// The contant points will still be generated.
 	void setNoCollisionResponse(bool dontRespontToCollisions);
 	bool hasNoCollisionResponse() const;
 
 	/// @brief Returns true if the RigidBody is properly created.
-	bool isValid() const {
+	bool isValid() const
+	{
 		return m_collisionObject.get() != nullptr;
 	}
 
@@ -289,7 +319,8 @@ struct SGE_ENGINE_API RigidBody {
 	void applyLinearVelocity(const vec3f& v);
 
 	/// @brief Retrieves the linear velocity of the rigid body.
-	vec3f getLinearVel() const {
+	vec3f getLinearVel() const
+	{
 		return getBulletRigidBody() ? fromBullet(getBulletRigidBody()->getLinearVelocity()) : vec3f(0.f);
 	}
 
@@ -321,14 +352,36 @@ struct SGE_ENGINE_API RigidBody {
 	transf3d getTransformAndScaling() const;
 	void setTransformAndScaling(const transf3d& tr, bool killVelocity);
 
-	/// @brief Retrieves the Bullet Physics representation of the rigid body.
-	btRigidBody* getBulletRigidBody() {
-		return static_cast<btRigidBody*>(m_collisionObject.get());
+	btCollisionObject* getCollisionShape()
+	{
+		return m_collisionObject.get();
+	}
+
+	const btCollisionObject* getCollisionShape() const
+	{
+		return m_collisionObject.get();
 	}
 
 	/// @brief Retrieves the Bullet Physics representation of the rigid body.
-	const btRigidBody* getBulletRigidBody() const {
-		return static_cast<btRigidBody*>(m_collisionObject.get());
+	btRigidBody* getBulletRigidBody()
+	{
+		if (m_collisionObject.get()) {
+			return btRigidBody::upcast(m_collisionObject.get());
+		}
+
+		return nullptr;
+	}
+
+	btPairCachingGhostObject* getBulletGhostObject();
+
+	/// @brief Retrieves the Bullet Physics representation of the rigid body.
+	const btRigidBody* getBulletRigidBody() const
+	{
+		if (m_collisionObject.get()) {
+			return btRigidBody::upcast(m_collisionObject.get());
+		}
+
+		return nullptr;
 	}
 
 	/// @brief Retrurns true if the rigid body participates in a physics world.
@@ -337,31 +390,59 @@ struct SGE_ENGINE_API RigidBody {
 	/// @brief Returns the axis aligned bounding box according to the physics engine in world space.
 	AABox3f getBBoxWs() const;
 
+
+	ubyte getMaskIdentifiesAs() const
+	{
+		return m_maskIndetifiedAs;
+	}
+
+	void setMaskIdentifiesAs(ubyte mask)
+	{
+		m_maskIndetifiedAs = mask;
+	}
+
+	ubyte getMaskCollidesWith() const
+	{
+		return m_maskCollidesWith;
+	}
+
+	void setMaskCollidesWith(ubyte mask)
+	{
+		m_maskCollidesWith = mask;
+	}
+
   public:
 	std::unique_ptr<btCollisionObject> m_collisionObject;
 	SgeCustomMoutionState m_motionState;
 	std::unique_ptr<CollisionShape> m_collisionShape;
 	Actor* actor = nullptr;
+
+	ubyte m_maskIndetifiedAs = RigidBodyFilterMask_bitDefault;
+	ubyte m_maskCollidesWith = RigidBodyFilterMask_bitDefault;
 };
 
 /// @brief Retieves our represetentation of the rigid body form btCollisionObject and it's derivatives like btRigidBody.
-inline RigidBody* fromBullet(btCollisionObject* const co) {
+inline RigidBody* fromBullet(btCollisionObject* const co)
+{
 	return co ? (RigidBody*)co->getUserPointer() : nullptr;
 }
 
 /// @brief Retieves our represetentation of the rigid body form btCollisionObject and it's derivatives like btRigidBody.
-inline const RigidBody* fromBullet(const btCollisionObject* const co) {
+inline const RigidBody* fromBullet(const btCollisionObject* const co)
+{
 	return co ? (const RigidBody*)co->getUserPointer() : nullptr;
 }
 
 /// @brief Retieves the Actor associated with the specified btCollisionObject and it's derivatives like btRigidBody.
-inline const Actor* getActorFromPhysicsObject(const btCollisionObject* const co) {
+inline const Actor* getActorFromPhysicsObject(const btCollisionObject* const co)
+{
 	const RigidBody* rb = fromBullet(co);
 	return rb ? rb->actor : nullptr;
 }
 
 /// @brief Retieves the Actor associated with the specified btCollisionObject and it's derivatives like btRigidBody.
-inline Actor* getActorFromPhysicsObjectMutable(const btCollisionObject* const co) {
+inline Actor* getActorFromPhysicsObjectMutable(const btCollisionObject* const co)
+{
 	const RigidBody* rb = fromBullet(co);
 	return rb ? rb->actor : nullptr;
 }
@@ -390,7 +471,8 @@ SGE_ENGINE_API const Actor*
 /// As by default Bullet Physics is built with no RTTI support we cannot use dynamic cast.
 /// In order to determine the shape of the object we need to use the enum specifying the type of the shape.
 template <typename T>
-T* btCollisionShapeCast(btCollisionShape* const shape, const BroadphaseNativeTypes type) {
+T* btCollisionShapeCast(btCollisionShape* const shape, const BroadphaseNativeTypes type)
+{
 	if (shape && shape->getShapeType() == type) {
 		return static_cast<T*>(shape);
 	}
@@ -402,7 +484,8 @@ T* btCollisionShapeCast(btCollisionShape* const shape, const BroadphaseNativeTyp
 /// As by default Bullet Physics is built with no RTTI support we cannot use dynamic cast.
 /// In order to determin the shape of the object we need to use the enum specifying the type of the shape.
 template <typename T>
-const T* btCollisionShapeCast(const btCollisionShape* const shape, const BroadphaseNativeTypes type) {
+const T* btCollisionShapeCast(const btCollisionShape* const shape, const BroadphaseNativeTypes type)
+{
 	if (shape && shape->getShapeType() == type) {
 		return static_cast<const T*>(shape);
 	}

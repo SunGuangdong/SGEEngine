@@ -1,4 +1,3 @@
-#include "sge_utils/utils/common.h"
 #include <algorithm>
 #include <sge_utils/math/mat4.h>
 #include <sge_utils/utils/json.h>

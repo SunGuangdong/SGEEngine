@@ -9,7 +9,7 @@
 #include "sge_utils/math/mat4.h"
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/ChunkContainer.h"
+#include "sge_utils/containers/ChunkContainer.h"
 
 #include "CollisionMesh.h"
 

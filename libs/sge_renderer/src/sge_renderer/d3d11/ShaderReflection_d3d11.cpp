@@ -4,7 +4,7 @@
 #include "Shader_d3d11.h"
 #include "ShadingProgram_d3d11.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 #include <d3dcompiler.h>
 
 #include "sge_renderer/renderer/ShaderReflection.h"

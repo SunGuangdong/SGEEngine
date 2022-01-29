@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GraphicsCommon_d3d11.h"
-#include "sge_utils/utils/Pair.h"
-#include "sge_utils/utils/StaticArray.h"
+#include "sge_utils/containers/Pair.h"
+#include "sge_utils/containers/StaticArray.h"
 #include <array>
 
 #include "include_d3d11.h"
@@ -14,7 +14,8 @@ namespace sge {
 //---------------------------------------------------------------------------
 struct D3D11ContextStateCache {
 	template <typename T>
-	bool UPDATE_ON_DIFF(T& Variable, const T& Value) {
+	bool UPDATE_ON_DIFF(T& Variable, const T& Value)
+	{
 		if (Variable == Value)
 			return false;
 		Variable = Value;
@@ -77,7 +78,8 @@ struct D3D11ContextStateCache {
 	ID3D11InputLayout* m_inputLayout;
 
 	struct BoundVertexBuffers {
-		BoundVertexBuffers() {
+		BoundVertexBuffers()
+		{
 			for (auto& v : buffer)
 				v = NULL;
 			for (auto& v : stride)
@@ -103,7 +105,8 @@ struct D3D11ContextStateCache {
 	ID3D11PixelShader* m_pixelShader;
 
 	struct ShadingStageResources {
-		ShadingStageResources() {
+		ShadingStageResources()
+		{
 			for (auto& v : cbuffers)
 				v = nullptr;
 			for (auto& v : srvs)

@@ -3,8 +3,8 @@
 #include "sge_core/typelib/typeLib.h"
 #include "sge_engine/typelibHelper.h"
 #include "sge_engine_api.h"
-#include "sge_utils/utils/basetypes.h"
-#include "sge_utils/utils/vector_map.h"
+#include "sge_utils/containers/vector_map.h"
+#include "sge_utils/types.h"
 #include <string>
 
 namespace sge {
@@ -29,15 +29,32 @@ struct ObjectId {
 	// Update it if you add any members!
 
 	explicit ObjectId(int const id = 0)
-	    : id(id) {}
+	    : id(id)
+	{
+	}
 
 	/// @brief Returns true if the id is invalid and cannot possibly point to any object.
-	bool isNull() const { return id == 0; }
+	bool isNull() const
+	{
+		return id == 0;
+	}
 
-	bool operator<(const ObjectId& r) const { return id < r.id; }
-	bool operator>(const ObjectId& r) const { return id > r.id; }
-	bool operator==(const ObjectId& r) const { return id == r.id; }
-	bool operator!=(const ObjectId& r) const { return id != r.id; }
+	bool operator<(const ObjectId& r) const
+	{
+		return id < r.id;
+	}
+	bool operator>(const ObjectId& r) const
+	{
+		return id > r.id;
+	}
+	bool operator==(const ObjectId& r) const
+	{
+		return id == r.id;
+	}
+	bool operator!=(const ObjectId& r) const
+	{
+		return id != r.id;
+	}
 
   public:
 	int id;
@@ -46,7 +63,7 @@ struct ObjectId {
 /// @brief GameObject is the base class for all game object that participate in a @GameWorld.
 /// This is just a base class that can be inherited to create specific kinds of game objects.
 /// The most notable GameObject kind is @Actor - this game object has a transformation and paricipates in the 3D scene.
-struct SGE_ENGINE_API GameObject : public NoncopyableMovable {
+struct SGE_ENGINE_API GameObject : public NoCopy {
 	GameObject() = default;
 	virtual ~GameObject() = default;
 
@@ -58,14 +75,38 @@ struct SGE_ENGINE_API GameObject : public NoncopyableMovable {
 	Actor* getActor();
 	const Actor* getActor() const;
 
-	ObjectId getId() const { return m_id; }
-	TypeId getType() const { return m_type; }
-	const std::string& getDisplayName() const { return m_displayName; }
-	const char* getDisplayNameCStr() const { return m_displayName.c_str(); }
-	void setDisplayName(std::string name) { m_displayName = std::move(name); }
-	GameWorld* getWorld() { return m_world; }
-	const GameWorld* getWorld() const { return m_world; }
-	GameWorld* getWorldMutable() const { return m_world; }
+	ObjectId getId() const
+	{
+		return m_id;
+	}
+	TypeId getType() const
+	{
+		return m_type;
+	}
+	const std::string& getDisplayName() const
+	{
+		return m_displayName;
+	}
+	const char* getDisplayNameCStr() const
+	{
+		return m_displayName.c_str();
+	}
+	void setDisplayName(std::string name)
+	{
+		m_displayName = std::move(name);
+	}
+	GameWorld* getWorld()
+	{
+		return m_world;
+	}
+	const GameWorld* getWorld() const
+	{
+		return m_world;
+	}
+	GameWorld* getWorldMutable() const
+	{
+		return m_world;
+	}
 
 	// Composes a debug display name that contains the display name + the id of the object (as the names aren't unique).
 	void composeDebugDisplayName(std::string& result) const;
@@ -78,11 +119,15 @@ struct SGE_ENGINE_API GameObject : public NoncopyableMovable {
 	// For example during update() the object shouldn't delete it's rigid bodies
 	// as other object may rely on the contact manifolds with that object.
 	// use the postUpdate() for such manipulations.
-	virtual void update(const GameUpdateSets& UNUSED(updateSets)) {}
+	virtual void update(const GameUpdateSets& UNUSED(updateSets))
+	{
+	}
 
 	// This is the place where the object can freely modify themselves,
 	// you cannot rely on other objects, as they can modify themselves here.
-	virtual void postUpdate(const GameUpdateSets& UNUSED(updateSets)) {}
+	virtual void postUpdate(const GameUpdateSets& UNUSED(updateSets))
+	{
+	}
 
 	/// Called when the object enters or leaves the game.
 	/// If you override this, make sure you've called this method as well.
@@ -90,12 +135,16 @@ struct SGE_ENGINE_API GameObject : public NoncopyableMovable {
 
 	/// Called when THIS object was create by duplicating another.
 	/// Called at the end of the duplication process.
-	virtual void onDuplocationComplete() {}
+	virtual void onDuplocationComplete()
+	{
+	}
 
 	/// Called when a member of the object has been changed.
 	/// Caution: Not really. The changer needs to call this, it is not automatic.
 	/// This is a legacy method (but still used) of notifying other object that something has changed.
-	virtual void onMemberChanged() {}
+	virtual void onMemberChanged()
+	{
+	}
 
 	/// This method just registers the pointer to the trait, it is only a book keeping.
 	void registerTrait(Trait& trait);
@@ -103,7 +152,8 @@ struct SGE_ENGINE_API GameObject : public NoncopyableMovable {
 	/// @brief Searches for a registered trait of the specified family in the current object.
 	/// It would be better to use the global @getTrait function, it is typesafe and can search
 	/// not just by family, but also by type.
-	Trait* findTraitByFamily(const TypeId family) {
+	Trait* findTraitByFamily(const TypeId family)
+	{
 		for (const TraitRegistration& traitReg : m_traits) {
 			if (traitReg.traitFamilyType == family) {
 				return traitReg.pointerToTrait;
@@ -116,7 +166,8 @@ struct SGE_ENGINE_API GameObject : public NoncopyableMovable {
 	/// @brief Searches for a registered trait of the specified family in the current object.
 	/// It would be better to use the global @getTrait function, it is typesafe and can search
 	/// not just by family, but also by type.
-	const Trait* findTraitByFamily(const TypeId family) const {
+	const Trait* findTraitByFamily(const TypeId family) const
+	{
 		for (const TraitRegistration& traitReg : m_traits) {
 			if (traitReg.traitFamilyType == family) {
 				return traitReg.pointerToTrait;
@@ -126,11 +177,20 @@ struct SGE_ENGINE_API GameObject : public NoncopyableMovable {
 		return nullptr;
 	}
 
-	int getDirtyIndex() const { return m_dirtyIndex; }
-	void makeDirtyExternal() { makeDirty(); }
+	int getDirtyIndex() const
+	{
+		return m_dirtyIndex;
+	}
+	void makeDirtyExternal()
+	{
+		makeDirty();
+	}
 
   protected:
-	void makeDirty() { m_dirtyIndex++; }
+	void makeDirty()
+	{
+		m_dirtyIndex++;
+	}
 
   public: // This should be private, however because of the reflection system it needs to be public.
 	/// The id of the game object. No other object can have the same id in the current GameWorld that owns that game object.
@@ -159,15 +219,25 @@ struct SelectedItem {
 	SelectedItem(EditMode const editMode, const ObjectId& objectId, int const index)
 	    : editMode(editMode)
 	    , objectId(objectId)
-	    , index(index) {}
+	    , index(index)
+	{
+	}
 
 	explicit SelectedItem(const ObjectId& objectId)
 	    : editMode(editMode_actors)
-	    , objectId(objectId) {}
+	    , objectId(objectId)
+	{
+	}
 
-	bool operator==(const SelectedItem& ref) const { return objectId == ref.objectId && index == ref.index && editMode == ref.editMode; }
+	bool operator==(const SelectedItem& ref) const
+	{
+		return objectId == ref.objectId && index == ref.index && editMode == ref.editMode;
+	}
 
-	bool operator<(const SelectedItem& ref) const { return ref.objectId > objectId || ref.index > index || ref.editMode > editMode; }
+	bool operator<(const SelectedItem& ref) const
+	{
+		return ref.objectId > objectId || ref.index > index || ref.editMode > editMode;
+	}
 
 	EditMode editMode = editMode_actors; // The mode the item was selected.
 	ObjectId objectId;
@@ -198,21 +268,26 @@ struct SelectedItemDirect {
 struct SGE_ENGINE_API Trait {
 	Trait() = default;
 
-	virtual ~Trait() { m_owner = nullptr; }
+	virtual ~Trait()
+	{
+		m_owner = nullptr;
+	}
 
 	Trait(const Trait&) = delete;
 	const Trait& operator==(const Trait&) = delete;
 
 	/// @brief Returns the GameObject that owns that trait.
 	/// Should never return nullptr.
-	GameObject* getObject() {
+	GameObject* getObject()
+	{
 		sgeAssert(m_owner != nullptr);
 		return m_owner;
 	}
 
 	/// @brief Returns the GameObject that owns that trait.
 	/// Should never return nullptr.
-	const GameObject* getObject() const {
+	const GameObject* getObject() const
+	{
 		sgeAssert(m_owner != nullptr);
 		return m_owner;
 	}
@@ -224,10 +299,16 @@ struct SGE_ENGINE_API Trait {
 	const Actor* getActor() const;
 
 	/// @brief Retrieves the GameWorld that owns the game object that owns that trait.
-	GameWorld* getWorld() { return m_owner ? m_owner->getWorld() : nullptr; }
+	GameWorld* getWorld()
+	{
+		return m_owner ? m_owner->getWorld() : nullptr;
+	}
 
 	/// @brief Retrieves the GameWorld that owns the game object that owns that trait.
-	const GameWorld* getWorld() const { return m_owner ? m_owner->getWorld() : nullptr; }
+	const GameWorld* getWorld() const
+	{
+		return m_owner ? m_owner->getWorld() : nullptr;
+	}
 
 	/// @brief Returns the familiy of the trait.
 	virtual TypeId getFamily() const = 0;
@@ -236,14 +317,20 @@ struct SGE_ENGINE_API Trait {
 	/// This function get called when GameObject::registerTrait, registers a new trait to the object.
 	/// The function provides a pointer to the game object that owns the trait.
 	/// Traits must always be owned by exactly one object.
-	void private_GameObject_register(GameObject* const owner) {
+	void private_GameObject_register(GameObject* const owner)
+	{
 		sgeAssert(owner);
 		m_owner = owner;
 	}
 
-	virtual void onPlayStateChanged(bool const UNUSED(isStartingToPlay)) {}
+	virtual void onPlayStateChanged(bool const UNUSED(isStartingToPlay))
+	{
+	}
 
-	Trait& operator=(const Trait&) { return *this; }
+	Trait& operator=(const Trait&)
+	{
+		return *this;
+	}
 
   public:
 	/// A pointer to the game object the owns this trait instance.
@@ -261,7 +348,10 @@ struct SGE_ENGINE_API Trait {
 /// call ReflAddTypeIdExists(BaseTrait) before defining the triat.
 #define SGE_TraitDecl_BaseFamily(BaseTrait) \
 	typedef BaseTrait TraitFamily;          \
-	TypeId getFamily() const final { return sgeTypeId(BaseTrait); }
+	TypeId getFamily() const final          \
+	{                                       \
+		return sgeTypeId(BaseTrait);        \
+	}
 
 /// Defines that this is the last override of the trait that we've extended.
 #define SGE_TraitDecl_Final(TraitSelf) \
@@ -270,16 +360,20 @@ struct SGE_ENGINE_API Trait {
 
 /// Defines a trait that is not going to be extendable ready to be used directly in game objects.
 /// The type is going to be both trait family and trait type.
-#define SGE_TraitDecl_Full(TraitSelf)                               \
-	typedef TraitSelf TraitFamily;                                  \
-	typedef TraitSelf TraitType;                                    \
-	TypeId getFamily() const final { return sgeTypeId(TraitSelf); } \
+#define SGE_TraitDecl_Full(TraitSelf) \
+	typedef TraitSelf TraitFamily;    \
+	typedef TraitSelf TraitType;      \
+	TypeId getFamily() const final    \
+	{                                 \
+		return sgeTypeId(TraitSelf);  \
+	}                                 \
 	//TypeId getExactType() const final { return sgeTypeId(TraitSelf); } \
 
 /// @brief Searches for a trait of a familly or a type in the specified game object.
 /// Returns nullptr if the trait was not found.
 template <typename TTrait>
-TTrait* getTrait(GameObject* const object) {
+TTrait* getTrait(GameObject* const object)
+{
 	if (!object) {
 		return nullptr;
 	}
@@ -295,7 +389,8 @@ TTrait* getTrait(GameObject* const object) {
 /// @brief Searches for a trait of a familly or a type in the specified game object.
 /// Returns nullptr if the trait was not found.
 template <typename TTrait>
-const TTrait* getTrait(const GameObject* const object) {
+const TTrait* getTrait(const GameObject* const object)
+{
 	if (!object) {
 		return nullptr;
 	}
@@ -314,6 +409,9 @@ const TTrait* getTrait(const GameObject* const object) {
 namespace std {
 template <>
 struct hash<sge::ObjectId> {
-	size_t operator()(const sge::ObjectId& x) const { return std::hash<decltype(x.id)>{}(x.id); }
+	size_t operator()(const sge::ObjectId& x) const
+	{
+		return std::hash<decltype(x.id)>{}(x.id);
+	}
 };
 } // namespace std

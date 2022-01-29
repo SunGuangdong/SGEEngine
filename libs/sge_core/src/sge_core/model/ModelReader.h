@@ -2,7 +2,7 @@
 
 #include "Model.h"
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/utils/IStream.h"
+#include "sge_utils/io/IStream.h"
 
 namespace sge {
 

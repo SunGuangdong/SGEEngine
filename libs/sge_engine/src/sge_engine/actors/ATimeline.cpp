@@ -15,7 +15,7 @@
 #include "sge_engine/typelibHelper.h"
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
 #include "sge_utils/math/Box.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 #include <vector>
 
 namespace sge {

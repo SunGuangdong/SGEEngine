@@ -8,8 +8,8 @@
 #include "sge_utils/math/Random.h"
 #include "sge_utils/math/color.h"
 #include "sge_utils/math/vec4.h"
-#include "sge_utils/utils/Event.h"
-#include "sge_utils/utils/optional.h"
+#include "sge_utils/react/Event.h"
+#include "sge_utils/containers/Optional.h"
 
 #include "sge_renderer/renderer/renderer.h"
 

@@ -1,5 +1,5 @@
 #include "GameExport.h"
-#include "sge_utils/utils/Path.h"
+#include "sge_utils/text/Path.h"
 #include <filesystem>
 
 namespace sge {

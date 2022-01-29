@@ -2,8 +2,8 @@
 
 #include "sge_core/SGEImGui.h"
 #include "sge_engine/GameObject.h"
-#include "sge_utils/utils/optional.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/containers/Optional.h"
+#include "sge_utils/containers/vector_set.h"
 #include <set>
 
 namespace sge {

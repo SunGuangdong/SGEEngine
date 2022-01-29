@@ -1,17 +1,17 @@
 #if 1
-/// This thing makes the driver to auto-choose the high-end GPU instead of the "integrated" one.
-#ifdef _WIN32
+    /// This thing makes the driver to auto-choose the high-end GPU instead of the "integrated" one.
+	#ifdef _WIN32
 extern "C" {
 __declspec(dllexport) int NvOptimusEnablement = 0x00000001;
 }
 extern "C" {
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
-#endif
+	#endif
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
+	#include <emscripten.h>
 #endif
 
 #include "../exe/DummyPlugin.h"
@@ -29,11 +29,11 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_engine_ui/windows/AssetsUI/AssetsWindow.h"
 #include "sge_engine_ui/windows/EditorWindow/EditorWindow.h"
 #include "sge_log/Log.h"
-#include "sge_utils/tiny/FileOpenDialog.h"
-#include "sge_utils/utils/DLLHandler.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/Path.h"
-#include "sge_utils/utils/json.h"
+#include "sge_utils/DLL/DLLHandler.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/json/json.h"
+#include "sge_utils/other/FileOpenDialog.h"
+#include "sge_utils/text/Path.h"
 #include <filesystem>
 #include <thread>
 
@@ -55,7 +55,8 @@ struct SGEGameWindow : public WindowBase {
 
 	vec2i cachedWindowSize = vec2i(0);
 
-	void HandleEvent(const WindowEvent event, const void* const eventData) final {
+	void HandleEvent(const WindowEvent event, const void* const eventData) final
+	{
 		if (event == WE_Create) {
 			OnCreate();
 		}
@@ -98,7 +99,8 @@ struct SGEGameWindow : public WindowBase {
 			AssetsWindow* wnd = getEngineGlobal()->findFirstWindowOfType<AssetsWindow>();
 			if (wnd) {
 				ImGui::SetWindowFocus(wnd->getWindowName());
-			} else {
+			}
+			else {
 				wnd = new AssetsWindow(ICON_FK_FILE " Assets");
 				getEngineGlobal()->addWindow(wnd);
 			}
@@ -107,7 +109,8 @@ struct SGEGameWindow : public WindowBase {
 		}
 	}
 
-	void OnCreate() {
+	void OnCreate()
+	{
 		int const backBufferWidth = this->GetClientWidth();
 		int const backBufferHeight = this->GetClientHeight();
 
@@ -148,14 +151,16 @@ struct SGEGameWindow : public WindowBase {
 
 		if (pluginFileName.empty()) {
 			getEngineGlobal()->changeActivePlugin(&dummyPlugin);
-		} else {
+		}
+		else {
 			loadPlugin();
 		}
 
 		getEngineGlobal()->addWindow(new EditorWindow(*this, "Editor Window Main"));
 	}
 
-	void loadPlugin() {
+	void loadPlugin()
+	{
 		const sint64 modtime = FileReadStream::getFileModTime(pluginFileName.c_str());
 
 		if (!pluginFileName.empty() && (modtime > m_workingDLLModTime || m_workingDLLModTime == 0)) {
@@ -184,7 +189,7 @@ struct SGEGameWindow : public WindowBase {
 
 			// Unload the old plugin DLL and load the new one.
 			m_dllHandler.unload();
-			
+
 			// Hack: Sleep for a bit for the OS to have time to register that nobody references the old working_plugin.dll.
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
@@ -197,7 +202,8 @@ struct SGEGameWindow : public WindowBase {
 			sgeAssert(interopGetter != nullptr && "The loaded game dll does not have a getInterop()!\n");
 			if (interopGetter) {
 				m_pluginInst = interopGetter();
-			} else {
+			}
+			else {
 				sgeAssert(false);
 				sgeLogError("The loaded game dll does not have a getInterop()!");
 			}
@@ -215,7 +221,8 @@ struct SGEGameWindow : public WindowBase {
 		}
 	}
 
-	void run() {
+	void run()
+	{
 		m_timer.tick();
 		getEngineGlobal()->update(m_timer.diff_seconds());
 
@@ -223,7 +230,8 @@ struct SGEGameWindow : public WindowBase {
 
 		if (getEngineGlobal()->getEngineAllowingRelativeCursor() && getEngineGlobal()->doesAnyoneNeedForRelativeCursorThisFrame()) {
 			setMouseCursorRelative(true);
-		} else {
+		}
+		else {
 			setMouseCursorRelative(false);
 		}
 		getEngineGlobal()->clearAnyoneNeedForRelativeCursorThisFrame();
@@ -254,7 +262,8 @@ struct SGEGameWindow : public WindowBase {
 	}
 };
 
-void sgeMainLoop() {
+void sgeMainLoop()
+{
 	sge::ApplicationHandler::get()->PollEvents();
 	for (WindowBase* wnd : sge::ApplicationHandler::get()->getAllWindows()) {
 		SGEGameWindow* gameWindow = dynamic_cast<SGEGameWindow*>(wnd);
@@ -264,7 +273,8 @@ void sgeMainLoop() {
 	}
 }
 
-int sge_main(int argc, char** argv) {
+int sge_main(int argc, char** argv)
+{
 	sgeLogInfo("sge_main()\n");
 
 	// Force the numeric locale to use "." for demical numbers as
@@ -304,17 +314,18 @@ int sge_main(int argc, char** argv) {
 }
 
 #ifdef __EMSCRIPTEN__
-#include <SDL2/SDL.h>
-#include <emscripten.h>
+	#include <SDL2/SDL.h>
+	#include <emscripten.h>
 //#include <GLES3/gl3.h> // WebGL2 + GLES 3 emulation.
 #else
-#include <SDL.h>
-#include <SDL_syswm.h>
+	#include <SDL.h>
+	#include <SDL_syswm.h>
 #endif
 
 // Caution:
 // SDL2 might have a macro (depending on the target platform) for the main function!
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 	sgeLogInfo("main()\n");
 	sgeRegisterMiniDumpHandler();
 
@@ -330,9 +341,9 @@ int main(int argc, char* argv[]) {
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #else
 	SDL_Init(SDL_INIT_EVERYTHING);
-#ifdef SGE_RENDERER_D3D11
-	// SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
-#else if SGE_RENDERER_GL
+	#ifdef SGE_RENDERER_D3D11
+		// SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
+	#else if SGE_RENDERER_GL
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
@@ -347,8 +358,8 @@ int main(int argc, char* argv[]) {
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-#endif
+		// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	#endif
 #endif
 
 	return sge_main(argc, argv);

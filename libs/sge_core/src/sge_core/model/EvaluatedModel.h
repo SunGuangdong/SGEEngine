@@ -11,8 +11,8 @@
 #include "sge_utils/math/Box.h"
 #include "sge_utils/math/mat4.h"
 #include "sge_utils/math/primitives.h"
-#include "sge_utils/utils/span.h"
-#include "sge_utils/utils/vector_map.h"
+#include "sge_utils/containers/ArrayView.h"
+#include "sge_utils/containers/vector_map.h"
 
 namespace sge {
 
@@ -62,7 +62,7 @@ struct SGE_CORE_API EvaluatedModel {
 	bool evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount);
 
 	/// Evaluates the model with no animation applied.
-	/// If you want an animation to play use @ModelAnimator2.
+	/// If you want an animation to play use @ModelAnimator.
 	void evaluateStatic();
 
 	int getNumEvalMeshes() const {
@@ -99,7 +99,7 @@ struct SGE_CORE_API EvaluatedModel {
 	}
 
   private:
-	bool evaluate_ApplyNodeGlobalTransforms(const span<const mat4f>& boneGlobalTrasnformOverrides);
+	bool evaluate_ApplyNodeGlobalTransforms(const ArrayView<const mat4f>& boneGlobalTrasnformOverrides);
 	bool evaluate_Skinning();
 	bool evaluate_getAllGeometries();
 

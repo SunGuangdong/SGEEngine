@@ -1,14 +1,14 @@
 #pragma once
 
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
+#include "sge_engine/Actor.h"
+#include "sge_engine/AssetProperty.h"
+#include "sge_utils/containers/Optional.h"
+#include "sge_utils/containers/Pair.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Random.h"
 #include "sge_utils/math/Rangef.h"
 #include "sge_utils/math/SphericalCoordinates.h"
-#include "sge_utils/utils/optional.h"
-
-#include "sge_engine/Actor.h"
-#include "sge_engine/AssetProperty.h"
 
 namespace sge {
 
@@ -128,7 +128,6 @@ struct Velocity {
 struct ParticlesAlpha {
 	float fadeInTimeAfterBirth = 0.f;
 	float fadeOutTimeBeforeDeath = 0.f;
-
 };
 
 struct ParticleGroupDesc {
@@ -240,7 +239,7 @@ struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 	{
 		m_pgroupState.clear();
 	}
-	
+
 	AABox3f getBBoxOS() const;
 
 	void getRenderItems(std::vector<TraitParticlesSimpleRenderItem>& renderItems);

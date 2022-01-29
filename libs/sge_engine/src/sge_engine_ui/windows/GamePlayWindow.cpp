@@ -1,4 +1,5 @@
 #include "sge_core/Camera.h"
+#include "sge_core/GameUI/UIContext.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
@@ -6,9 +7,6 @@
 #include "sge_engine/GameDrawer/DefaultGameDrawer.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameSerialization.h"
-#include "sge_utils/utils/Wildcard.h"
-
-#include "sge_core/GameUI/UIContext.h"
 
 #include "GamePlayWindow.h"
 
@@ -16,7 +14,8 @@ namespace sge {
 
 GamePlayWindow::GamePlayWindow(std::string windowName, const char* const worldJsonString)
     : m_windowName(std::move(windowName))
-    , m_isOpened(true) {
+    , m_isOpened(true)
+{
 	m_gameDrawer.reset(new DefaultGameDrawer());
 
 	m_sceneInstance.newScene();
@@ -28,7 +27,8 @@ GamePlayWindow::GamePlayWindow(std::string windowName, const char* const worldJs
 	m_sceneInstance.getWorld().isEdited = false;
 }
 
-void GamePlayWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspector), const InputState& isOriginal) {
+void GamePlayWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspector), const InputState& isOriginal)
+{
 	m_timer.tick();
 
 	if (isClosed()) {

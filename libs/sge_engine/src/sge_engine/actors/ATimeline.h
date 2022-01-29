@@ -6,7 +6,7 @@
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitPath.h"
 #include "sge_engine/traits/TraitViewportIcon.h"
-#include "sge_utils/utils/vector_map.h"
+#include "sge_utils/containers/vector_map.h"
 
 namespace sge {
 

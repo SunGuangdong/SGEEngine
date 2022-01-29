@@ -11,7 +11,6 @@
 #include "sge_engine/InspectorCmds.h"
 #include "sge_engine_ui/ui/ImGuiDragDrop.h"
 #include "sge_utils/math/color.h"
-#include "sge_utils/utils/Wildcard.h"
 
 #include "SceneWindow.h"
 #include "sge_engine/EngineGlobal.h"
@@ -24,7 +23,8 @@ namespace sge {
 
 struct AStaticObstacle;
 
-void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& isOriginal) {
+void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& isOriginal)
+{
 	if (m_gameDrawer == nullptr) {
 		return;
 	}
@@ -166,7 +166,8 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 		// ImDrawList* draw_list = ImGui::GetWindowDrawList();
 		if (kIsTexcoordStyleD3D) {
 			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(m_canvasSize.x, m_canvasSize.y));
-		} else {
+		}
+		else {
 			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(m_canvasSize.x, m_canvasSize.y), ImVec2(0, 1), ImVec2(1, 0));
 		}
 
@@ -179,7 +180,8 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 						inspector->appendCommand(cmd, true);
 
 						AStaticObstacle* newActorToBePlaced = inspector->getWorld()->getActor<AStaticObstacle>(cmd->getCreatedObjectId());
-						if_checked(newActorToBePlaced) {
+						if_checked(newActorToBePlaced)
+						{
 							// TODO: add a undo/redo command for this change.
 							newActorToBePlaced->m_traitModel.clearModels(); // Remove the default cube.
 							newActorToBePlaced->m_traitModel.addModel(droppedAssetPath->c_str());
@@ -215,7 +217,8 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 	}
 }
 
-void SceneWindow::updateRightClickMenu(bool canOpen) {
+void SceneWindow::updateRightClickMenu(bool canOpen)
+{
 	if (m_gameDrawer == nullptr) {
 		return;
 	}
@@ -282,7 +285,8 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 
 			wasMenuShowPrevFrame = true;
 			ImGui::EndMenu();
-		} else {
+		}
+		else {
 			wasMenuShowPrevFrame = false;
 		}
 
@@ -351,7 +355,8 @@ void SceneWindow::updateRightClickMenu(bool canOpen) {
 	}
 }
 
-bool SceneWindow::updateToolsAndOverlay(const InputState& is, const GameDrawSets& drawSets) {
+bool SceneWindow::updateToolsAndOverlay(const InputState& is, const GameDrawSets& drawSets)
+{
 	if (m_gameDrawer == nullptr) {
 		return false;
 	}
@@ -381,7 +386,8 @@ bool SceneWindow::updateToolsAndOverlay(const InputState& is, const GameDrawSets
 		if (is.isKeyCombo(Key::Key_LShift, Key::Key_R)) {
 			inspector->m_transformTool.m_mode = Gizmo3D::Mode_ScaleVolume;
 			inspector->setTool(&inspector->m_transformTool);
-		} else if (is.IsKeyReleased(Key::Key_R)) {
+		}
+		else if (is.IsKeyReleased(Key::Key_R)) {
 			inspector->m_transformTool.m_mode = Gizmo3D::Mode_Scaling;
 			inspector->setTool(&inspector->m_transformTool);
 		}
@@ -392,16 +398,19 @@ bool SceneWindow::updateToolsAndOverlay(const InputState& is, const GameDrawSets
 			if (inspector->m_selection.size() > 0) {
 				inspector->m_plantingTool.setup(newObjects, *inspector->getWorld());
 				inspector->setTool(&inspector->m_plantingTool);
-			} else {
+			}
+			else {
 				getEngineGlobal()->showNotification("Make a selection first before using the planting tool!");
 			}
-		} else if (is.IsKeyReleased(Key::Key_T)) {
+		}
+		else if (is.IsKeyReleased(Key::Key_T)) {
 			vector_set<ObjectId> allSelectedObjects;
 			inspector->getAllSelectedObjects(allSelectedObjects);
 			if (allSelectedObjects.empty() == false) {
 				inspector->m_plantingTool.setup(allSelectedObjects, *inspector->getWorld());
 				inspector->setTool(&inspector->m_plantingTool);
-			} else {
+			}
+			else {
 				getEngineGlobal()->showNotification("Make a selection first before using the planting tool!");
 			}
 		}
@@ -410,13 +419,15 @@ bool SceneWindow::updateToolsAndOverlay(const InputState& is, const GameDrawSets
 	// Update the viewport tool.
 	if (!inspector->m_toolInAction) {
 		inspector->m_toolInAction = &inspector->m_selectionTool;
-	} else if (inspector->m_toolInAction) {
+	}
+	else if (inspector->m_toolInAction) {
 		InspectorToolResult res = inspector->m_toolInAction->updateTool(inspector, canInteractWithViewport, is, drawSets);
 
 		if (canInteractWithViewport) {
 			if (res.reapply) {
 				inspector->setTool(inspector->m_toolInAction);
-			} else if (res.propagateInput) {
+			}
+			else if (res.propagateInput) {
 				inspector->setTool(&inspector->m_selectionTool);
 			}
 		}
@@ -431,7 +442,8 @@ bool SceneWindow::updateToolsAndOverlay(const InputState& is, const GameDrawSets
 	return canInteractWithViewport;
 }
 
-void SceneWindow::drawOverlay(const GameDrawSets& drawSets) {
+void SceneWindow::drawOverlay(const GameDrawSets& drawSets)
+{
 	if (m_gameDrawer == nullptr) {
 		return;
 	}
@@ -460,7 +472,8 @@ void SceneWindow::drawOverlay(const GameDrawSets& drawSets) {
 	}
 }
 
-InputState SceneWindow::computeInputStateInDomainSpace(const InputState& isOriginal) const {
+InputState SceneWindow::computeInputStateInDomainSpace(const InputState& isOriginal) const
+{
 	// Compute the input state according ot the position of this window.
 	InputState is = isOriginal;
 	is.setDomainFromPosAndSize(m_canvasPos, m_canvasSize);

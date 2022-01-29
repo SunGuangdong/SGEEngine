@@ -1,5 +1,3 @@
-
-
 #include <filesystem>
 
 #include "../ActorCreateWindow.h"
@@ -33,18 +31,19 @@
 #include "sge_engine/actors/ALight.h"
 #include "sge_engine/actors/ALine.h"
 #include "sge_utils/debugger/VSDebugger.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/json/json.h"
+#include "sge_utils/other/FileOpenDialog.h"
 #include "sge_utils/stl_algorithm_ex.h"
-#include "sge_utils/tiny/FileOpenDialog.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/Path.h"
-#include "sge_utils/utils/json.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/Path.h"
+#include "sge_utils/text/format.h"
 
 #include "IconsForkAwesome/IconsForkAwesome.h"
 
 namespace sge {
 
-void EditorWindow::Assets::load() {
+void EditorWindow::Assets::load()
+{
 	AssetLibrary* assetLib = getCore()->getAssetLib();
 
 	m_assetPlayIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/play.png");
@@ -71,18 +70,21 @@ void EditorWindow::Assets::load() {
 	m_zIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/z.png");
 }
 
-void EditorWindow::onGamePluginPreUnload() {
+void EditorWindow::onGamePluginPreUnload()
+{
 	m_sceneInstances.clear();
 	iActiveInstance = -1;
 }
 
-void EditorWindow::onGamePluginChanged() {
+void EditorWindow::onGamePluginChanged()
+{
 	m_sceneWindow->setGameDrawer(m_gameDrawer.get());
 }
 
 EditorWindow::EditorWindow(WindowBase& nativeWindow, std::string windowName)
     : m_nativeWindow(nativeWindow)
-    , m_windowName(std::move(windowName)) {
+    , m_windowName(std::move(windowName))
+{
 	m_gameDrawer.reset(new DefaultGameDrawer());
 
 	getEngineGlobal()->subscribeOnPluginChange([this]() -> void { onGamePluginChanged(); }).abandon();
@@ -107,7 +109,8 @@ EditorWindow::EditorWindow(WindowBase& nativeWindow, std::string windowName)
 	loadEditorSettings();
 }
 
-void EditorWindow::loadEditorSettings() {
+void EditorWindow::loadEditorSettings()
+{
 	FileReadStream frs("editorSettings.json");
 	if (frs.isOpened()) {
 		m_rescentOpenedSceneFiles.clear();
@@ -125,7 +128,8 @@ void EditorWindow::loadEditorSettings() {
 	}
 }
 
-void EditorWindow::saveEditorSettings() {
+void EditorWindow::saveEditorSettings()
+{
 	JsonValueBuffer jvb;
 	JsonValue* jRoot = jvb(JID_MAP);
 
@@ -141,7 +145,8 @@ void EditorWindow::saveEditorSettings() {
 	jw.WriteInFile("editorSettings.json", jRoot, true);
 }
 
-void EditorWindow::addReasecentScene(const char* const filename) {
+void EditorWindow::addReasecentScene(const char* const filename)
+{
 	if (filename == nullptr) {
 		return;
 	}
@@ -151,7 +156,8 @@ void EditorWindow::addReasecentScene(const char* const filename) {
 	if (itr == m_rescentOpenedSceneFiles.end()) {
 		// If the file isn't already in the list, push it to the front.
 		push_front(m_rescentOpenedSceneFiles, std::string(filename));
-	} else {
+	}
+	else {
 		// if the file is already in the list move it to the front.
 		std::string x = std::move(*itr);
 		m_rescentOpenedSceneFiles.erase(itr);
@@ -160,7 +166,8 @@ void EditorWindow::addReasecentScene(const char* const filename) {
 	saveEditorSettings();
 }
 
-int EditorWindow::newEmptyInstance() {
+int EditorWindow::newEmptyInstance()
+{
 	m_sceneInstances.emplace_back(PerSceneInstanceData());
 
 	m_sceneInstances.back().sceneInstace = std::make_unique<SceneInstance>();
@@ -170,14 +177,16 @@ int EditorWindow::newEmptyInstance() {
 	return (int)m_sceneInstances.size() - 1;
 }
 
-void EditorWindow::switchToInstance(int iInstance) {
+void EditorWindow::switchToInstance(int iInstance)
+{
 	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
 		iActiveInstance = iInstance;
 		m_gameDrawer->initialize(&getActiveInstance()->getWorld());
 	}
 }
 
-void EditorWindow::deleteInstance(int iInstance) {
+void EditorWindow::deleteInstance(int iInstance)
+{
 	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
 		std::string message = string_format("Closing scene %s. All unsaved changes will be lost! Do you want to continue closing?",
 		                                    getInstanceData(iInstance)->displayName.c_str());
@@ -193,7 +202,8 @@ void EditorWindow::deleteInstance(int iInstance) {
 	}
 }
 
-SceneInstance* EditorWindow::getActiveInstance() {
+SceneInstance* EditorWindow::getActiveInstance()
+{
 	if (iActiveInstance >= 0 && iActiveInstance < m_sceneInstances.size()) {
 		return m_sceneInstances[iActiveInstance].sceneInstace.get();
 	}
@@ -201,11 +211,13 @@ SceneInstance* EditorWindow::getActiveInstance() {
 	return nullptr;
 }
 
-EditorWindow::PerSceneInstanceData* EditorWindow::getActiveInstanceData() {
+EditorWindow::PerSceneInstanceData* EditorWindow::getActiveInstanceData()
+{
 	return getInstanceData(iActiveInstance);
 }
 
-EditorWindow::PerSceneInstanceData* EditorWindow::getInstanceData(int iInstance) {
+EditorWindow::PerSceneInstanceData* EditorWindow::getInstanceData(int iInstance)
+{
 	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
 		return &m_sceneInstances[iInstance];
 	}
@@ -213,11 +225,13 @@ EditorWindow::PerSceneInstanceData* EditorWindow::getInstanceData(int iInstance)
 	return nullptr;
 }
 
-EditorWindow::~EditorWindow() {
+EditorWindow::~EditorWindow()
+{
 	sgeAssert(false);
 }
 
-void EditorWindow::newScene(bool UNUSED(forceKeepSameInspector)) {
+void EditorWindow::newScene(bool UNUSED(forceKeepSameInspector))
+{
 	switchToInstance(newEmptyInstance());
 
 	// m_sceneInstance.newScene(forceKeepSameInspector);
@@ -232,7 +246,8 @@ void EditorWindow::newScene(bool UNUSED(forceKeepSameInspector)) {
 	//}
 }
 
-void EditorWindow::loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename, bool forceKeepSameInspector) {
+void EditorWindow::loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename, bool forceKeepSameInspector)
+{
 	std::vector<char> fileContents;
 	if (FileReadStream::readFile(filename, fileContents)) {
 		fileContents.push_back('\0');
@@ -250,7 +265,8 @@ void EditorWindow::loadWorldFromFile(const char* const filename, const char* ove
 void EditorWindow::loadWorldFromJson(const char* const json,
                                      bool disableAutoSepping,
                                      const char* const workingFileName,
-                                     bool loadInNewInstance) {
+                                     bool loadInNewInstance)
+{
 	if (loadInNewInstance && getActiveInstance() == nullptr) {
 		int iInstance = newEmptyInstance();
 		switchToInstance(iInstance);
@@ -264,21 +280,24 @@ void EditorWindow::loadWorldFromJson(const char* const json,
 
 	if (workingFileName) {
 		sceneInstData->displayName = extractFileNameWithExt(workingFileName);
-	} else {
+	}
+	else {
 		sceneInstData->displayName = "Unsaved Scene";
 	}
 
 	sceneInstData->sceneInstace->loadWorldFromJson(json, disableAutoSepping);
 }
 
-void EditorWindow::saveInstanceToFile(int iInstance, bool forceAskForFilename) {
+void EditorWindow::saveInstanceToFile(int iInstance, bool forceAskForFilename)
+{
 	std::string filename;
 
 	PerSceneInstanceData* instData = getInstanceData(iInstance);
 
 	if (!forceAskForFilename && instData->filename.empty() == false) {
 		filename = instData->filename;
-	} else {
+	}
+	else {
 		// In order for the File Save dialog to point to the default assets/levels directory
 		// the directory must exist.
 		std::filesystem::create_directories("./assets/levels");
@@ -301,7 +320,8 @@ void EditorWindow::saveInstanceToFile(int iInstance, bool forceAskForFilename) {
 	saveInstanceToSpecificFile(iInstance, filename.c_str());
 }
 
-void EditorWindow::saveInstanceToSpecificFile(int iInstance, const char* filename) {
+void EditorWindow::saveInstanceToSpecificFile(int iInstance, const char* filename)
+{
 	if (isStringEmpty(filename)) {
 		sgeAssert(false && "saveWorldToSpecificFile expects a filename");
 		return;
@@ -320,7 +340,8 @@ void EditorWindow::saveInstanceToSpecificFile(int iInstance, const char* filenam
 			instData->displayName = filename;
 
 			addReasecentScene(filename);
-		} else {
+		}
+		else {
 			std::string error = string_format("FAILED saving level '%s'", filename);
 			getEngineGlobal()->showNotification(error);
 			sgeLogWarn(error.c_str());
@@ -329,7 +350,8 @@ void EditorWindow::saveInstanceToSpecificFile(int iInstance, const char* filenam
 }
 
 
-void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspector), const InputState& is) {
+void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspector), const InputState& is)
+{
 	m_timer.tick();
 
 	const ImGuiWindowFlags mainWndFlags =
@@ -427,7 +449,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 
 				if (levelsList.empty()) {
 					ImGui::Text(ICON_FK_EXCLAMATION_TRIANGLE " No files in assets/levels.");
-				} else {
+				}
+				else {
 					for (const auto& levelFile : levelsList) {
 						if (ImGui::MenuItem(levelFile.c_str())) {
 							loadWorldFromFile(levelFile.c_str(), nullptr, true);
@@ -458,7 +481,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				AssetsWindow* wnd = getEngineGlobal()->findFirstWindowOfType<AssetsWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new AssetsWindow(ICON_FK_FILE " Assets"));
 				}
 			}
@@ -467,7 +491,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				OutlinerWindow* wnd = getEngineGlobal()->findFirstWindowOfType<OutlinerWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new OutlinerWindow(ICON_FK_SEARCH " Outliner"));
 				}
 			}
@@ -476,7 +501,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				WorldSettingsWindow* wnd = getEngineGlobal()->findFirstWindowOfType<WorldSettingsWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new WorldSettingsWindow(ICON_FK_COGS " World Settings"));
 				}
 			}
@@ -485,7 +511,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				PropertyEditorWindow* wnd = getEngineGlobal()->findFirstWindowOfType<PropertyEditorWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new PropertyEditorWindow("Propery Editor"));
 				}
 			}
@@ -494,7 +521,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				ActorCreateWindow* wnd = getEngineGlobal()->findFirstWindowOfType<ActorCreateWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new ActorCreateWindow("Actor Create"));
 				}
 			}
@@ -503,7 +531,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				PrefabWindow* wnd = getEngineGlobal()->findFirstWindowOfType<PrefabWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new PrefabWindow("Prefabs"));
 				}
 			}
@@ -531,7 +560,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				LogWindow* wnd = getEngineGlobal()->findFirstWindowOfType<LogWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new LogWindow(ICON_FK_LIST " Log"));
 				}
 			}
@@ -556,7 +586,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				HelpWindow* wnd = getEngineGlobal()->findFirstWindowOfType<HelpWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new HelpWindow(ICON_FK_BOOK " Keyboard Shortucts and Docs"));
 				}
 			}
@@ -567,7 +598,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				CreditsWindow* wnd = getEngineGlobal()->findFirstWindowOfType<CreditsWindow>();
 				if (wnd) {
 					ImGui::SetWindowFocus(wnd->getWindowName());
-				} else {
+				}
+				else {
 					getEngineGlobal()->addWindow(new CreditsWindow("Credits"));
 				}
 			}
@@ -579,7 +611,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 			ProjectSettingsWindow* wnd = getEngineGlobal()->findFirstWindowOfType<ProjectSettingsWindow>();
 			if (wnd) {
 				ImGui::SetWindowFocus(wnd->getWindowName());
-			} else {
+			}
+			else {
 				getEngineGlobal()->addWindow(new ProjectSettingsWindow(ICON_FK_PUZZLE_PIECE " Run & Export"));
 			}
 
@@ -635,7 +668,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		if (m_assets.m_assetPlayIcon && getActiveInstance()->getInspector().m_disableAutoStepping) {
 			if (imageButton(m_assets.m_assetPlayIcon))
 				getActiveInstance()->getInspector().m_disableAutoStepping = false;
-		} else if (imageButton(m_assets.m_assetPauseIcon)) {
+		}
+		else if (imageButton(m_assets.m_assetPauseIcon)) {
 			getActiveInstance()->getInspector().m_disableAutoStepping = true;
 		}
 
@@ -704,7 +738,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 			if (imageButton(m_assets.m_assetSnapToGridOnIcon)) {
 				getActiveInstance()->getInspector().m_transformTool.m_useSnapSettings = false;
 			}
-		} else {
+		}
+		else {
 			if (imageButton(m_assets.m_assetSnapToGridOffIcon)) {
 				getActiveInstance()->getInspector().m_transformTool.m_useSnapSettings = true;
 			}
@@ -820,7 +855,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		ImGui::DockBuilderDockWindow(ICON_FK_COG " Property Editor", dock_id_right);
 
 		ImGui::DockBuilderFinish(dockSpaceID);
-	} else {
+	}
+	else {
 		ImGui::DockSpace(dockSpaceID, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_PassthruCentralNode);
 	}
 
@@ -863,7 +899,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 			HelpWindow* const wnd = getEngineGlobal()->findFirstWindowOfType<HelpWindow>();
 			if (wnd) {
 				ImGui::SetWindowFocus(wnd->getWindowName());
-			} else {
+			}
+			else {
 				getEngineGlobal()->addWindow(new HelpWindow(ICON_FK_BOOK " Keyboard Shortucts and Docs"));
 			}
 
@@ -918,7 +955,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		wnd->update(sgecon, &getActiveInstance()->getInspector(), is);
 	}
 }
-void EditorWindow::prepareForHotReload(SceneInstanceSerializedData& sceneInstancesData) {
+void EditorWindow::prepareForHotReload(SceneInstanceSerializedData& sceneInstancesData)
+{
 	sceneInstancesData = SceneInstanceSerializedData();
 
 	sceneInstancesData.iActiveInstance = iActiveInstance;
@@ -941,7 +979,8 @@ void EditorWindow::prepareForHotReload(SceneInstanceSerializedData& sceneInstanc
 	// TODO: Close all gameplay windows.
 }
 
-void EditorWindow::recoverFromHotReload(const SceneInstanceSerializedData& sceneInstancesData) {
+void EditorWindow::recoverFromHotReload(const SceneInstanceSerializedData& sceneInstancesData)
+{
 	for (int iInst = 0; iInst < sceneInstancesData.instances.size(); ++iInst) {
 		const SceneInstanceSerializedData::PerInstanceSerializedData& instData = sceneInstancesData.instances[iInst];
 

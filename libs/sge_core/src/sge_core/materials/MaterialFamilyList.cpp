@@ -1,6 +1,6 @@
 #include "MaterialFamilyList.h"
 #include "sge_core/materials/IMaterial.h"
-#include "sge_utils/utils/json.h"
+#include "sge_utils/json/json.h"
 
 namespace sge {
 

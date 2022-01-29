@@ -2,7 +2,7 @@
 
 #include "sge_core/Camera.h"
 #include "sge_engine/sge_engine_api.h"
-#include "sge_utils/tiny/orbit_camera.h"
+#include "sge_utils/other/SimpleOrbitCamera.h"
 
 namespace sge {
 

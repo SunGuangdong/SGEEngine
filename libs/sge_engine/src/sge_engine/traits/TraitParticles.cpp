@@ -146,7 +146,7 @@ vec3f getRandomOnSphereSurface(float uRandom, float vRandom)
 	float theta = uRandom * two_pi();
 	float phi = acosf(2.f * vRandom - 1.f);
 	float r = 1.f;
-	
+
 	float sinTheta = sinf(theta);
 	float cosTheta = cosf(theta);
 	float sinPhi = sinf(phi);
@@ -376,11 +376,11 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 		}
 
 		vec3f addedVelocity = vec3f(0.f);
-		
+
 		for (const Velocity& vel : pgDesc.velocityForces) {
 			addedVelocity += computeAddedVelocity(m_rnd, particle.pos, vel);
 		}
-		
+
 		if (spawnLocationMtx.isValid()) {
 			addedVelocity = mat_mul_dir(spawnLocationMtx.get(), addedVelocity);
 		}

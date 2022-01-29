@@ -5,7 +5,7 @@
 #include "sge_engine/Physics.h"
 #include "sge_engine/PhysicsHelpers.h"
 #include "sge_engine/traits/TraitRigidBody.h"
-#include "sge_utils/utils/StaticArray.h"
+#include "sge_utils/containers/StaticArray.h"
 
 namespace sge {
 

@@ -1,14 +1,15 @@
 #include "ShadingProgramPermuatorCache.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/Path.h"
-#include "sge_utils/utils/base64/base64.h"
-#include "sge_utils/utils/hash_combine.h"
-#include "sge_utils/utils/json.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/base64/base64.h"
+#include "sge_utils/hash/hash_combine.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/json/json.h"
+#include "sge_utils/text/Path.h"
+#include "sge_utils/text/format.h"
 
 namespace sge {
 
-bool ShadingProgramPermuatorCache::saveToFile(const char* cacheFilename) const {
+bool ShadingProgramPermuatorCache::saveToFile(const char* cacheFilename) const
+{
 	std::string fileDir = extractFileDir(cacheFilename, true);
 	if (!fileDir.empty()) {
 		createDirectory(fileDir.c_str());
@@ -46,7 +47,8 @@ bool ShadingProgramPermuatorCache::saveToFile(const char* cacheFilename) const {
 	return succeeded;
 }
 
-bool ShadingProgramPermuatorCache::loadFileFile(const char* cacheFilename) {
+bool ShadingProgramPermuatorCache::loadFileFile(const char* cacheFilename)
+{
 	try {
 		// Reset the structure to its default state.
 		*this = ShadingProgramPermuatorCache();
@@ -95,7 +97,8 @@ bool ShadingProgramPermuatorCache::loadFileFile(const char* cacheFilename) {
 		}
 
 		return true;
-	} catch (...) {
+	}
+	catch (...) {
 		sgeAssertFalse("The cache file seems to be broken");
 		*this = ShadingProgramPermuatorCache();
 		return false;
@@ -104,7 +107,8 @@ bool ShadingProgramPermuatorCache::loadFileFile(const char* cacheFilename) {
 
 
 
-bool ShadingProgramPermuatorCache::verifyThatCacheIsUpDoDate() const {
+bool ShadingProgramPermuatorCache::verifyThatCacheIsUpDoDate() const
+{
 	std::vector<char> fileData;
 	for (const auto& fileNameHashPair : sourceFileContentsHash) {
 		fileData.clear();

@@ -1,7 +1,7 @@
 #include "sge_codepreproc/sge_codepreproc.h"
 
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/text/format.h"
 #include <mutex>
 #include <set>
 #include <string>

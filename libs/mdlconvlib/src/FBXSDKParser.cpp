@@ -5,8 +5,8 @@
 #include "IAssetRelocationPolicy.h"
 #include "ImporterCommon.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/range_loop.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/containers/Range.h"
+#include "sge_utils/containers/vector_set.h"
 
 namespace sge {
 
@@ -32,8 +32,8 @@ ModelCollisionMesh fbxMeshToCollisionMesh(fbxsdk::FbxMesh* const fbxMesh) {
 
 	std::vector<vec3f> trianglesVeticesWithDuplicated(numVerts);
 
-	for (int const iPoly : range_int(numPolygons)) {
-		for (int const iVertex : range_int(3)) {
+	for (int const iPoly : RangeInt(numPolygons)) {
+		for (int const iVertex : RangeInt(3)) {
 			int const globalVertexIndex = iPoly * 3 + iVertex;
 			int const ctrlPtIndex = fbxMesh->GetPolygonVertex(iPoly, iVertex);
 
@@ -231,7 +231,7 @@ bool FBXSDKParser::parse(Model* result,
 		// As a workaround for them, if we aren't exporting a sub-tree we attach them to root of the imported node.
 		if (enforcedRootNode == nullptr) {
 			ModelNode* rootNode = m_model->nodeAt(importedRootNodeIndex);
-			for (int const iFbxNode : range_int(m_fbxScene->GetNodeCount())) {
+			for (int const iFbxNode : RangeInt(m_fbxScene->GetNodeCount())) {
 				// If the node hasn't been discovered yet, that means that is is not parented to the root node.
 				FbxNode* const fbxNode = m_fbxScene->GetNode(iFbxNode);
 				if (m_fbxNode2NodeIndex.find(fbxNode) == m_fbxNode2NodeIndex.end()) {
@@ -286,7 +286,7 @@ int FBXSDKParser::discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode) {
 	// It could be if the node is used for a bone some parameters of that bone (for example it's length).
 	// It could be a mesh and/or material.
 	int const attribCount = fbxNode->GetNodeAttributeCount();
-	for (const int iAttrib : range_int(attribCount)) {
+	for (const int iAttrib : RangeInt(attribCount)) {
 		fbxsdk::FbxNodeAttribute* const fbxNodeAttrib = fbxNode->GetNodeAttributeByIndex(iAttrib);
 
 		const fbxsdk::FbxNodeAttribute::EType fbxAttriuteType = fbxNodeAttrib->GetAttributeType();
@@ -469,11 +469,11 @@ void FBXSDKParser::importMaterials() {
 			const auto findTextureFromFbxProperty = [](const FbxProperty& property) -> fbxsdk::FbxFileTexture* {
 				// Search in the layered textures.
 				int const layeredTexCount = property.GetSrcObjectCount<fbxsdk::FbxLayeredTexture>();
-				for (int const iLayer : range_int(layeredTexCount)) {
+				for (int const iLayer : RangeInt(layeredTexCount)) {
 					fbxsdk::FbxLayeredTexture* const fbxLayeredTex =
 					    FbxCast<fbxsdk::FbxLayeredTexture>(property.GetSrcObject<fbxsdk::FbxLayeredTexture>(iLayer));
 					int const textureCount = fbxLayeredTex->GetSrcObjectCount<fbxsdk::FbxTexture>();
-					for (int const iTex : range_int(textureCount)) {
+					for (int const iTex : RangeInt(textureCount)) {
 						fbxsdk::FbxFileTexture* const fFileTex =
 						    fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(fbxLayeredTex->GetSrcObject<FbxTexture>(iTex));
 						if (fFileTex != nullptr) {
@@ -483,7 +483,7 @@ void FBXSDKParser::importMaterials() {
 				}
 
 				int const textureCount = property.GetSrcObjectCount<FbxTexture>();
-				for (int const iTex : range_int(textureCount)) {
+				for (int const iTex : RangeInt(textureCount)) {
 					fbxsdk::FbxFileTexture* const fFileTex =
 					    fbxsdk::FbxCast<fbxsdk::FbxFileTexture>(property.GetSrcObject<FbxTexture>(iTex));
 					if (fFileTex) {
@@ -680,7 +680,7 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 	if (importSkinningData) {
 		const int numDeformers = fbxMesh->GetDeformerCount();
 		sgeAssert(numDeformers <= 1 && "We support only 1 deformer!");
-		for (int const iDeformer : range_int(numDeformers)) {
+		for (int const iDeformer : RangeInt(numDeformers)) {
 			fbxsdk::FbxDeformer* const fDeformer = fbxMesh->GetDeformer(iDeformer);
 			fbxsdk::FbxSkin* const fSkin = fbxsdk::FbxCast<fbxsdk::FbxSkin>(fDeformer);
 
@@ -693,7 +693,7 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 
 			mesh.bones.reserve(clustersCount);
 
-			for (const int iCluster : range_int(clustersCount)) {
+			for (const int iCluster : RangeInt(clustersCount)) {
 				fbxsdk::FbxCluster* const fCluster = fSkin->GetCluster(iCluster);
 				fbxsdk::FbxNode* const fNodeBone = fCluster->GetLink();
 
@@ -726,13 +726,13 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 				FbxAMatrix const globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix;
 
 				mat4f boneOffseMtx = mat4f::getIdentity();
-				for (int const t : range_int(16)) {
+				for (int const t : RangeInt(16)) {
 					boneOffseMtx.data[t / 4][t % 4] = (float)(globalBindposeInverseMatrix.mData[t / 4].mData[t % 4]);
 				}
 
 				// Read the affected vertex indices by the bone and store their affection weight.
 				int const affectedPointsCount = fCluster->GetControlPointIndicesCount();
-				for (int const iPt : range_int(affectedPointsCount)) {
+				for (int const iPt : RangeInt(affectedPointsCount)) {
 					const float weight = float(fCluster->GetControlPointWeights()[iPt]);
 					const int ctrlPt = fCluster->GetControlPointIndices()[iPt];
 
@@ -786,7 +786,7 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 							FbxAMatrix const globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix;
 
 							mat4f boneOffseMtx = mat4f::getIdentity();
-							for (int const t : range_int(16)) {
+							for (int const t : RangeInt(16)) {
 								boneOffseMtx.data[t / 4][t % 4] = (float)(globalBindposeInverseMatrix.mData[t / 4].mData[t % 4]);
 							}
 
@@ -917,10 +917,10 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 	// Provides a way to get the control point form a vertex.
 	std::vector<int> vert2controlPoint_BeforeInterleave(numVertsBeforeIBGen);
 
-	for (int const iPoly : range_int(numPolygons)) {
+	for (int const iPoly : RangeInt(numPolygons)) {
 		[[maybe_unused]] const int debugOnly_polyVertexCountInFbx = fbxMesh->GetPolygonSize(iPoly);
 		sgeAssert(debugOnly_polyVertexCountInFbx == 3);
-		for (int const iVertex : range_int(3)) {
+		for (int const iVertex : RangeInt(3)) {
 			int const globalVertexIndex = iPoly * 3 + iVertex;
 			int const ctrlPtIndex = fbxMesh->GetPolygonVertex(iPoly, iVertex);
 
@@ -1163,7 +1163,7 @@ void FBXSDKParser::importNodes_singleNode(FbxNode* fbxNode, int importNodeIndex)
 	// It could be if the node is used for a bone some parameters of that bone (for example it's length).
 	// It could be a mesh and/or material.
 	int const attribCount = fbxNode->GetNodeAttributeCount();
-	for (const int iAttrib : range_int(attribCount)) {
+	for (const int iAttrib : RangeInt(attribCount)) {
 		fbxsdk::FbxNodeAttribute* const fbxNodeAttrib = fbxNode->GetNodeAttributeByIndex(iAttrib);
 
 		const fbxsdk::FbxNodeAttribute::EType fbxAttriuteType = fbxNodeAttrib->GetAttributeType();
@@ -1231,7 +1231,7 @@ void FBXSDKParser::importAnimations() {
 	// Each animation is called "Animation Stack" previously they were called "Takes",
 	// this is why you see a mixed usage of terms.
 	int const animStackCount = m_fbxScene->GetSrcObjectCount<fbxsdk::FbxAnimStack>();
-	for (int const iStack : range_int(animStackCount)) {
+	for (int const iStack : RangeInt(animStackCount)) {
 		// Clear the cache form the previous node.
 		fbxsdk::FbxAnimStack* const fbxAnimStack = m_fbxScene->GetSrcObject<fbxsdk::FbxAnimStack>(iStack);
 		const char* const animationName = fbxAnimStack->GetName();
@@ -1258,7 +1258,7 @@ void FBXSDKParser::importAnimations() {
 		// of keyframes while animating. This is purely used to keep the animation timeline organized and has no functionally when
 		// playing the animation in code.
 		int const layerCount = fbxAnimStack->GetMemberCount<fbxsdk::FbxAnimLayer>();
-		for (int const iLayer : range_int(layerCount)) {
+		for (int const iLayer : RangeInt(layerCount)) {
 			fbxsdk::FbxAnimLayer* const fbxAnimLayer = fbxAnimStack->GetMember<fbxsdk::FbxAnimLayer>(iLayer);
 
 			// Read each the animated values for each node on that curve.
@@ -1280,7 +1280,7 @@ void FBXSDKParser::importAnimations() {
 					if (!keyFrameTimesTranslation.empty()) {
 						const int keyFramesCount = keyFrameTimesTranslation.size();
 
-						for (int const iKey : range_int(keyFramesCount)) {
+						for (int const iKey : RangeInt(keyFramesCount)) {
 							const fbxsdk::FbxTime fbxKeyTime = keyFrameTimesTranslation.getNth(iKey);
 
 							const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
@@ -1301,7 +1301,7 @@ void FBXSDKParser::importAnimations() {
 					getLayerKeyTimesForProp(fbxNode->LclRotation, fbxAnimLayer, keyFrameTimesRotation);
 					if (!keyFrameTimesRotation.empty()) {
 						const int keyFramesCount = keyFrameTimesRotation.size();
-						for (int const iKey : range_int(keyFramesCount)) {
+						for (int const iKey : RangeInt(keyFramesCount)) {
 							fbxsdk::FbxTime const fbxKeyTime = keyFrameTimesRotation.getNth(iKey);
 
 							const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
@@ -1322,7 +1322,7 @@ void FBXSDKParser::importAnimations() {
 
 					if (!keyFrameTimesScaling.empty()) {
 						const int keyFramesCount = keyFrameTimesScaling.size();
-						for (int const iKey : range_int(keyFramesCount)) {
+						for (int const iKey : RangeInt(keyFramesCount)) {
 							fbxsdk::FbxTime const fbxKeyTime = keyFrameTimesScaling.getNth(iKey);
 
 							const FbxAMatrix localTransform = getNodeTransform(fbxNode, fbxKeyTime);
@@ -1362,7 +1362,7 @@ void FBXSDKParser::importCollisionGeometry() {
 
 		if (collisionMeshObjectSpace.indices.size() % 3 == 0) {
 			// For every instance transform the vertices to model (or in this context world space).
-			for (int const iInstance : range_int(int(itrFbxMeshInstantiations.second.size()))) {
+			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
 				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
@@ -1385,7 +1385,7 @@ void FBXSDKParser::importCollisionGeometry() {
 
 		if (collisionMeshObjectSpace.indices.size() % 3 == 0) {
 			// For every instance transform the vertices to model (or in this context world space).
-			for (int const iInstance : range_int(int(itrFbxMeshInstantiations.second.size()))) {
+			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
 				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
@@ -1406,11 +1406,11 @@ void FBXSDKParser::importCollisionGeometry() {
 
 		// CAUTION: The code assumes that the mesh vertices are untoched.
 		AABox3f bbox;
-		for (int const iVert : range_int(fbxMesh->GetControlPointsCount())) {
+		for (int const iVert : RangeInt(fbxMesh->GetControlPointsCount())) {
 			bbox.expand(vec3fFromFbx(fbxMesh->GetControlPointAt(iVert)));
 		}
 
-		for (int const iInstance : range_int(int(itrBoxInstantiations.second.size()))) {
+		for (int const iInstance : RangeInt(int(itrBoxInstantiations.second.size()))) {
 			transf3d n2w = m_collision_transfromCorrection * itrBoxInstantiations.second[iInstance];
 			n2w.p += bbox.center();
 			m_model->m_collisionBoxes.push_back(
@@ -1424,7 +1424,7 @@ void FBXSDKParser::importCollisionGeometry() {
 
 		// CAUTION: The code assumes that the mesh vertices are untoched.
 		AABox3f bbox;
-		for (int const iVert : range_int(fbxMesh->GetControlPointsCount())) {
+		for (int const iVert : RangeInt(fbxMesh->GetControlPointsCount())) {
 			bbox.expand(vec3fFromFbx(fbxMesh->GetControlPointAt(iVert)));
 		}
 
@@ -1439,7 +1439,7 @@ void FBXSDKParser::importCollisionGeometry() {
 
 		halfHeight -= radius;
 
-		for (int const iInstance : range_int(int(itrBoxInstantiations.second.size()))) {
+		for (int const iInstance : RangeInt(int(itrBoxInstantiations.second.size()))) {
 			transf3d n2w = m_collision_transfromCorrection * itrBoxInstantiations.second[iInstance];
 			n2w.p += bbox.center();
 			m_model->m_collisionCapsules.push_back(
@@ -1453,12 +1453,12 @@ void FBXSDKParser::importCollisionGeometry() {
 
 		// CAUTION: The code assumes that the mesh vertices are untoched.
 		AABox3f bboxOS;
-		for (int const iVert : range_int(fbxMesh->GetControlPointsCount())) {
+		for (int const iVert : RangeInt(fbxMesh->GetControlPointsCount())) {
 			bboxOS.expand(vec3fFromFbx(fbxMesh->GetControlPointAt(iVert)));
 		}
 
 		vec3f const halfDiagonal = bboxOS.halfDiagonal();
-		for (int const iInstance : range_int(int(itrCylinderInstantiations.second.size()))) {
+		for (int const iInstance : RangeInt(int(itrCylinderInstantiations.second.size()))) {
 			transf3d const n2w = m_collision_transfromCorrection * itrCylinderInstantiations.second[iInstance];
 
 			m_model->m_collisionCylinders.push_back(
@@ -1472,13 +1472,13 @@ void FBXSDKParser::importCollisionGeometry() {
 
 		// CAUTION: The code assumes that the mesh vertices are untoched.
 		AABox3f bboxOS;
-		for (int const iVert : range_int(fbxMesh->GetControlPointsCount())) {
+		for (int const iVert : RangeInt(fbxMesh->GetControlPointsCount())) {
 			bboxOS.expand(vec3fFromFbx(fbxMesh->GetControlPointAt(iVert)));
 		}
 
 		vec3f const halfDiagonal = bboxOS.halfDiagonal();
 		float const radius = halfDiagonal.getSorted().x;
-		for (int const iInstance : range_int(int(itrSphereInstantiations.second.size()))) {
+		for (int const iInstance : RangeInt(int(itrSphereInstantiations.second.size()))) {
 			transf3d const n2w = m_collision_transfromCorrection * itrSphereInstantiations.second[iInstance];
 
 			m_model->m_collisionSpheres.push_back(Model_CollisionShapeSphere{std::string(fbxMesh->GetNode()->GetName()), n2w, radius});

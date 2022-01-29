@@ -3,7 +3,7 @@
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "application/application.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/StaticArray.h"
+#include "sge_utils/containers/StaticArray.h"
 
 #include "SGEImGui.h"
 

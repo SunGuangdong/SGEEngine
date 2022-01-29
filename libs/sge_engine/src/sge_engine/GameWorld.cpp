@@ -6,8 +6,8 @@
 #include "InspectorCmd.h"
 #include "sge_core/ICore.h"
 #include "sge_core/typelib/MemberChain.h"
-#include "sge_utils/utils/strings.h"
-#include "sge_utils/utils/timer.h"
+#include "sge_utils/text/format.h"
+#include "sge_utils/time/Timer.h"
 #include "traits/TraitCamera.h"
 #include "sge_engine/InspectorCmds.h"
 #include <functional>
@@ -758,7 +758,7 @@ void GameWorld::createPrefab(GameWorld& prefabWorld,
 	prefabWorld.instantiatePrefab(*this, false, !shouldKeepOriginalObjectIds, pOblectsToInstantiate);
 }
 
-span<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(const RigidBody* rb) const {
+ArrayView<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(const RigidBody* rb) const {
 	if (rb == nullptr) {
 		return {};
 	}
@@ -768,7 +768,7 @@ span<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(co
 		return {};
 	}
 
-	return span<const btPersistentManifold* const>(itrFind->second.data(), itrFind->second.size());
+	return ArrayView<const btPersistentManifold* const>(itrFind->second.data(), itrFind->second.size());
 }
 
 

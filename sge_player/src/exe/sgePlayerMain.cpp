@@ -28,11 +28,11 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_engine/IPlugin.h"
 #include "sge_engine/setImGuiContextEngine.h"
 #include "sge_log/Log.h"
-#include "sge_utils/tiny/FileOpenDialog.h"
-#include "sge_utils/utils/DLLHandler.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/Path.h"
-#include "sge_utils/utils/json.h"
+#include "sge_utils/other/FileOpenDialog.h"
+#include "sge_utils/DLL/DLLHandler.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/text/Path.h"
+#include "sge_utils/json/json.h"
 
 #include <filesystem>
 #include <thread>

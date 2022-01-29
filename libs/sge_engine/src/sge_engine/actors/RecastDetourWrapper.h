@@ -6,7 +6,7 @@
 #include "Recast.h"
 
 #include "sge_utils/sge_utils.h"
-#include "sge_utils/utils/basetypes.h"
+#include "sge_utils/types.h"
 
 #include <string>
 
@@ -15,33 +15,44 @@ namespace sge {
 /// As Recast is build in C it is quite tedous and error-prone to do the memory management manually.
 /// So, to workaround this class should be used instead. It automatically calls m_allocator/free by default.
 template <typename T, T* (*TAlloc)(), void (*TFree)(T*)>
-struct RecastObject : public Noncopyable {
-	RecastObject() { createNew(); }
-	~RecastObject() { freeExisting(); }
+struct RecastObject : public NoCopy {
+	RecastObject()
+	{
+		createNew();
+	}
+	~RecastObject()
+	{
+		freeExisting();
+	}
 
-	void createNew() {
+	void createNew()
+	{
 		freeExisting();
 		object = TAlloc();
 	}
 
-	void freeExisting() {
+	void freeExisting()
+	{
 		if (object != nullptr) {
 			TFree(object);
 			object = nullptr;
 		}
 	}
 
-	T& ref() {
+	T& ref()
+	{
 		sgeAssert(object);
 		return *object;
 	}
 
-	T* operator->() {
+	T* operator->()
+	{
 		sgeAssert(object);
 		return object;
 	}
 
-	const T* operator->() const {
+	const T* operator->() const
+	{
 		sgeAssert(object);
 		return object;
 	}

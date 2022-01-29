@@ -1,6 +1,6 @@
 #include "SceneInstance.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/json.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/json/json.h"
 
 namespace sge {
 

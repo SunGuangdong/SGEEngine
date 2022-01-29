@@ -1,13 +1,12 @@
 #pragma once
 
-#include "sge_core/Animator.h"
 #include "sge_core/materials/IGeometryDrawer.h"
+#include "sge_core/model/EvaluatedModel.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/GameDrawer/IRenderItem.h"
-#include "sge_utils/ChangeIndex.h"
-#include "sge_utils/utils/optional.h"
-#include "sge_core/model/EvaluatedModel.h"
+#include "sge_utils/containers/Optional.h"
+#include "sge_utils/react/ChangeIndex.h"
 
 namespace sge {
 
@@ -20,15 +19,18 @@ struct GeometryRenderItem;
 /// For animated models use @CustomModelEntry.
 struct ModelEntry {
 	ModelEntry()
-	    : m_assetProperty(assetIface_model3d) {
+	    : m_assetProperty(assetIface_model3d)
+	{
 	}
 
 	/// Invalidates the asset property focing an update.
-	void invalidateCachedAssets() {
+	void invalidateCachedAssets()
+	{
 		m_assetProperty.clear();
 	}
 
-	bool updateAssetProperty() {
+	bool updateAssetProperty()
+	{
 		if (m_assetProperty.update()) {
 			changeIndex.markAChange();
 			onAssetModelChanged();
@@ -41,7 +43,7 @@ struct ModelEntry {
 
 	/// Computes the bounding box of the attached 3D model.
 	/// Including the m_additionalTransform,
-	/// @worldTrasnform is used to compute correctly the bounding box 
+	/// @worldTrasnform is used to compute correctly the bounding box
 	/// when ignoreActorTransform is used.
 	AABox3f getBBoxOS(const mat4f& invWorldTrasnform) const;
 
@@ -93,7 +95,8 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	void addModel(const char* assetPath, bool setupCustomEvalState = false);
 	void addModel(AssetPtr& asset, bool setupCustomEvalState = false);
-	void clearModels() {
+	void clearModels()
+	{
 		m_models.clear();
 	}
 
@@ -101,7 +104,8 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	/// Updates the working models.
 	/// Returns true if a model has been changed (no matter if it is valid or not),
 	/// useful if other sytems might depend on it.
-	bool postUpdate() {
+	bool postUpdate()
+	{
 		return updateAssetProperties();
 	}
 

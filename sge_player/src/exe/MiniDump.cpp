@@ -1,21 +1,22 @@
 #include "MiniDump.h"
 
 #if WIN32
-// clang-format off
+
+    // clang-format off
 // The include order here matters.
 #include <Windows.h>
 #include <DbgHelp.h>
-#include <tchar.h> // For _T
+#include <tchar.h> // For the _T macro.
 // clang-format on
 
-void sgeCreateMiniDump(EXCEPTION_POINTERS* pep) {
+void sgeCreateMiniDump(EXCEPTION_POINTERS* pep)
+{
 	SYSTEMTIME sysTime;
 	GetLocalTime(&sysTime);
 
 	HANDLE hFile = CreateFile(_T("minidump.dmp"), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if ((hFile != NULL) && (hFile != INVALID_HANDLE_VALUE)) {
-		// Create the minidump
-
+		// Create the minidump file.
 		MINIDUMP_EXCEPTION_INFORMATION mdei;
 
 		mdei.ThreadId = GetCurrentThreadId();
@@ -32,17 +33,19 @@ void sgeCreateMiniDump(EXCEPTION_POINTERS* pep) {
 	}
 }
 
-LONG WINAPI sgeCrashHandler(EXCEPTION_POINTERS* except) {
+LONG WINAPI sgeCrashHandler(EXCEPTION_POINTERS* except)
+{
 	sgeCreateMiniDump(except);
-#if SGE_USE_DEBUG
+	#if SGE_USE_DEBUG
 	return EXCEPTION_EXECUTE_HANDLER; // Try to debug.
-#else
+	#else
 	return EXCEPTION_CONTINUE_SEARCH; // Just continue.
-#endif
+	#endif
 }
 #endif
 
-void sgeRegisterMiniDumpHandler() {
+void sgeRegisterMiniDumpHandler()
+{
 #if WIN32
 	SetUnhandledExceptionFilter(sgeCrashHandler);
 #endif

@@ -8,7 +8,7 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine_ui/ui/ImGuiDragDrop.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 
 #include "UIAssetPicker.h"
 

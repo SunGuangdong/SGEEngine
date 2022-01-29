@@ -4,7 +4,7 @@
 #include "sge_engine/Actor.h"
 #include "sge_engine/traits/TraitCamera.h"
 #include "sge_engine/traits/TraitViewportIcon.h"
-#include "sge_utils/utils/optional.h"
+#include "sge_utils/containers/Optional.h"
 
 namespace sge {
 

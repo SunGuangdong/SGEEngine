@@ -4,19 +4,19 @@
 #include "sge_core/SGEImGui.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameExport.h"
-#include "sge_utils/tiny/FileOpenDialog.h"
-#include "sge_utils/utils/Path.h"
+#include "sge_utils/other/FileOpenDialog.h"
+#include "sge_utils/text/Path.h"
 #include <filesystem>
 
 namespace sge {
 ProjectSettingsWindow::ProjectSettingsWindow(std::string windowName)
-    : m_windowName(std::move(windowName)) {
+    : m_windowName(std::move(windowName))
+{
 	m_gamePlayerSetting.loadFromJsonFile("appdata/game_project_settings.json");
 }
 
-void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon),
-                                   struct GameInspector* UNUSED(inspector),
-                                   const InputState& UNUSED(is)) {
+void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
+{
 	if (isClosed()) {
 		return;
 	}
@@ -39,7 +39,8 @@ void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon),
 				try {
 					pickedLevel = canonizePathRespectOS(std::filesystem::proximate(pickedLevel).string());
 					m_gamePlayerSetting.initalLevel = pickedLevel;
-				} catch (...) {
+				}
+				catch (...) {
 					sgeLogError("Failed to convert initial level path to relative!");
 				}
 			}
@@ -76,7 +77,8 @@ void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon),
 				if (exportFolder.empty() == false) {
 					exportGame(exportFolder);
 				}
-			} else {
+			}
+			else {
 				DialongOk("Game Export",
 				          "Game cannot be exported, as there is no initial project settings specified. To specify them open Windows -> "
 				          "Project Settings");

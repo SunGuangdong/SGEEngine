@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_engine/GameObject.h"
-#include "sge_utils/utils/vector_set.h"
+#include "sge_utils/containers/vector_set.h"
 
 namespace sge {
 

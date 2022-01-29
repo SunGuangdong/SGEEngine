@@ -3,8 +3,8 @@
 #include "FBXSDKParser.h"
 #include "IAssetRelocationPolicy.h"
 #include "ModelParseSettings.h"
-#include "sge_utils/utils/Path.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/Path.h"
+#include "sge_utils/text/format.h"
 #include <type_traits>
 
 // The macros to expose the symbols (functions) that will perform the import.

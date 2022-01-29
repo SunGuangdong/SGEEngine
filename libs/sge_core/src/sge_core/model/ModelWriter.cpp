@@ -1,8 +1,8 @@
 #include "ModelWriter.h"
 #include "Model.h"
-#include "sge_utils/utils/FileStream.h"
-#include "sge_utils/utils/json.h"
-#include "sge_utils/utils/range_loop.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/json/json.h"
+#include "sge_utils/containers/Range.h"
 
 namespace sge {
 
@@ -102,7 +102,7 @@ void ModelWriter::writeAnimations() {
 
 	auto jAnimations = root->setMember("animations", jvb(JID_ARRAY_BEGIN));
 
-	for (int iAnim : range_int(model->numAnimations())) {
+	for (int iAnim : RangeInt(model->numAnimations())) {
 		const ModelAnimation& animation = *model->animationAt(iAnim);
 
 		auto jAnim = jAnimations->arrPush(jvb(JID_MAP_BEGIN));
@@ -129,7 +129,7 @@ void ModelWriter::writeNodes() {
 	JsonValue* jNodes = root->setMember("nodes", jvb(JID_ARRAY));
 	root->setMember("rootNodeIndex", jvb(model->getRootNodeIndex()));
 
-	for (int iNode : range_int(model->numNodes())) {
+	for (int iNode : RangeInt(model->numNodes())) {
 		const ModelNode* node = model->nodeAt(iNode);
 
 		JsonValue* jNode = jNodes->arrPush(jvb(JID_MAP));
@@ -178,7 +178,7 @@ void ModelWriter::writeNodes() {
 void ModelWriter::writeMaterials() {
 	JsonValue* const jMaterials = root->setMember("materials", jvb(JID_ARRAY));
 
-	for (const int iMtl : range_int(model->numMaterials())) {
+	for (const int iMtl : RangeInt(model->numMaterials())) {
 		JsonValue* const jMaterial = jMaterials->arrPush(jvb(JID_MAP));
 
 		const ModelMaterial* mtl = model->materialAt(iMtl);
@@ -223,7 +223,7 @@ void ModelWriter::writeMeshes() {
 
 	JsonValue* const jMeshes = root->setMember("meshes", jvb(JID_ARRAY));
 
-	for (const int iMesh : range_int(model->numMeshes())) {
+	for (const int iMesh : RangeInt(model->numMeshes())) {
 		JsonValue* jMesh = jMeshes->arrPush(jvb(JID_MAP));
 
 		const ModelMesh* mesh = model->meshAt(iMesh);

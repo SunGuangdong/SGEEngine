@@ -2,7 +2,7 @@
 #include "sge_utils/math/EulerAngles.h"
 #include "sge_utils/math/common.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/utils/strings.h"
+#include "sge_utils/text/format.h"
 #include <string>
 using namespace sge;
 

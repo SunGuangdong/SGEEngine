@@ -3,7 +3,7 @@
 #include "D3D11ContextStateCache.h"
 #include "GraphicsCommon_d3d11.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/utils/StringRegister.h"
+#include "sge_utils/text/StringRegister.h"
 
 namespace sge {
 

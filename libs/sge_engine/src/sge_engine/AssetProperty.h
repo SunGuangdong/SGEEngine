@@ -2,8 +2,8 @@
 
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine_api.h"
-#include "sge_utils/ChangeIndex.h"
-#include "sge_utils/utils/StaticArray.h"
+#include "sge_utils/react/ChangeIndex.h"
+#include "sge_utils/containers/StaticArray.h"
 
 namespace sge {
 

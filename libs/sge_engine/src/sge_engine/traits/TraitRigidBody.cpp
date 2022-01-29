@@ -81,8 +81,15 @@ void TraitRigidBody::onPlayStateChanged(bool const isStartingToPlay) {
 void TraitRigidBody::setTrasnform(const transf3d& transf, bool killVelocity) {
 	if (m_rigidBody.isValid()) {
 		m_rigidBody.setTransformAndScaling(transf, killVelocity);
-		if (m_rigidBody.getBulletRigidBody()->isInWorld() && m_rigidBody.getBulletRigidBody()->getActivationState() == ISLAND_SLEEPING) {
-			getWorld()->physicsWorld.dynamicsWorld->updateSingleAabb(m_rigidBody.getBulletRigidBody());
+
+		if (m_rigidBody.getBulletRigidBody()) {
+			if (m_rigidBody.getBulletRigidBody()->isInWorld() &&
+			    m_rigidBody.getBulletRigidBody()->getActivationState() == ISLAND_SLEEPING) {
+				getWorld()->physicsWorld.dynamicsWorld->updateSingleAabb(m_rigidBody.getBulletRigidBody());
+			}
+		}
+		else if (m_rigidBody.getBulletGhostObject()) {
+			//getWorld()->physicsWorld.dynamicsWorld->updateSingleAabb(m_rigidBody.getBulletGhostObject());
 		}
 	}
 }

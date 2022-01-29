@@ -11,7 +11,7 @@
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/traits/TraitRigidBody.h"
 #include "sge_log/Log.h"
-#include "sge_utils/utils/ScopeGuard.h"
+#include "sge_utils/ScopeGuard.h"
 
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
 

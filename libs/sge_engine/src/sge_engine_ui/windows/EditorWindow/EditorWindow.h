@@ -8,7 +8,7 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/SceneInstance.h"
-#include "sge_utils/utils/timer.h"
+#include "sge_utils/time/Timer.h"
 
 namespace sge {
 struct WindowBase;

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/utils/json.h"
+#include "sge_utils/json/json.h"
 #include <memory>
 
 namespace sge {

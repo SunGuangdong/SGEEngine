@@ -5,7 +5,7 @@
 #include "sge_engine/Actor.h"
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitViewportIcon.h"
-#include "sge_utils/utils/Event.h"
+#include "sge_utils/react/Event.h"
 
 namespace sge {
 
