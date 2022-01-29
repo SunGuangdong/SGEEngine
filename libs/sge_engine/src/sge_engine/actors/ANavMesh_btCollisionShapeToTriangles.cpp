@@ -1,9 +1,11 @@
 #include "ANavMesh_btCollisionShapeToTriangles.h"
+#include "sge_engine/physics/CollisionShape.h"
 #include "sge_utils/containers/Range.h"
 
 namespace sge {
 
-void pushIndices(std::vector<int>& outIndices, int a, int b, int c) {
+void pushIndices(std::vector<int>& outIndices, int a, int b, int c)
+{
 	outIndices.push_back(a);
 	outIndices.push_back(b);
 	outIndices.push_back(c);
@@ -12,7 +14,8 @@ void pushIndices(std::vector<int>& outIndices, int a, int b, int c) {
 void btBoxShapeToTriangles(const btBoxShape* const box,
                            const mat4f& transformNoScaling,
                            std::vector<vec3f>& outVertices,
-                           std::vector<int>& outIndices) {
+                           std::vector<int>& outIndices)
+{
 	// Caution:
 	// getHalfExtentsWithMargin obtains the extent with local scaling applied!
 	const vec3f extents = fromBullet(box->getHalfExtentsWithMargin());
@@ -109,7 +112,8 @@ void btCylinderShapeToTriangles(const btCylinderShape* cylinderShape,
                                 const mat4f& transformNoScaling,
                                 std::vector<vec3f>& outVertices,
                                 std::vector<int>& outIndices,
-                                const int numHorizontalSegments = 8) {
+                                const int numHorizontalSegments = 8)
+{
 	// Caution:
 	// getHalfExtentsWithMargin obtains the extent with local scaling applied!
 	const vec3f extents = fromBullet(cylinderShape->getHalfExtentsWithMargin());
@@ -221,7 +225,8 @@ void btSphereShapeToTriangles(const btSphereShape* btSphereShape,
                               std::vector<vec3f>& outVertices,
                               std::vector<int>& outIndices,
                               const int numRings = 6,
-                              const int numHorizontalSegments = 6) {
+                              const int numHorizontalSegments = 6)
+{
 	outVertices.reserve(outVertices.size() + numRings * numHorizontalSegments + 2);
 	outIndices.reserve(outIndices.size() + (numRings - 1) * numHorizontalSegments * 6 + 2 * numHorizontalSegments * 3);
 
@@ -316,7 +321,8 @@ void btSphereShapeToTriangles(const btSphereShape* btSphereShape,
 bool btConvexHullShapeToTriangles(const btConvexHullShape* const convexHullShape,
                                   const mat4f& transformNoScaling,
                                   std::vector<vec3f>& outVertices,
-                                  std::vector<int>& outIndices) {
+                                  std::vector<int>& outIndices)
+{
 	// Caution [CONVEX_HULLS_TRIANGLE_USER_DATA]:
 	// All convex hulls must have their triangle representation set as a user pointer!
 	const vec3f localScaling = fromBullet(convexHullShape->getLocalScaling());
@@ -348,7 +354,8 @@ bool btConvexHullShapeToTriangles(const btConvexHullShape* const convexHullShape
 bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshShape,
                                        const mat4f& transformNoScaling,
                                        std::vector<vec3f>& outVertices,
-                                       std::vector<int>& outIndices) {
+                                       std::vector<int>& outIndices)
+{
 	const btStridingMeshInterface* const bulletMeshInterface = bvhTriMeshShape->getMeshInterface();
 
 	if (bulletMeshInterface == nullptr) {
@@ -523,7 +530,8 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 void bulletCollisionShapeToTriangles(const btCollisionShape* const collisionShape,
                                      const btTransform& parentTransform,
                                      std::vector<vec3f>& outVertices,
-                                     std::vector<int>& outIndices) {
+                                     std::vector<int>& outIndices)
+{
 	const btCompoundShape* const compoundShape = btCollisionShapeCast<btCompoundShape>(collisionShape, COMPOUND_SHAPE_PROXYTYPE);
 	const btBoxShape* const boxShape = btCollisionShapeCast<btBoxShape>(collisionShape, BOX_SHAPE_PROXYTYPE);
 	const btSphereShape* const sphereShape = btCollisionShapeCast<btSphereShape>(collisionShape, SPHERE_SHAPE_PROXYTYPE);
@@ -541,21 +549,27 @@ void bulletCollisionShapeToTriangles(const btCollisionShape* const collisionShap
 
 			bulletCollisionShapeToTriangles(childShape, childFullTransform, outVertices, outIndices);
 		}
-	} else if (boxShape) {
+	}
+	else if (boxShape) {
 		btBoxShapeToTriangles(boxShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
-	} else if (sphereShape) {
+	}
+	else if (sphereShape) {
 		btSphereShapeToTriangles(sphereShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
-	} else if (cylinderShape) {
+	}
+	else if (cylinderShape) {
 		btCylinderShapeToTriangles(cylinderShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
-	} else if (convexHullShape) {
+	}
+	else if (convexHullShape) {
 		[[maybe_unused]] bool succeeded =
 		    btConvexHullShapeToTriangles(convexHullShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
 		sgeAssert(succeeded);
-	} else if (bvhTriMeshShape) {
+	}
+	else if (bvhTriMeshShape) {
 		[[maybe_unused]] bool succeeded =
 		    btBvhTriangleMeshShapeToTriangles(bvhTriMeshShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
 		sgeAssert(succeeded);
-	} else {
+	}
+	else {
 		sgeAssert(false && "Unimplemented collision shape. The shape will be skipped");
 	}
 

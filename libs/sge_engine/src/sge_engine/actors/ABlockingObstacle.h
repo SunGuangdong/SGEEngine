@@ -3,7 +3,6 @@
 #include "sge_renderer/renderer/renderer.h"
 
 #include "sge_engine/Actor.h"
-#include "sge_engine/Physics.h"
 #include "sge_engine/RigidBodyEditorConfig.h"
 #include "sge_engine/TerrainGenerator.h"
 #include "sge_engine/traits/TraitCustomAE.h"

@@ -24,7 +24,10 @@ struct NavMeshBuildSets {
 	float polygonsMaxEdgeLength = 10.f;
 };
 
-struct SGE_ENGINE_API INavMesh : public Polymorphic {
+struct SGE_ENGINE_API INavMesh {
+	INavMesh() = default;
+	virtual ~INavMesh() = default;
+
 	virtual bool findPath(std::vector<vec3f>& outPath,
 	                      const vec3f& startPos,
 	                      const vec3f& endPos,
@@ -58,7 +61,8 @@ struct SGE_ENGINE_API ANavMesh : public Actor, public IActorCustomAttributeEdito
 	vec3f moveAlongNavMesh(const vec3f& start, const vec3f& end) final;
 
   private:
-	void clearRecastAndDetourState() {
+	void clearRecastAndDetourState()
+	{
 		m_detourNavMesh.freeExisting();
 		m_detourNavMeshQuery.freeExisting();
 

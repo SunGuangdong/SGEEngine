@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_engine/Physics.h"
+#include "sge_engine/physics/CollisionShape.h"
 #include "sge_engine/sge_engine_api.h"
 
 namespace sge {

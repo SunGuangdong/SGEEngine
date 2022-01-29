@@ -1,376 +1,27 @@
-#include "Physics.h"
-#include "BulletCollision/CollisionDispatch/btGhostObject.h"
-#include "sge_core/model/Model.h"
+#include "RigidBody.h"
+#include "BulletHelper.h"
+#include "CollisionShape.h"
 #include "sge_engine/Actor.h"
 
 namespace sge {
-
-// clang-format off
-ReflAddTypeId(CollsionShapeDesc::Type,        21'02'28'0003);
-ReflAddTypeId(CollsionShapeDesc,              21'02'28'0004);
-ReflAddTypeId(std::vector<CollsionShapeDesc>, 21'02'28'0005);
-ReflBlock()
+bool operator==(const btVector3& b, const vec3f& s)
 {
-	ReflAddType(CollsionShapeDesc::Type)
-		ReflEnumVal(CollsionShapeDesc::type_box, "Box")
-		ReflEnumVal(CollsionShapeDesc::type_sphere, "Sphere")
-		ReflEnumVal(CollsionShapeDesc::type_capsule, "Capsule")
-		ReflEnumVal(CollsionShapeDesc::type_cylinder, "Cylinder")
-		ReflEnumVal(CollsionShapeDesc::type_cone, "Cone")
-		ReflEnumVal(CollsionShapeDesc::type_convexPoly, "Convex")
-		ReflEnumVal(CollsionShapeDesc::type_triangleMesh, "Triangle Mesh")
-		ReflEnumVal(CollsionShapeDesc::type_infinitePlane, "Plane")
-	;
-
-	ReflAddType(CollsionShapeDesc)
-		ReflMember(CollsionShapeDesc, type)
-		ReflMember(CollsionShapeDesc, offset)
-		ReflMember(CollsionShapeDesc, boxHalfDiagonal).uiRange(0.f, 1000000.f, 0.1f)
-		ReflMember(CollsionShapeDesc, sphereRadius).uiRange(0.f, 1000000.f, 0.1f)
-		ReflMember(CollsionShapeDesc, capsuleHeight).uiRange(0.f, 1000000.f, 0.1f)
-		ReflMember(CollsionShapeDesc, capsuleRadius).uiRange(0.f, 1000000.f, 0.1f)
-		ReflMember(CollsionShapeDesc, cylinderHalfDiagonal).uiRange(0.f, 1000000.f, 0.1f)
-		ReflMember(CollsionShapeDesc, coneHeight).uiRange(0.f, 1000000.f, 0.1f)
-		ReflMember(CollsionShapeDesc, coneRadius).uiRange(0.f, 1000000.f, 0.1f)
-		ReflMember(CollsionShapeDesc, infinitePlaneNormal)
-		ReflMember(CollsionShapeDesc, infinitePlaneConst)
-	;
-
-	ReflAddType(std::vector<CollsionShapeDesc>);
-}
-// clang-format on
-
-//-------------------------------------------------------------------------
-// PhysicsWorld
-//-------------------------------------------------------------------------
-void sgeNearCallback(btBroadphasePair& collisionPair, btCollisionDispatcher& dispatcher, const btDispatcherInfo& dispatchInfo)
-{
-	btCollisionObject* colObj0 = (btCollisionObject*)collisionPair.m_pProxy0->m_clientObject;
-	btCollisionObject* colObj1 = (btCollisionObject*)collisionPair.m_pProxy1->m_clientObject;
-
-	RigidBody* rb0 = (RigidBody*)colObj0->getUserPointer();
-	RigidBody* rb1 = (RigidBody*)colObj1->getUserPointer();
-
-	bool needsToCollide = true;
-	if (rb0 && rb1) {
-		bool agree0 = rb0->getMaskIdentifiesAs() & rb1->getMaskCollidesWith();
-		bool agree1 = rb1->getMaskIdentifiesAs() & rb0->getMaskCollidesWith();
-
-		needsToCollide = agree0 || agree1;
-	}
-
-	// Should be called we want a collision to occur.
-	if (needsToCollide) {
-		dispatcher.defaultNearCallback(collisionPair, dispatcher, dispatchInfo);
-	}
+	return b.x() == s.x && b.y() == s.y && b.z() == s.z;
 }
 
-void PhysicsWorld::create()
+bool operator!=(const btVector3& b, const vec3f& s)
 {
-	destroy();
-
-	broadphase.reset(new btDbvtBroadphase());
-	collisionConfiguration.reset(new btDefaultCollisionConfiguration());
-	dispatcher.reset(new btCollisionDispatcher(collisionConfiguration.get()));
-	solver.reset(new btSequentialImpulseConstraintSolver());
-
-	dispatcher->setNearCallback(sgeNearCallback);
-	dynamicsWorld.reset(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
-	dynamicsWorld->setForceUpdateAllAabbs(false);
+	return !(b == s);
 }
 
-void PhysicsWorld::destroy()
+bool operator==(const btQuaternion& b, const quatf& s)
 {
-	dynamicsWorld.reset();
-	solver.reset();
-	dispatcher.reset();
-	collisionConfiguration.reset();
-	broadphase.reset();
+	return b.x() == s.x && b.y() == s.y && b.z() == s.z && b.w() == s.w;
 }
 
-void PhysicsWorld::addPhysicsObject(RigidBody& obj)
+bool operator!=(const btQuaternion& b, const quatf& s)
 {
-	if (obj.getBulletRigidBody()) {
-		dynamicsWorld->addRigidBody(obj.getBulletRigidBody());
-	}
-	else {
-		dynamicsWorld->addCollisionObject(obj.m_collisionObject.get());
-	}
-}
-
-void PhysicsWorld::removePhysicsObject(RigidBody& obj)
-{
-	if (obj.getBulletRigidBody()) {
-		if (obj.isInWorld()) {
-			dynamicsWorld->removeRigidBody(obj.getBulletRigidBody());
-		}
-	}
-}
-
-void PhysicsWorld::setGravity(const vec3f& gravity)
-{
-	if (dynamicsWorld) {
-		dynamicsWorld->setGravity(toBullet(gravity));
-	}
-}
-
-vec3f PhysicsWorld::getGravity() const
-{
-	if (dynamicsWorld) {
-		return fromBullet(dynamicsWorld->getGravity());
-	}
-
-	return vec3f(0.f);
-}
-
-void PhysicsWorld::rayTest(const vec3f& from, const vec3f& to, std::function<void(btDynamicsWorld::LocalRayResult&)> lambda)
-{
-	struct RayCallback : public btDynamicsWorld::RayResultCallback {
-		RayCallback(std::function<void(btDynamicsWorld::LocalRayResult&)>& lambda)
-		    : lambda(lambda)
-		{
-		}
-
-		std::function<void(btDynamicsWorld::LocalRayResult&)>& lambda;
-
-		btScalar addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool UNUSED(normalInWorldSpace)) override
-		{
-			lambda(rayResult);
-			return rayResult.m_hitFraction;
-		}
-	};
-
-	RayCallback rayCB(lambda);
-	dynamicsWorld->rayTest(toBullet(from), toBullet(to), rayCB);
-}
-
-//// http://bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Filtering
-// void PhysicsWorld::dispacherNearCallback(btBroadphasePair& collisionPair, btCollisionDispatcher& dispatcher, const btDispatcherInfo&
-// dispatchInfo)
-//{
-//	// Only dispatch the Bullet collision information if you want the physics to continue.
-//	dispatcher.defaultNearCallback(collisionPair, dispatcher, dispatchInfo);
-//}
-
-//-------------------------------------------------------------------------
-// CollsionShapeDesc
-//-------------------------------------------------------------------------
-CollsionShapeDesc CollsionShapeDesc::createBox(const vec3f& halfDiagonal, const transf3d& offset)
-{
-	CollsionShapeDesc r;
-	r.type = type_box;
-	r.boxHalfDiagonal = halfDiagonal * offset.s;
-	r.offset = transf3d(offset.p, offset.r, vec3f(1.f));
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createBox(const AABox3f& box)
-{
-	sgeAssert(box.IsEmpty() == false);
-
-	CollsionShapeDesc r;
-	r.type = type_box;
-	r.boxHalfDiagonal = box.halfDiagonal();
-	r.offset = transf3d(box.center());
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createSphere(const float radius, const transf3d& offset)
-{
-	CollsionShapeDesc r;
-	r.type = type_sphere;
-	r.sphereRadius = radius * offset.s.hsum() / 3.f;
-	r.offset = transf3d(offset.p, offset.r, vec3f(1.f));
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createCapsule(const float height, const float radius, const transf3d& offset)
-{
-	CollsionShapeDesc r;
-	r.type = type_capsule;
-	r.capsuleHeight = height * offset.s.y;
-	r.capsuleRadius = radius;
-	r.offset = transf3d(offset.p, offset.r, vec3f(1.f));
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createCylinder(const vec3f& halfDiagonal, const transf3d& offset)
-{
-	CollsionShapeDesc r;
-	r.type = type_cylinder;
-	r.cylinderHalfDiagonal = halfDiagonal * offset.s;
-	r.offset = transf3d(offset.p, offset.r, vec3f(1.f));
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createCylinder(float height, float radius, const transf3d& offset)
-{
-	vec3f halfDiagonal = vec3f(radius, height * 0.5f, radius);
-	return createCylinder(halfDiagonal, offset);
-}
-
-CollsionShapeDesc CollsionShapeDesc::createCylinderBottomAligned(float height, float radius, transf3d offset)
-{
-	offset.p.y += height * 0.5f;
-	return createCylinder(height, radius, offset);
-}
-
-CollsionShapeDesc CollsionShapeDesc::createCone(const float height, const float radius, const transf3d& offset)
-{
-	CollsionShapeDesc r;
-	r.type = type_cone;
-	r.coneHeight = height * offset.s.y;
-	r.coneRadius = radius * offset.s.x0z().hsum() / 2.f;
-	r.offset = transf3d(offset.p, offset.r, vec3f(1.f));
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createConvexPoly(std::vector<vec3f> verts, std::vector<int> indices)
-{
-	CollsionShapeDesc r;
-	r.type = type_convexPoly;
-
-	r.verticesConvexOrTriMesh = std::move(verts);
-	r.indicesConvexOrTriMesh = std::move(indices);
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createTriMesh(std::vector<vec3f> verts, std::vector<int> indices)
-{
-	CollsionShapeDesc r;
-	r.type = type_triangleMesh;
-
-	r.verticesConvexOrTriMesh = std::move(verts);
-	r.indicesConvexOrTriMesh = std::move(indices);
-
-	return r;
-}
-
-CollsionShapeDesc CollsionShapeDesc::createInfinitePlane(vec3f planeNormal, float planeConstant)
-{
-	CollsionShapeDesc r;
-	r.type = type_infinitePlane;
-
-	r.infinitePlaneNormal = planeNormal;
-	r.infinitePlaneConst = planeConstant;
-
-	return r;
-}
-
-
-//-------------------------------------------------------------------------
-// CollisionShape
-//-------------------------------------------------------------------------
-void CollisionShape::create(const CollsionShapeDesc* shapeDescriptors, const int numShapeDescriptors)
-{
-	destroy();
-	m_desc.clear();
-	m_desc.reserve(numShapeDescriptors);
-
-	for (int t = 0; t < numShapeDescriptors; ++t) {
-		m_desc.push_back(shapeDescriptors[t]);
-	}
-
-	struct CreatedShape {
-		btCollisionShape* shape = nullptr;
-		transf3d offset;
-	};
-
-	std::vector<CreatedShape> createdShapes;
-
-	for (CollsionShapeDesc& desc : m_desc) {
-		CreatedShape createdShape;
-
-		createdShape.offset = desc.offset;
-
-		switch (desc.type) {
-			case CollsionShapeDesc::type_box: {
-				createdShape.shape = new btBoxShape(toBullet(desc.boxHalfDiagonal));
-			} break;
-			case CollsionShapeDesc::type_sphere: {
-				createdShape.shape = new btSphereShape(desc.sphereRadius);
-			} break;
-			case CollsionShapeDesc::type_capsule: {
-				createdShape.shape = new btCapsuleShape(desc.capsuleRadius, desc.capsuleHeight);
-			} break;
-			case CollsionShapeDesc::type_cylinder: {
-				createdShape.shape = new btCylinderShape(toBullet(desc.cylinderHalfDiagonal));
-			} break;
-			case CollsionShapeDesc::type_cone: {
-				createdShape.shape = new btConeShape(desc.coneRadius, desc.coneHeight);
-			} break;
-			case CollsionShapeDesc::type_convexPoly: {
-				createdShape.shape = new btConvexHullShape((float*)desc.verticesConvexOrTriMesh.data(),
-				                                           int(desc.verticesConvexOrTriMesh.size()), sizeof(vec3f));
-
-				// Caution: [CONVEX_HULLS_TRIANGLE_USER_DATA]
-				// The user point here specifies the triangle mesh used
-				// to create the convexhull. Bullet doesn't provide a way to store the triangles inside btConvexHullShape
-				// however these triangles are needed for the navmesh building.
-				createdShape.shape->setUserPointer(&desc);
-			} break;
-			case CollsionShapeDesc::type_triangleMesh: {
-				btTriangleMesh* triMesh = new btTriangleMesh(true, false);
-				m_triangleMeshes.push_back(std::make_unique<btTriangleMesh>(triMesh));
-
-				const int numTriangles = int(desc.indicesConvexOrTriMesh.size()) / 3;
-
-				for (int t = 0; t < numTriangles; ++t) {
-					const int i0 = desc.indicesConvexOrTriMesh[t * 3 + 0];
-					const int i1 = desc.indicesConvexOrTriMesh[t * 3 + 1];
-					const int i2 = desc.indicesConvexOrTriMesh[t * 3 + 2];
-
-					const btVector3 v0 = toBullet(desc.verticesConvexOrTriMesh[i0]);
-					const btVector3 v1 = toBullet(desc.verticesConvexOrTriMesh[i1]);
-					const btVector3 v2 = toBullet(desc.verticesConvexOrTriMesh[i2]);
-
-					triMesh->addTriangle(v0, v1, v2, true);
-				}
-
-				createdShape.shape = new btBvhTriangleMeshShape(triMesh, true);
-
-			} break;
-			case CollsionShapeDesc::type_infinitePlane: {
-				createdShape.shape = new btStaticPlaneShape(toBullet(desc.infinitePlaneNormal), desc.infinitePlaneConst);
-			}
-
-			default: {
-				sgeAssert("Collision Shape Type not implemented");
-			};
-		}
-
-		if (createdShape.shape != nullptr) {
-			createdShapes.push_back(createdShape);
-		}
-	}
-
-	// Shortcut for simple collision shape (which is the common case).
-	if (createdShapes.size() == 1) {
-		if (createdShapes[0].offset == transf3d()) {
-			m_btShape.reset(createdShapes[0].shape);
-		}
-		else {
-			btCompoundShape* const compound = new btCompoundShape();
-			compound->addChildShape(toBullet(createdShapes[0].offset), createdShapes[0].shape);
-			m_btShape.reset(compound);
-		}
-	}
-	else {
-		btCompoundShape* const compound = new btCompoundShape();
-		for (const CreatedShape& shape : createdShapes) {
-			btTransform localTransform = toBullet(shape.offset);
-			compound->addChildShape(localTransform, shape.shape);
-		}
-
-		m_btShape.reset(compound);
-	}
+	return !(b == s);
 }
 
 //-------------------------------------------------------------------------
@@ -404,7 +55,6 @@ void SgeCustomMoutionState::setWorldTransform(const btTransform& UNUSED(centerOf
 #endif
 	}
 }
-
 
 //-------------------------------------------------------------------------
 // RigidBody
@@ -469,9 +119,14 @@ void RigidBody::createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs
 	ghostBullet->setCollisionShape(m_collisionShape->getBulletShape());
 	m_collisionObject.reset(ghostBullet);
 
+
+	m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+
 	if (noResponse) {
 		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
+
+	//btGhostPairCallback;
 
 	this->actor = actor;
 	m_collisionObject->setUserPointer(static_cast<RigidBody*>(this));
@@ -769,26 +424,6 @@ transf3d RigidBody::getTransformAndScaling() const
 	return tr;
 }
 
-bool operator==(const btVector3& b, const vec3f& s)
-{
-	return b.x() == s.x && b.y() == s.y && b.z() == s.z;
-}
-
-bool operator!=(const btVector3& b, const vec3f& s)
-{
-	return !(b == s);
-}
-
-bool operator==(const btQuaternion& b, const quatf& s)
-{
-	return b.x() == s.x && b.y() == s.y && b.z() == s.z && b.w() == s.w;
-}
-
-bool operator!=(const btQuaternion& b, const quatf& s)
-{
-	return !(b == s);
-}
-
 void RigidBody::setTransformAndScaling(const transf3d& tr, bool killVelocity)
 {
 	if (m_collisionObject == nullptr) {
@@ -934,5 +569,6 @@ const btCollisionObject* getOtherBodyFromManifold(const btPersistentManifold* co
 		*youIdx = -1;
 	return nullptr;
 }
+
 
 } // namespace sge

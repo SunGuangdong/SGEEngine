@@ -1,27 +1,31 @@
-#include "GameWorld.h"
-#include "EngineGlobal.h"
-#include "GameInspector.h"
-#include "GameSerialization.h"
-#include "IWorldScript.h"
-#include "InspectorCmd.h"
+#include "sge_engine/GameWorld.h"
 #include "sge_core/ICore.h"
 #include "sge_core/typelib/MemberChain.h"
+#include "sge_engine/EngineGlobal.h"
+#include "sge_engine/GameInspector.h"
+#include "sge_engine/GameSerialization.h"
+#include "sge_engine/IWorldScript.h"
+#include "sge_engine/InspectorCmd.h"
+#include "sge_engine/InspectorCmds.h"
+#include "sge_engine/physics/RigidBody.h"
+#include "sge_engine/traits/TraitCamera.h"
 #include "sge_utils/text/format.h"
 #include "sge_utils/time/Timer.h"
-#include "traits/TraitCamera.h"
-#include "sge_engine/InspectorCmds.h"
+
 #include <functional>
 #include <thread>
 
 namespace sge {
 
-ObjectId GameWorld::getNewId() {
+ObjectId GameWorld::getNewId()
+{
 	ObjectId id(m_nextObjectId);
 	m_nextObjectId++;
 	return id;
 }
 
-bool GameWorld::isIdTaken(ObjectId const id) const {
+bool GameWorld::isIdTaken(ObjectId const id) const
+{
 	bool result = false;
 	iterateOverPlayingObjects(
 	    [&](const GameObject* obj) -> bool {
@@ -38,7 +42,8 @@ bool GameWorld::isIdTaken(ObjectId const id) const {
 	return result;
 }
 
-GameObject* GameWorld::getObjectById(const ObjectId& id) {
+GameObject* GameWorld::getObjectById(const ObjectId& id)
+{
 	const auto& itr = m_gameObjectByIdLUT.find(id);
 	if (itr == m_gameObjectByIdLUT.end()) {
 		return nullptr;
@@ -48,12 +53,14 @@ GameObject* GameWorld::getObjectById(const ObjectId& id) {
 	return gameObject;
 }
 
-Actor* GameWorld::getActorById(const ObjectId& id) {
+Actor* GameWorld::getActorById(const ObjectId& id)
+{
 	GameObject* obj = getObjectById(id);
 	return obj ? obj->getActor() : nullptr;
 }
 
-GameObject* GameWorld::getObjectByName(const char* name) {
+GameObject* GameWorld::getObjectByName(const char* name)
+{
 	GameObject* result = nullptr;
 	iterateOverPlayingObjects(
 	    [&](GameObject* obj) -> bool {
@@ -69,12 +76,14 @@ GameObject* GameWorld::getObjectByName(const char* name) {
 	return result;
 }
 
-Actor* GameWorld::getActorByName(const char* name) {
+Actor* GameWorld::getActorByName(const char* name)
+{
 	GameObject* obj = getObjectByName(name);
 	return obj ? obj->getActor() : nullptr;
 }
 
-void GameWorld::iterateOverPlayingObjects(const std::function<bool(GameObject*)>& lambda, bool includeAwaitCreationObject) {
+void GameWorld::iterateOverPlayingObjects(const std::function<bool(GameObject*)>& lambda, bool includeAwaitCreationObject)
+{
 	// Caution:
 	// If you do any changes here to them in the const method equivalednt!
 	for (auto& itrActorByType : playingObjects) {
@@ -109,7 +118,8 @@ void GameWorld::iterateOverPlayingObjects(const std::function<bool(GameObject*)>
 	}
 }
 
-void GameWorld::iterateOverPlayingObjects(const std::function<bool(const GameObject*)>& lambda, bool includeAwaitCreationObject) const {
+void GameWorld::iterateOverPlayingObjects(const std::function<bool(const GameObject*)>& lambda, bool includeAwaitCreationObject) const
+{
 	// Caution:
 	// If you do any changes here do them in the non-const method equivalent!
 
@@ -147,7 +157,8 @@ void GameWorld::iterateOverPlayingObjects(const std::function<bool(const GameObj
 
 /// @brief Retrieves a list of all playing object of the specified type. May be nullptr.
 
-const std::vector<GameObject*>* GameWorld::getObjects(TypeId type) const {
+const std::vector<GameObject*>* GameWorld::getObjects(TypeId type) const
+{
 	const auto itr = playingObjects.find(type);
 	if (itr == playingObjects.end()) {
 		return nullptr;
@@ -156,7 +167,8 @@ const std::vector<GameObject*>* GameWorld::getObjects(TypeId type) const {
 	return &itr->second;
 }
 
-GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId, const char* name) {
+GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId, const char* name)
+{
 	// If a specific id is desiered first check if this id is available for use.
 	if (!specificId.isNull()) {
 		if (isIdTaken(specificId)) {
@@ -196,7 +208,8 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 		m_gameObjectByIdLUT[object->getId()] = object;
 
 		return object;
-	} else {
+	}
+	else {
 		sgeAssertFalse(
 		    "It seems that you are trying to allocate an GameObject of incompte type or a type that is not registerered to the typelib(). "
 		    "Check if you've correctly overriden all virtual methods and that you have a reflection for this type,");
@@ -205,7 +218,8 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 	return nullptr;
 }
 
-Actor* GameWorld::allocActor(TypeId const type, ObjectId const specificId, const char* name) {
+Actor* GameWorld::allocActor(TypeId const type, ObjectId const specificId, const char* name)
+{
 	const TypeDesc* const td = typeLib().find(type);
 	if (td == nullptr || td->doesInherits(sgeTypeId(Actor)) == false) {
 		sgeAssert(false && "Trying to alocate an Actor with type which is not an actor!");
@@ -217,17 +231,20 @@ Actor* GameWorld::allocActor(TypeId const type, ObjectId const specificId, const
 	return actor;
 }
 
-void GameWorld::objectDelete(const ObjectId& id) {
+void GameWorld::objectDelete(const ObjectId& id)
+{
 	objectsWantingPermanentKill.add(id);
 }
 
-void GameWorld::create() {
+void GameWorld::create()
+{
 	physicsWorld.create();
 	physicsWorld.dynamicsWorld->setGravity(toBullet(m_defaultGravity));
 	physicsWorld.dynamicsWorld->setDebugDrawer(&m_physicsDebugDraw);
 }
 
-void GameWorld::clear() {
+void GameWorld::clear()
+{
 	m_nextObjectId = 1;
 	for (auto& itrObjByType : playingObjects) {
 		for (int t = 0; t < itrObjByType.second.size(); ++t) {
@@ -288,7 +305,8 @@ void GameWorld::clear() {
 	m_ambientLightFakeDetailAmount = 1.f;
 }
 
-void GameWorld::update(const GameUpdateSets& updateSets) {
+void GameWorld::update(const GameUpdateSets& updateSets)
+{
 	if (debug.forceSleepMs != 0) {
 		std::this_thread::sleep_for(std::chrono::milliseconds(debug.forceSleepMs));
 	}
@@ -363,7 +381,8 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 	// If not paused, then perform the normal physics simulation.
 	if (updateSets.isSimulationPaused()) {
 		physicsWorld.dynamicsWorld->updateAabbs();
-	} else {
+	}
+	else {
 		const int numSubStepsForPhysics = std::max(1, m_physicsSimNumSubSteps);
 		const float physicsSubStepDeltaTime = updateSets.dt / float(numSubStepsForPhysics);
 		physicsWorld.dynamicsWorld->stepSimulation(updateSets.dt, numSubStepsForPhysics, physicsSubStepDeltaTime);
@@ -399,7 +418,8 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 			GameObject* const object = itrActorByType.second[t];
 			if (object != nullptr) {
 				object->update(updateSets);
-			} else {
+			}
+			else {
 				sgeAssertFalse("It is expected that all actors in GameWorld::playingObjects are not nullptr!");
 			}
 		}
@@ -412,7 +432,8 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 			GameObject* const object = itrActorByType.second[t];
 			if (object != nullptr) {
 				object->postUpdate(updateSets);
-			} else {
+			}
+			else {
 				sgeAssertFalse("It is expected that all actors in GameWorld::playingObjects are not nullptr!");
 			}
 		}
@@ -432,13 +453,15 @@ void GameWorld::update(const GameUpdateSets& updateSets) {
 }
 
 // Used for giving object unique names (However the GameWorld still supports objects with same name).
-int GameWorld::getNextNameIndex() {
+int GameWorld::getNextNameIndex()
+{
 	int retval = m_nextNameIndex;
 	m_nextNameIndex++;
 	return retval;
 }
 
-bool GameWorld::setParentOf(ObjectId const childId, ObjectId const newParentId, bool doNotAssert) {
+bool GameWorld::setParentOf(ObjectId const childId, ObjectId const newParentId, bool doNotAssert)
+{
 	// TODO: Circular hierarchy checks.
 	if (childId == newParentId) {
 		return false;
@@ -482,9 +505,11 @@ bool GameWorld::setParentOf(ObjectId const childId, ObjectId const newParentId, 
 	// Attach to the new parent.
 	if (newParentId.isNull()) {
 		child->m_bindingToParentTransform = transf3d::getIdentity();
-	} else {
+	}
+	else {
 		const Actor* const newParent = getActorById(newParentId);
-		if_checked(newParent) {
+		if_checked(newParent)
+		{
 			m_parentOf[childId] = newParentId;
 			m_childernOf[newParentId].add(childId);
 
@@ -498,7 +523,8 @@ bool GameWorld::setParentOf(ObjectId const childId, ObjectId const newParentId, 
 	return false;
 }
 
-ObjectId GameWorld::getParentId(ObjectId const child) const {
+ObjectId GameWorld::getParentId(ObjectId const child) const
+{
 	const auto itr = m_parentOf.find(child);
 	if (itr != m_parentOf.end())
 		return itr->second;
@@ -506,13 +532,15 @@ ObjectId GameWorld::getParentId(ObjectId const child) const {
 	return ObjectId();
 }
 
-Actor* GameWorld::getParentActor(ObjectId const child) {
+Actor* GameWorld::getParentActor(ObjectId const child)
+{
 	ObjectId parentId = getParentId(child);
 	return getActorById(parentId);
 }
 
 /// Returns the root parent (parent of the parent of the parent and so on) of the specified object.
-ObjectId GameWorld::getRootParentId(ObjectId child) const {
+ObjectId GameWorld::getRootParentId(ObjectId child) const
+{
 	ObjectId parentToReturn;
 	while (true) {
 		ObjectId parent = getParentId(child);
@@ -524,7 +552,8 @@ ObjectId GameWorld::getRootParentId(ObjectId child) const {
 	}
 }
 
-const vector_set<ObjectId>* GameWorld::getChildensOf(ObjectId const parent) const {
+const vector_set<ObjectId>* GameWorld::getChildensOf(ObjectId const parent) const
+{
 	const auto itr = m_childernOf.find(parent);
 	if (itr == m_childernOf.end())
 		return nullptr;
@@ -532,7 +561,8 @@ const vector_set<ObjectId>* GameWorld::getChildensOf(ObjectId const parent) cons
 	return &itr->second;
 }
 
-void GameWorld::getAllChildren(vector_set<ObjectId>& result, ObjectId const parent) const {
+void GameWorld::getAllChildren(vector_set<ObjectId>& result, ObjectId const parent) const
+{
 	const auto itr = m_childernOf.find(parent);
 	if (itr == m_childernOf.end()) {
 		return;
@@ -544,7 +574,8 @@ void GameWorld::getAllChildren(vector_set<ObjectId>& result, ObjectId const pare
 	}
 }
 
-void GameWorld::getAllParents(vector_set<ObjectId>& result, ObjectId actorId) const {
+void GameWorld::getAllParents(vector_set<ObjectId>& result, ObjectId actorId) const
+{
 	while (true) {
 		actorId = getParentId(actorId);
 		if (actorId.isNull())
@@ -554,7 +585,8 @@ void GameWorld::getAllParents(vector_set<ObjectId>& result, ObjectId actorId) co
 	}
 }
 
-void GameWorld::getAllRelativesOf(vector_set<ObjectId>& result, ObjectId actorId) const {
+void GameWorld::getAllRelativesOf(vector_set<ObjectId>& result, ObjectId actorId) const
+{
 	// if the list already had the specified actorId keep it, otherwise, remove it,
 	// as it might get added by the other functions.
 	const bool hadInitialActorInitially = result.count(actorId) != 0;
@@ -581,7 +613,8 @@ void GameWorld::getAllRelativesOf(vector_set<ObjectId>& result, ObjectId actorId
 void sge::GameWorld::instantiatePrefab(const char* prefabPath,
                                        bool createHistory,
                                        bool shouldGenerateNewObjectIds,
-                                       const Optional<transf3d>& offsetWorldSpace) {
+                                       const Optional<transf3d>& offsetWorldSpace)
+{
 	GameWorld prefabWorld;
 	if (loadGameWorldFromFile(&prefabWorld, prefabPath)) {
 		instantiatePrefab(prefabWorld, createHistory, shouldGenerateNewObjectIds, nullptr, nullptr, offsetWorldSpace);
@@ -594,13 +627,15 @@ void sge::GameWorld::instantiatePrefab(const char* prefabPath,
 void GameWorld::instantiatePrefabFromJsonString(const char* prefabJson,
                                                 bool createHistory,
                                                 bool shouldGenerateNewObjectIds,
-                                                const Optional<transf3d>& offsetWorldSpace) {
+                                                const Optional<transf3d>& offsetWorldSpace)
+{
 	GameWorld prefabWorld;
 	bool succeeded = loadGameWorldFromString(&prefabWorld, prefabJson);
 
 	if (succeeded) {
 		instantiatePrefab(prefabWorld, createHistory, shouldGenerateNewObjectIds, nullptr, nullptr, offsetWorldSpace);
-	} else {
+	}
+	else {
 		sgeLogError("Failed to instantiage game objects from json describing game world");
 	}
 }
@@ -610,7 +645,8 @@ void sge::GameWorld::instantiatePrefab(const GameWorld& prefabWorld,
                                        bool shouldGenerateNewObjectIds,
                                        const vector_set<ObjectId>* const pOblectsToInstantiate,
                                        vector_set<ObjectId>* const newObjectIds,
-                                       const Optional<transf3d>& offsetWorldSpace) {
+                                       const Optional<transf3d>& offsetWorldSpace)
+{
 	std::vector<GameObject*> createdObjects;
 	std::unordered_map<ObjectId, ObjectId> oldToNew;
 	std::unordered_map<ObjectId, ObjectId> oldParentOf;
@@ -642,7 +678,8 @@ void sge::GameWorld::instantiatePrefab(const GameWorld& prefabWorld,
 			newObjectIds->add(newObject->getId());
 		}
 
-		if_checked(newObject) {
+		if_checked(newObject)
+		{
 			sgeAssert(originalId == prefabObject->getId());
 			oldToNew[originalId] = newObject->getId();
 
@@ -752,13 +789,15 @@ void sge::GameWorld::instantiatePrefab(const GameWorld& prefabWorld,
 
 void GameWorld::createPrefab(GameWorld& prefabWorld,
                              bool shouldKeepOriginalObjectIds,
-                             const vector_set<ObjectId>* const pOblectsToInstantiate) const {
+                             const vector_set<ObjectId>* const pOblectsToInstantiate) const
+{
 	prefabWorld.clear();
 	prefabWorld.create();
 	prefabWorld.instantiatePrefab(*this, false, !shouldKeepOriginalObjectIds, pOblectsToInstantiate);
 }
 
-ArrayView<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(const RigidBody* rb) const {
+ArrayView<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifolds(const RigidBody* rb) const
+{
 	if (rb == nullptr) {
 		return {};
 	}
@@ -772,7 +811,8 @@ ArrayView<const btPersistentManifold* const> sge::GameWorld::getRigidBodyManifol
 }
 
 
-void GameWorld::removeRigidBodyManifold(RigidBody* const rb) {
+void GameWorld::removeRigidBodyManifold(RigidBody* const rb)
+{
 	auto itrFind = m_physicsManifoldList.find(rb);
 	if (itrFind == m_physicsManifoldList.end()) {
 		return;
@@ -805,26 +845,31 @@ void GameWorld::removeRigidBodyManifold(RigidBody* const rb) {
 	m_physicsManifoldList.erase(itrFind);
 }
 
-void GameWorld::addPostSceneTask(IPostSceneUpdateTask* const task) {
+void GameWorld::addPostSceneTask(IPostSceneUpdateTask* const task)
+{
 	if (task) {
 		m_postSceneUpdateTasks.emplace_back(task);
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 }
 
-void GameWorld::addPostSceneTaskLoadWorldFormFile(const char* filename) {
+void GameWorld::addPostSceneTaskLoadWorldFormFile(const char* filename)
+{
 	PostSceneUpdateTaskLoadWorldFormFile* task = new PostSceneUpdateTaskLoadWorldFormFile(filename, true);
 	addPostSceneTask(task);
 }
 
 
-void GameWorld::setDefaultGravity(const vec3f& gravity) {
+void GameWorld::setDefaultGravity(const vec3f& gravity)
+{
 	physicsWorld.dynamicsWorld->setGravity(toBullet(gravity));
 	m_defaultGravity = gravity;
 }
 
-ICamera* GameWorld::getRenderCamera() {
+ICamera* GameWorld::getRenderCamera()
+{
 	if (m_useEditorCamera) {
 		return &m_editorCamera;
 	}

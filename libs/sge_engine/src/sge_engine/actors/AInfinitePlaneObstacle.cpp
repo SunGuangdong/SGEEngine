@@ -1,5 +1,5 @@
 #include "AInfinitePlaneObstacle.h"
-#include "sge_engine/Physics.h"
+#include "sge_engine/physics/CollisionShape.h"
 
 namespace sge {
 // clang-format off
@@ -13,11 +13,13 @@ ReflBlock()
 }
 // clang-format on
 
-AABox3f AInfinitePlaneObstacle::getBBoxOS() const {
+AABox3f AInfinitePlaneObstacle::getBBoxOS() const
+{
 	return AABox3f();
 }
 
-void AInfinitePlaneObstacle::create() {
+void AInfinitePlaneObstacle::create()
+{
 	registerTrait(ttRigidBody);
 	ttRigidBody.getRigidBody()->create(this, CollsionShapeDesc::createInfinitePlane(vec3f::axis_y(), 0.f), 0.f, false);
 
@@ -26,7 +28,8 @@ void AInfinitePlaneObstacle::create() {
 	rbPropConfig.dontShowDynamicProperties = true;
 }
 
-void AInfinitePlaneObstacle::onPlayStateChanged(bool const isStartingToPlay) {
+void AInfinitePlaneObstacle::onPlayStateChanged(bool const isStartingToPlay)
+{
 	Actor::onPlayStateChanged(isStartingToPlay);
 
 	if (isStartingToPlay) {

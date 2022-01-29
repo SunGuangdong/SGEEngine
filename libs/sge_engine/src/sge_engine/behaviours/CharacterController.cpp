@@ -2,14 +2,15 @@
 #include "sge_core/ICore.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/GameWorld.h"
-#include "sge_engine/Physics.h"
-#include "sge_engine/PhysicsHelpers.h"
+#include "sge_engine/physics/BulletHelper.h"
+#include "sge_engine/physics/RigidBody.h"
 #include "sge_engine/traits/TraitRigidBody.h"
 #include "sge_utils/containers/StaticArray.h"
 
 namespace sge {
 
-inline float speedLerp2(const float& a, const float& b, const float speed, const float epsilon = 1e-6f) {
+inline float speedLerp2(const float& a, const float& b, const float speed, const float epsilon = 1e-6f)
+{
 	float const diff = b - a;
 	float const fabsfDiff = fabsf(diff);
 
@@ -30,7 +31,8 @@ inline float speedLerp2(const float& a, const float& b, const float speed, const
 
 struct AInvisibleRigidObstacle;
 
-CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, const CharacterCtrlInput& input) {
+CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, const CharacterCtrlInput& input)
+{
 	const float kAllowedJumpTimeDelay = 0.1f; // The time we allow the player jump even if he is no longer on a walkable land.
 
 	GameWorld* const world = m_actor->getWorld();
@@ -47,7 +49,8 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 		float rotationSpeed = deg2rad(480.f) + deg2rad(480.f) * (1.f - k);
 		outcome.facingDir =
 		    rotateTowards(input.facingDir, m_targetFacingDir, updateSets.dt * rotationSpeed, vec3f(0.f, 1.f, 0.f)).normalized();
-	} else {
+	}
+	else {
 		outcome.facingDir = m_targetFacingDir;
 	}
 
@@ -56,7 +59,8 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 	if (walkDirInputMagnitude > 1e-3f) {
 		float k = pow((dot(outcome.facingDir, input.walkDir / walkDirInputMagnitude) + 1.f) * 0.5f, 5.f);
 		m_walkDirSmoothAccumulator = normalized(k * outcome.facingDir + (1.f - k) * input.walkDir);
-	} else {
+	}
+	else {
 		m_walkDirSmoothAccumulator = vec3f(0.f);
 	}
 
@@ -136,7 +140,8 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 	if (isGroundSlopeClimbable) {
 		m_timeInAir = 0.f;
 		// m_jumpCounter = 0;
-	} else {
+	}
+	else {
 		m_timeInAir += updateSets.dt;
 	}
 
@@ -172,7 +177,7 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 
 		sgeAssert(walkDirProjectedOnGround.hasNan() == false);
 
-#if 1
+	#if 1
 		walkDirProjectedOnGround *= walkDirInputMagnitude;
 
 		// TODO: move the a cfg variable.
@@ -199,7 +204,7 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 		velocityToApply +=
 		    walkDirProjectedOnGround * speedLerp2(initialSpeedAlongMovementVector, targetSpeed, velocityChangeSpeed * updateSets.dt);
 		sgeAssert(!velocityToApply.hasNan());
-#else
+	#else
 		// float initialSpeedAlongMovementVector = maxOf(0.f,  dot(walkDirProjectedOnGround.normalized0(), initalLinearVelocty));
 		float maxSpeed = 8.f;
 		float timeToMaxSpeed = 0.5f;
@@ -213,8 +218,9 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 		velocityToApply.z -= sign(initalLinearVelocty.z) * sqr(initalLinearVelocty.z) * drag * updateSets.dt * 0.5f;
 
 
-#endif
-	} else {
+	#endif
+	}
+	else {
 		// Handle minimal jump height.
 		if (isJumping() && input.isJumpBtnReleased) {
 			if (initalLinearVelocty.y > m_cfg.minJumpVelocity) {
@@ -243,7 +249,8 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 
 		if (!isGroundSlopeClimbable || isJumping()) {
 			myRigidBody->getRigidBody()->setGravity(vec3f(0, -gravity, 0));
-		} else {
+		}
+		else {
 			if (isGroundSlopeClimbable) {
 				myRigidBody->getRigidBody()->setGravity(groundNormal * -3.f * m_cfg.fallingGravity);
 			}

@@ -1,19 +1,19 @@
 #include "PlantingTool.h"
 #include "GameInspector.h"
-#include "Physics.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/application/input.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
-#include "sge_engine/PhysicsHelpers.h"
-#include "sge_engine/traits/TraitCamera.h"
 #include "sge_engine/InspectorCmds.h"
+#include "sge_engine/physics/PhysicsWorldQuery.h"
+#include "sge_engine/traits/TraitCamera.h"
 
 namespace sge {
 
 struct AInvisibleRigidObstacle;
 
-void PlantingTool::setup(Actor* actorToPlant) {
+void PlantingTool::setup(Actor* actorToPlant)
+{
 	if (actorToPlant == nullptr)
 		return;
 
@@ -22,7 +22,8 @@ void PlantingTool::setup(Actor* actorToPlant) {
 	setup(a, *actorToPlant->getWorld());
 }
 
-void PlantingTool::setup(const vector_set<ObjectId>& actorsToPlant, GameWorld& world) {
+void PlantingTool::setup(const vector_set<ObjectId>& actorsToPlant, GameWorld& world)
+{
 	actorsToPlantOriginalTrasnforms.clear();
 	actorsToIgnorePhysicsHits.clear();
 
@@ -38,16 +39,17 @@ void PlantingTool::setup(const vector_set<ObjectId>& actorsToPlant, GameWorld& w
 	}
 }
 
-void PlantingTool::onSetActive(GameInspector* const UNUSED(inspector)) {
+void PlantingTool::onSetActive(GameInspector* const UNUSED(inspector))
+{
 }
 
-void PlantingTool::onUI(GameInspector* UNUSED(inspector)) {
+void PlantingTool::onUI(GameInspector* UNUSED(inspector))
+{
 }
 
-InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
-                                             bool isAllowedToTakeInput,
-                                             const InputState& is,
-                                             const GameDrawSets& drawSets) {
+InspectorToolResult
+    PlantingTool::updateTool(GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
+{
 	InspectorToolResult result;
 
 	// Compute the picking ray.
@@ -110,8 +112,8 @@ InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
 				primaryActorNewTransf.p -= hitNormal * bbox.min.y;
 			}
 		}
-
-	} else {
+	}
+	else {
 		// intersect with the "grid" plane witch is looking towards Y+ from (0,0,0).
 		const Plane p = Plane::FromPosAndDir(vec3f(0.f), vec3f::axis_y());
 		const float hitDistance = intersectRayPlane(pickRay.pos, pickRay.dir, p.norm(), p.d());
@@ -119,7 +121,8 @@ InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
 		if (hitDistance != FLT_MAX) {
 			if (hitDistance > 0.f) {
 				primaryActorNewTransf.p = pickRay.Sample(hitDistance);
-			} else {
+			}
+			else {
 				// A bit a of strage solution but here me out:
 				// if the hit distance is negative, this means that the camera is not looking towards
 				// the plane, meaning that the hit is behind the camera.
@@ -168,7 +171,8 @@ InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
 		result.propagateInput = false;
 		result.isDone = true;
 		return result;
-	} else {
+	}
+	else {
 		for (auto pair : actorsToPlantOriginalTrasnforms) {
 			Actor* actor = world->getActorById(pair.key());
 			if (actor) {
@@ -182,10 +186,12 @@ InspectorToolResult PlantingTool::updateTool(GameInspector* const inspector,
 	return result;
 }
 
-void PlantingTool::onCancel(GameInspector* UNUSED(inspector)) {
+void PlantingTool::onCancel(GameInspector* UNUSED(inspector))
+{
 }
 
-void PlantingTool::drawOverlay(const GameDrawSets& UNUSED(drawSets)) {
+void PlantingTool::drawOverlay(const GameDrawSets& UNUSED(drawSets))
+{
 }
 
 } // namespace sge

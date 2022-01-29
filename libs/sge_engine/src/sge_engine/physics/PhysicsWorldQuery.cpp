@@ -1,8 +1,36 @@
-#include "PhysicsHelpers.h"
+#include "PhysicsWorldQuery.h"
+#include "BulletHelper.h"
+#include "PhysicsWorld.h"
+#include "RigidBody.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/traits/TraitRigidBody.h"
+#include "sge_utils/containers/vector_set.h"
 
 namespace sge {
+
+void PhysicsWorldQuery::rayTest(PhysicsWorld& physWorld,
+                                const vec3f& from,
+                                const vec3f& to,
+                                std::function<void(btDynamicsWorld::LocalRayResult&)> lambda)
+{
+	struct RayCallback : public btDynamicsWorld::RayResultCallback {
+		RayCallback(std::function<void(btDynamicsWorld::LocalRayResult&)>& lambda)
+		    : lambda(lambda)
+		{
+		}
+
+		std::function<void(btDynamicsWorld::LocalRayResult&)>& lambda;
+
+		btScalar addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool UNUSED(normalInWorldSpace)) override
+		{
+			lambda(rayResult);
+			return rayResult.m_hitFraction;
+		}
+	};
+
+	RayCallback rayCB(lambda);
+	physWorld.dynamicsWorld->rayTest(toBullet(from), toBullet(to), rayCB);
+}
 
 //-------------------------------------------------------------------------
 // RayResultCollisionObject
@@ -90,7 +118,7 @@ btScalar RayResultActor::addSingleResult(btDynamicsWorld::LocalRayResult& rayRes
 void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* const rootActor)
 {
 	GameWorld& world = *rootActor->getWorld();
-	vector_set<const RigidBody*> processedRigidBodies;
+	vector_set<const RigidBody*> processedRigidBodies; // TODO: make this an input to avoid allocating on every frame when it is used.
 
 	std::function<void(const RigidBody*, bool)> processManifolds = [&](const RigidBody* const rbContactsToProcess,
 	                                                                   bool parentIgnoreRotation) -> void {
@@ -183,5 +211,6 @@ void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* c
 		}
 	}
 }
+
 
 } // namespace sge

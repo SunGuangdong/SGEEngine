@@ -2,13 +2,14 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_core/model/EvaluatedModel.h"
-#include "sge_engine/Physics.h"
+#include "sge_engine/physics/CollisionShape.h"
 #include "sge_engine/traits/TraitModel.h"
 
 
 namespace sge {
 
-bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, const EvaluatedModel& evaluatedMode) {
+bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, const EvaluatedModel& evaluatedMode)
+{
 	const Model* const model = evaluatedMode.m_model;
 	if (model == nullptr) {
 		return false;
@@ -68,7 +69,8 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 	return true;
 }
 
-bool addCollisionShapeBasedOnModelRenderGeom(std::vector<CollsionShapeDesc>& shapeDescs, const EvaluatedModel& evaluatedModel) {
+bool addCollisionShapeBasedOnModelRenderGeom(std::vector<CollsionShapeDesc>& shapeDescs, const EvaluatedModel& evaluatedModel)
+{
 	std::vector<vec3f> triangleList;
 	std::vector<int> triangleIndices;
 
@@ -100,7 +102,8 @@ bool addCollisionShapeBasedOnModelRenderGeom(std::vector<CollsionShapeDesc>& sha
 						vertIdx[0] = ((unsigned*)(indexBuffer))[iTri * 3 + 0];
 						vertIdx[1] = ((unsigned*)(indexBuffer))[iTri * 3 + 1];
 						vertIdx[2] = ((unsigned*)(indexBuffer))[iTri * 3 + 2];
-					} else {
+					}
+					else {
 						vertIdx[0] = iTri * 3 + 0;
 						vertIdx[1] = iTri * 3 + 1;
 						vertIdx[2] = iTri * 3 + 2;
@@ -145,7 +148,8 @@ bool addCollisionShapeBasedOnModelRenderGeom(std::vector<CollsionShapeDesc>& sha
 	return false;
 }
 
-bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, const char* modelAssetPath) {
+bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, const char* modelAssetPath)
+{
 	AssetPtr modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelAssetPath);
 	if (!isAssetLoaded(modelAsset, assetIface_model3d)) {
 		return false;
@@ -154,7 +158,8 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 	return addCollisionShapeBasedOnModel(shapeDescs, getLoadedAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval());
 }
 
-bool addCollisionShapeBasedOnTraitModel(std::vector<CollsionShapeDesc>& shapeDescs, TraitModel& traitModel) {
+bool addCollisionShapeBasedOnTraitModel(std::vector<CollsionShapeDesc>& shapeDescs, TraitModel& traitModel)
+{
 	bool hadShapes = false;
 	for (ModelEntry& mdlSets : traitModel.m_models) {
 		if (AssetIface_Model3D* mdlIface = mdlSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>()) {

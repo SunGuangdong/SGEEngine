@@ -10,7 +10,7 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/InspectorCmds.h"
-#include "sge_engine/PhysicsHelpers.h"
+#include "sge_engine/physics/PhysicsWorldQuery.h"
 #include "sge_engine/traits/TraitRigidBody.h"
 #include "sge_engine/typelibHelper.h"
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
@@ -78,17 +78,20 @@ ReflBlock() {
 //--------------------------------------------------------
 struct TimelineWindow final : public IImGuiWindow {
 	TimelineWindow(std::string windowName, ATimeline* const timeline)
-	    : m_windowName(std::move(windowName)) {
+	    : m_windowName(std::move(windowName))
+	{
 		if (timeline) {
 			timelineActorId = timeline->getId();
 		}
 	}
 
-	bool isClosed() override {
+	bool isClosed() override
+	{
 		return !m_isOpened;
 	}
 	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
-	const char* getWindowName() const override {
+	const char* getWindowName() const override
+	{
 		return m_windowName.c_str();
 	}
 
@@ -107,7 +110,8 @@ struct TimelineWindow final : public IImGuiWindow {
 };
 
 
-void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
+void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+{
 	if (isClosed()) {
 		return;
 	}
@@ -297,7 +301,8 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 			}
 
 			ImGui::EndPopup();
-		} else {
+		}
+		else {
 			m_lastRightClickedFrame = -1;
 		}
 
@@ -313,11 +318,13 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 //--------------------------------------------------------
 // ATimeline
 //--------------------------------------------------------
-AABox3f ATimeline::getBBoxOS() const {
+AABox3f ATimeline::getBBoxOS() const
+{
 	return AABox3f();
 }
 
-void ATimeline::create() {
+void ATimeline::create()
+{
 	registerTrait(*(IActorCustomAttributeEditorTrait*)this);
 	registerTrait(ttViewportIcon);
 
@@ -325,7 +332,8 @@ void ATimeline::create() {
 }
 
 
-void ATimeline::postUpdate(const GameUpdateSets& u) {
+void ATimeline::postUpdate(const GameUpdateSets& u)
+{
 	const float frameLengthSeconds = 1.f / framesPerSecond;
 
 	if (keyFrames.size() == 0) {
@@ -352,11 +360,13 @@ void ATimeline::postUpdate(const GameUpdateSets& u) {
 	if (m_gameplayEvalTime > totalAnimLength) {
 		if (playbackMethod == playbackMethod_reset) {
 			m_gameplayEvalTime -= std::floor(m_gameplayEvalTime / totalAnimLength) * totalAnimLength;
-		} else if (playbackMethod == playbackMethod_flipflop) {
+		}
+		else if (playbackMethod == playbackMethod_flipflop) {
 			m_gameplayEvalTime =
 			    totalAnimLength - (m_gameplayEvalTime - std::floor(m_gameplayEvalTime / totalAnimLength) * totalAnimLength);
 			flipFlopDir *= -1.f;
-		} else {
+		}
+		else {
 			// Assume stop.
 			m_gameplayEvalTime = totalAnimLength;
 		}
@@ -454,7 +464,8 @@ void ATimeline::postUpdate(const GameUpdateSets& u) {
 								transf3d newActorTform = pair.key()->getTransform();
 								if (applyRotation) {
 									newActorTform = diffTransform * newActorTform;
-								} else {
+								}
+								else {
 									newActorTform.p = (diffTransform * newActorTform).p;
 								}
 
@@ -474,7 +485,8 @@ void ATimeline::postUpdate(const GameUpdateSets& u) {
 	}
 }
 
-void ATimeline::doAttributeEditor(GameInspector* inspector) {
+void ATimeline::doAttributeEditor(GameInspector* inspector)
+{
 	MemberChain chain;
 
 	chain.add(typeLib().findMember(&ATimeline::m_isEnabled));
@@ -503,7 +515,8 @@ void ATimeline::doAttributeEditor(GameInspector* inspector) {
 		IImGuiWindow* wnd = getEngineGlobal()->findWindowByName(windowName.c_str());
 		if (wnd) {
 			ImGui::SetWindowFocus(wnd->getWindowName());
-		} else {
+		}
+		else {
 			getEngineGlobal()->addWindow(new TimelineWindow(windowName.c_str(), this));
 		}
 	}

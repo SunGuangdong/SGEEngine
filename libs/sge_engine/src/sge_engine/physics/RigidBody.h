@@ -1,10 +1,7 @@
 #pragma once
 
-#include <functional>
-#include <memory>
-#include <vector>
-
-#include "sge_core/model/Model.h"
+#include "BulletHelper.h"
+#include "CollisionShape.h"
 #include "sge_engine/sge_engine_api.h"
 #include "sge_utils/math/Box.h"
 #include "sge_utils/math/transform.h"
@@ -17,175 +14,13 @@ SGE_NO_WARN_BEGIN
 #include <btBulletDynamicsCommon.h>
 SGE_NO_WARN_END
 
+#include <memory>
 
 namespace sge {
 
 struct Actor;
-struct RigidBody;
-
-inline btVector3 toBullet(const vec3f& v)
-{
-	return btVector3(v.x, v.y, v.z);
-}
-
-inline vec3f fromBullet(const btVector3& bt)
-{
-	return vec3f(bt.x(), bt.y(), bt.z());
-}
-
-inline btQuaternion toBullet(const quatf v)
-{
-	return btQuaternion(v.x, v.y, v.z, v.w);
-}
-
-inline quatf fromBullet(const btQuaternion& bt)
-{
-	return quatf(bt.x(), bt.y(), bt.z(), bt.w());
-}
-
-inline btTransform toBullet(const transf3d& tr)
-{
-	return btTransform(toBullet(tr.r), toBullet(tr.p));
-}
-
-/// Caution:
-/// Scaling in bullet is applied on the rigid body itself, it's not part of the transform!
-inline transf3d fromBullet(const btTransform& btTr)
-{
-	btVector3 const btP = btTr.getOrigin();
-	btQuaternion btR;
-	btTr.getBasis().getRotation(btR);
-
-	const transf3d res = transf3d(fromBullet(btP), fromBullet(btR), vec3f(1.f));
-	return res;
-}
-
-/// PhysicsWorld
-/// A wrapper around the physics world of the engine that is doing the actual simulation of the object.
-/// CAUTION: Do not forget to update the destroy() method!!!
-struct SGE_ENGINE_API PhysicsWorld {
-	PhysicsWorld() = default;
-	~PhysicsWorld()
-	{
-		destroy();
-	}
-
-	void create();
-	void destroy();
-
-	void addPhysicsObject(RigidBody& obj);
-	void removePhysicsObject(RigidBody& obj);
-
-	/// @brief Changes the default gravity of the world and applies the new gravity to all non-static rigid bodies.
-	void setGravity(const vec3f& gravity);
-
-	/// @brief Retrieves the default gravity in the scene.
-	vec3f getGravity() const;
-
-	void rayTest(const vec3f& from, const vec3f& to, std::function<void(btDynamicsWorld::LocalRayResult&)> cb);
-
-	// static void dispacherNearCallback(btBroadphasePair& collisionPair, btCollisionDispatcher& dispatcher, const btDispatcherInfo&
-	// dispatchInfo);
-  public:
-	std::unique_ptr<btDiscreteDynamicsWorld> dynamicsWorld;
-	std::unique_ptr<btBroadphaseInterface> broadphase;
-	std::unique_ptr<btDefaultCollisionConfiguration> collisionConfiguration;
-	std::unique_ptr<btCollisionDispatcher> dispatcher;
-	std::unique_ptr<btSequentialImpulseConstraintSolver> solver;
-};
-
-/// CollsionShapeDesc
-/// @brief This structures stores the information about how to create a single collision shape.
-/// Rigid Bodies (or Collision Shapes) might accept multiple descriptions to create compound collision shapes.
-struct SGE_ENGINE_API CollsionShapeDesc {
-	enum Type : int {
-		type_box,
-		type_sphere,
-		type_capsule,
-		type_cylinder,
-		type_cone,
-		type_convexPoly,
-		type_triangleMesh,
-		type_infinitePlane,
-	};
-
-	CollsionShapeDesc() = default;
-
-	static CollsionShapeDesc createBox(const vec3f& halfDiagonal, const transf3d& offset = transf3d());
-	static CollsionShapeDesc createBox(const AABox3f& box);
-	static CollsionShapeDesc createSphere(const float radius, const transf3d& offset = transf3d());
-	static CollsionShapeDesc createCapsule(const float height, const float radius, const transf3d& offset = transf3d());
-	static CollsionShapeDesc createCylinder(const vec3f& halfDiagonal, const transf3d& offset = transf3d());
-	static CollsionShapeDesc createCylinder(float height, float radius, const transf3d& offset = transf3d());
-	static CollsionShapeDesc createCylinderBottomAligned(float height, float radius, transf3d offset = transf3d());
-	static CollsionShapeDesc createCone(const float height, const float radius, const transf3d& offset = transf3d());
-	static CollsionShapeDesc createConvexPoly(std::vector<vec3f> verts, std::vector<int> indices);
-	static CollsionShapeDesc createTriMesh(std::vector<vec3f> verts, std::vector<int> indices);
-
-	/// @brief Create an infinite plane rigid body. The body is defined with the canonical plane formula:
-	/// Ax + By + Cz + D = 0, where (A,B,C) are the normal of the plane and D is the constant of the plane.
-	static CollsionShapeDesc createInfinitePlane(vec3f planeNormal, float planeConstant);
-
-  public:
-	Type type = type_box;
-	transf3d offset;
-
-	// Boxes.
-	vec3f boxHalfDiagonal = vec3f(0.5f);
-	// Spheres.
-	float sphereRadius = 0.5f;
-	// Capsules.
-	float capsuleHeight = 0.5f;
-	float capsuleRadius = 0.25f;
-	// Cylinder.
-	vec3f cylinderHalfDiagonal = vec3f(0.5f);
-	// Cone.
-	float coneHeight = 1.f;
-	float coneRadius = 0.5f;
-	// Convex or Triangle meshes.
-	std::vector<vec3f> verticesConvexOrTriMesh;
-	std::vector<int> indicesConvexOrTriMesh;
-	// Infinite Plane.
-	vec3f infinitePlaneNormal = vec3f::axis_y();
-	float infinitePlaneConst = 0.f;
-};
-
-/// CollisionShape
-/// Represents a collision shape for a rigid body.
-/// Do not share it between multiple rigid bodies, as this is possible but not supported by our wrappers yet!
-struct SGE_ENGINE_API CollisionShape {
-	CollisionShape() = default;
-	~CollisionShape()
-	{
-		destroy();
-	}
-
-	void create(const CollsionShapeDesc* desc, const int numDesc);
-	void destroy()
-	{
-		m_triangleMeshes.clear();
-		m_btShape.reset(nullptr);
-		m_desc.clear();
-	}
-
-	btCollisionShape* getBulletShape()
-	{
-		return m_btShape.get();
-	}
-	const btCollisionShape* getBulletShape() const
-	{
-		return m_btShape.get();
-	}
-
-  private:
-	std::vector<CollsionShapeDesc> m_desc;
-
-	// The main shape used to be attached to the bullet rigid body.
-	std::unique_ptr<btCollisionShape> m_btShape;
-
-	// In case the collision shape is represented by concave triangle mesh, this object stores the actual triangles used by bullet physics.
-	std::vector<std::unique_ptr<btTriangleMesh>> m_triangleMeshes;
-};
+struct CollsionShapeDesc;
+struct CollisionShape;
 
 /// SgeCustomMoutionState
 /// A helper class used to communicate with the physics engine about the location of collsion objects.
@@ -245,7 +80,6 @@ struct SGE_ENGINE_API RigidBody {
 	void create(Actor* const actor, CollisionShape* collisionShapeToBeOwned, float const mass, bool noResponce);
 	void create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce);
 	void create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce);
-
 
 	void createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs, bool noResponse);
 
@@ -467,30 +301,6 @@ SGE_ENGINE_API const btCollisionObject*
 SGE_ENGINE_API const Actor*
     getOtherBodyFromManifold(const Actor* const you, const btPersistentManifold* const manifold, int* youIdx = nullptr);
 
-/// Caution:
-/// As by default Bullet Physics is built with no RTTI support we cannot use dynamic cast.
-/// In order to determine the shape of the object we need to use the enum specifying the type of the shape.
-template <typename T>
-T* btCollisionShapeCast(btCollisionShape* const shape, const BroadphaseNativeTypes type)
-{
-	if (shape && shape->getShapeType() == type) {
-		return static_cast<T*>(shape);
-	}
 
-	return nullptr;
-}
 
-/// Caution:
-/// As by default Bullet Physics is built with no RTTI support we cannot use dynamic cast.
-/// In order to determin the shape of the object we need to use the enum specifying the type of the shape.
-template <typename T>
-const T* btCollisionShapeCast(const btCollisionShape* const shape, const BroadphaseNativeTypes type)
-{
-	if (shape && shape->getShapeType() == type) {
-		return static_cast<const T*>(shape);
-	}
-
-	return nullptr;
-}
-
-}; // namespace sge
+} // namespace sge

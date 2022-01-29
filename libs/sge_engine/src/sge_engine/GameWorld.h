@@ -7,13 +7,13 @@
 
 #include "Actor.h"
 #include "EditorCamera.h"
-#include "PhysicsDebugDraw.h"
 #include "sge_core/application/input.h"
-#include "sge_engine/Physics.h"
+#include "sge_engine/physics/PhysicsDebugDraw.h"
+#include "sge_engine/physics/PhysicsWorld.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/react/Event.h"
 #include "sge_utils/containers/ArrayView.h"
 #include "sge_utils/containers/vector_set.h"
+#include "sge_utils/react/Event.h"
 
 namespace sge {
 
@@ -36,7 +36,8 @@ struct SGE_ENGINE_API PostSceneUpdateTaskSetWorldState final : public IPostScene
 	PostSceneUpdateTaskSetWorldState() = default;
 	PostSceneUpdateTaskSetWorldState(std::string json, bool noPauseNoEditorCamera)
 	    : newWorldStateJson(std::move(json))
-	    , noPauseNoEditorCamera(noPauseNoEditorCamera) {
+	    , noPauseNoEditorCamera(noPauseNoEditorCamera)
+	{
 	}
 
 	std::string newWorldStateJson;
@@ -47,7 +48,8 @@ struct SGE_ENGINE_API PostSceneUpdateTaskLoadWorldFormFile final : public IPostS
 	PostSceneUpdateTaskLoadWorldFormFile() = default;
 	PostSceneUpdateTaskLoadWorldFormFile(std::string filename, bool noPauseNoEditorCamera)
 	    : filename(std::move(filename))
-	    , noPauseNoEditorCamera(noPauseNoEditorCamera) {
+	    , noPauseNoEditorCamera(noPauseNoEditorCamera)
+	{
 	}
 
 	std::string filename;
@@ -62,16 +64,19 @@ struct GameUpdateSets {
 	GameUpdateSets(float dt, bool isPaused, InputState is)
 	    : dt(dt)
 	    , isSimPaused(isPaused)
-	    , is(is) {
+	    , is(is)
+	{
 	}
 
 	/// @brief Returns true if the game is paused for some reason.
-	bool isSimulationPaused() const {
+	bool isSimulationPaused() const
+	{
 		return isSimPaused;
 	}
 
 	/// @brief Returns true if the game is not paused.
-	bool isPlaying() const {
+	bool isPlaying() const
+	{
 		return !isSimulationPaused();
 	}
 
@@ -84,14 +89,16 @@ struct GameUpdateSets {
 /// @brief GameWorld is the main class that hold all alocated GameObject (Material, Scripts, Actors and so on),
 /// Maintains their lifetime, as well as stepping the game simulation.
 struct SGE_ENGINE_API GameWorld {
-	GameWorld() {
+	GameWorld()
+	{
 		userProjectionSettings.fov = deg2rad(60.f);
 		userProjectionSettings.aspectRatio = 1.f; // Cannot be determined here.
 		userProjectionSettings.near = 0.1f;
 		userProjectionSettings.far = 10000.f;
 	}
 
-	~GameWorld() {
+	~GameWorld()
+	{
 		clear();
 	}
 
@@ -115,7 +122,8 @@ struct SGE_ENGINE_API GameWorld {
 
 	/// @brief Type-safe allocation of a GameObject.
 	template <typename T>
-	T* allocObjectT(ObjectId const specificId = ObjectId(), const char* name = nullptr) {
+	T* allocObjectT(ObjectId const specificId = ObjectId(), const char* name = nullptr)
+	{
 		return dynamic_cast<T*>(allocObject(sgeTypeId(T), specificId, name));
 	}
 
@@ -185,7 +193,8 @@ struct SGE_ENGINE_API GameWorld {
 
 	/// @brief Retrieves all childres of the specified object.
 	const vector_set<ObjectId>* getChildensOf(ObjectId const parent) const;
-	vector_set<ObjectId> getChildensOfAsList(ObjectId const parent) const {
+	vector_set<ObjectId> getChildensOfAsList(ObjectId const parent) const
+	{
 		const vector_set<ObjectId>* pList = getChildensOf(parent);
 		return pList ? *pList : vector_set<ObjectId>();
 	}
@@ -243,21 +252,25 @@ struct SGE_ENGINE_API GameWorld {
 	int getNextNameIndex();
 
 	/// @brief Returns the attached inspector (if any).
-	GameInspector* getInspector() {
+	GameInspector* getInspector()
+	{
 		return inspector;
 	}
 
 	/// @brief Retrieves the amount of time passed while not being paused.
-	float getGameTime() const {
+	float getGameTime() const
+	{
 		return timeSpendPlaying;
 	}
 
 	/// @brief Returns true if the scene is in edit mode. Could be true only in the SGEEditor.
-	bool isInEditMode() const {
+	bool isInEditMode() const
+	{
 		return isEdited;
 	}
 
-	void toggleEditMode() {
+	void toggleEditMode()
+	{
 		isEdited = !isEdited;
 	}
 
@@ -357,7 +370,8 @@ struct SGE_ENGINE_API GameWorld {
 };
 
 template <typename T>
-T* GameWorld::getFistObject() {
+T* GameWorld::getFistObject()
+{
 	const std::vector<GameObject*>* objs = getObjects(sgeTypeId(T));
 
 	if (objs && !objs->empty()) {
@@ -368,7 +382,8 @@ T* GameWorld::getFistObject() {
 }
 
 template <typename T>
-T* GameWorld::getObject(const ObjectId& id) {
+T* GameWorld::getObject(const ObjectId& id)
+{
 	GameObject* const go = getActorById(id);
 	if (!go || go->getType() != sgeTypeId(T)) {
 		return nullptr;
@@ -378,7 +393,8 @@ T* GameWorld::getObject(const ObjectId& id) {
 }
 
 template <typename T>
-T* GameWorld::getActor(const ObjectId& id) {
+T* GameWorld::getActor(const ObjectId& id)
+{
 	Actor* const actor = getActorById(id);
 	if (!actor || actor->getType() != sgeTypeId(T)) {
 		return nullptr;

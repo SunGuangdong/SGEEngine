@@ -1,11 +1,29 @@
 #pragma once
 
-#include "sge_engine/Physics.h"
-#include "sge_utils/containers/vector_set.h"
+#include "BulletHelper.h"
+#include "sge_engine/sge_engine_api.h"
+#include "sge_utils/containers/vector_map.h"
+#include "sge_utils/math/vec3.h"
+#include "sge_utils/sge_utils.h"
+
 #include <functional>
-#include <iosfwd>
+
+SGE_NO_WARN_BEGIN
+#include <BulletCollision/CollisionDispatch/btGhostObject.h>
+#include <BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <BulletCollision/CollisionShapes/btTriangleMeshShape.h>
+#include <btBulletDynamicsCommon.h>
+SGE_NO_WARN_END
 
 namespace sge {
+
+struct Actor;
+struct PhysicsWorld;
+
+struct SGE_ENGINE_API PhysicsWorldQuery {
+	static void
+	    rayTest(PhysicsWorld& physWorld, const vec3f& from, const vec3f& to, std::function<void(btDynamicsWorld::LocalRayResult&)> cb);
+};
 
 //-------------------------------------------------------------------------
 // RayResultCollisionObject
@@ -15,18 +33,21 @@ struct SGE_ENGINE_API RayResultCollisionObject : public btDynamicsWorld::RayResu
 
 	RayResultCollisionObject() = default;
 
-	RayResultCollisionObject(const Actor* const igonreActor, const vec3f& rayFromWorld, const vec3f& rayToWorld, FilterFnType filterFn) {
+	RayResultCollisionObject(const Actor* const igonreActor, const vec3f& rayFromWorld, const vec3f& rayToWorld, FilterFnType filterFn)
+	{
 		setup(igonreActor, toBullet(rayFromWorld), toBullet(rayToWorld), filterFn);
 	}
 
 	RayResultCollisionObject(const Actor* const igonreActor,
 	                         const btVector3& rayFromWorld,
 	                         const btVector3& rayToWorld,
-	                         FilterFnType filterFn) {
+	                         FilterFnType filterFn)
+	{
 		setup(igonreActor, rayFromWorld, rayToWorld, filterFn);
 	}
 
-	void setup(const Actor* const igonreActor, const btVector3& rayFromWorld, const btVector3& rayToWorld, FilterFnType filterFn) {
+	void setup(const Actor* const igonreActor, const btVector3& rayFromWorld, const btVector3& rayToWorld, FilterFnType filterFn)
+	{
 		m_ignoreActor = igonreActor;
 		m_rayFromWorld = rayFromWorld;
 		m_rayToWorld = rayToWorld;
@@ -37,8 +58,10 @@ struct SGE_ENGINE_API RayResultCollisionObject : public btDynamicsWorld::RayResu
 
 	btScalar addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool normalInWorldSpace) final;
 
-	const btCollisionObject* rayTest(const btDynamicsWorld* const dynamicsWorld) {
-		if_checked(dynamicsWorld) {
+	const btCollisionObject* rayTest(const btDynamicsWorld* const dynamicsWorld)
+	{
+		if_checked(dynamicsWorld)
+		{
 			dynamicsWorld->rayTest(m_rayFromWorld, m_rayToWorld, *this);
 			return m_hitObject;
 		}
@@ -56,17 +79,20 @@ struct SGE_ENGINE_API RayResultCollisionObject : public btDynamicsWorld::RayResu
 	const btCollisionObject* m_hitObject = nullptr;
 };
 
+
 //-------------------------------------------------------------------------
 // Raycasting ray result.
 //-------------------------------------------------------------------------
 struct SGE_ENGINE_API RayResultActor final : public btDynamicsWorld::RayResultCallback {
 	RayResultActor() = default;
 
-	RayResultActor(const Actor* const igonreActor, const vec3f& rayFromWorld, const vec3f& rayToWorld) {
+	RayResultActor(const Actor* const igonreActor, const vec3f& rayFromWorld, const vec3f& rayToWorld)
+	{
 		setup(igonreActor, toBullet(rayFromWorld), toBullet(rayToWorld));
 	}
 
-	RayResultActor(const Actor* const igonreActor, const btVector3& rayFromWorld, const btVector3& rayToWorld) {
+	RayResultActor(const Actor* const igonreActor, const btVector3& rayFromWorld, const btVector3& rayToWorld)
+	{
 		setup(igonreActor, rayFromWorld, rayToWorld);
 	}
 
@@ -77,8 +103,10 @@ struct SGE_ENGINE_API RayResultActor final : public btDynamicsWorld::RayResultCa
 
 	btScalar addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool normalInWorldSpace) override;
 
-	Actor* rayTest(btDynamicsWorld* dynamicsWorld) {
-		if_checked(dynamicsWorld) {
+	Actor* rayTest(btDynamicsWorld* dynamicsWorld)
+	{
+		if_checked(dynamicsWorld)
+		{
 			dynamicsWorld->rayTest(m_rayFromWorld, m_rayToWorld, *this);
 			return m_hitActor;
 		}
@@ -105,4 +133,6 @@ struct FindActorsOnTopResult {
 };
 
 SGE_ENGINE_API void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* const rootActor);
+
+
 } // namespace sge

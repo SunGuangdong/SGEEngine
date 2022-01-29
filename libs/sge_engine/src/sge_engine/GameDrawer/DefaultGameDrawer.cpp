@@ -9,7 +9,6 @@
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/IWorldScript.h"
-#include "sge_engine/Physics.h"
 #include "sge_engine/actors/ABlockingObstacle.h"
 #include "sge_engine/actors/ACRSpline.h"
 #include "sge_engine/actors/ACamera.h"
@@ -25,9 +24,9 @@
 #include "sge_engine/traits/TraitParticles.h"
 #include "sge_engine/traits/TraitSprite.h"
 #include "sge_engine/traits/TraitViewportIcon.h"
+#include "sge_utils/io/FileStream.h"
 #include "sge_utils/math/Frustum.h"
 #include "sge_utils/math/color.h"
-#include "sge_utils/io/FileStream.h"
 
 // Caution:
 // this include is an exception do not include anything else like it.

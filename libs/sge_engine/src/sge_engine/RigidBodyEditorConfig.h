@@ -1,7 +1,7 @@
 #pragma once
 
 #include "AssetProperty.h"
-#include "Physics.h"
+#include "sge_engine/physics/CollisionShape.h"
 
 namespace sge {
 
@@ -9,6 +9,8 @@ struct Actor;
 struct GameObject;
 struct GameInspector;
 struct MemberChain;
+
+struct RigidBody;
 
 /// @brief Provides a strcture that can configure the properties of a TraitRigidBody.
 /// It is intended to have this as a member in an Actor (however it is not limited to that used) to
@@ -59,7 +61,8 @@ struct SGE_ENGINE_API RigidBodyPropertiesConfigurator {
 /// In order to embed this class properly make sure that the @apply method is called when the Actor play state changes.
 struct SGE_ENGINE_API RigidBodyConfigurator : public RigidBodyPropertiesConfigurator {
 	RigidBodyConfigurator()
-	    : m_sourceModel(assetIface_model3d) {
+	    : m_sourceModel(assetIface_model3d)
+	{
 	}
 	~RigidBodyConfigurator() = default;
 
@@ -77,7 +80,6 @@ struct SGE_ENGINE_API RigidBodyConfigurator : public RigidBodyPropertiesConfigur
 	bool apply(Actor& actor, bool addToWorldNow = false) const;
 
   public:
-
 	ShapeSource shapeSource = shapeSource_fromTraitModel;
 	AssetProperty assetPropery = AssetProperty(assetIface_model3d);
 	std::vector<CollsionShapeDesc> collisionShapes;

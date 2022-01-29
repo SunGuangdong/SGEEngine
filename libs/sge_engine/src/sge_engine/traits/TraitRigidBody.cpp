@@ -2,7 +2,6 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_engine/GameWorld.h"
-#include "sge_engine/Physics.h"
 #include "sge_engine/RigidBodyFromModel.h"
 
 namespace sge {
@@ -11,13 +10,15 @@ namespace sge {
 // TraitRigidBody
 //-----------------------------------------------------------
 ReflAddTypeId(TraitRigidBody, 20'03'06'0001);
-TraitRigidBody::~TraitRigidBody() {
+TraitRigidBody::~TraitRigidBody()
+{
 	if (m_rigidBody.isValid()) {
 		this->destroyRigidBody();
 	}
 }
 
-void TraitRigidBody::destroyRigidBody() {
+void TraitRigidBody::destroyRigidBody()
+{
 	if (!m_rigidBody.isValid()) {
 		return;
 	}
@@ -29,7 +30,8 @@ void TraitRigidBody::destroyRigidBody() {
 	this->m_rigidBody.destroy();
 }
 
-bool TraitRigidBody::createBasedOnModel(const EvaluatedModel& eval, float mass, bool noResponse, bool addToWorldNow) {
+bool TraitRigidBody::createBasedOnModel(const EvaluatedModel& eval, float mass, bool noResponse, bool addToWorldNow)
+{
 	destroyRigidBody();
 
 	std::vector<CollsionShapeDesc> shapeDesc;
@@ -49,7 +51,8 @@ bool TraitRigidBody::createBasedOnModel(const EvaluatedModel& eval, float mass, 
 	return false;
 }
 
-bool TraitRigidBody::createBasedOnModel(const char* modelPath, float mass, bool noResponse, bool addToWorldNow) {
+bool TraitRigidBody::createBasedOnModel(const char* modelPath, float mass, bool noResponse, bool addToWorldNow)
+{
 	AssetPtr modelAsset = getCore()->getAssetLib()->getAssetFromFile(modelPath);
 	if (!isAssetLoaded(modelAsset, assetIface_model3d)) {
 		sgeAssert(false && "Failed to load an asset.");
@@ -59,7 +62,8 @@ bool TraitRigidBody::createBasedOnModel(const char* modelPath, float mass, bool 
 	return createBasedOnModel(getLoadedAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval(), mass, noResponse, addToWorldNow);
 }
 
-bool TraitRigidBody::isInWorld() const {
+bool TraitRigidBody::isInWorld() const
+{
 	if (!m_rigidBody.isValid()) {
 		return false;
 	}
@@ -67,18 +71,21 @@ bool TraitRigidBody::isInWorld() const {
 	return m_rigidBody.getBulletRigidBody()->isInWorld();
 }
 
-void TraitRigidBody::onPlayStateChanged(bool const isStartingToPlay) {
+void TraitRigidBody::onPlayStateChanged(bool const isStartingToPlay)
+{
 	if (!m_rigidBody.isValid())
 		return;
 
 	if (isStartingToPlay) {
 		addToWorld();
-	} else {
+	}
+	else {
 		removeFromWorld();
 	}
 }
 
-void TraitRigidBody::setTrasnform(const transf3d& transf, bool killVelocity) {
+void TraitRigidBody::setTrasnform(const transf3d& transf, bool killVelocity)
+{
 	if (m_rigidBody.isValid()) {
 		m_rigidBody.setTransformAndScaling(transf, killVelocity);
 
@@ -89,18 +96,20 @@ void TraitRigidBody::setTrasnform(const transf3d& transf, bool killVelocity) {
 			}
 		}
 		else if (m_rigidBody.getBulletGhostObject()) {
-			//getWorld()->physicsWorld.dynamicsWorld->updateSingleAabb(m_rigidBody.getBulletGhostObject());
+			// getWorld()->physicsWorld.dynamicsWorld->updateSingleAabb(m_rigidBody.getBulletGhostObject());
 		}
 	}
 }
 
-void TraitRigidBody::addToWorld() {
+void TraitRigidBody::addToWorld()
+{
 	if (isInWorld() == false && m_rigidBody.isValid()) {
 		getWorld()->physicsWorld.addPhysicsObject(this->m_rigidBody);
 	}
 }
 
-void TraitRigidBody::removeFromWorld() {
+void TraitRigidBody::removeFromWorld()
+{
 	if (isInWorld()) {
 		getWorld()->physicsWorld.removePhysicsObject(this->m_rigidBody);
 	}
