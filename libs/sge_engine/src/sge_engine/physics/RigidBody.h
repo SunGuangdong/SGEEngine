@@ -55,11 +55,13 @@ enum RigidBodyFilterMask : ubyte {
 
 /// RigidBody
 /// This class represents our own wrapper around bullet rigid bodies.
+/// User for Static, Dynamic and Ghost (kinematic) objects.
 struct SGE_ENGINE_API RigidBody {
 	RigidBody()
 	    : m_motionState(this)
 	{
 	}
+
 	~RigidBody()
 	{
 		destroy();
@@ -81,6 +83,12 @@ struct SGE_ENGINE_API RigidBody {
 	void create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce);
 	void create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce);
 
+	/// Create a ghost(kinematic) object that doesn't get affected by any forces.
+	/// It just get collision information.
+	/// if @noResponse is false than all intersecting object will get pushed out of it.
+	/// if @noResponse is true then the the physics engine will not push any other object,
+	/// it will just report intersections. This could be used for manually handling collisions.
+	/// Usually you would do that with @PhysicsAction or @btActionInterface.
 	void createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs, bool noResponse);
 
 	/// Specifies if the rigid body should not respond to collsions with other objects.
@@ -247,6 +255,7 @@ struct SGE_ENGINE_API RigidBody {
 
   public:
 	std::unique_ptr<btCollisionObject> m_collisionObject;
+
 	SgeCustomMoutionState m_motionState;
 	std::unique_ptr<CollisionShape> m_collisionShape;
 	Actor* actor = nullptr;

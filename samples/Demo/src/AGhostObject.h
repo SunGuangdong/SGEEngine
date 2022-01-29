@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_core/AssetLibrary/AssetLibrary.h"
-
+#include "sge_engine/physics/PhysicsAction.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitRigidBody.h"
@@ -11,12 +11,11 @@
 namespace sge {
 
 struct AGhostObject;
-struct GhostAction : btActionInterface {
+struct GhostAction : PhysicsAction {
 	virtual void updateAction(btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
 
-	virtual void debugDraw(btIDebugDraw* UNUSED(debugDrawer)) override;
-
 	AGhostObject* owner;
+	btManifoldArray tempManifoldArr;
 };
 
 //--------------------------------------------------------------------

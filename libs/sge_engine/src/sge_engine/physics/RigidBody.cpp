@@ -126,8 +126,6 @@ void RigidBody::createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs
 		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 
-	//btGhostPairCallback;
-
 	this->actor = actor;
 	m_collisionObject->setUserPointer(static_cast<RigidBody*>(this));
 }

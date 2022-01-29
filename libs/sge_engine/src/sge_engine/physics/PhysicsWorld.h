@@ -17,6 +17,7 @@ SGE_NO_WARN_END
 namespace sge {
 
 struct RigidBody;
+struct PhysicsAction;
 
 /// PhysicsWorld
 /// A wrapper around the physics world of the engine that is doing the actual simulation of the object.
@@ -31,8 +32,18 @@ struct SGE_ENGINE_API PhysicsWorld {
 	void create();
 	void destroy();
 
+	/// Adds a physics object to the world.
+	/// If you are doing this manually
+	/// Make sure to add it and remove in @GameObject::onPlayStateChanged.
+	/// If you are using the TraitRigidBody it handles that for you.
 	void addPhysicsObject(RigidBody& obj);
 	void removePhysicsObject(RigidBody& obj);
+
+	/// Adds a physics action to the world.
+	/// If you are doing this in a GameObject or an Actor
+	/// Make sure to add it and remove in @GameObject::onPlayStateChanged.
+	void addAction(PhysicsAction* action);
+	void removeAction(PhysicsAction* action);
 
 	/// @brief Changes the default gravity of the world and applies the new gravity to all non-static rigid bodies.
 	void setGravity(const vec3f& gravity);
@@ -46,6 +57,8 @@ struct SGE_ENGINE_API PhysicsWorld {
 	std::unique_ptr<btDefaultCollisionConfiguration> collisionConfiguration;
 	std::unique_ptr<btCollisionDispatcher> dispatcher;
 	std::unique_ptr<btSequentialImpulseConstraintSolver> solver;
+
+	btGhostPairCallback m_ghostPairCallback;
 };
 
 

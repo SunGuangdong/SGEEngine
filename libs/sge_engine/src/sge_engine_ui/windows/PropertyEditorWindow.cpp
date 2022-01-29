@@ -6,22 +6,22 @@
 #include "sge_core/SGEImGui.h"
 #include "sge_core/typelib/MemberChain.h"
 #include "sge_core/ui/MultiCurve2DEditor.h"
-#include "sge_engine//RigidBodyEditorConfig.h"
 #include "sge_engine/AssetProperty.h"
 #include "sge_engine/DynamicProperties.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameInspector.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/InspectorCmds.h"
-#include "sge_engine/Physics.h"
+#include "sge_engine/RigidBodyEditorConfig.h"
+#include "sge_engine/physics/CollisionShape.h"
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitScriptSlot.h"
 #include "sge_engine_ui/ui/UIAssetPicker.h"
+#include "sge_utils/containers/Variant.h"
 #include "sge_utils/math/EulerAngles.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"
 #include "sge_utils/math/SphericalCoordinates.h"
-#include "sge_utils/containers/Variant.h"
 #include "sge_utils/text/format.h"
 
 namespace sge {
@@ -550,7 +550,7 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		v3edit.aroundY = rad2deg(v3ref.aroundY);
 		v3edit.fromY = rad2deg(v3ref.fromY);
 
-		
+
 		bool change = false;
 
 

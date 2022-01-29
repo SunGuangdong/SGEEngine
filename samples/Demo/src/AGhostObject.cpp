@@ -2,98 +2,30 @@
 #include "sge_core/ICore.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/RigidBodyFromModel.h"
+#include "sge_engine/physics/PenetrationRecovery.h"
 
 namespace sge {
-
-bool recoverFromPenetration(btCollisionWorld* collisionWorld, btPairCachingGhostObject* ghostObj)
-{
-	// TODO MOVE IT
-	btManifoldArray manifoldArray;
-	float maxPenetrationDepth = 0.2f;
-
-	// Here we must refresh the overlapping paircache as the penetrating movement itself or the
-	// previous recovery iteration might have used setWorldTransform and pushed us into an object
-	// that is not in the previous cache contents from the last timestep, as will happen if we
-	// are pushed into a new AABB overlap. Unhandled this means the next convex sweep gets stuck.
-	//
-	// Do this by calling the broadphase's setAabb with the moved AABB, this will update the broadphase
-	// paircache and the ghostobject's internal paircache at the same time.    /BW
-
-	btCollisionShape* collisionShape = ghostObj->getCollisionShape();
-
-	btVector3 minAabb, maxAabb;
-	collisionShape->getAabb(ghostObj->getWorldTransform(), minAabb, maxAabb);
-	collisionWorld->getBroadphase()->setAabb(ghostObj->getBroadphaseHandle(), minAabb, maxAabb, collisionWorld->getDispatcher());
-
-	bool penetration = false;
-
-	collisionWorld->getDispatcher()->dispatchAllCollisionPairs(ghostObj->getOverlappingPairCache(), collisionWorld->getDispatchInfo(),
-	                                                           collisionWorld->getDispatcher());
-
-	btVector3 m_currentPosition = ghostObj->getWorldTransform().getOrigin();
-
-	//	btScalar maxPen = btScalar(0.0);
-	for (int i = 0; i < ghostObj->getOverlappingPairCache()->getNumOverlappingPairs(); i++) {
-		manifoldArray.resize(0);
-
-		btBroadphasePair* collisionPair = &ghostObj->getOverlappingPairCache()->getOverlappingPairArray()[i];
-
-		btCollisionObject* obj0 = static_cast<btCollisionObject*>(collisionPair->m_pProxy0->m_clientObject);
-		btCollisionObject* obj1 = static_cast<btCollisionObject*>(collisionPair->m_pProxy1->m_clientObject);
-
-		if ((obj0 && !obj0->hasContactResponse()) || (obj1 && !obj1->hasContactResponse()))
-			continue;
-
-		bool collides = (obj0->getBroadphaseHandle()->m_collisionFilterGroup & obj1->getBroadphaseHandle()->m_collisionFilterMask) != 0;
-		collides = collides && (obj1->getBroadphaseHandle()->m_collisionFilterGroup & obj0->getBroadphaseHandle()->m_collisionFilterMask);
-		if (!collides) {
-			return false;
-		}
-
-		if (collisionPair->m_algorithm)
-			collisionPair->m_algorithm->getAllContactManifolds(manifoldArray);
-
-		for (int j = 0; j < manifoldArray.size(); j++) {
-			btPersistentManifold* manifold = manifoldArray[j];
-			btScalar directionSign = manifold->getBody0() == ghostObj ? btScalar(-1.0) : btScalar(1.0);
-			for (int p = 0; p < manifold->getNumContacts(); p++) {
-				const btManifoldPoint& pt = manifold->getContactPoint(p);
-
-				btScalar dist = pt.getDistance();
-
-				if (dist < -maxPenetrationDepth) {
-					// TODO: cause problems on slopes, not sure if it is needed
-					// if (dist < maxPen)
-					//{
-					//	maxPen = dist;
-					//	m_touchingNormal = pt.m_normalWorldOnB * directionSign;//??
-
-					//}
-					m_currentPosition += pt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
-					penetration = true;
-				}
-				else {
-					// printf("touching %f\n", dist);
-				}
-			}
-
-			// manifold->clearManifold();
-		}
-	}
-	btTransform newTrans = ghostObj->getWorldTransform();
-	newTrans.setOrigin(m_currentPosition);
-	ghostObj->setWorldTransform(newTrans);
-	//	printf("m_touchingNormal = %f,%f,%f\n",m_touchingNormal[0],m_touchingNormal[1],m_touchingNormal[2]);
-	return penetration;
-}
-
 
 void GhostAction::updateAction(btCollisionWorld* collisionWorld, btScalar UNUSED(deltaTimeStep))
 {
 	btPairCachingGhostObject* ghostObj = owner->m_traitRB.getRigidBody()->getBulletGhostObject();
-	// const btAlignedObjectArray<btCollisionObject*>& pairs = pairs->getOverlappingPairs();
+	if (ghostObj == nullptr) {
+		return;
+	}
 
-	recoverFromPenetration(collisionWorld, ghostObj);
+	btVector3 recoverVector;
+	if (recoverFromPenetrationVector(&recoverVector, collisionWorld, ghostObj, tempManifoldArr, 0.2f)) {
+		btTransform newTransform = ghostObj->getWorldTransform();
+		newTransform.setOrigin(newTransform.getOrigin() + recoverVector);
+		ghostObj->setWorldTransform(newTransform);
+
+		// Not sure if the line below needs to be called, it works without it.
+		// collisionWorld->updateSingleAabb(ghostObj);
+
+		if (Actor* a = getActorFromPhysicsObjectMutable(ghostObj)) {
+			a->setTransformEx(fromBullet(ghostObj->getWorldTransform()), false, false, false);
+		}
+	}
 }
 
 void GhostAction::debugDraw(btIDebugDraw* UNUSED(debugDrawer))
