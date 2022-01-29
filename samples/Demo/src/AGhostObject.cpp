@@ -28,9 +28,6 @@ void GhostAction::updateAction(btCollisionWorld* collisionWorld, btScalar UNUSED
 	}
 }
 
-void GhostAction::debugDraw(btIDebugDraw* UNUSED(debugDrawer))
-{
-}
 //--------------------------------------------------------------------
 // AStaticObstacle
 //--------------------------------------------------------------------
