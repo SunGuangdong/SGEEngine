@@ -13,7 +13,7 @@ namespace sge {
 
 struct Actor;
 
-// Caution: WIP. Currenctly hardcoded to create static obstacles with some model attached.
+/// A tool that uses physics world ray-casts to reposition objects.
 struct SGE_ENGINE_API PlantingTool : public IInspectorTool {
 	void setup(Actor* actorToPlant);
 	void setup(const vector_set<ObjectId>& actorsToPlant, GameWorld& world);
@@ -34,6 +34,9 @@ struct SGE_ENGINE_API PlantingTool : public IInspectorTool {
 	// These objects are the ones what we currently "plant" and the others are the children
 	// of these objects, as they will move as the tool works.
 	vector_set<ObjectId> actorsToIgnorePhysicsHits;
+
+	/// True if the object orientation should match the surface orientation.
+	bool shouldRotateObjects = true;
 };
 
 } // namespace sge

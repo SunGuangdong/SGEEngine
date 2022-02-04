@@ -8,8 +8,9 @@ struct GameUpdateSets;
 struct GameDrawSets;
 
 SGE_NO_WARN_BEGIN
-/// @brief An interface for getting getting callbacks on world events.
+/// @brief An interface for getting callbacks on world events.
 /// The object needs to be attached to the world in order to work.
+/// See the "World Settings" window to find it.
 struct IWorldScript : public Script {
 	IWorldScript() = default;
 	~IWorldScript() = default;

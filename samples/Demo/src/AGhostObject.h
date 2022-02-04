@@ -34,6 +34,8 @@ struct SGE_ENGINE_API AGhostObject : public Actor {
 	TraitModel m_traitModel;
 	TraitSprite m_traitSprite;
 	GhostAction action;
+
+	vec3f velocity = vec3f(0.f);
 };
 
 

@@ -2,6 +2,7 @@
 #include "GameInspector.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
+#include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/InspectorCmds.h"
@@ -14,12 +15,12 @@ struct AInvisibleRigidObstacle;
 
 void PlantingTool::setup(Actor* actorToPlant)
 {
-	if (actorToPlant == nullptr)
-		return;
+	vector_set<ObjectId> actorList;
+	if (actorToPlant) {
+		actorList.insert(actorToPlant->getId());
+	}
 
-	vector_set<ObjectId> a;
-	a.insert(actorToPlant->getId());
-	setup(a, *actorToPlant->getWorld());
+	setup(actorList, *actorToPlant->getWorld());
 }
 
 void PlantingTool::setup(const vector_set<ObjectId>& actorsToPlant, GameWorld& world)
@@ -45,6 +46,7 @@ void PlantingTool::onSetActive(GameInspector* const UNUSED(inspector))
 
 void PlantingTool::onUI(GameInspector* UNUSED(inspector))
 {
+	ImGui::Checkbox("Rotate Objects", &shouldRotateObjects);
 }
 
 InspectorToolResult
@@ -129,16 +131,18 @@ InspectorToolResult
 				// Placing the object behind the camera is pretty stupid and non-intuitive.
 				// In order to place the object on same logical position We are going to do this:
 				//
-				//    (plane) ------------------*(negative hit)----------------------
-				//                               \                    
-				//                                 \             
-				//                                   \           
-				//                                     (eye)
-				//                                      \
-				//                                       >(look dir)
-				//                                        \                            
-				//                                         * abs(hit) We would use this hit here, so the object would be infornt of the
-				//                                         camera.
+				// ----(plane)---*(negative hit)----------------------
+				//                \                    
+				//                 \             
+				//                  \           
+				//                   * (eye - ray start from here)
+				//                    \
+				//                     > (look dir - the ray is looking towards this direction)
+				//                      \                            
+				//                       \                                                        
+				//                        * fabsf(negative hit)
+				//
+				// We will use (negative hit) here, so the object would be placed infornt of the camera.
 
 				const float absHitDistance = fabsf(hitDistance);
 				primaryActorNewTransf.p = pickRay.Sample(absHitDistance);
@@ -152,6 +156,8 @@ InspectorToolResult
 	}
 
 	const transf3d diffTrasform = primaryActorNewTransf * actorsToPlantOriginalTrasnforms.begin().value().inverseSimple();
+	transf3d diffTrasformNoRotation = diffTrasform;
+	diffTrasformNoRotation.r = quatf::getIdentity();
 
 	if (isAllowedToTakeInput && is.IsKeyReleased(Key::Key_MouseLeft)) {
 		CmdCompound* cmdAll = new CmdCompound();
@@ -160,7 +166,15 @@ InspectorToolResult
 			Actor* actor = world->getActorById(pair.key());
 			if (actor) {
 				CmdMemberChange* const cmd = new CmdMemberChange();
-				transf3d newTransform = diffTrasform * pair.value();
+				transf3d newTransform;
+
+				if (shouldRotateObjects) {
+					newTransform = diffTrasform * pair.value();
+				}
+				else {
+					newTransform = diffTrasformNoRotation * pair.value();
+				}
+
 				cmd->setupLogicTransformChange(*actor, pair.value(), newTransform);
 				cmdAll->addCommand(cmd);
 			}
@@ -173,7 +187,7 @@ InspectorToolResult
 		return result;
 	}
 	else {
-		for (auto pair : actorsToPlantOriginalTrasnforms) {
+		for (const auto& pair : actorsToPlantOriginalTrasnforms) {
 			Actor* actor = world->getActorById(pair.key());
 			if (actor) {
 				actor->setTransform(diffTrasform * pair.value(), true);
@@ -181,13 +195,21 @@ InspectorToolResult
 		}
 	}
 
-
 	result.propagateInput = false;
 	return result;
 }
 
-void PlantingTool::onCancel(GameInspector* UNUSED(inspector))
+void PlantingTool::onCancel(GameInspector* inspector)
 {
+	actorsToPlantOriginalTrasnforms.clear();
+	actorsToIgnorePhysicsHits.clear();
+
+	for (const auto& pair : actorsToPlantOriginalTrasnforms) {
+		Actor* actor = inspector->getWorld()->getActorById(pair.key());
+		if (actor) {
+			actor->setTransform(pair.value(), true);
+		}
+	}
 }
 
 void PlantingTool::drawOverlay(const GameDrawSets& UNUSED(drawSets))

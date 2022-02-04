@@ -9,6 +9,7 @@ SGE_NO_WARN_BEGIN
 SGE_NO_WARN_END
 
 namespace sge {
+
 /// Computes the needed vector for the @ghostObj to stop penetrating any other objects.
 /// @param [out] recoveryVector an optional output if there was any penetratation.
 /// @param [in] collisionWorld is the bullet collision world owning the objects.
@@ -39,5 +40,12 @@ bool SGE_ENGINE_API recoverFromPenetrationVector(btVector3* const recoveryVector
                                                  btPairCachingGhostObject* ghostObj,
                                                  btManifoldArray& tempManifoldArray,
                                                  float maxPenetrationDepth = 0.02f);
+
+
+bool SGE_ENGINE_API recoverFromPenetrationVector(btVector3* const recoveryVector,
+                                                 btCollisionWorld* collisionWorld,
+                                                 btCollisionObject* colObj,
+                                                 float maxPenetrationDepth = 0.02f);
+
 
 } // namespace sge

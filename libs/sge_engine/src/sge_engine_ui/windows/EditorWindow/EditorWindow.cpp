@@ -971,6 +971,12 @@ void EditorWindow::prepareForHotReload(SceneInstanceSerializedData& sceneInstanc
 		sceneInstancesData.instances.emplace_back(std::move(instanceData));
 	}
 
+	for (std::unique_ptr<IImGuiWindow>& wnd : getEngineGlobal()->getAllWindows()) {
+		if (dynamic_cast<GamePlayWindow*>(wnd.get())) {
+			wnd->close();
+		}
+	}
+
 	// Clear all the instances, deallocated and so on, the game plugin is going to get unloaded
 	// and all function pointers will be invalidated.
 	iActiveInstance = -1;

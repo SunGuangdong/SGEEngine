@@ -36,6 +36,12 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 
   public:
 	AssetsWindow(std::string windowName);
+
+	void close() override
+	{
+		m_isOpened = false;
+	}
+
 	bool isClosed() override
 	{
 		return !m_isOpened;

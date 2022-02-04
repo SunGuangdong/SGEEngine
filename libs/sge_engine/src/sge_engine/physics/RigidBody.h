@@ -89,6 +89,8 @@ struct SGE_ENGINE_API RigidBody {
 	/// if @noResponse is true then the the physics engine will not push any other object,
 	/// it will just report intersections. This could be used for manually handling collisions.
 	/// Usually you would do that with @PhysicsAction or @btActionInterface.
+	/// Note: Unlike with the rigid body, if the ghost physics object is moved, it will not
+	/// automaticall move any associated actor with it. You have to do it manually in you logic.
 	void createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs, bool noResponse);
 
 	/// Specifies if the rigid body should not respond to collsions with other objects.
@@ -309,6 +311,9 @@ SGE_ENGINE_API const btCollisionObject*
 /// @brief Retieves the other actor participating in the collsion manifold. Useful for sensors and triggers.
 SGE_ENGINE_API const Actor*
     getOtherBodyFromManifold(const Actor* const you, const btPersistentManifold* const manifold, int* youIdx = nullptr);
+
+SGE_ENGINE_API const Actor*
+    getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx = nullptr);
 
 
 

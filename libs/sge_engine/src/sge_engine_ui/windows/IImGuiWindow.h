@@ -12,6 +12,8 @@ struct SGE_ENGINE_API IImGuiWindow {
 	IImGuiWindow() = default;
 	virtual ~IImGuiWindow() = default;
 
+	virtual void close() = 0;
+
 	virtual bool isClosed() = 0;
 	virtual void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) = 0;
 	virtual const char* getWindowName() const = 0;

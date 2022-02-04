@@ -568,5 +568,30 @@ const btCollisionObject* getOtherBodyFromManifold(const btPersistentManifold* co
 	return nullptr;
 }
 
+SGE_ENGINE_API const Actor* getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx)
+{
+	btCollisionObject* obj0 = static_cast<btCollisionObject*>(pair->m_pProxy0->m_clientObject);
+	btCollisionObject* obj1 = static_cast<btCollisionObject*>(pair->m_pProxy1->m_clientObject);
+
+	const Actor* const a0 = getActorFromPhysicsObject(obj0);
+	const Actor* const a1 = getActorFromPhysicsObject(obj1);
+
+	if (you == a0) {
+		if (youIdx)
+			*youIdx = 0;
+		return a1;
+	}
+	else if (you == a1) {
+		if (youIdx)
+			*youIdx = 1;
+		return a0;
+	}
+
+	if (youIdx)
+		*youIdx = -1;
+	return nullptr;
+}
+
+
 
 } // namespace sge

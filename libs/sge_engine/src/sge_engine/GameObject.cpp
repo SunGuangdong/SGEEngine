@@ -1,14 +1,12 @@
-#include "sge_engine/GameWorld.h"
 #include "sge_core/typelib/typeLib.h"
+#include "sge_engine/GameWorld.h"
 #include "sge_utils/text/format.h"
 
 #include "Actor.h"
 
 namespace sge {
 
-//--------------------------------------------------------------------
-// struct Object
-//--------------------------------------------------------------------
+
 
 // clang-format off
 ReflAddTypeId(ObjectId, 20'03'06'0005);
@@ -32,47 +30,53 @@ ReflBlock()
 }
 // clang-format on
 
-
-/// @brief To be called only by @GameWorld. The function sets the common properties of the game object.
-/// Never call this manually.
-
+//--------------------------------------------------------------------
+// GameObject
+//--------------------------------------------------------------------
 void GameObject::private_GameWorld_performInitialization(GameWorld* const world,
                                                          const ObjectId id,
                                                          const TypeId typeId,
-                                                         std::string displayName) {
+                                                         std::string displayName)
+{
 	m_id = id;
 	m_type = typeId;
 	m_world = world;
 	m_displayName = std::move(displayName);
 }
 
-bool GameObject::isActor() const {
-	return dynamic_cast<const Actor*>(this) != nullptr;
+bool GameObject::isActor() const
+{
+	return getActor() != nullptr;
 }
 
-Actor* GameObject::getActor() {
+Actor* GameObject::getActor()
+{
 	return dynamic_cast<Actor*>(this);
 }
 
-const Actor* GameObject::getActor() const {
+const Actor* GameObject::getActor() const
+{
 	return dynamic_cast<const Actor*>(this);
 }
 
-void GameObject::composeDebugDisplayName(std::string& result) const {
+void GameObject::composeDebugDisplayName(std::string& result) const
+{
 	string_format(result, "%s[id=%d]", m_displayName.c_str(), m_id.id);
 }
 
-void GameObject::onPlayStateChanged(bool const isStartingToPlay) {
+void GameObject::onPlayStateChanged(bool const isStartingToPlay)
+{
 	for (const TraitRegistration& trait : m_traits) {
+		sgeAssert(trait.pointerToTrait != nullptr);
+
 		if (trait.pointerToTrait) {
 			trait.pointerToTrait->onPlayStateChanged(isStartingToPlay);
-		} else {
-			sgeAssertFalse("Should never happen");
 		}
 	}
 }
 
-void GameObject::registerTrait(Trait& trait) {
+void GameObject::registerTrait(Trait& trait)
+{
 	Trait* const pTrait = &trait;
 	TypeId const family = pTrait->getFamily();
 
@@ -95,17 +99,20 @@ void GameObject::registerTrait(Trait& trait) {
 //--------------------------------------------------------------------
 // Trait
 //--------------------------------------------------------------------
-Actor* Trait::getActor() {
+Actor* Trait::getActor()
+{
 	Actor* actor = dynamic_cast<Actor*>(getObject());
 	return actor;
 }
 
-const Actor* Trait::getActor() const {
+const Actor* Trait::getActor() const
+{
 	const Actor* actor = dynamic_cast<const Actor*>(getObject());
 	return actor;
 }
 
-SelectedItemDirect SelectedItemDirect::fromSelectedItem(const SelectedItem& item, GameWorld& world) {
+SelectedItemDirect SelectedItemDirect::fromSelectedItem(const SelectedItem& item, GameWorld& world)
+{
 	SelectedItemDirect result;
 	result.editMode = item.editMode;
 	result.index = item.index;

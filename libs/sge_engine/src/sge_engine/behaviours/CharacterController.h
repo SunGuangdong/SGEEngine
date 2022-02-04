@@ -12,36 +12,55 @@ struct RigidBody;
 
 /// @brief CharacterCtrlCfg describes how the character control should move, its speed, jump height and other parameters.
 struct SGE_ENGINE_API CharacterCtrlCfg {
-	// Everything below this height is concidered feet. Used to detect if the player is grounded. This is in object space.
+	/// Everything below this height in actor space is concidered feet.
+	// Used to detect if the player is grounded. This is in object space.
 	float feetLevel = 0.1f;
 
-	// Walk speed in units per second. This is in object space.
+	/// Walk speed in units per second. This is in object space.
 	float walkSpeed = 8.87f;
 
-	// Cosine of the climbable slope angle.
+	/// Cosine of the climbable slope angle.
 	float minClimbableIncline = cosf(deg2rad(60.f));
 
-	float gravity = 1.f;         // The size of the gravity force.
-	float fallingGravity = 1.f;  // The size of gravity when falling.
-	float maxJumpVelocity = 0.f; // The velocity to be applied one, in order to reach the high point of the jump.
-	float minJumpVelocity = 0.f; // The velocity needed  to be applied if the player released the jump button too early.
+	float jumpHeight = 5.f;               ///< The regular jump height of the cracter.
+	float jumpTimeApex = 1.f;             ///< The time (in seconds) that we wish the character to rach @jumpHeight.
+	float minJumpHeight = 2.f;            ///< The minium jump hight that we want if the player released the jump button.
+	float fallingGravityMultiplier = 2.f; ///< How much stronger we want the gravity to be if the character is falling. In mario games it is
+	                                      ///< used to make the jump feel better.
 
-	/// @brief By specified jump height and time needed to rach the peak of that jump,
-	/// this function computes the jump force and the gravity to be applied to the rigid body
-	/// needed to have the desiered jump.
-	/// @param jumpHeight is the maximum height of the jump.
-	/// @param jumpTimeApex is the time needed to the character to reach @jumpHeight.
-	/// @param minJumpHeight The jump usually increases as the player hold the jump button. However if the player
-	///                      Release the jump button too early the character might not appear to be jumping. This value forces
-	///                      The character to continue to move upwards for the specified (usually small) distance,
-	///                      even if the jump button is released.
-	/// @param fallingGravityMultiplier If we want the gravity to be stronger when the character is falling (a commonly desiered effect)
-	///                                 set this to be above 1, otherwise use 1 to have the same falling speed.
-	void computeJumpParams(float jumpHeight, float jumpTimeApex, float minJumpHeight, float fallingGravityMultiplier) {
-		gravity = 2.f * jumpHeight / (jumpTimeApex * jumpTimeApex);
-		fallingGravity = gravity * fallingGravityMultiplier;
-		maxJumpVelocity = gravity * jumpTimeApex;
-		minJumpVelocity = sqrtf(2.f * gravity * minJumpHeight);
+	/// The size of the gravity force.
+	/// If the @isFallingGravity == true, than this gravity should be aplied when the
+	/// character is going upwards, so its jump height and time to jump apex could be used correctly.
+	/// If @isFallingGravity == false, than this gravity should be applied when the character is moving downwards.
+	/// This is used usually for platformers for better 'feel'.
+	float computeGravity(bool isFallingGravity) const
+	{
+		float gravity = 2.f * jumpHeight / (jumpTimeApex * jumpTimeApex);
+		if (isFallingGravity) {
+			gravity *= fallingGravityMultiplier;
+		}
+
+		return gravity;
+	}
+
+	/// The velocity to be applied when the player jumps.
+	/// The player will reach @minJumpHeight after @jumpTimeApex seconds.
+	float computeJumpAcceleration() const
+	{
+		float gravity = computeGravity(false);
+		float vel = gravity * jumpTimeApex;
+		return vel;
+	}
+
+	/// Useful for variable jump height (aka. the longer you hold the jump button the higher you jump).
+	/// The velocity to be applied if the player release the jump button and if the character current upwards velocity
+	/// is less than this value.
+	/// As a result the character will jump at least @minJumpHeight high.
+	float computeMinJumpAcceleration() const
+	{
+		float gravity = computeGravity(false);
+		float vel = sqrtf(2.f * gravity * minJumpHeight);
+		return vel;
 	}
 };
 
@@ -56,7 +75,8 @@ struct SGE_ENGINE_API CharaterCtrlOutcome {
 
 struct SGE_ENGINE_API CharacterCtrlInput {
 	/// A shortcut for initializing the strcture for AI input (as the class is used for AI and player character controllers).
-	static CharacterCtrlInput aiInput(const vec3f& facingDir, const vec3f& walkDir) {
+	static CharacterCtrlInput aiInput(const vec3f& facingDir, const vec3f& walkDir)
+	{
 		CharacterCtrlInput in;
 		in.facingDir = facingDir;
 		in.walkDir = walkDir;
@@ -77,7 +97,10 @@ struct SGE_ENGINE_API CharacterCtrl {
 	/// Use the return value to change the facing direction of the character).
 	CharaterCtrlOutcome update(const GameUpdateSets& updateSets, const CharacterCtrlInput& input);
 
-	bool isJumping() const { return m_jumpCounter > 0; }
+	bool isJumping() const
+	{
+		return m_jumpCounter > 0;
+	}
 
 
   public:

@@ -2,46 +2,21 @@
 #include "BulletHelper.h"
 #include "PhysicsAction.h"
 #include "RigidBody.h"
+#include "SgeCollisionDispatcher.h"
 
 namespace sge {
 
 //-------------------------------------------------------------------------
 // PhysicsWorld
 //-------------------------------------------------------------------------
-
-/// http://bulletphysics.org/mediawiki-1.5.8/index.php/Collision_Filtering
-void sgeNearCallback(btBroadphasePair& collisionPair, btCollisionDispatcher& dispatcher, const btDispatcherInfo& dispatchInfo)
-{
-	btCollisionObject* colObj0 = (btCollisionObject*)collisionPair.m_pProxy0->m_clientObject;
-	btCollisionObject* colObj1 = (btCollisionObject*)collisionPair.m_pProxy1->m_clientObject;
-
-	RigidBody* rb0 = (RigidBody*)colObj0->getUserPointer();
-	RigidBody* rb1 = (RigidBody*)colObj1->getUserPointer();
-
-	bool needsToCollide = true;
-	if (rb0 && rb1) {
-		bool agree0 = rb0->getMaskIdentifiesAs() & rb1->getMaskCollidesWith();
-		bool agree1 = rb1->getMaskIdentifiesAs() & rb0->getMaskCollidesWith();
-
-		needsToCollide = agree0 || agree1;
-	}
-
-	// Should be called we want a collision to occur.
-	if (needsToCollide) {
-		dispatcher.defaultNearCallback(collisionPair, dispatcher, dispatchInfo);
-	}
-}
-
 void PhysicsWorld::create()
 {
 	destroy();
 
 	broadphase.reset(new btDbvtBroadphase());
 	collisionConfiguration.reset(new btDefaultCollisionConfiguration());
-	dispatcher.reset(new btCollisionDispatcher(collisionConfiguration.get()));
+	dispatcher.reset(new SgeCollisionDispatcher(collisionConfiguration.get()));
 	solver.reset(new btSequentialImpulseConstraintSolver());
-
-	dispatcher->setNearCallback(sgeNearCallback);
 	dynamicsWorld.reset(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
 	dynamicsWorld->setForceUpdateAllAabbs(false);
 
@@ -67,8 +42,10 @@ void PhysicsWorld::addPhysicsObject(RigidBody& obj)
 	else {
 		// Caution: [SGE_BULLET_GHOSTS]
 		// By default ghost (kinematic) objects generate contacts with dynamic objects only.
-		// No static objects. In order to generate constants with them we need to change their bullet filter mask.
-		// We wanna do this as for example kinematic characters need to be able to recover form collision with the level.
+		// No static objects. In order to generate contacts with them 
+		// we need to change their bullet filter mask.
+		// We wanna do this as for example kinematic characters 
+		// need to be able to recover form collision with the level.
 		dynamicsWorld->addCollisionObject(obj.m_collisionObject.get(), btBroadphaseProxy::AllFilter, btBroadphaseProxy::AllFilter);
 	}
 }

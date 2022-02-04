@@ -119,6 +119,45 @@ void Actor::setTransformEx(const transf3d& newTransform, bool killVelocity, bool
 	}
 }
 
+
+/// This function tells the editor that the actor provides sub-objects that can be edited in the viewport.
+/// For example the Splines have control points that we can move via the transform tools.
+
+int Actor::getNumItemsInMode(EditMode const mode) const
+{
+	if (mode == editMode_actors)
+		return 1;
+	return 0;
+}
+
+bool Actor::getItemTransform(transf3d& result, EditMode const mode, int UNUSED(itemIndex))
+{
+	if (mode == editMode_actors) {
+		result = getTransform();
+		return true;
+	}
+
+	// You probably want to implement this?
+	sgeAssert(false);
+	result = getTransform();
+
+	return false;
+}
+
+
+// TODO: Should perform some checks when we are in actor mode>
+
+void Actor::setItemTransform(EditMode const mode, int UNUSED(itemIndex), const transf3d& tr)
+{
+	if (mode == editMode_actors) {
+		setTransformEx(tr, true, true, true);
+		return;
+	}
+
+	// You probably want to implement this?
+	sgeAssert(false);
+}
+
 //--------------------------------------------------------------------
 // Actor edit mode stuff.
 //--------------------------------------------------------------------

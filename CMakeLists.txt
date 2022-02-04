@@ -284,7 +284,4 @@ sge_mark_internal_tools(sge_editor)
 include(copy_engine_helper.cmake)
 
 # Samples
-add_subdirectory(samples/Demo)
-add_subdirectory(samples/CatballRoll)
-#add_subdirectory(samples/TemplateGame)
-#add_subdirectory(samples/SpriteGame2D)
+add_subdirectory(samples)

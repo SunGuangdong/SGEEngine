@@ -3,6 +3,7 @@
 #include "BulletHelper.h"
 #include "sge_engine/sge_engine_api.h"
 #include "sge_utils/containers/vector_map.h"
+#include "sge_utils/containers/vector_set.h"
 #include "sge_utils/math/vec3.h"
 #include "sge_utils/sge_utils.h"
 
@@ -19,6 +20,7 @@ namespace sge {
 
 struct Actor;
 struct PhysicsWorld;
+struct RigidBody;
 
 struct SGE_ENGINE_API PhysicsWorldQuery {
 	static void

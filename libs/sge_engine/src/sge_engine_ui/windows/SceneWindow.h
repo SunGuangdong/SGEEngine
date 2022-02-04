@@ -18,6 +18,11 @@ struct SGE_ENGINE_API SceneWindow : public IImGuiWindow {
 
 	void setGameDrawer(IGameDrawer* gd) { m_gameDrawer = gd; }
 
+	void close() override
+	{
+		
+	}
+
 	bool isClosed() override { return false; }
 	void update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is) override;
 	const char* getWindowName() const override { return m_windowName.c_str(); }

@@ -155,7 +155,7 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 		}
 
 		{
-			float jumpVelocityY = m_cfg.maxJumpVelocity;
+			float jumpVelocityY = m_cfg.computeJumpAcceleration();
 			velocityToApply.y += jumpVelocityY - initalLinearVelocty.y; // +gravityY * updateSets.dt;
 			sgeAssert(!velocityToApply.hasNan());
 
@@ -223,9 +223,9 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 	else {
 		// Handle minimal jump height.
 		if (isJumping() && input.isJumpBtnReleased) {
-			if (initalLinearVelocty.y > m_cfg.minJumpVelocity) {
+			if (initalLinearVelocty.y > m_cfg.computeMinJumpAcceleration()) {
 				velocityToApply.y -= initalLinearVelocty.y;
-				velocityToApply.y += m_cfg.minJumpVelocity;
+				velocityToApply.y += m_cfg.computeMinJumpAcceleration();
 				sgeAssert(!velocityToApply.hasNan());
 			}
 		}
@@ -245,14 +245,14 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 		// Use lower gravity when the player is sliding on a wall in order to give them time to react.
 		// However apply it only if the sliding is downwards, becuse when the player tries to jump
 		// to a platform while touching the wall they will get frustratingly slowed down.
-		float gravity = (initalLinearVelocty.y < -1e-1f) ? m_cfg.fallingGravity : m_cfg.gravity;
+		float gravity = m_cfg.computeGravity(initalLinearVelocty.y < -1e-1f);
 
 		if (!isGroundSlopeClimbable || isJumping()) {
 			myRigidBody->getRigidBody()->setGravity(vec3f(0, -gravity, 0));
 		}
 		else {
 			if (isGroundSlopeClimbable) {
-				myRigidBody->getRigidBody()->setGravity(groundNormal * -3.f * m_cfg.fallingGravity);
+				myRigidBody->getRigidBody()->setGravity(groundNormal * -3.f * m_cfg.computeGravity(false));
 			}
 		}
 	}
