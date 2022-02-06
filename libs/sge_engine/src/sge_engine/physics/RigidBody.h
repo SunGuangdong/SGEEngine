@@ -56,16 +56,15 @@ enum RigidBodyFilterMask : ubyte {
 /// RigidBody
 /// This class represents our own wrapper around bullet rigid bodies.
 /// User for Static, Dynamic and Ghost (kinematic) objects.
+/// We add our custom information in the user point of the created btCollisionObject,
+/// uou can get the RigidBody by calling @fromBullet(btCollisionObject*).
 struct SGE_ENGINE_API RigidBody {
 	RigidBody()
 	    : m_motionState(this)
 	{
 	}
 
-	~RigidBody()
-	{
-		destroy();
-	}
+	~RigidBody() { destroy(); }
 
 	void destroy();
 
@@ -99,10 +98,7 @@ struct SGE_ENGINE_API RigidBody {
 	bool hasNoCollisionResponse() const;
 
 	/// @brief Returns true if the RigidBody is properly created.
-	bool isValid() const
-	{
-		return m_collisionObject.get() != nullptr;
-	}
+	bool isValid() const { return m_collisionObject.get() != nullptr; }
 
 	/// @brief Retrieves the mass of the body.
 	float getMass() const;
@@ -163,10 +159,7 @@ struct SGE_ENGINE_API RigidBody {
 	void applyLinearVelocity(const vec3f& v);
 
 	/// @brief Retrieves the linear velocity of the rigid body.
-	vec3f getLinearVel() const
-	{
-		return getBulletRigidBody() ? fromBullet(getBulletRigidBody()->getLinearVelocity()) : vec3f(0.f);
-	}
+	vec3f getLinearVel() const { return getBulletRigidBody() ? fromBullet(getBulletRigidBody()->getLinearVelocity()) : vec3f(0.f); }
 
 	/// @brief Forces the velocity for the rigid body to be the specified value.
 	void setLinearVelocity(const vec3f& v);
@@ -196,15 +189,9 @@ struct SGE_ENGINE_API RigidBody {
 	transf3d getTransformAndScaling() const;
 	void setTransformAndScaling(const transf3d& tr, bool killVelocity);
 
-	btCollisionObject* getCollisionShape()
-	{
-		return m_collisionObject.get();
-	}
+	btCollisionObject* getCollisionShape() { return m_collisionObject.get(); }
 
-	const btCollisionObject* getCollisionShape() const
-	{
-		return m_collisionObject.get();
-	}
+	const btCollisionObject* getCollisionShape() const { return m_collisionObject.get(); }
 
 	/// @brief Retrieves the Bullet Physics representation of the rigid body.
 	btRigidBody* getBulletRigidBody()
@@ -235,25 +222,13 @@ struct SGE_ENGINE_API RigidBody {
 	AABox3f getBBoxWs() const;
 
 
-	ubyte getMaskIdentifiesAs() const
-	{
-		return m_maskIndetifiedAs;
-	}
+	ubyte getMaskIdentifiesAs() const { return m_maskIndetifiedAs; }
 
-	void setMaskIdentifiesAs(ubyte mask)
-	{
-		m_maskIndetifiedAs = mask;
-	}
+	void setMaskIdentifiesAs(ubyte mask) { m_maskIndetifiedAs = mask; }
 
-	ubyte getMaskCollidesWith() const
-	{
-		return m_maskCollidesWith;
-	}
+	ubyte getMaskCollidesWith() const { return m_maskCollidesWith; }
 
-	void setMaskCollidesWith(ubyte mask)
-	{
-		m_maskCollidesWith = mask;
-	}
+	void setMaskCollidesWith(ubyte mask) { m_maskCollidesWith = mask; }
 
   public:
 	std::unique_ptr<btCollisionObject> m_collisionObject;
@@ -312,8 +287,7 @@ SGE_ENGINE_API const btCollisionObject*
 SGE_ENGINE_API const Actor*
     getOtherBodyFromManifold(const Actor* const you, const btPersistentManifold* const manifold, int* youIdx = nullptr);
 
-SGE_ENGINE_API const Actor*
-    getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx = nullptr);
+SGE_ENGINE_API const Actor* getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx = nullptr);
 
 
 

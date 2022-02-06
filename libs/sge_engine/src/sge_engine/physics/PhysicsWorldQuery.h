@@ -2,8 +2,10 @@
 
 #include "BulletHelper.h"
 #include "sge_engine/sge_engine_api.h"
+#include "sge_utils/containers/StaticArray.h"
 #include "sge_utils/containers/vector_map.h"
 #include "sge_utils/containers/vector_set.h"
+#include "sge_utils/math/Box.h"
 #include "sge_utils/math/vec3.h"
 #include "sge_utils/sge_utils.h"
 
@@ -22,10 +24,44 @@ struct Actor;
 struct PhysicsWorld;
 struct RigidBody;
 
-struct SGE_ENGINE_API PhysicsWorldQuery {
-	static void
+namespace PhysicsWorldQuery {
+
+	/// A callback for @boxTest or btCollisionWorld::aabbTest that will contain
+	/// all overlapping bodies with the box.
+	/// The class will not allocate memory, instead it can handle only fixed amout of collision.
+	struct SGE_ENGINE_API BoxTestCallback : public btBroadphaseAabbCallback {
+		virtual bool process(const btBroadphaseProxy* proxy) override
+		{
+			[[maybe_unused]] bool pushSucceeded = proxies.push_back(proxy);
+			sgeAssert(pushSucceeded && "Hey, maybe you need more eleements?");
+
+			return true;
+		}
+
+		StaticArray<const btBroadphaseProxy*, 16> proxies;
+	};
+
+	/// A callback for @boxTest or btCollisionWorld::aabbTest that will contain
+	/// all overlapping bodies with the box.
+	/// The class will allocate memory, suitable for situations where there might be many
+	/// collisions.
+	struct SGE_ENGINE_API BoxTestCallbackAlloc : public btBroadphaseAabbCallback {
+		virtual bool process(const btBroadphaseProxy* proxy) override
+		{
+			proxies.push_back(proxy);
+			return true;
+		}
+
+		std::vector<const btBroadphaseProxy*> proxies;
+	};
+
+	SGE_ENGINE_API void
 	    rayTest(PhysicsWorld& physWorld, const vec3f& from, const vec3f& to, std::function<void(btDynamicsWorld::LocalRayResult&)> cb);
-};
+
+	/// A callback for finding all potential collisions with thhe specified box.
+	/// @param cb a callback to be called. You can use BoxTestCallback for quick results.
+	SGE_ENGINE_API void boxTest(PhysicsWorld& physWorld, const AABox3f& bbox, btBroadphaseAabbCallback& cb);
+}; // namespace PhysicsWorldQuery
 
 //-------------------------------------------------------------------------
 // RayResultCollisionObject

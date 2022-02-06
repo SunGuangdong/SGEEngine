@@ -1,19 +1,23 @@
-#include "PenetrationRecovery.h"
+#include "sge_utils/sge_utils.h"
+
 SGE_NO_WARN_BEGIN
 #include <BulletCollision/BroadphaseCollision/btBroadphaseProxy.h>
 #include <BulletCollision/BroadphaseCollision/btDispatcher.h>
 SGE_NO_WARN_END
+
+#include "PenetrationRecovery.h"
+#include "PhysicsWorldQuery.h"
 #include <vector>
 
 namespace sge {
 
-bool computePenerationRecorverVectorFromManifold(btVector3* const recoveryVector,
+bool computePenerationRecorverVectorFromManifold(btVector3& recoveryVector,
                                                  const btPersistentManifold* persistManifold,
                                                  const btCollisionObject* collisionObject,
                                                  float maxPenetrationDepth)
 {
 	bool hadPenetration = false;
-	*recoveryVector = btVector3(0.f, 0.f, 0.f);
+	recoveryVector = btVector3(0.f, 0.f, 0.f);
 
 	const btScalar directionSign = persistManifold->getBody0() == collisionObject ? btScalar(-1.0) : btScalar(1.0);
 
@@ -25,7 +29,7 @@ bool computePenerationRecorverVectorFromManifold(btVector3* const recoveryVector
 		// If the manifold exists, and the penetration is deep enough
 		// move the object, otherwise the objects are just touching.
 		if (dist < -maxPenetrationDepth) {
-			*recoveryVector += manifoldPt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
+			recoveryVector += manifoldPt.m_normalWorldOnB * directionSign * dist * btScalar(0.2);
 			hadPenetration = true;
 		}
 	}
@@ -33,14 +37,14 @@ bool computePenerationRecorverVectorFromManifold(btVector3* const recoveryVector
 	return hadPenetration;
 }
 
-bool recoverFromPenetrationVector(btVector3* const recoveryVector,
+bool recoverFromPenetrationVector(btVector3& recoveryVector,
                                   btCollisionWorld* collisionWorld,
                                   btPairCachingGhostObject* ghostObj,
                                   btManifoldArray& tempManifoldArray,
                                   float maxPenetrationDepth)
 {
 	bool hadPenetration = false;
-	*recoveryVector = btVector3(0.f, 0.f, 0.f);
+	recoveryVector = btVector3(0.f, 0.f, 0.f);
 
 	collisionWorld->getDispatcher()->dispatchAllCollisionPairs(ghostObj->getOverlappingPairCache(), collisionWorld->getDispatchInfo(),
 	                                                           collisionWorld->getDispatcher());
@@ -99,9 +103,9 @@ bool recoverFromPenetrationVector(btVector3* const recoveryVector,
 
 			btVector3 recoveryForThisManifold;
 			bool hadPenetrationWithManifold =
-			    computePenerationRecorverVectorFromManifold(&recoveryForThisManifold, persistManifold, ghostObj, maxPenetrationDepth);
+			    computePenerationRecorverVectorFromManifold(recoveryForThisManifold, persistManifold, ghostObj, maxPenetrationDepth);
 			if (hadPenetrationWithManifold) {
-				*recoveryVector += recoveryForThisManifold;
+				recoveryVector += recoveryForThisManifold;
 				hadPenetration = true;
 			}
 
@@ -114,146 +118,79 @@ bool recoverFromPenetrationVector(btVector3* const recoveryVector,
 	return hadPenetration;
 }
 
-bool recoverFromPenetrationVector(btVector3* const recoveryVector,
+struct FindContactCallback : public btManifoldResult {
+	FindContactCallback(const btCollisionObjectWrapper* body0Wrap, const btCollisionObjectWrapper* body1Wrap)
+	    : btManifoldResult(body0Wrap, body1Wrap)
+	{
+	}
+
+	void FindContactCallback::addContactPoint(const btVector3& normalOnBInWorld, const btVector3& pointInWorldOnB, btScalar depth)
+	{
+		if (m_penetration_distance > depth) {
+			const bool isSwapped = m_manifoldPtr->getBody0() != m_body0Wrap->getCollisionObject();
+			m_penetration_distance = depth;
+			m_other_compound_shape_index = isSwapped ? m_index0 : m_index1;
+			m_pointWorld = isSwapped ? (pointInWorldOnB + (normalOnBInWorld * depth)) : pointInWorldOnB;
+
+			m_pointNormalWorld = isSwapped ? normalOnBInWorld * -1 : normalOnBInWorld;
+		}
+	}
+
+	bool hasPenetration() const { return m_penetration_distance < 0; }
+
+	btVector3 m_pointNormalWorld;
+	btVector3 m_pointWorld;
+	btScalar m_penetration_distance = 0;
+	int m_other_compound_shape_index = 0;
+};
+
+bool recoverFromPenetrationVector(btVector3& recoveryVector,
                                   btCollisionWorld* collisionWorld,
                                   btCollisionObject* colObj,
                                   float UNUSED(maxPenetrationDepth))
 {
-	struct PenetrationContactResultCallback : public btManifoldResult {
-		PenetrationContactResultCallback(const btCollisionObjectWrapper* body0Wrap, const btCollisionObjectWrapper* body1Wrap)
-		    : btManifoldResult(body0Wrap, body1Wrap)
-		{
-		}
-
-
-		void PenetrationContactResultCallback::addContactPoint(const btVector3& normalOnBInWorld,
-		                                                       const btVector3& pointInWorldOnB,
-		                                                       btScalar depth)
-		{
-			if (m_penetration_distance > depth) { // Has penetration?
-
-				const bool isSwapped = m_manifoldPtr->getBody0() != m_body0Wrap->getCollisionObject();
-				m_penetration_distance = depth;
-				m_other_compound_shape_index = isSwapped ? m_index0 : m_index1;
-				m_pointWorld = isSwapped ? (pointInWorldOnB + (normalOnBInWorld * depth)) : pointInWorldOnB;
-
-				m_pointNormalWorld = isSwapped ? normalOnBInWorld * -1 : normalOnBInWorld;
-			}
-		}
-
-		bool hasHit() { return m_penetration_distance < 0; }
-
-		btVector3 m_pointNormalWorld;
-		btVector3 m_pointWorld;
-		btScalar m_penetration_distance = 0;
-		int m_other_compound_shape_index = 0;
-	};
-
-
-#if 0
-	struct Callback : public btCollisionWorld::ContactResultCallback {
-		btScalar addSingleResult(btManifoldPoint& cp,
-		                         const btCollisionObjectWrapper* colObj0Wrap,
-		                         int UNUSED(partId0),
-		                         int UNUSED(index0),
-		                         const btCollisionObjectWrapper* colObj1Wrap,
-		                         int UNUSED(partId1),
-		                         int UNUSED(index1)) override
-		{
-			const btCollisionObject* const col0 = colObj0Wrap->getCollisionObject();
-			const btCollisionObject* const col1 = colObj1Wrap->getCollisionObject();
-
-			sgeAssert(col0 == colObj || col1 == colObj);
-
-			// Compute the recovery vecotr.
-			const btScalar directionSign = col0 == colObj ? btScalar(-1.0) : btScalar(1.0);
-			const btScalar dist = cp.getDistance();
-
-			// If the manifold exists, and the penetration is deep enough
-			// move the object, otherwise the objects are just touching.
-			if (dist < -maxPenetrationDepth) {
-				recoveryVector += cp.m_normalWorldOnB * directionSign * dist;
-				hadPenetration = true;
-			}
-			else {
-			 // Just touching.
-			}
-
-			return 1; // Not used by Bullet.
-		}
-
-	  public:
-		// Inputs:
-		const btCollisionObject* colObj = nullptr;
-		float maxPenetrationDepth = 0.2f;
-
-		// Results:
-		bool hadPenetration = false;
-		btVector3 recoveryVector = btVector3(0.f, 0.f, 0.f);
-	};
-
-	Callback cb;
-	cb.colObj = colObj;
-	cb.maxPenetrationDepth = maxPenetrationDepth;
-
-	collisionWorld->contactTest(colObj, cb);
-
-	*recoveryVector = cb.recoveryVector;
-	return cb.hadPenetration;
-#else
-
-	*recoveryVector = btVector3(0.f, 0.f, 0.f);
+	recoveryVector = btVector3(0.f, 0.f, 0.f);
 	bool hadPenetration = false;
 
-	struct AABBCallback : public btBroadphaseAabbCallback {
-		virtual bool process(const btBroadphaseProxy* proxy) override
-		{
-			proxies.push_back(proxy);
-			return true;
-		}
-
-		std::vector<const btBroadphaseProxy*> proxies;
-	};
-
-	AABBCallback aabbCallback;
-
+	// Find the bounding box of the collision object in world space.
 	btVector3 bbMinWs;
 	btVector3 bbMaxWs;
 	colObj->getCollisionShape()->getAabb(colObj->getWorldTransform(), bbMinWs, bbMaxWs);
 
+	PhysicsWorldQuery::BoxTestCallback aabbCallback;
 	collisionWorld->getBroadphase()->aabbTest(bbMinWs, bbMaxWs, aabbCallback);
 
+	// For each potentially found collision object that the @colObj might penetrate
+	// find the actual penetration depth.
 	btCollisionObjectWrapper obA(nullptr, colObj->getCollisionShape(), colObj, colObj->getWorldTransform(), -1, -1);
-
 	for (const btBroadphaseProxy* proxy : aabbCallback.proxies) {
-		btCollisionObject* otherCo = (btCollisionObject*)(proxy->m_clientObject);
+		btCollisionObject* const otherCo = (btCollisionObject*)(proxy->m_clientObject);
 
+		// The aabbTest above will report the @colObj as well. Skip it.
 		if (otherCo == colObj) {
 			continue;
 		}
-
 		btCollisionObjectWrapper obB(nullptr, otherCo->getCollisionShape(), otherCo, otherCo->getWorldTransform(), -1, -1);
 
+		// Find the collision algorithm that computes the actual penetration depth.
 		btCollisionAlgorithm* algorithm = collisionWorld->getDispatcher()->findAlgorithm(&obA, &obB, nullptr, BT_CONTACT_POINT_ALGORITHMS);
 		if (algorithm) {
-			PenetrationContactResultCallback manifold(&obA, &obB);
-
+			FindContactCallback manifold(&obA, &obB);
 			algorithm->processCollision(&obA, &obB, collisionWorld->getDispatchInfo(), &manifold);
 
-			if (manifold.hasHit()) {
-				*recoveryVector += manifold.m_pointNormalWorld * -manifold.m_penetration_distance;
+			if (manifold.hasPenetration()) {
+				recoveryVector += manifold.m_pointNormalWorld * -manifold.m_penetration_distance;
 				hadPenetration = true;
 			}
 
-			// The algorithm has created with placement new in bullet
-			// call its destructor.
+			// The algorithm has been created with placement new in bullet.
+			// Call its destructor.
 			algorithm->~btCollisionAlgorithm();
 			collisionWorld->getDispatcher()->freeCollisionAlgorithm(algorithm);
 		}
 	}
 
 	return hadPenetration;
-#endif
 }
 
 } // namespace sge

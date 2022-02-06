@@ -8,6 +8,7 @@
 #include "sge_engine/InspectorCmds.h"
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
 
+
 namespace sge {
 
 // clang-format off
@@ -24,9 +25,12 @@ ReflBlock() {
 }
 // clang-format on
 
-void ABlockingObstacle::create() {
+void ABlockingObstacle::create()
+{
 	registerTrait(m_traitRB);
 	registerTrait(*static_cast<IActorCustomAttributeEditorTrait*>(this));
+	registerTrait(tt_rendGeom);
+
 	this->currentDesc.stairs.numStairs = 0; // Just make this something invalid inorder to force generate on creation.
 
 	// Disable making the rigid body dynamic. This Actor represents a static object.
@@ -34,13 +38,15 @@ void ABlockingObstacle::create() {
 	m_rbPropConfig.dontShowDynamicProperties = true;
 }
 
-void ABlockingObstacle::onPlayStateChanged(bool const isStartingToPlay) {
+void ABlockingObstacle::onPlayStateChanged(bool const isStartingToPlay)
+{
 	if (isStartingToPlay) {
 		m_rbPropConfig.applyProperties(*this);
 	}
 }
 
-void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
+void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
+{
 	m_textureX.update();
 	m_textureY.update();
 
@@ -93,8 +99,9 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 			this->setTransform(getTransform(), true);
 
 			GameObject::getWorld()->physicsWorld.addPhysicsObject(*m_traitRB.getRigidBody());
-		} else if (currentDesc.type == SimpleObstacleType::Slope &&
-		           TerrainGenerator::generateSlope(vertices, indices, slopeCollisionMesh, currentDesc.slope, &numVerts, &numIndices)) {
+		}
+		else if (currentDesc.type == SimpleObstacleType::Slope &&
+		         TerrainGenerator::generateSlope(vertices, indices, slopeCollisionMesh, currentDesc.slope, &numVerts, &numIndices)) {
 			// Create the rendering resources.
 			BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(vertices.size() * sizeof(vertices[0]));
 			BufferDesc const ibDesc = BufferDesc::GetDefaultIndexBuffer(indices.size() * sizeof(indices[0]));
@@ -119,9 +126,10 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 			this->setTransform(getTransform(), true);
 
 			GameObject::getWorld()->physicsWorld.addPhysicsObject(*m_traitRB.getRigidBody());
-		} else if (currentDesc.type == SimpleObstacleType::SlantedBlock &&
-		           TerrainGenerator::generateSlantedBlock(vertices, indices, slopeCollisionMesh, currentDesc.slantedBlock, &numVerts,
-		                                                  &numIndices)) {
+		}
+		else if (currentDesc.type == SimpleObstacleType::SlantedBlock &&
+		         TerrainGenerator::generateSlantedBlock(vertices, indices, slopeCollisionMesh, currentDesc.slantedBlock, &numVerts,
+		                                                &numIndices)) {
 			// Create the rendering resources.
 			BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(vertices.size() * sizeof(vertices[0]));
 			BufferDesc const ibDesc = BufferDesc::GetDefaultIndexBuffer(indices.size() * sizeof(indices[0]));
@@ -159,20 +167,31 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 		                    PrimitiveTopology::TriangleList, 0, 0, sizeof(vec3f) * 2, UniformType::Uint, numIndices);
 	}
 
-	material = DefaultPBRMtlData();
+	tt_rendGeom.geoms.resize(1);
 
-	// material.diffuseTextureX = m_textureX.getAssetTexture() ? m_textureX.getAssetTexture()->tex.GetPtr() : nullptr;
-	// material.diffuseTextureY = m_textureY.getAssetTexture() ? m_textureY.getAssetTexture()->tex.GetPtr() : nullptr;
-	// material.diffuseTextureZ = material.diffuseTextureX;
+	tt_rendGeom.geoms[0].pGeom = &geometry;
+	tt_rendGeom.geoms[0].pMtl = &material;
+	tt_rendGeom.geoms[0].bboxGeometry = boundingBox;
 
-	material.diffuseTexXYZScaling = vec3f(1.f / m_textureXScale, 1.f / m_textureYScale, 1.f / m_textureXScale);
+	material = SimpleTriplanarMtlData();
+
+	material.diffuseTextureX =
+	    m_textureX.getAssetInterface<AssetIface_Texture2D>() ? m_textureX.getAssetInterface<AssetIface_Texture2D>()->getTexture() : nullptr;
+	material.diffuseTextureY =
+	    m_textureY.getAssetInterface<AssetIface_Texture2D>() ? m_textureY.getAssetInterface<AssetIface_Texture2D>()->getTexture() : nullptr;
+	material.diffuseTextureZ = material.diffuseTextureX;
+
+	material.uvwTransform = mat4f::getScaling(1.f / m_textureXScale, 1.f / m_textureYScale, 1.f / m_textureXScale);
+	material.sharpness = 64.f;
 }
 
-AABox3f ABlockingObstacle::getBBoxOS() const {
+AABox3f ABlockingObstacle::getBBoxOS() const
+{
 	return boundingBox;
 }
 
-void ABlockingObstacle::doAttributeEditor(GameInspector* inspector) {
+void ABlockingObstacle::doAttributeEditor(GameInspector* inspector)
+{
 	MemberChain chain;
 
 	chain.add(typeLib().find<ABlockingObstacle>()->findMember(&ABlockingObstacle::targetDesc));

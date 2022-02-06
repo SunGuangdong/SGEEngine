@@ -4,6 +4,8 @@
 // GGX
 // https://learnopengl.com/PBR/Lighting
 
+#define PI 3.14159265f
+
 float DistributionGGX(float3 N, float3 H, float a) {
 	float a2 = a * a;
 	float NdotH = max(dot(N, H), 0.0);

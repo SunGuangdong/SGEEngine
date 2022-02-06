@@ -18,7 +18,7 @@ namespace sge {
 /// @return true if there was any penetration.
 ///
 /// The code is based on the code in Bullet Physics, see btKinematicCharacterController::recoverFromPenetration.
-bool SGE_ENGINE_API computePenerationRecorverVectorFromManifold(btVector3* const recoveryVector,
+bool SGE_ENGINE_API computePenerationRecorverVectorFromManifold(btVector3& recoveryVector,
                                                                 const btPersistentManifold* persistManifold,
                                                                 const btCollisionObject* collisionObject,
                                                                 float maxPenetrationDepth = 0.02f);
@@ -35,14 +35,18 @@ bool SGE_ENGINE_API computePenerationRecorverVectorFromManifold(btVector3* const
 /// @return true if there was any penetration.
 ///
 /// The code is based on the code in Bullet Physics, see btKinematicCharacterController::recoverFromPenetration.
-bool SGE_ENGINE_API recoverFromPenetrationVector(btVector3* const recoveryVector,
+bool SGE_ENGINE_API recoverFromPenetrationVector(btVector3& recoveryVector,
                                                  btCollisionWorld* collisionWorld,
                                                  btPairCachingGhostObject* ghostObj,
                                                  btManifoldArray& tempManifoldArray,
                                                  float maxPenetrationDepth = 0.02f);
 
-
-bool SGE_ENGINE_API recoverFromPenetrationVector(btVector3* const recoveryVector,
+/// Computes the needed vector for the @ghostObj to stop penetrating any other objects.
+/// Unlike the other methods, this one will try to find each manifold without relying on
+/// any caching done by btDynamicsWorld::stepSimulation.
+/// @param [out] recoveryVector the vector needed to move the body to get out of penetrations if there was any penetratation.
+/// @return true if there was any penetration.
+bool SGE_ENGINE_API recoverFromPenetrationVector(btVector3& recoveryVector,
                                                  btCollisionWorld* collisionWorld,
                                                  btCollisionObject* colObj,
                                                  float maxPenetrationDepth = 0.02f);

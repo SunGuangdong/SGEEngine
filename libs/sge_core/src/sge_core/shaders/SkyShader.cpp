@@ -12,10 +12,13 @@ struct SkyShaderCBufferParams {
 	vec3f uColorBottom;
 	float uColorBottom_padding;
 	vec3f uColorTop;
+	float uColorTop_padding;
+	vec3f uSunDir;
 	int skyShaderMode;
 };
 
-void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f view, const mat4f proj, const SkyShaderSettings& sets) {
+void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f view, const mat4f proj, const SkyShaderSettings& sets)
+{
 	SGEDevice* const sgedev = rdest.getDevice();
 
 	enum : int {
@@ -38,11 +41,11 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 
 		ShadingProgramPermuator tempPermutator;
 
-		if (tempPermutator.createFromFile(sgedev, "core_shaders/SkyGradient.hlsl",
-		                                  "shader_cache/SkyShader.shadercache", compileTimeOptions, uniformsToCache,
-		                                  &includedFilesByShaders)) {
+		if (tempPermutator.createFromFile(sgedev, "core_shaders/SkyGradient.hlsl", "shader_cache/SkyShader.shadercache", compileTimeOptions,
+		                                  uniformsToCache, &includedFilesByShaders)) {
 			shadingPermut = std::move(tempPermutator);
-		} else {
+		}
+		else {
 			sgeLogError("SkyShader failed to compile shaders!");
 			if (!shadingPermut) {
 				shadingPermut = ShadingProgramPermuator();
@@ -54,7 +57,7 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 	}
 
 	if (!cbParms.IsResourceValid()) {
-		BufferDesc bd = BufferDesc::GetDefaultConstantBuffer(256, ResourceUsage::Dynamic);
+		BufferDesc bd = BufferDesc::GetDefaultConstantBuffer(512, ResourceUsage::Dynamic);
 		cbParms = sgedev->requestResource<Buffer>();
 		cbParms->create(bd, nullptr);
 	}
@@ -102,6 +105,7 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 	cbParamsData.uProj = proj;
 	cbParamsData.uWorld = mat4f::getScaling(sphereScaling);
 	cbParamsData.uColorTop = sets.topColor;
+	cbParamsData.uSunDir = sets.sunDirection.normalized0();
 	cbParamsData.uColorBottom = sets.bottomColor;
 	cbParamsData.skyShaderMode = int(sets.mode);
 

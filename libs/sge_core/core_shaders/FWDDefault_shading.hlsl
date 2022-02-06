@@ -1,6 +1,6 @@
 #include "ShadeCommon.h"
 
-#define PI 3.14159265f
+
 
 #if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
 #include "lib_skinning.hlsl"

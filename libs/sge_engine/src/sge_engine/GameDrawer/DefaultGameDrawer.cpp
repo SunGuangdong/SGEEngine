@@ -225,7 +225,7 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 
 		shadingLight.pLightDesc = &lightDesc;
 		shadingLight.lightPositionWs = position;
-		shadingLight.lightDirectionWs = light->getTransformMtx().c0.xyz().normalized0();
+		shadingLight.lightDirectionWs = light->getLightDirection();
 		shadingLight.lightBoxWs = light->getBBoxOS().getTransformed(light->getTransformMtx());
 
 		m_shadingLights.push_back(shadingLight);
@@ -299,6 +299,10 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 	}
 
 	if (TraitModel* const trait = getTrait<TraitModel>(actor); item.editMode == editMode_actors && trait != nullptr) {
+		trait->getRenderItems(drawReason, m_RIs_geometry);
+	}
+
+	if (TraitRenderGeometry* const trait = getTrait<TraitRenderGeometry>(actor); item.editMode == editMode_actors && trait != nullptr) {
 		trait->getRenderItems(drawReason, m_RIs_geometry);
 	}
 
@@ -898,13 +902,12 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 			else if (lightDesc.type == light_directional) {
 				const float arrowLength = maxOf(lightDesc.intensity * 10.f, 1.f);
 				drawSets.quickDraw->drawWiredAdd_Arrow(
-				    actor->getTransform().p, actor->getTransform().p + actor->getTransformMtx().c0.xyz().normalized() * arrowLength,
-				    wireframeColorInt);
+				    actor->getTransform().p, actor->getTransform().p + light->getLightDirection() * arrowLength, wireframeColorInt);
 			}
 			else if (lightDesc.type == light_spot) {
 				const float coneHeight = maxOf(lightDesc.range, 2.f);
 				const float coneRadius = tanf(lightDesc.spotLightAngle) * coneHeight;
-				drawSets.quickDraw->drawWiredAdd_ConeBottomAligned(actor->getTransformMtx() * mat4f::getRotationZ(deg2rad(-90.f)),
+				drawSets.quickDraw->drawWiredAdd_ConeBottomAligned(actor->getTransformMtx() * mat4f::getRotationX(deg2rad(-90.f)),
 				                                                   wireframeColorInt, coneHeight, coneRadius, 6);
 			}
 

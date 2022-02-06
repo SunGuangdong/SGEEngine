@@ -11,17 +11,18 @@ namespace sge {
 struct ICamera;
 
 struct SkyShaderSettings {
+	// [SKY_ENUM_DUPLICATED]
 	enum Mode : int {
 		mode_colorGradinet = 0,
-		mode_textureSphericalMapped = 1,
-		mode_textureCubeMapped = 2,
-		mode_stillTexture = 3,
-
+		mode_semiRealistic = 1,
+		mode_textureSphericalMapped = 2,
+		mode_textureCubeMapped = 3,
 	};
 
 	Mode mode = mode_colorGradinet;
 	vec3f topColor = vec3f(0.75f);
 	vec3f bottomColor = vec3f(0.25f);
+	vec3f sunDirection = vec3f(0.f, 0.f, 1.f);
 	Texture* texture = nullptr;
 };
 

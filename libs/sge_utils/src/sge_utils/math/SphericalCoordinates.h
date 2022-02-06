@@ -21,9 +21,12 @@ inline float toSphericalYUp(float& angleFromY, float& angleAroundY, const vec3f&
 inline vec3f fromSphericalYUp(float angleFromY, float angleAroundY, float radius)
 {
 	vec3f r;
+
+	float s = sin(angleFromY);
+
 	r.y = radius * cos(angleFromY);
-	r.x = radius * cos(angleAroundY) * sin(angleFromY);
-	r.z = radius * sin(angleAroundY) * sin(angleFromY);
+	r.x = radius * cos(angleAroundY) * s;
+	r.z = radius * sin(angleAroundY) * s;
 
 	return r;
 }

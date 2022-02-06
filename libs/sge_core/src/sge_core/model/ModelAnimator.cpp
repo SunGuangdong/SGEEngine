@@ -148,7 +148,8 @@ void ModelAnimator::advanceAnimation(const float dt) {
 		const AnimationTrack& trackInfo = m_tracks[playback.trackId];
 
 		const AnimationModelSrc& animationSrc = trackInfo.animationSources[playback.trackAnimationIndex];
-		const ModelAnimation* const animInfo = animationSrc.modelAnimSouce->animationAt(animationSrc.animIndexInAnimSource);
+		const Model& animationSourceModel = (animationSrc.modelAnimSouce != nullptr) ? *animationSrc.modelAnimSouce : *m_modelToAnimate;
+		const ModelAnimation* const animInfo = animationSourceModel.animationAt(animationSrc.animIndexInAnimSource);
 
 		if (animInfo == nullptr) {
 			// This should never happen, all the animations should be available.

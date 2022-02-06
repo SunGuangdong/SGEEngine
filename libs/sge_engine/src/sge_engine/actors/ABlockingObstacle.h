@@ -2,13 +2,14 @@
 
 #include "sge_renderer/renderer/renderer.h"
 
+#include "sge_core/materials/SimpleTriplanar/SimpleTriplanarMtl.h"
 #include "sge_engine/Actor.h"
 #include "sge_engine/RigidBodyEditorConfig.h"
 #include "sge_engine/TerrainGenerator.h"
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitRigidBody.h"
-#include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
+#include "sge_engine/traits/TraitRenderGeometry.h"
 
 namespace sge {
 
@@ -20,7 +21,9 @@ struct GameInspector;
 struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCustomAttributeEditorTrait {
 	ABlockingObstacle()
 	    : m_textureX(assetIface_texture2d)
-	    , m_textureY(assetIface_texture2d) {}
+	    , m_textureY(assetIface_texture2d)
+	{
+	}
 
 	void create() final;
 	void onPlayStateChanged(bool const isStartingToPlay) override;
@@ -33,8 +36,8 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
   public:
 	SimpleObstacleDesc targetDesc;
 	SimpleObstacleDesc currentDesc;
-
 	RigidBodyPropertiesConfigurator m_rbPropConfig;
+	TraitRenderGeometry tt_rendGeom;
 
 	AssetProperty m_textureX;
 	float m_textureXScale = 1.f;
@@ -46,7 +49,7 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 	GpuHandle<Buffer> vertexBuffer;
 	GpuHandle<Buffer> indexBuffer;
 	Geometry geometry;
-	DefaultPBRMtlData material;
+	SimpleTriplanarMtlData material;
 	int numVerts = 0;
 	int numIndices = 0;
 	TraitRigidBody m_traitRB;

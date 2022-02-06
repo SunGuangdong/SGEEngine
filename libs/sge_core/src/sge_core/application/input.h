@@ -1,10 +1,10 @@
 #pragma once
 
 #include "sge_core/sgecore_api.h"
+#include "sge_utils/containers/Optional.h"
 #include "sge_utils/math/Box.h"
 #include "sge_utils/math/vec2.h"
 #include "sge_utils/sge_utils.h"
-#include "sge_utils/containers/Optional.h"
 #include <string>
 #include <vector>
 
@@ -185,7 +185,8 @@ struct SGE_CORE_API InputState {
 	/// it is in range [0;0] to [1;1], where:
 	/// [0;0] is the top left position of the domain space,
 	/// [1;1] is the bottom right position of the domain space.
-	vec2f clientToDomainUV(const vec2f& ptClient) const {
+	vec2f clientToDomainUV(const vec2f& ptClient) const
+	{
 		const vec2f ptDomain = ptClient - m_domain.min;
 		const vec2f ptDomainUV = ptDomain / m_domain.diagonal();
 		return ptDomainUV;
@@ -236,9 +237,11 @@ struct SGE_CORE_API InputState {
 
 	/// Retrieves the vetor pointed by the arrow keys using +X right, +Y up.
 	vec2f GetArrowKeysDir(const bool normalize, bool includeWASD = false, int useGamePadAtIndex = -1) const;
+	vec3f GetArrowKeysDirXZ(const bool normalize, bool includeWASD = false, int useGamePadAtIndex = -1) const;
 
 	const GamepadState* getHookedGemepad(const int playerIndex) const;
-	const GamepadState& getXInputDevice(int index) const {
+	const GamepadState& getXInputDevice(int index) const
+	{
 		sgeAssert(index >= 0 && index < SGE_ARRSZ(xinputDevicesState));
 		return xinputDevicesState[index];
 	}

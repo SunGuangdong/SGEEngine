@@ -44,7 +44,7 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 			transf3d shadowCameraTrasnform = lightToWsNoScaling;
 			shadowCameraTrasnform.p = camPosWs;
 
-			const mat4f shadowViewMtx = mat4f::getRotationY(half_pi()) * shadowCameraTrasnform.toMatrix().inverse();
+			const mat4f shadowViewMtx = shadowCameraTrasnform.toMatrix().inverse();
 			const mat4f shadowProjMtx = mat4f::getOrthoRHCentered(camWidth, camheight, 0.f, camZRange, kIsTexcoordStyleD3D);
 			const RawCamera shadowMapCamera = RawCamera(camPosWs, shadowViewMtx, shadowProjMtx);
 
@@ -55,7 +55,7 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 			transf3d lightToWsNoScaling = lightWs;
 			lightToWsNoScaling.s = vec3f(1.f);
 
-			const mat4f shadowViewMtx = mat4f::getRotationY(half_pi()) * lightToWsNoScaling.toMatrix().inverse();
+			const mat4f shadowViewMtx = lightToWsNoScaling.toMatrix().inverse();
 			const mat4f shadowProjMtx = mat4f::getPerspectiveFovRH(spotLightAngle * 2.f, 1.f, 0.1f, range, 0.f, kIsTexcoordStyleD3D);
 			const RawCamera shadowMapCamera = RawCamera(lightToWsNoScaling.p, shadowViewMtx, shadowProjMtx);
 

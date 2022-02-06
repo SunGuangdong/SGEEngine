@@ -9,13 +9,9 @@
 // clang-format on
 
 void sgeCreateMiniDump(EXCEPTION_POINTERS* pep) {
-	SYSTEMTIME sysTime;
-	GetLocalTime(&sysTime);
-
 	HANDLE hFile = CreateFile(_T("minidump.dmp"), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if ((hFile != NULL) && (hFile != INVALID_HANDLE_VALUE)) {
-		// Create the minidump
-
+		// Create the minidump.
 		MINIDUMP_EXCEPTION_INFORMATION mdei;
 
 		mdei.ThreadId = GetCurrentThreadId();

@@ -2,13 +2,15 @@
 
 namespace sge {
 
-InputState::InputState() {
+InputState::InputState()
+{
 	for (auto& v : m_keyStates) {
 		v = 0;
 	}
 }
 
-Optional<vec2f> InputState::hasTouchJustPresedUV(const vec2f& minUV, const vec2f& maxUV) const {
+Optional<vec2f> InputState::hasTouchJustPresedUV(const vec2f& minUV, const vec2f& maxUV) const
+{
 	for (const TouchInput& touch : m_touchInputs) {
 		const vec2f touchPosUV = clientToDomainUV(touch.touchPositionPixels);
 		bool isIn = touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
@@ -19,7 +21,8 @@ Optional<vec2f> InputState::hasTouchJustPresedUV(const vec2f& minUV, const vec2f
 	return NullOptional();
 }
 
-Optional<vec2f> InputState::hasTouchJustReleasedUV(const vec2f& minUV, const vec2f& maxUV) const {
+Optional<vec2f> InputState::hasTouchJustReleasedUV(const vec2f& minUV, const vec2f& maxUV) const
+{
 	for (const TouchInput& touch : m_touchInputs) {
 		const vec2f touchPosUV = clientToDomainUV(touch.touchPositionPixels);
 		bool isIn = touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
@@ -30,7 +33,8 @@ Optional<vec2f> InputState::hasTouchJustReleasedUV(const vec2f& minUV, const vec
 	return NullOptional();
 }
 
-Optional<vec2f> InputState::hasTouchPressedUV(const vec2f& minUV, const vec2f& maxUV) const {
+Optional<vec2f> InputState::hasTouchPressedUV(const vec2f& minUV, const vec2f& maxUV) const
+{
 	for (const TouchInput& touch : m_touchInputs) {
 		const vec2f touchPosUV = clientToDomainUV(touch.touchPositionPixels);
 		bool isIn = touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
@@ -41,7 +45,8 @@ Optional<vec2f> InputState::hasTouchPressedUV(const vec2f& minUV, const vec2f& m
 	return NullOptional();
 }
 
-void InputState::addTouch(const TouchInput& newTouch) {
+void InputState::addTouch(const TouchInput& newTouch)
+{
 	for (TouchInput& touch : m_touchInputs) {
 		if (touch.touchId == newTouch.touchId) {
 			touch = newTouch;
@@ -50,7 +55,8 @@ void InputState::addTouch(const TouchInput& newTouch) {
 	}
 }
 
-TouchInput& InputState::findOrCreateTouchById(const int64 touchId) {
+TouchInput& InputState::findOrCreateTouchById(const int64 touchId)
+{
 	for (TouchInput& t : m_touchInputs) {
 		if (t.touchId == touchId) {
 			return t;
@@ -64,7 +70,8 @@ TouchInput& InputState::findOrCreateTouchById(const int64 touchId) {
 	return m_touchInputs.back();
 }
 
-const TouchInput* InputState::getTouchById(const int64 touchId) const {
+const TouchInput* InputState::getTouchById(const int64 touchId) const
+{
 	for (const TouchInput& t : m_touchInputs) {
 		if (t.touchId == touchId) {
 			return &t;
@@ -74,7 +81,8 @@ const TouchInput* InputState::getTouchById(const int64 touchId) const {
 	return nullptr;
 }
 
-void InputState::Advance() {
+void InputState::Advance()
+{
 	m_hadkeyboardOrMouseInputThisPoll = false;
 	m_wasActiveWhilePolling = false;
 	m_inputText.clear();
@@ -113,35 +121,41 @@ void InputState::Advance() {
 	}
 }
 
-void InputState::setCursorPos(const vec2f& c) {
+void InputState::setCursorPos(const vec2f& c)
+{
 	if (m_cursorClient != c) {
 		m_hadkeyboardOrMouseInputThisPoll = true;
 		m_cursorClient = c;
 	}
 }
 
-void InputState::addInputText(const char c) {
+void InputState::addInputText(const char c)
+{
 	m_hadkeyboardOrMouseInputThisPoll = true;
 	m_inputText.push_back(c);
 }
 
-void InputState::addKeyUpOrDown(Key key, bool isDown) {
+void InputState::addKeyUpOrDown(Key key, bool isDown)
+{
 	m_hadkeyboardOrMouseInputThisPoll = true;
 	if (key >= 0 && key < Key_NumElements) {
 		if (isDown) {
 			m_keyStates[key] |= 1;
-		} else {
+		}
+		else {
 			m_keyStates[key] &= ~1;
 		}
 	}
 }
 
-void InputState::addMouseWheel(int v) {
+void InputState::addMouseWheel(int v)
+{
 	m_hadkeyboardOrMouseInputThisPoll = true;
 	m_wheelCount = v;
 }
 
-const GamepadState* InputState::getHookedGemepad(const int playerIndex) const {
+const GamepadState* InputState::getHookedGemepad(const int playerIndex) const
+{
 	int numFoundHooked = 0;
 	for (int t = 0; t < SGE_ARRSZ(xinputDevicesState); ++t) {
 		if (xinputDevicesState[t].hooked) {
@@ -164,7 +178,8 @@ const GamepadState* InputState::getHookedGemepad(const int playerIndex) const {
 	return nullptr;
 }
 
-void GamepadState::Advance(bool sdlStyleDontZeroTheThumbsticks) {
+void GamepadState::Advance(bool sdlStyleDontZeroTheThumbsticks)
+{
 	hadInputThisPoll = false;
 	hooked = false;
 
@@ -180,31 +195,36 @@ void GamepadState::Advance(bool sdlStyleDontZeroTheThumbsticks) {
 	}
 }
 
-bool GamepadState::isBtnDown(Button btn) const {
+bool GamepadState::isBtnDown(Button btn) const
+{
 	if (!hooked)
 		return false;
 	return (btnState[btn] & 1) != 0;
 }
 
-bool GamepadState::isBtnUp(Button btn) const {
+bool GamepadState::isBtnUp(Button btn) const
+{
 	if (!hooked)
 		return false;
 	return (btnState[btn] & 1) == 0;
 }
 
-bool GamepadState::isBtnPressed(Button btn) const {
+bool GamepadState::isBtnPressed(Button btn) const
+{
 	if (!hooked)
 		return false;
 	return (btnState[btn] & 0x3) == 1;
 }
 
-bool GamepadState::isBtnReleased(Button btn) const {
+bool GamepadState::isBtnReleased(Button btn) const
+{
 	if (!hooked)
 		return false;
 	return (btnState[btn] & 0x3) == 2;
 }
 
-vec2f GamepadState::getInputDir(bool const includeDPad) const {
+vec2f GamepadState::getInputDir(bool const includeDPad) const
+{
 	vec2f r(0.f);
 
 	if (!hooked)
@@ -229,7 +249,8 @@ vec2f GamepadState::getInputDir(bool const includeDPad) const {
 	return r;
 }
 
-bool InputState::AnyArrowKeyDown(bool includeWASD) const {
+bool InputState::AnyArrowKeyDown(bool includeWASD) const
+{
 	bool res = IsKeyDown(Key_Left) || IsKeyDown(Key_Right) || IsKeyDown(Key_Up) || IsKeyDown(Key_Down);
 	if (includeWASD) {
 		res |= IsKeyDown(Key_A) || IsKeyDown(Key_D) || IsKeyDown(Key_W) || IsKeyDown(Key_S);
@@ -238,7 +259,8 @@ bool InputState::AnyArrowKeyDown(bool includeWASD) const {
 	return res;
 }
 
-vec2f InputState::GetArrowKeysDir(const bool normalize, bool includeWASD, int useGamePadAtIndex) const {
+vec2f InputState::GetArrowKeysDir(const bool normalize, bool includeWASD, int useGamePadAtIndex) const
+{
 	vec2f result(0.f);
 
 	bool const left = IsKeyDown(Key_Left) || (includeWASD && IsKeyDown(Key_A));
@@ -254,6 +276,12 @@ vec2f InputState::GetArrowKeysDir(const bool normalize, bool includeWASD, int us
 	}
 
 	return normalize ? normalized0(result) : result;
+}
+
+vec3f InputState::GetArrowKeysDirXZ(const bool normalize, bool includeWASD, int useGamePadAtIndex) const
+{
+	vec2f input = GetArrowKeysDir(normalize, includeWASD, useGamePadAtIndex);
+	return vec3f(input.x, 0.f, -input.y);
 }
 
 } // namespace sge

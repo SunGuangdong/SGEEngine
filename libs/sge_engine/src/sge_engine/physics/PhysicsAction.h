@@ -10,10 +10,11 @@ SGE_NO_WARN_END
 namespace sge {
 
 /// PhysicsAction provides an interfaces that will get invoked
-/// on every physics sub step.
+/// on every physics sub-step.
 /// Particularly useful when writing kinematic objects (like characters)
 /// or when you need to do something with the same update rate as the physics (fixedUpdate in other engines).
 /// You can still use btActionInterface directly if you want.
+/// Bullet Physics calls these actions at the end of each step.
 struct PhysicsAction : public btActionInterface {
 	PhysicsAction() = default;
 
@@ -21,9 +22,7 @@ struct PhysicsAction : public btActionInterface {
 	// it is the meat of this class.
 	// virtual void updateAction(btCollisionWorld* collisionWorld, btScalar deltaTimeStep) override;
 
-	virtual void debugDraw(btIDebugDraw* UNUSED(debugDrawer)) override
-	{
-	}
+	virtual void debugDraw(btIDebugDraw* UNUSED(debugDrawer)) override {}
 };
 
 } // namespace sge

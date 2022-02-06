@@ -58,8 +58,8 @@ AABox3f ALight::getBBoxOS() const {
 			const float coneRadius = tanf(m_lightDesc.spotLightAngle) * coneLength;
 			AABox3f result;
 			result.expand(vec3f(0.f));
-			result.expand(vec3f(coneLength, coneRadius, coneRadius));
-			result.expand(vec3f(coneLength, -coneRadius, -coneRadius));
+			result.expand(vec3f(coneRadius, coneRadius, -coneLength));
+			result.expand(vec3f(-coneRadius, -coneRadius, -coneLength));
 			return result;
 		};
 		default:

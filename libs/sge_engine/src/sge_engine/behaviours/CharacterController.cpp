@@ -31,7 +31,7 @@ inline float speedLerp2(const float& a, const float& b, const float speed, const
 
 struct AInvisibleRigidObstacle;
 
-CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, const CharacterCtrlInput& input)
+CharaterCtrlOutcome CharacterCtrlDynamic::update(const GameUpdateSets& updateSets, const CharacterCtrlInput& input)
 {
 	const float kAllowedJumpTimeDelay = 0.1f; // The time we allow the player jump even if he is no longer on a walkable land.
 
@@ -258,8 +258,8 @@ CharaterCtrlOutcome CharacterCtrl::update(const GameUpdateSets& updateSets, cons
 	}
 
 	// Apply the gameplay veloctiy.
-	velocityToApply += gamplayAppliedLinearVelocity;
-	gamplayAppliedLinearVelocity = vec3f(0.f);
+	velocityToApply += gamplayAppliedLinearImpuse;
+	gamplayAppliedLinearImpuse = vec3f(0.f);
 
 	// Apply the computed velocity to the rigid body.
 	sgeAssert(!velocityToApply.hasNan());

@@ -17,7 +17,7 @@ struct GeometryRenderItem;
 /// ModelEntry is used to assign an AssetIface_Model3D model to TraitModel
 /// to get rendered. These use the evaluated state provided by this interface and cannot be animated.
 /// For animated models use @CustomModelEntry.
-struct ModelEntry {
+struct SGE_ENGINE_API ModelEntry {
 	ModelEntry()
 	    : m_assetProperty(assetIface_model3d)
 	{

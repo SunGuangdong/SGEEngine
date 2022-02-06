@@ -555,14 +555,14 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 
 
 		ImGuiEx::BeginGroupPanel(memberName);
-		ImGuiEx::Label("Angle From +Y");
+		ImGuiEx::Label("Angle Around +Y");
 		bool justReleased0 = false;
 		bool justActivated0 = false;
-		change |= SGEImGui::DragFloats("##SphericalRotation_RotationAroundY123", &v3edit.aroundY, 1, &justReleased0, &justActivated0);
-		ImGuiEx::Label("Angle Around +Y");
+		change |= SGEImGui::DragFloats("##SphericalRotation_RotationFromY", &v3edit.aroundY, 1, &justReleased0, &justActivated0);
+		ImGuiEx::Label("Angle From +Y");
 		bool justReleased1 = false;
 		bool justActivated1 = false;
-		change |= SGEImGui::DragFloats("##SphericalRotation_RotationFromY", &v3edit.fromY, 1, &justReleased1, &justActivated1);
+		change |= SGEImGui::DragFloats("##SphericalRotation_RotationAroundY", &v3edit.fromY, 1, &justReleased1, &justActivated1);
 		ImGuiEx::EndGroupPanel();
 
 		bool justReleased = justReleased0 || justReleased1;

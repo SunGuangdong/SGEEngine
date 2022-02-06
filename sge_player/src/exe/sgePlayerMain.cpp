@@ -133,7 +133,8 @@ struct SGEGameWindow : public WindowBase {
 
 		typeLib().performRegistration();
 		createAndInitializeEngineGlobal();
-		// When we are playing the game (in sge_player) we needs to allow the game
+
+		// When we are playing the game (in sge_player) we need to allow the game
 		// to do whatever it wants with the cursor, there is no editor to restrict that.
 		getEngineGlobal()->setEngineAllowingRelativeCursor(true);
 

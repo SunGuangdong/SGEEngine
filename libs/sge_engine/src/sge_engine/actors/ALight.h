@@ -16,6 +16,9 @@ struct SGE_ENGINE_API ALight : public Actor {
 	void update(const GameUpdateSets& updateSets) final;
 	const LightDesc& getLightDesc() const { return m_lightDesc; }
 
+	/// Get the light forward direction. This is the -Z axis.
+	vec3f getLightDirection() const { return -getTransformMtx().c2.xyz().normalized(); }
+
   public:
 	LightDesc m_lightDesc;
 	TraitViewportIcon m_traitViewportIcon;

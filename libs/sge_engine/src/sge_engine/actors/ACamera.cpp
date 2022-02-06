@@ -42,8 +42,7 @@ void CameraTraitCamera::update(const GameUpdateSets& UNUSED(updateSets)) {
 	const CameraProjectionSettings& projSets = world->userProjectionSettings;
 	m_proj = m_cameraSettings.calcMatrix(projSets.aspectRatio);
 	m_view = getActor()->getTransform().toMatrix().inverse();
-	// Make the camera look along +X
-	m_view = mat4f::getRotationY(sgeHalfPi) * m_view;
+	m_view = m_view;
 	m_projView = m_proj * m_view;
 	m_cachedFrustumWS = Frustum::extractClippingPlanes(m_projView, kIsTexcoordStyleD3D);
 }
