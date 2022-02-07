@@ -16,7 +16,7 @@ struct JsonValue;
 
 struct SGE_CORE_API MaterialFamilyDesc {
 	using GeometryDrawerAllocFn = IGeometryDrawer* (*)();
-	using MaterialAllocFn = std::shared_ptr<IMaterial> (*)();
+	using MaterialAllocFn = std::unique_ptr<IMaterial> (*)();
 
 	uint32 familyUniqueNumber;
 	std::string displayName;
@@ -72,7 +72,7 @@ struct MaterialFamilyLibrary {
 		return m_mtlFamilies;
 	}
 
-	std::shared_ptr<IMaterial> loadMaterialFromJson(const JsonValue* jRoot, const char* materialDirectory) const;
+	std::unique_ptr<IMaterial> loadMaterialFromJson(const JsonValue* jRoot, const char* materialDirectory) const;
 
   private:
 	std::unordered_map<uint32, MaterialFamilyData> m_mtlFamilies;

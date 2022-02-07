@@ -8,7 +8,8 @@ namespace sge {
 //--------------------------------------------------------------
 // Model
 //--------------------------------------------------------------
-void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib) {
+void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib)
+{
 	for (ModelMesh* const mesh : m_meshes) {
 		const ResourceUsage::Enum usage = ResourceUsage::Immutable;
 
@@ -33,7 +34,8 @@ void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib) {
 	loadMaterials(assetLib);
 }
 
-void Model::loadMaterials(AssetLibrary& assetLib) {
+void Model::loadMaterials(AssetLibrary& assetLib)
+{
 	m_loadedMaterial.resize(numMaterials());
 
 	for (int iMaterial = 0; iMaterial < numMaterials(); ++iMaterial) {
@@ -42,9 +44,12 @@ void Model::loadMaterials(AssetLibrary& assetLib) {
 		if (!rawMaterial->assetForThisMaterial.empty()) {
 			m_loadedMaterial[iMaterial] = assetLib.getLoadedAssetIface<AssetIface_Material>(rawMaterial->assetForThisMaterial.c_str(),
 			                                                                                getModelLoadSetting().assetDir.c_str());
-		} else {
-			std::shared_ptr<DefaultPBRMtl> evalMtl = std::make_shared<DefaultPBRMtl>();
+		}
+		else {
 			// Legacy material import where the materials weren't a separate asset.
+
+			std::unique_ptr<DefaultPBRMtl> evalMtl = std::make_unique<DefaultPBRMtl>();
+
 			evalMtl->diffuseColor = rawMaterial->oldInplaceMtl.diffuseColor;
 			evalMtl->roughness = rawMaterial->oldInplaceMtl.roughness;
 			evalMtl->metallic = rawMaterial->oldInplaceMtl.metallic;
@@ -62,14 +67,15 @@ void Model::loadMaterials(AssetLibrary& assetLib) {
 			                                                                           getModelLoadSetting().assetDir.c_str());
 
 			std::shared_ptr<AssetIface_Material_Simple> mtlProvider = std::make_shared<AssetIface_Material_Simple>();
-			mtlProvider->mtl = evalMtl;
+			mtlProvider->mtl = std::move(evalMtl);
 
 			m_loadedMaterial[iMaterial] = mtlProvider;
 		}
 	}
 }
 
-int Model::makeNewNode() {
+int Model::makeNewNode()
+{
 	ModelNode* node = m_containerNode.new_element();
 	const int nodeIndex = int(m_nodes.size());
 	m_nodes.push_back(node);
@@ -77,36 +83,42 @@ int Model::makeNewNode() {
 	return nodeIndex;
 }
 
-int Model::makeNewMaterial() {
+int Model::makeNewMaterial()
+{
 	ModelMaterial* newMtl = m_containerMaterial.new_element();
 	int materialIndex = int(m_materials.size());
 	m_materials.push_back(newMtl);
 	return materialIndex;
 }
 
-int Model::makeNewMesh() {
+int Model::makeNewMesh()
+{
 	ModelMesh* mesh = m_containerMesh.new_element();
 	int meshIndex = int(m_meshes.size());
 	m_meshes.push_back(mesh);
 	return meshIndex;
 }
 
-int Model::makeNewAnim() {
+int Model::makeNewAnim()
+{
 	int animIndex = int(m_animations.size());
 	m_animations.push_back(ModelAnimation());
 	return animIndex;
 }
 
-void Model::setRootNodeIndex(const int newRootNodeIndex) {
+void Model::setRootNodeIndex(const int newRootNodeIndex)
+{
 	if (newRootNodeIndex >= 0 && newRootNodeIndex < numNodes()) {
 		m_rootNodeIndex = newRootNodeIndex;
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 }
 
 
-ModelNode* Model::nodeAt(int nodeIndex) {
+ModelNode* Model::nodeAt(int nodeIndex)
+{
 	if (nodeIndex >= 0 && nodeIndex < int(m_nodes.size())) {
 		return m_nodes[nodeIndex];
 	}
@@ -114,7 +126,8 @@ ModelNode* Model::nodeAt(int nodeIndex) {
 	return nullptr;
 }
 
-const ModelNode* Model::nodeAt(int nodeIndex) const {
+const ModelNode* Model::nodeAt(int nodeIndex) const
+{
 	if (nodeIndex >= 0 && nodeIndex < int(m_nodes.size())) {
 		return m_nodes[nodeIndex];
 	}
@@ -122,7 +135,8 @@ const ModelNode* Model::nodeAt(int nodeIndex) const {
 	return nullptr;
 }
 
-int Model::findFistNodeIndexWithName(const std::string& name) const {
+int Model::findFistNodeIndexWithName(const std::string& name) const
+{
 	for (int t = 0; t < int(m_nodes.size()); ++t) {
 		if (m_nodes[t]->name == name) {
 			return t;
@@ -131,7 +145,8 @@ int Model::findFistNodeIndexWithName(const std::string& name) const {
 	return -1;
 }
 
-ModelMaterial* Model::materialAt(int materialIndex) {
+ModelMaterial* Model::materialAt(int materialIndex)
+{
 	if (materialIndex >= 0 && materialIndex < int(m_materials.size())) {
 		return m_materials[materialIndex];
 	}
@@ -139,7 +154,8 @@ ModelMaterial* Model::materialAt(int materialIndex) {
 	return nullptr;
 }
 
-const ModelMaterial* Model::materialAt(int materialIndex) const {
+const ModelMaterial* Model::materialAt(int materialIndex) const
+{
 	if (materialIndex >= 0 && materialIndex < int(m_materials.size())) {
 		return m_materials[materialIndex];
 	}
@@ -147,25 +163,28 @@ const ModelMaterial* Model::materialAt(int materialIndex) const {
 	return nullptr;
 }
 
-IMaterial* Model::loadedMaterialAt(int materialIndex) {
+IMaterial* Model::loadedMaterialAt(int materialIndex)
+{
 	if (materialIndex >= 0 && materialIndex < int(m_loadedMaterial.size())) {
 		if (m_loadedMaterial[materialIndex]) {
-			return m_loadedMaterial[materialIndex]->getMaterial().get();
+			return m_loadedMaterial[materialIndex]->getMaterial();
 		}
 	}
 	return nullptr;
 }
 
-IMaterial* Model::loadedMaterialAt(int materialIndex) const {
+IMaterial* Model::loadedMaterialAt(int materialIndex) const
+{
 	if (materialIndex >= 0 && materialIndex < int(m_loadedMaterial.size())) {
 		if (m_loadedMaterial[materialIndex]) {
-			return m_loadedMaterial[materialIndex]->getMaterial().get();
+			return m_loadedMaterial[materialIndex]->getMaterial();
 		}
 	}
 	return nullptr;
 }
 
-ModelMesh* Model::meshAt(int meshIndex) {
+ModelMesh* Model::meshAt(int meshIndex)
+{
 	if (meshIndex >= 0 && meshIndex < int(m_meshes.size())) {
 		return m_meshes[meshIndex];
 	}
@@ -173,7 +192,8 @@ ModelMesh* Model::meshAt(int meshIndex) {
 	return nullptr;
 }
 
-const ModelMesh* Model::meshAt(int meshIndex) const {
+const ModelMesh* Model::meshAt(int meshIndex) const
+{
 	if (meshIndex >= 0 && meshIndex < int(m_meshes.size())) {
 		return m_meshes[meshIndex];
 	}
@@ -181,21 +201,24 @@ const ModelMesh* Model::meshAt(int meshIndex) const {
 	return nullptr;
 }
 
-const ModelAnimation* Model::animationAt(int iAnim) const {
+const ModelAnimation* Model::animationAt(int iAnim) const
+{
 	if (iAnim >= 0 && iAnim < int(m_animations.size())) {
 		return &m_animations[iAnim];
 	}
 	return nullptr;
 }
 
-ModelAnimation* Model::animationAt(int iAnim) {
+ModelAnimation* Model::animationAt(int iAnim)
+{
 	if (iAnim >= 0 && iAnim < int(m_animations.size())) {
 		return &m_animations[iAnim];
 	}
 	return nullptr;
 }
 
-const ModelAnimation* Model::getAnimationByName(const std::string& name) const {
+const ModelAnimation* Model::getAnimationByName(const std::string& name) const
+{
 	for (const ModelAnimation& a : m_animations) {
 		if (a.animationName == name) {
 			return &a;
@@ -204,7 +227,8 @@ const ModelAnimation* Model::getAnimationByName(const std::string& name) const {
 	return nullptr;
 }
 
-int Model::getAnimationIndexByName(const std::string& name) const {
+int Model::getAnimationIndexByName(const std::string& name) const
+{
 	for (int iAnimation = 0; iAnimation < m_animations.size(); ++iAnimation) {
 		if (m_animations[iAnimation].animationName == name)
 			return iAnimation;
@@ -212,25 +236,29 @@ int Model::getAnimationIndexByName(const std::string& name) const {
 	return -1;
 }
 
-void KeyFrames::evaluate(transf3d& result, const float t) const {
+void KeyFrames::evaluate(transf3d& result, const float t) const
+{
 	// Evaluate the translation.
 	if (positionKeyFrames.empty() == false) {
 		const auto& keyItr = positionKeyFrames.upper_bound(t);
 		if (keyItr == positionKeyFrames.end()) {
 			result.p = positionKeyFrames.rbegin()->second;
-		} else {
+		}
+		else {
 			const auto& prevKeyItr = std::prev(keyItr);
 
 			if (prevKeyItr == positionKeyFrames.end()) {
 				result.p = keyItr->second;
-			} else {
+			}
+			else {
 				const float t0 = prevKeyItr->first;
 				const float t1 = keyItr->first;
 				const float dt = t1 - t0;
 
 				if (dt > 1e-6f) {
 					result.p = lerp(prevKeyItr->second, keyItr->second, (t - t0) / dt);
-				} else {
+				}
+				else {
 					result.p = keyItr->second;
 				}
 			}
@@ -242,19 +270,22 @@ void KeyFrames::evaluate(transf3d& result, const float t) const {
 		const auto& keyItr = rotationKeyFrames.upper_bound(t);
 		if (keyItr == rotationKeyFrames.end()) {
 			result.r = rotationKeyFrames.rbegin()->second;
-		} else {
+		}
+		else {
 			const auto& prevKeyItr = std::prev(keyItr);
 
 			if (prevKeyItr == rotationKeyFrames.end()) {
 				result.r = keyItr->second;
-			} else {
+			}
+			else {
 				const float t0 = prevKeyItr->first;
 				const float t1 = keyItr->first;
 				const float dt = t1 - t0;
 
 				if (dt > 1e-6f) {
 					result.r = slerp(prevKeyItr->second, keyItr->second, (t - t0) / dt);
-				} else {
+				}
+				else {
 					result.r = keyItr->second;
 				}
 			}
@@ -267,19 +298,22 @@ void KeyFrames::evaluate(transf3d& result, const float t) const {
 		const auto& keyItr = scalingKeyFrames.upper_bound(t);
 		if (keyItr == scalingKeyFrames.end()) {
 			result.s = scalingKeyFrames.rbegin()->second;
-		} else {
+		}
+		else {
 			const auto& prevKeyItr = std::prev(keyItr);
 
 			if (prevKeyItr == scalingKeyFrames.end()) {
 				result.s = keyItr->second;
-			} else {
+			}
+			else {
 				const float t0 = prevKeyItr->first;
 				const float t1 = keyItr->first;
 				const float dt = t1 - t0;
 
 				if (dt > 1e-6f) {
 					result.s = lerp(prevKeyItr->second, keyItr->second, (t - t0) / dt);
-				} else {
+				}
+				else {
 					result.s = keyItr->second;
 				}
 			}

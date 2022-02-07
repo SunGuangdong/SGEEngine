@@ -9,6 +9,42 @@
 
 namespace sge {
 
+struct ACoin : public Actor {
+	TraitModel ttModel;
+	TraitRigidBody ttRb;
+
+	AABox3f getBBoxOS() const
+	{
+		AABox3f bbox = ttModel.getBBoxOS();
+		return bbox;
+	}
+
+	void create()
+	{
+		registerTrait(ttModel);
+		registerTrait(ttRb);
+		ttModel.addModel("assets/coin.mdl");
+		ttRb.createBasedOnModel("assets/coin.mdl", 0.f, true, false);
+	}
+
+	void update(const GameUpdateSets& u)
+	{
+		if (u.isSimPaused) {
+			return;
+		}
+
+		const auto& itr = getWorld()->m_physicsManifoldList.find(ttRb.getRigidBody());
+
+		if (itr != getWorld()->m_physicsManifoldList.end()) {
+			getWorld()->objectDelete(getId());
+		}
+	}
+};
+
+ReflBlock()
+{
+	ReflAddActor(ACoin);
+}
 
 void GhostAction::updateAction(btCollisionWorld* UNUSED(collisionWorld), btScalar deltaTimeStep)
 {
@@ -83,6 +119,7 @@ void AGhostObject::create()
 	animator.playTrack(0);
 
 	charCtrl.m_cfg.defaultFacingDir = vec3f(0.f, 0.f, -1.f);
+	charCtrl.m_cfg.feetLevel = 1.f;
 
 	action.owner = this;
 }

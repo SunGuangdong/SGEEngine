@@ -4,13 +4,14 @@
 #include "sge_engine/Actor.h"
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitViewportIcon.h"
-#include "sge_utils/math/SphericalCoordinates.h"
 
 namespace sge {
 
 struct ASky : public Actor, public IActorCustomAttributeEditorTrait {
 	ASky()
-	    : m_textureAssetProp(assetIface_texture2d) {}
+	    : m_textureAssetProp(assetIface_texture2d)
+	{
+	}
 
 	AABox3f getBBoxOS() const override { return AABox3f(); }
 
@@ -31,7 +32,6 @@ struct ASky : public Actor, public IActorCustomAttributeEditorTrait {
 
 	vec3f m_topColor = vec3f(0.259f, 0.814f, 1.f);
 	vec3f m_bottomColor = vec3f(1.000f, 0.739f, 0.409f);
-	SphericalRotation m_sunDirection;
 
 	AssetProperty m_textureAssetProp;
 };

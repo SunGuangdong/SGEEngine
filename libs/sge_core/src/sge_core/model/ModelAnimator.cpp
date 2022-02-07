@@ -7,13 +7,15 @@
 
 namespace sge {
 
-void ModelAnimator::create(Model& modelToBeAnimated) {
+void ModelAnimator::create(Model& modelToBeAnimated)
+{
 	*this = ModelAnimator();
 	this->m_modelToAnimate = &modelToBeAnimated;
 }
 
 
-void ModelAnimator::trackSetFadeTime(int trackId, float fadingTime) {
+void ModelAnimator::trackSetFadeTime(int trackId, float fadingTime)
+{
 	if (m_tracks.count(trackId) == 0) {
 		m_tracks[trackId] = AnimationTrack();
 	}
@@ -21,7 +23,8 @@ void ModelAnimator::trackSetFadeTime(int trackId, float fadingTime) {
 	m_tracks[trackId].fadeInOutTime = fadingTime;
 }
 
-void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, const char* animationNameInSrcModel) {
+void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, const char* animationNameInSrcModel)
+{
 	if (animationNameInSrcModel == nullptr) {
 		sgeAssertFalse("Animation name is empty.");
 		return;
@@ -30,7 +33,8 @@ void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, const char* anima
 	int animIndexInAnimSource = -1;
 	if (srcModel) {
 		animIndexInAnimSource = srcModel->getAnimationIndexByName(animationNameInSrcModel);
-	} else {
+	}
+	else {
 		animIndexInAnimSource = m_modelToAnimate->getAnimationIndexByName(animationNameInSrcModel);
 	}
 
@@ -43,7 +47,8 @@ void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, const char* anima
 	trackAddAmim(trackId, srcModel, animIndexInAnimSource);
 }
 
-void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, int animIndexInSrcModel) {
+void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, int animIndexInSrcModel)
+{
 	AnimationTrack& track = m_tracks[trackId];
 	track.animationSources.emplace_back(AnimationModelSrc{srcModel, animIndexInSrcModel});
 
@@ -53,22 +58,25 @@ void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, int animIndexInSr
 	}
 }
 
-void ModelAnimator::trackAddAmimPath(int trackId, const char* modelAssetPath, int animIndexInSrcModel) {
+void ModelAnimator::trackAddAmimPath(int trackId, const char* modelAssetPath, int animIndexInSrcModel)
+{
 	std::shared_ptr<AssetIface_Model3D> mdlIface = getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
 	if (mdlIface) {
-		trackAddAmim(trackId, &mdlIface->getModel3D(), animIndexInSrcModel);
+		trackAddAmim(trackId, mdlIface->getModel3D(), animIndexInSrcModel);
 	}
 }
 
-void ModelAnimator::trackAddAmimPath(int trackId, const char* modelAssetPath, const char* animNameInModel) {
+void ModelAnimator::trackAddAmimPath(int trackId, const char* modelAssetPath, const char* animNameInModel)
+{
 	std::shared_ptr<AssetIface_Model3D> mdlIface = getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
 	if (mdlIface) {
-		int animIndex = mdlIface->getModel3D().getAnimationIndexByName(animNameInModel);
-		trackAddAmim(trackId, &mdlIface->getModel3D(), animIndex);
+		int animIndex = mdlIface->getModel3D()->getAnimationIndexByName(animNameInModel);
+		trackAddAmim(trackId, mdlIface->getModel3D(), animIndex);
 	}
 }
 
-void ModelAnimator::createNodeToNodeRemapForModel(Model& srcModel) {
+void ModelAnimator::createNodeToNodeRemapForModel(Model& srcModel)
+{
 	if (m_perModel_srcNode_toNode.count(&srcModel) > 0) {
 		return;
 	}
@@ -87,7 +95,8 @@ void ModelAnimator::createNodeToNodeRemapForModel(Model& srcModel) {
 	m_perModel_srcNode_toNode[&srcModel] = std::move(srcNode_toNode);
 }
 
-void ModelAnimator::playTrack(int trackIdToPlay) {
+void ModelAnimator::playTrack(int trackIdToPlay)
+{
 	// If we are already playing the same track as the top of the stack, do nothing.
 	if (getPlayingTrackId() == trackIdToPlay) {
 		return;
@@ -119,7 +128,8 @@ void ModelAnimator::playTrack(int trackIdToPlay) {
 	m_playbacks.emplace_back(playback);
 }
 
-void ModelAnimator::forceTrack(int trackIdToPlay, float animTime) {
+void ModelAnimator::forceTrack(int trackIdToPlay, float animTime)
+{
 	m_playbacks.clear();
 
 	if (m_tracks.count(trackIdToPlay)) {
@@ -134,7 +144,8 @@ void ModelAnimator::forceTrack(int trackIdToPlay, float animTime) {
 	}
 }
 
-void ModelAnimator::advanceAnimation(const float dt) {
+void ModelAnimator::advanceAnimation(const float dt)
+{
 	if (m_playbacks.empty()) {
 		return;
 	}
@@ -227,7 +238,8 @@ void ModelAnimator::advanceAnimation(const float dt) {
 					--iPlayback;
 					continue;
 				}
-			} else {
+			}
+			else {
 				playback.mixingWeight += fadePercentage;
 				playback.mixingWeight = clamp01(playback.mixingWeight);
 			}
@@ -237,7 +249,8 @@ void ModelAnimator::advanceAnimation(const float dt) {
 	if (m_playbacks.size() == 1) {
 		m_playbacks[0].mixingWeight = 1.f;
 		m_playbacks[0].normWeight = 1.f;
-	} else {
+	}
+	else {
 		float totalWeigth = 0.f;
 		for (int iPlayback = 0; iPlayback < m_playbacks.size(); ++iPlayback) {
 			TrackPlayback& playback = m_playbacks[iPlayback];
@@ -251,11 +264,13 @@ void ModelAnimator::advanceAnimation(const float dt) {
 	}
 }
 
-int ModelAnimator::getNumNodes() const {
+int ModelAnimator::getNumNodes() const
+{
 	return m_modelToAnimate ? m_modelToAnimate->numNodes() : 0;
 }
 
-void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int outNodeTransformsSize) {
+void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int outNodeTransformsSize)
+{
 	if (outNodeTransformsSize < m_modelToAnimate->numNodes()) {
 		sgeAssertFalse("The outNodeTransformsSize is not big enough!");
 		return;
@@ -304,7 +319,8 @@ void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int ou
 			int donorNodeIndex = -1;
 			if (animSrc.modelAnimSouce) {
 				donorNodeIndex = m_perModel_srcNode_toNode[&animationSourceModel][iOrigNode];
-			} else {
+			}
+			else {
 				donorNodeIndex = iOrigNode;
 			}
 
@@ -316,14 +332,16 @@ void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int ou
 					nodeLocalTransform = animationSourceModel.nodeAt(donorNodeIndex)->staticLocalTransform;
 					animationSourceAnimation->modifyTransformWithKeyFrames(nodeLocalTransform, donorNodeIndex, evalTime);
 				}
-			} else {
+			}
+			else {
 				// In no matching node is found, apply the static transform that has no animation.
 				nodeLocalTransform = m_modelToAnimate->nodeAt(iOrigNode)->staticLocalTransform;
 			}
 
 			if (isSingleTrackPlaying) {
 				outNodeTransforms[iOrigNode] = nodeLocalTransform.toMatrix();
-			} else {
+			}
+			else {
 				outNodeTransforms[iOrigNode] += nodeLocalTransform.toMatrix() * playback.normWeight;
 			}
 		}

@@ -14,9 +14,8 @@ struct SkyShaderSettings {
 	// [SKY_ENUM_DUPLICATED]
 	enum Mode : int {
 		mode_colorGradinet = 0,
-		mode_semiRealistic = 1,
-		mode_textureSphericalMapped = 2,
-		mode_textureCubeMapped = 3,
+		mode_textureSphericalMapped = 1,
+		mode_textureCubeMapped = 2,
 	};
 
 	Mode mode = mode_colorGradinet;

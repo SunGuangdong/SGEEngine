@@ -8,16 +8,15 @@
 #include "sge_engine/TerrainGenerator.h"
 #include "sge_engine/traits/TraitCustomAE.h"
 #include "sge_engine/traits/TraitModel.h"
-#include "sge_engine/traits/TraitRigidBody.h"
 #include "sge_engine/traits/TraitRenderGeometry.h"
+#include "sge_engine/traits/TraitRigidBody.h"
 
 namespace sge {
 
 struct GameInspector;
 
-//--------------------------------------------------------------------
-// ABlockingObstacle
-//--------------------------------------------------------------------
+/// ABlockingObstacle provides a way to block out levels using boxes, stairs and slopes.
+/// The obstacle is textured with triplaner mapped textures.
 struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCustomAttributeEditorTrait {
 	ABlockingObstacle()
 	    : m_textureX(assetIface_texture2d)
@@ -30,21 +29,22 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 	void postUpdate(const GameUpdateSets& updateSets) final;
 	AABox3f getBBoxOS() const final;
 
-	// IActorCustomAttributeEditorTrait
 	void doAttributeEditor(GameInspector* inspector) override;
 
   public:
+	TraitRenderGeometry tt_rendGeom;
+	TraitRigidBody m_traitRB;
+
 	SimpleObstacleDesc targetDesc;
 	SimpleObstacleDesc currentDesc;
 	RigidBodyPropertiesConfigurator m_rbPropConfig;
-	TraitRenderGeometry tt_rendGeom;
 
 	AssetProperty m_textureX;
 	float m_textureXScale = 1.f;
 	AssetProperty m_textureY;
 	float m_textureYScale = 1.f;
 
-	// TODO: move that away form here!
+	// Properties of the geometry and the material.
 	AABox3f boundingBox;
 	GpuHandle<Buffer> vertexBuffer;
 	GpuHandle<Buffer> indexBuffer;
@@ -52,7 +52,6 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 	SimpleTriplanarMtlData material;
 	int numVerts = 0;
 	int numIndices = 0;
-	TraitRigidBody m_traitRB;
 };
 
 } // namespace sge

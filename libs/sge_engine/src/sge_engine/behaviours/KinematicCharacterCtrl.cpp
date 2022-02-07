@@ -38,10 +38,11 @@ struct FindContactCallback : public btManifoldResult {
 struct ScanCollisionsResult {
 	bool hadAnyPenetration = false;
 	btVector3 recoveryVector = btVector3(0.f, 0.f, 0.f);
-	vec3f groundNormalWs = vec3f(0.f);
+	Optional<vec3f> groundNormalWs;
 };
 
-ScanCollisionsResult scanCollisions(btCollisionWorld* collisionWorld, btCollisionObject* colObj, float UNUSED(maxPenetrationDepth))
+ScanCollisionsResult
+    scanCollisions(btCollisionWorld* collisionWorld, btCollisionObject* colObj, float feetLevelWorld, float UNUSED(maxPenetrationDepth))
 {
 	ScanCollisionsResult result;
 
@@ -74,9 +75,11 @@ ScanCollisionsResult scanCollisions(btCollisionWorld* collisionWorld, btCollisio
 			if (manifold.hasPenetration()) {
 				result.recoveryVector += manifold.m_pointNormalWorld * -manifold.m_penetration_distance;
 
-				vec3f newNrm = fromBullet(manifold.m_pointNormalWorld).normalized0();
-				if (newNrm.y > result.groundNormalWs.y) {
-					result.groundNormalWs = newNrm;
+				if (manifold.m_pointWorld.y() < feetLevelWorld) {
+					vec3f newNrm = fromBullet(manifold.m_pointNormalWorld).normalized0();
+					if (!result.groundNormalWs || newNrm.y > result.groundNormalWs->y) {
+						result.groundNormalWs = newNrm;
+					}
 				}
 
 				result.hadAnyPenetration = true;
@@ -111,16 +114,13 @@ void CharacterCtrlKinematic::update(const CharacterCtrlInput& input, RigidBody& 
 		btTransform transformAfterMovement = rbBullet->getWorldTransform();
 		transformAfterMovement.setOrigin(transformAfterMovement.getOrigin() + toBullet((velocity + inputVelocity) * deltaTime));
 		rbBullet->setWorldTransform(transformAfterMovement);
+		collisionWorldBullet->updateSingleAabb(rbBullet);
 
-		scanCollision = scanCollisions(collisionWorldBullet, rbBullet, 0.02f);
+		scanCollision = scanCollisions(collisionWorldBullet, rbBullet, transformAfterMovement.getOrigin().y() + m_cfg.feetLevel, 0.02f);
 		if (scanCollision.hadAnyPenetration) {
 			btTransform newTransform = rbBullet->getWorldTransform();
 			newTransform.setOrigin(newTransform.getOrigin() + scanCollision.recoveryVector);
 			rbBullet->setWorldTransform(newTransform);
-
-
-
-			// Not sure if the line below needs to be called, it works without it.
 			collisionWorldBullet->updateSingleAabb(rbBullet);
 
 			if (scanCollision.recoveryVector.y() > 0.f) {
@@ -131,9 +131,9 @@ void CharacterCtrlKinematic::update(const CharacterCtrlInput& input, RigidBody& 
 
 	inputVelocity = vec3f(0.f);
 
-	if (scanCollision.hadAnyPenetration) {
+	if (scanCollision.groundNormalWs) {
 		// Reproject the input on the groundPlane.
-		Plane groundPlane(scanCollision.groundNormalWs, 0.f);
+		Plane groundPlane(scanCollision.groundNormalWs.get(), 0.f);
 		vec3f projectedInput = groundPlane.Project(input.walkDir).normalized0();
 
 		inputVelocity = projectedInput * m_cfg.walkSpeed;
@@ -156,8 +156,8 @@ void CharacterCtrlKinematic::update(const CharacterCtrlInput& input, RigidBody& 
 			velocity.y += m_cfg.computeJumpAcceleration();
 		}
 
-		if (isJumping == false && !input.isJumpButtonPressed) {
-			velocity = -scanCollision.groundNormalWs * deltaTime;
+		if (!isJumping && scanCollision.groundNormalWs) {
+			velocity = -scanCollision.groundNormalWs.get() * deltaTime;
 		}
 	}
 

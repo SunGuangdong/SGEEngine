@@ -197,7 +197,7 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice)
 			1001,
 			"DefaultPBR", 
 			[]() -> IGeometryDrawer* { return new DefaultPBRMtlGeomDrawer(); },
-		    []() -> std::shared_ptr<IMaterial> { return std::make_shared<DefaultPBRMtl>(); }
+		    []() -> std::unique_ptr<IMaterial> { return std::make_unique<DefaultPBRMtl>(); }
 		};
 
 		getMaterialLib()->registerFamily(pbrFd);
@@ -208,7 +208,7 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice)
 			1002,
 			"SimpleTriplanar", 
 			[]() -> IGeometryDrawer* { return new SimpleTriplanarMtlGeomDrawer(); },
-		    []() -> std::shared_ptr<IMaterial> { return std::make_shared<SimpleTriplanarMtl>(); }
+		    []() -> std::unique_ptr<IMaterial> { return std::make_unique<SimpleTriplanarMtl>(); }
 		};
 
 		getMaterialLib()->registerFamily(simpleTriplanarFd);

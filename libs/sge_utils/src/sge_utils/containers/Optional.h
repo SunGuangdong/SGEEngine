@@ -3,15 +3,16 @@
 #include <new>
 #include <utility>
 
-#include "sge_utils/sge_utils.h"
 #include "sge_utils/AlignedStorage.h"
 #include "sge_utils/TypeTraits.h"
+#include "sge_utils/sge_utils.h"
 
 namespace sge {
 
 /// A helper struct to construct empty Optional variable.
 /// example usage: NullOptional();
-struct NullOptional {};
+struct NullOptional {
+};
 
 template <class T>
 struct Optional {
@@ -25,180 +26,200 @@ struct Optional {
 
 	Optional() = default;
 
-	~Optional() {
-		destroyStorage();
-	}
+	~Optional() { destroyStorage(); }
 
-	Optional(const NullOptional&) {
-	}
+	Optional(const NullOptional&) {}
 
-	Optional(const T& other) {
-		copyConstructStorage(other);
-	}
+	Optional(const T& other) { copyConstructStorage(other); }
 
-	Optional(T&& other) {
-		moveConstructStorage(std::move(other));
-	}
+	Optional(T&& other) { moveConstructStorage(std::move(other)); }
 
-	Optional(const Optional& other) {
+	Optional(const Optional& other)
+	{
 		if (other.isValid()) {
 			copyConstructStorage(other.getStorageTyped());
 		}
 	}
 
-	Optional(Optional&& other) {
+	Optional(Optional&& other)
+	{
 		if (other.isValid()) {
 			moveConstructStorage(std::move(other.getStorageTyped()));
 			other.m_isValid = false;
 		}
 	}
 
-	Optional& operator=(const T& other) {
+	Optional& operator=(const T& other)
+	{
 		setStorage(other);
 		return *this;
 	}
 
-	Optional& operator=(T&& other) {
+	Optional& operator=(T&& other)
+	{
 		setStorage(std::move(other));
 		return *this;
 	}
 
-	Optional& operator=(const Optional& other) {
+	Optional& operator=(const Optional& other)
+	{
 		if (other.isValid()) {
 			setStorage(other.getStorageTyped());
-		} else {
+		}
+		else {
 			destroyStorage();
 		}
 		return *this;
 	}
 
-	Optional& operator=(Optional&& other) {
+	Optional& operator=(Optional&& other)
+	{
 		destroyStorage();
 		if (other.isValid()) {
 			setStorage(std::move(other.getStorageForMoving()));
 			other.m_isValid = false;
-		} else {
+		}
+		else {
 			destroyStorage();
 		}
 		return *this;
 	}
 
-	bool operator==(T& other) const {
-		return m_isValid && get() == other;
-	}
+	bool operator==(T& other) const { return m_isValid && get() == other; }
 
-	bool operator!=(T& other) const {
-		return !m_isValid || (get() != other);
-	}
+	bool operator!=(T& other) const { return !m_isValid || (get() != other); }
 
-	void reset() {
-		*this = Optional();
-	}
+	void reset() { *this = Optional(); }
 
-	TNoRef* operator->() {
+	TNoRef* operator->()
+	{
 		sgeAssert(isValid());
 		T& result = *reinterpret_cast<T*>(m_storage.data);
 		return &result;
 	}
 
-	const TNoRef* operator->() const {
+	const TNoRef* operator->() const
+	{
 		sgeAssert(isValid());
 		const T& result = *reinterpret_cast<const T*>(m_storage.data);
 		return &result;
 	}
 
-	operator bool() const {
-		return m_isValid;
+	operator bool() const { return m_isValid; }
+
+	bool isValid() const { return (bool)(*this); }
+
+	bool hasValue() const { return (bool)(*this); }
+
+	T* getPtr()
+	{
+		if (isValid()) {
+			T* result = reinterpret_cast<T*>(m_storage.data);
+			return result;
+		}
+		return nullptr;
 	}
 
-	bool isValid() const {
-		return (bool)(*this);
+	const T* getPtr() const
+	{
+		if (isValid()) {
+			const T* result = reinterpret_cast<const T*>(m_storage.data);
+			return result;
+		}
+		return nullptr;
 	}
 
-	bool hasValue() const {
-		return (bool)(*this);
-	}
-
-	T& get() {
+	T& get()
+	{
 		sgeAssert(isValid());
 		T& result = *reinterpret_cast<T*>(m_storage.data);
 		return result;
 	}
 
-	const T& get() const {
+	const T& get() const
+	{
 		sgeAssert(isValid());
 		const T& result = *reinterpret_cast<const T*>(m_storage.data);
 		return result;
 	}
 
-	T& operator*() {
-		return get();
-	}
-	const T& operator*() const {
-		return get();
-	}
+	T& operator*() { return get(); }
+	const T& operator*() const { return get(); }
 
   private:
 	// void defaultConstructStorage() {
 	//	new (m_storage.data) T();
 	//}
 
-	void copyConstructStorage(const T& value) {
+	void copyConstructStorage(const T& value)
+	{
 		new (m_storage.data) T(value);
 		m_isValid = true;
 	}
 
-	void moveConstructStorage(T&& value) {
+	void moveConstructStorage(T&& value)
+	{
 		new (m_storage.data) T(std::move(value));
 		m_isValid = true;
 	}
 
-	T& getStorageTyped() {
+	T& getStorageTyped()
+	{
 		T& result = *reinterpret_cast<T*>(m_storage.data);
 		return result;
 	}
 
-	const T& getStorageTyped() const {
+	const T& getStorageTyped() const
+	{
 		const T& result = *reinterpret_cast<const T*>(m_storage.data);
 		return result;
 	}
 
-	T&& getStorageForMoving() {
+	T&& getStorageForMoving()
+	{
 		T& result = *reinterpret_cast<T*>(m_storage.data);
 		return std::move(result);
 	}
 
-	void setStorage(const T& value) {
+	void setStorage(const T& value)
+	{
 		if constexpr (std::is_const<T>::value) {
 			reset();
 			copyConstructStorage(value);
-		} else {
+		}
+		else {
 			if (isValid()) {
 				getStorageTyped() = value;
-			} else {
+			}
+			else {
 				copyConstructStorage(value);
 			}
 		}
 	}
 
-	void setStorage(TNoRef&& value) {
+	void setStorage(TNoRef&& value)
+	{
 		if constexpr (std::is_const<T>::value) {
 			reset();
 			moveConstructStorage(std::move(value));
-		} else {
+		}
+		else {
 			if (isValid()) {
 				getStorageTyped() = std::move(value);
-			} else {
+			}
+			else {
 				if constexpr (std::is_move_constructible_v<T>) {
 					moveConstructStorage(std::move(value));
-				} else {
+				}
+				else {
 					copyConstructStorage(value);
 				}
 			}
 		}
 	}
 
-	void destroyStorage() {
+	void destroyStorage()
+	{
 		if (isValid()) {
 			T& result = *reinterpret_cast<T*>(m_storage.data);
 			result.~T();

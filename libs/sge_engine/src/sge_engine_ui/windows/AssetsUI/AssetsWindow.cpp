@@ -496,7 +496,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 								explorePreviewAssetChanged = true;
 								explorePreviewAsset = assetLib->getAssetFromFile(localAssetPath.c_str());
 
-								if (auto mtlIface = getLoadedAssetIface<AssetIface_Material>(explorePreviewAsset)) {
+								if (auto mtlIface = std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset)) {
 									openMaterialEditWindow(mtlIface);
 								}
 							}
@@ -687,7 +687,7 @@ void AssetsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSE
 						ImGui::Image(spriteTexIface->getTexture(), sz);
 					}
 				}
-				else if (AssetIface_Material* mtlIface = getLoadedAssetIface<AssetIface_Material>(explorePreviewAsset)) {
+				else if (auto mtlIface = std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset)) {
 					if (ImGui::Button(ICON_FK_PICTURE_O " Edit Material")) {
 						openMaterialEditWindow(mtlIface);
 					}
@@ -862,10 +862,8 @@ void AssetsWindow::doImportPopUp()
 	}
 }
 
-void AssetsWindow::openMaterialEditWindow(sge::AssetIface_Material* mtlIface)
+void AssetsWindow::openMaterialEditWindow(std::shared_ptr<sge::AssetIface_Material> mtlIface)
 {
-	std::shared_ptr<IMaterial> mtl = mtlIface->getMaterial();
-
 	MaterialEditWindow* mtlEditWnd =
 	    dynamic_cast<MaterialEditWindow*>(getEngineGlobal()->findWindowByName(ICON_FK_PICTURE_O " Material Edit"));
 	if (mtlEditWnd == nullptr) {
@@ -876,7 +874,7 @@ void AssetsWindow::openMaterialEditWindow(sge::AssetIface_Material* mtlIface)
 		ImGui::SetNextWindowFocus();
 	}
 
-	mtlEditWnd->setAsset(std::dynamic_pointer_cast<AssetIface_Material>(explorePreviewAsset));
+	mtlEditWnd->setAsset(mtlIface);
 }
 
 void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreviewAssetChanged)
@@ -891,25 +889,27 @@ void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreview
 		}
 	}
 
-	const Model& model = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getModel3D();
-	EvaluatedModel& staticEval = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval();
+	AssetIface_Model3D* modelSrc = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset);
 
-	m_exploreModelPreviewWidget.doWidget(getCore()->getDevice()->getContext(), is, staticEval);
+	const Model* model = modelSrc ? modelSrc->getModel3D() : nullptr;
+	if (model) {
+		EvaluatedModel& staticEval = modelSrc->getStaticEval();
 
-	ImGui::Text("Animation Count: %d", model.numAnimations());
-	for (int iAnim = 0; iAnim < model.numAnimations(); ++iAnim) {
-		ImGui::Text("\t%s", model.animationAt(iAnim)->animationName.c_str());
-	}
+		m_exploreModelPreviewWidget.doWidget(getCore()->getDevice()->getContext(), is, staticEval);
 
+		ImGui::Text("Animation Count: %d", model->numAnimations());
+		for (int iAnim = 0; iAnim < model->numAnimations(); ++iAnim) {
+			ImGui::Text("\t%s", model->animationAt(iAnim)->animationName.c_str());
+		}
 
+		for (int iMesh = 0; iMesh < model->numMeshes(); ++iMesh) {
+			ImGui::Text("\t%s", model->meshAt(iMesh)->name.c_str());
+		}
 
-	for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
-		ImGui::Text("\t%s", model.meshAt(iMesh)->name.c_str());
-	}
-
-	ImGui::Text("Material Count: %d", model.numMaterials());
-	for (int iMtl = 0; iMtl < model.numMaterials(); ++iMtl) {
-		ImGui::Text("\t%s", model.materialAt(iMtl)->name.c_str());
+		ImGui::Text("Material Count: %d", model->numMaterials());
+		for (int iMtl = 0; iMtl < model->numMaterials(); ++iMtl) {
+			ImGui::Text("\t%s", model->materialAt(iMtl)->name.c_str());
+		}
 	}
 }
 

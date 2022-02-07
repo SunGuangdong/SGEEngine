@@ -13,7 +13,6 @@ ReflAddTypeId(ASky, 21'06'23'0002);
 ReflBlock() {
 	ReflAddType(SkyShaderSettings::Mode)
 		ReflEnumVal(SkyShaderSettings::mode_colorGradinet, "Top-Down Gradient")
-		ReflEnumVal(SkyShaderSettings::mode_semiRealistic, "Semi-Realistic")
 		ReflEnumVal(SkyShaderSettings::mode_textureSphericalMapped, "Sphere Mapped")
 		ReflEnumVal(SkyShaderSettings::mode_textureCubeMapped, "Cube Mapped 2D")
 	;
@@ -22,7 +21,6 @@ ReflBlock() {
 		ReflMember(ASky, m_mode)
 		ReflMember(ASky, m_topColor).addMemberFlag(MFF_Vec3fAsColor)
 		ReflMember(ASky, m_bottomColor).addMemberFlag(MFF_Vec3fAsColor)
-		ReflMember(ASky, m_sunDirection)
 		ReflMember(ASky, m_textureAssetProp)
 
 	;
@@ -60,11 +58,6 @@ void ASky::doAttributeEditor(GameInspector* inspector)
 		ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
 		chain.pop();
 	}
-	else if (m_mode == SkyShaderSettings::mode_semiRealistic) {
-		chain.add(typeLib().findMember(&ASky::m_sunDirection));
-		ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
-		chain.pop();
-	}
 	else if (m_mode == SkyShaderSettings::mode_textureSphericalMapped || m_mode == SkyShaderSettings::mode_textureCubeMapped) {
 		chain.add(typeLib().findMember(&ASky::m_textureAssetProp));
 		ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
@@ -82,7 +75,6 @@ SkyShaderSettings ASky::getSkyShaderSetting() const
 	result.topColor = m_topColor;
 	result.bottomColor = m_bottomColor;
 	result.texture = texIface ? texIface->getTexture() : nullptr;
-	result.sunDirection = m_sunDirection.getDirection();
 
 	return result;
 }

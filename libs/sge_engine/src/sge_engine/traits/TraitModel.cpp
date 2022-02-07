@@ -13,8 +13,8 @@
 #include "sge_engine/actors/ALocator.h"
 #include "sge_engine_ui/ui/UIAssetPicker.h"
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
-#include "sge_utils/containers/vector_set.h"
 #include "sge_utils/containers/Range.h"
+#include "sge_utils/containers/vector_set.h"
 #include "sge_utils/stl_algorithm_ex.h"
 #include "sge_utils/text/format.h"
 
@@ -57,7 +57,7 @@ void ModelEntry::setModel(AssetPtr& asset, bool setupCustomEvalState)
 		AssetIface_Model3D* mdlIface = getLoadedAssetIface<AssetIface_Model3D>(asset);
 		if (mdlIface) {
 			customEvalModel = EvaluatedModel();
-			customEvalModel->initialize(&mdlIface->getModel3D());
+			customEvalModel->initialize(mdlIface->getModel3D());
 		}
 	}
 
@@ -69,7 +69,7 @@ void ModelEntry::onAssetModelChanged()
 	customEvalModel = NullOptional();
 
 	if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(m_assetProperty.getAsset())) {
-		mtlOverrides.resize(modelIface->getModel3D().numMaterials());
+		mtlOverrides.resize(modelIface->getModel3D()->numMaterials());
 	}
 }
 
@@ -156,7 +156,7 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRende
 				if (meshInst.iMaterial < modelSets.mtlOverrides.size()) {
 					if (modelSets.mtlOverrides[meshInst.iMaterial]) {
 						if (modelSets.mtlOverrides[meshInst.iMaterial]) {
-							mtl = modelSets.mtlOverrides[meshInst.iMaterial]->getMaterial().get();
+							mtl = modelSets.mtlOverrides[meshInst.iMaterial]->getMaterial();
 						}
 					}
 				}
@@ -244,14 +244,14 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 				AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 				if (loadedModelIface) {
 					// Now do the UI for each available material slot.
-					modelSets.mtlOverrides.resize(loadedModelIface->getModel3D().numMaterials());
+					modelSets.mtlOverrides.resize(loadedModelIface->getModel3D()->numMaterials());
 
 					if (ImGui::CollapsingHeader(ICON_FK_PAINT_BRUSH " Materials")) {
 						ImGuiEx::IndentGuard indentCollapsHeaderCotent;
-						for (int iMtl : RangeInt(loadedModelIface->getModel3D().numMaterials())) {
+						for (int iMtl : RangeInt(loadedModelIface->getModel3D()->numMaterials())) {
 							const ImGuiEx::IDGuard guard(iMtl);
 
-							const ModelMaterial* mtl = loadedModelIface->getModel3D().materialAt(iMtl);
+							const ModelMaterial* mtl = loadedModelIface->getModel3D()->materialAt(iMtl);
 
 							AssetIfaceType types[] = {assetIface_mtl};
 							AssetPtr currentAsset = std::dynamic_pointer_cast<Asset>(modelSets.mtlOverrides[iMtl]);

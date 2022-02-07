@@ -4,10 +4,10 @@
 
 namespace sge {
 
-std::shared_ptr<IMaterial> MaterialFamilyLibrary::loadMaterialFromJson(const JsonValue* jMtlRoot,
-                                                                       const char* materialDirectory) const {
+std::unique_ptr<IMaterial> MaterialFamilyLibrary::loadMaterialFromJson(const JsonValue* jMtlRoot, const char* materialDirectory) const
+{
 	if (jMtlRoot == nullptr) {
-		return std::shared_ptr<IMaterial>();
+		return std::unique_ptr<IMaterial>();
 	}
 
 	try {
@@ -18,18 +18,18 @@ std::shared_ptr<IMaterial> MaterialFamilyLibrary::loadMaterialFromJson(const Jso
 			return false;
 		}
 
-		std::shared_ptr<IMaterial> newMtl = family->familyDesc.mtlAllocFn();
+		std::unique_ptr<IMaterial> newMtl = family->familyDesc.mtlAllocFn();
 		bool succeeded = newMtl && newMtl->fromJson(jMtlRoot, materialDirectory);
 
 		if (succeeded) {
 			return newMtl;
 		}
-
-	} catch (...) {
+	}
+	catch (...) {
 	}
 
 	sgeAssert(false);
-	return std::shared_ptr<IMaterial>();
+	return std::unique_ptr<IMaterial>();
 }
 
 } // namespace sge

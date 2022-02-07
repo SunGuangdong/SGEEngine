@@ -6,6 +6,8 @@
 
 namespace sge {
 
+/// ModelReader is the class that can load the @Model form a file.
+/// All it does it just deserialized the information.
 struct SGE_CORE_API ModelReader {
 	ModelReader() = default;
 	~ModelReader() {}
@@ -25,7 +27,7 @@ struct SGE_CORE_API ModelReader {
 
 	const DataChunkDesc& FindDataChunkDesc(const int chunkId) const;
 
-	// CAUTION: These functions assume that irs points at the BEGINING of data chunks.
+	/// CAUTION: These functions assume that @irs points at the BEGINING of data chunks.
 	template <typename T>
 	void loadDataChunk(std::vector<T>& resultBuffer, const int chunkId);
 	void loadDataChunkRaw(void* const ptr, const size_t ptrExpectedSize, const int chunkId);

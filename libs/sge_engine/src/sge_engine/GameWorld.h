@@ -331,6 +331,7 @@ struct SGE_ENGINE_API GameWorld {
 	BulletPhysicsDebugDraw m_physicsDebugDraw;
 
 	/// Per frame physics contact manifold list.
+	/// Updated each frame after the physics simulation has ended.
 	std::unordered_map<const RigidBody*, std::vector<const btPersistentManifold*>> m_physicsManifoldList;
 
 	/// The next free game object id.

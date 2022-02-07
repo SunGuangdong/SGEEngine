@@ -50,6 +50,8 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 	m_textureX.update();
 	m_textureY.update();
 
+	// Check if the description of the obstacle has changed.
+	// If so update the object,
 	if (memcmp(&currentDesc, &targetDesc, sizeof(currentDesc)) != 0) {
 		boundingBox.setEmpty();
 
@@ -165,24 +167,27 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 
 		geometry = Geometry(vertexBuffer, indexBuffer, nullptr, -1, vertexDeclIdx, false, false, true, false,
 		                    PrimitiveTopology::TriangleList, 0, 0, sizeof(vec3f) * 2, UniformType::Uint, numIndices);
+
+
+		tt_rendGeom.geoms.resize(1);
+
+		tt_rendGeom.geoms[0].pGeom = &geometry;
+		tt_rendGeom.geoms[0].pMtl = &material;
+		tt_rendGeom.geoms[0].bboxGeometry = boundingBox;
+
+		material = SimpleTriplanarMtlData();
+
+		material.diffuseTextureX = m_textureX.getAssetInterface<AssetIface_Texture2D>()
+		                               ? m_textureX.getAssetInterface<AssetIface_Texture2D>()->getTexture()
+		                               : nullptr;
+		material.diffuseTextureY = m_textureY.getAssetInterface<AssetIface_Texture2D>()
+		                               ? m_textureY.getAssetInterface<AssetIface_Texture2D>()->getTexture()
+		                               : nullptr;
+		material.diffuseTextureZ = material.diffuseTextureX;
+
+		material.uvwTransform = mat4f::getScaling(m_textureXScale, m_textureYScale, m_textureXScale);
+		material.sharpness = 64.f;
 	}
-
-	tt_rendGeom.geoms.resize(1);
-
-	tt_rendGeom.geoms[0].pGeom = &geometry;
-	tt_rendGeom.geoms[0].pMtl = &material;
-	tt_rendGeom.geoms[0].bboxGeometry = boundingBox;
-
-	material = SimpleTriplanarMtlData();
-
-	material.diffuseTextureX =
-	    m_textureX.getAssetInterface<AssetIface_Texture2D>() ? m_textureX.getAssetInterface<AssetIface_Texture2D>()->getTexture() : nullptr;
-	material.diffuseTextureY =
-	    m_textureY.getAssetInterface<AssetIface_Texture2D>() ? m_textureY.getAssetInterface<AssetIface_Texture2D>()->getTexture() : nullptr;
-	material.diffuseTextureZ = material.diffuseTextureX;
-
-	material.uvwTransform = mat4f::getScaling(1.f / m_textureXScale, 1.f / m_textureYScale, 1.f / m_textureXScale);
-	material.sharpness = 64.f;
 }
 
 AABox3f ABlockingObstacle::getBBoxOS() const
@@ -237,6 +242,7 @@ void ABlockingObstacle::doAttributeEditor(GameInspector* inspector)
 	ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
 	chain.pop();
 
+	// Some presets to resize the geometry.
 	if (ImGui::Button("2x1x2")) {
 		transf3d newTransform = getTransform();
 		newTransform.s = vec3f(2.f, 1.f, 2.f);

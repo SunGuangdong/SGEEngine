@@ -103,7 +103,7 @@ void ModelPreviewWindow::setPreviewModel(AssetPtr asset)
 	nextTrackIndex = 0;
 
 	if (isAssetLoaded(m_model, assetIface_model3d)) {
-		m_eval.initialize(&getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
+		m_eval.initialize(getLoadedAssetIface<AssetIface_Model3D>(m_model)->getModel3D());
 		m_evalAnimator.create(*m_eval.m_model);
 
 		nextTrackIndex = 0;
@@ -154,19 +154,20 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 				AssetPtr animSrcModel;
 				if (promptForModel(animSrcModel)) {
 					if (AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(animSrcModel)) {
-						Model& srcModel = modelIface->getModel3D();
+						Model* srcModel = modelIface->getModel3D();
+						if (modelIface) {
+							// Add all animations each in a separate track.
+							for (int iAnim = 0; iAnim < srcModel->numAnimations(); ++iAnim) {
+								m_evalAnimator.trackAddAmim(nextTrackIndex, srcModel, iAnim);
 
-						// Add all animations each in a separate track.
-						for (int iAnim = 0; iAnim < srcModel.numAnimations(); ++iAnim) {
-							m_evalAnimator.trackAddAmim(nextTrackIndex, &srcModel, iAnim);
+								AnimationDisplayInfo animInfo;
+								animInfo.name = m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath();
+								animInfo.duration = srcModel->animationAt(iAnim)->durationSec;
 
-							AnimationDisplayInfo animInfo;
-							animInfo.name = m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath();
-							animInfo.duration = srcModel.animationAt(iAnim)->durationSec;
+								previewAnimationsInfo.push_back(animInfo);
 
-							previewAnimationsInfo.push_back(animInfo);
-
-							nextTrackIndex++;
+								nextTrackIndex++;
+							}
 						}
 					}
 				}
@@ -274,22 +275,24 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 
 	// Do the information side bar.
 	AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(m_model);
-	Model& model = modelIface->getModel3D();
+	Model* model = modelIface ? modelIface->getModel3D() : nullptr;
+
+	if (model)
 	{
-		ImGui::Text(ICON_FK_FILM " Animation Count: %d", model.numAnimations());
-		ImGui::Text(ICON_FK_CUBES " Node Count: %d", model.numNodes());
-		ImGui::Text(ICON_FK_CUBE " Mesh Count: %d", model.numMeshes());
-		ImGui::Text(ICON_FK_PICTURE_O " Material Count: %d", model.numMaterials());
+		ImGui::Text(ICON_FK_FILM " Animation Count: %d", model->numAnimations());
+		ImGui::Text(ICON_FK_CUBES " Node Count: %d", model->numNodes());
+		ImGui::Text(ICON_FK_CUBE " Mesh Count: %d", model->numMeshes());
+		ImGui::Text(ICON_FK_PICTURE_O " Material Count: %d", model->numMaterials());
 
 		if (ImGui::CollapsingHeader(ICON_FK_FILM " Animations", ImGuiTreeNodeFlags_DefaultOpen)) {
-			for (int iAnim = 0; iAnim < model.numAnimations(); ++iAnim) {
-				ImGui::Text("\t%s duration=%f", model.animationAt(iAnim)->animationName.c_str(), model.animationAt(iAnim)->durationSec);
+			for (int iAnim = 0; iAnim < model->numAnimations(); ++iAnim) {
+				ImGui::Text("\t%s duration=%f", model->animationAt(iAnim)->animationName.c_str(), model->animationAt(iAnim)->durationSec);
 			}
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_CUBES " Nodes")) {
 			std::function<void(int)> recusiveDoNodeInfo = [&](int nodeIndex) {
-				const ModelNode* node = model.nodeAt(nodeIndex);
+				const ModelNode* node = model->nodeAt(nodeIndex);
 
 				ImGuiTreeNodeFlags treeNodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_DefaultOpen;
 
@@ -310,8 +313,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 					for (const MeshAttachment& attachment : node->meshAttachments) {
 						const int meshIndex = attachment.attachedMeshIndex;
 						const int mtlIndex = attachment.attachedMeshIndex;
-						const ModelMesh* mesh = model.meshAt(meshIndex);
-						const ModelMaterial* mtl = model.materialAt(mtlIndex);
+						const ModelMesh* mesh = model->meshAt(meshIndex);
+						const ModelMaterial* mtl = model->materialAt(mtlIndex);
 						ImGui::Text("Attached Mesh [index=%d] %s", meshIndex, mesh->name.c_str());
 						ImGui::Text("Attached Material [index=%d] %s", meshIndex, mtl->name.c_str());
 
@@ -323,12 +326,12 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 				}
 			};
 
-			recusiveDoNodeInfo(model.getRootNodeIndex());
+			recusiveDoNodeInfo(model->getRootNodeIndex());
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_CUBES " Meshes")) {
-			for (int iMesh = 0; iMesh < model.numMeshes(); ++iMesh) {
-				const ModelMesh* mesh = model.meshAt(iMesh);
+			for (int iMesh = 0; iMesh < model->numMeshes(); ++iMesh) {
+				const ModelMesh* mesh = model->meshAt(iMesh);
 
 				ImGui::Text("Mesh [index=%d] %s", iMesh, mesh->name.c_str());
 				ImGui::Text("\tNum Vertices: %d", mesh->numVertices);
@@ -348,8 +351,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 		}
 
 		if (ImGui::CollapsingHeader(ICON_FK_PICTURE_O " Materials")) {
-			for (int iMtl = 0; iMtl < model.numMaterials(); ++iMtl) {
-				ModelMaterial* mtl = model.materialAt(iMtl);
+			for (int iMtl = 0; iMtl < model->numMaterials(); ++iMtl) {
+				ModelMaterial* mtl = model->materialAt(iMtl);
 				ImGui::Text("Material [index=%d] %s", iMtl, mtl->name.c_str());
 				ImGui::Text("\tAsset for Material: %s", mtl->assetForThisMaterial.c_str());
 			}
