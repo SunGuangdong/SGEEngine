@@ -28,7 +28,7 @@ ReflBlock() {
 }
 // clang-format on
 
-AABox3f AIKNode::getBBoxOS() const {
+Box3f AIKNode::getBBoxOS() const {
 	return kBBoxObjSpace;
 }
 

@@ -26,8 +26,8 @@ ReflBlock() {
 }
 // clang-format on
 
-AABox3f AStaticObstacle::getBBoxOS() const {
-	AABox3f bbox = m_traitModel.getBBoxOS();
+Box3f AStaticObstacle::getBBoxOS() const {
+	Box3f bbox = m_traitModel.getBBoxOS();
 	bbox.expand(m_traitSprite.getBBoxOS());
 	return bbox;
 }

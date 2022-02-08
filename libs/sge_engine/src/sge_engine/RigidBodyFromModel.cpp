@@ -47,7 +47,7 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 
 		if (shapeDescs.empty()) {
 			// Fallback to the bounding box of the whole 3D model.
-			AABox3f modelBBox = evaluatedMode.aabox;
+			Box3f modelBBox = evaluatedMode.aabox;
 
 			// For example if we have a single plane for obsticle,
 			// the bounding box by some axis could be 0, in order

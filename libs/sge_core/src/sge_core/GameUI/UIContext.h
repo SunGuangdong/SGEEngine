@@ -2,7 +2,8 @@
 
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/vec2.h"
+#include "sge_utils/math/vec2f.h"
+#include "sge_utils/math/vec2i.h"
 #include <memory>
 
 namespace sge {
@@ -16,7 +17,8 @@ namespace gamegui {
 	struct IWidget;
 
 	struct UIDrawSets {
-		void setup(RenderDestination rdest, QuickDraw* const quickDraw) {
+		void setup(RenderDestination rdest, QuickDraw* const quickDraw)
+		{
 			this->rdest = rdest;
 			this->quickDraw = quickDraw;
 		}
@@ -27,9 +29,6 @@ namespace gamegui {
 		QuickDraw* quickDraw = nullptr;
 	};
 
-	///
-	///
-	///
 	struct SGE_CORE_API UIContext {
 		void create(const vec2i& canvasSize) { m_canvasSize = canvasSize; }
 

@@ -1,6 +1,6 @@
 #pragma once
 #include "math_base.h"
-#include "vec4.h"
+#include "vec4f.h"
 #include <cfloat>
 
 namespace sge {

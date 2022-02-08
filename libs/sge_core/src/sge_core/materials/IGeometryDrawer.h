@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/mat4f.h"
 
 namespace sge {
 
@@ -23,7 +23,7 @@ struct InstanceDrawMods {};
 struct ShadingLightData {
 	const LightDesc* pLightDesc = nullptr;
 	Texture* shadowMap = nullptr;
-	AABox3f lightBoxWs;
+	Box3f lightBoxWs;
 	mat4f shadowMapProjView = mat4f::getIdentity();
 	vec3f lightPositionWs = vec3f(0.f);
 	vec3f lightDirectionWs = vec3f(0.f);

@@ -6,7 +6,7 @@
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_core/application/input.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 
 namespace sge::gamegui {
 
@@ -32,7 +32,7 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 		}
 
 		if (w->m_wasHoveredPrevFrame) {
-			AABox2f bboxss = w->getScissorBoxSS();
+			Box2f bboxss = w->getScissorBoxSS();
 
 			if (m_isUsingGamepad) {
 				w->m_wasHoveredPrevFrame = false;
@@ -154,7 +154,7 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 			hoveredWidgetsChain.push_back(w);
 
 			for (const std::shared_ptr<IWidget>& child : w->getChildren()) {
-				AABox2f bboxss = child->getScissorBoxSS();
+				Box2f bboxss = child->getScissorBoxSS();
 
 				if (bboxss.isInside(is.GetCursorPos())) {
 					handleCursor(child);
@@ -163,7 +163,7 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 		};
 
 		for (const std::shared_ptr<IWidget>& widget : m_rootWidgets) {
-			AABox2f bboxss = widget->getScissorBoxSS();
+			Box2f bboxss = widget->getScissorBoxSS();
 
 			if (bboxss.isInside(is.GetCursorPos()) && widget->isSuspended() == false) {
 				handleCursor(widget);
@@ -231,7 +231,7 @@ void UIContext::draw(const UIDrawSets& drawSets) {
 	}
 
 	if (auto gamepadTarget = getGamepadTarget(); m_isUsingGamepad && gamepadTarget && !gamepadTarget->isSuspended()) {
-		AABox2f bb = gamepadTarget->getBBoxPixels();
+		Box2f bb = gamepadTarget->getBBoxPixels();
 		drawSets.quickDraw->drawRect(drawSets.rdest, bb, vec4f(1.f, 1.f, 0.f, 0.33f),
 		                             getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}

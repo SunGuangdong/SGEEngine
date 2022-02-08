@@ -255,7 +255,7 @@ void GameInspector::focusOnSelection() {
 		return;
 	}
 
-	AABox3f combinedBoundingBox;
+	Box3f combinedBoundingBox;
 	vec3f averagePosition = vec3f(0.f);
 
 	for (int t = 0; t < m_selection.size(); ++t) {
@@ -264,7 +264,7 @@ void GameInspector::focusOnSelection() {
 			continue;
 
 		if (m_selection[t].editMode == editMode_actors) {
-			AABox3f const box = actor->getBBoxOS().getTransformed(actor->getTransform().toMatrix());
+			Box3f const box = actor->getBBoxOS().getTransformed(actor->getTransform().toMatrix());
 			if (!box.IsEmpty())
 				combinedBoundingBox.expand(box);
 			else

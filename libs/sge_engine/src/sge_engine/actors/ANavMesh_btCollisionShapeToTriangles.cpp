@@ -147,8 +147,8 @@ void btCylinderShapeToTriangles(const btCylinderShape* cylinderShape,
 	outVertices.reserve(outVertices.size() + numHorizontalSegments * 2 + 2);
 	outIndices.reserve(outIndices.size() + numHorizontalSegments * 6 + numHorizontalSegments * 3 * 2);
 	for (int i = 0; i < numHorizontalSegments; ++i) {
-		const vec3f vBottom = mat_mul_pos(transformNoScaling, vec3(x2, -kHalfHeight, z2) * extents);
-		const vec3f vTop = mat_mul_pos(transformNoScaling, vec3(x2, +kHalfHeight, z2) * extents);
+		const vec3f vBottom = mat_mul_pos(transformNoScaling, vec3f(x2, -kHalfHeight, z2) * extents);
+		const vec3f vTop = mat_mul_pos(transformNoScaling, vec3f(x2, +kHalfHeight, z2) * extents);
 
 		outVertices.push_back(vBottom);
 		outVertices.push_back(vTop);

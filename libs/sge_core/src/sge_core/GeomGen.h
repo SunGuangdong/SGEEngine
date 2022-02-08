@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/vec3.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/vec3f.h"
 #include "sgecore_api.h"
 
 namespace sge {
@@ -52,7 +52,7 @@ struct SGE_CORE_API GeomGen {
 	// Adds the vertices to the global array for wire geometry - verts.
 	// Vertices: Line List of [ float3 Position ]
 	static void wiredBox(std::vector<PosColorVert>& verts, const mat4f& transform, const uint32 rgba);
-	static void wiredBox(std::vector<PosColorVert>& verts, const AABox3f& aabb, const uint32 rgba);
+	static void wiredBox(std::vector<PosColorVert>& verts, const Box3f& aabb, const uint32 rgba);
 
 	// Generates a 3D wired capsule in RH Y-up.
 	// Adds the vertices to the global array for wire geometry - verts.

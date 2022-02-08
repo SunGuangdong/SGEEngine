@@ -62,9 +62,9 @@ void ANavMesh::create()
 	});
 }
 
-AABox3f ANavMesh::getBBoxOS() const
+Box3f ANavMesh::getBBoxOS() const
 {
-	return AABox3f::getFromHalfDiagonal(vec3f(1.f));
+	return Box3f::getFromHalfDiagonal(vec3f(1.f));
 }
 
 void ANavMesh::doAttributeEditor(GameInspector* inspector)
@@ -229,7 +229,7 @@ void ANavMesh::build()
 	// Set the area where the navigation will be build.
 	// Here the bounds of the input mesh are used, but the
 	// area could be specified by an user defined box, etc.
-	AABox3f navMeshBBox = getBBoxOS().getTransformed(getTransformMtx());
+	Box3f navMeshBBox = getBBoxOS().getTransformed(getTransformMtx());
 
 	recastCfg.bmin[0] = navMeshBBox.min.x;
 	recastCfg.bmin[1] = navMeshBBox.min.y;

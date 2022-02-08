@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sge_engine/GameDrawer/IRenderItem.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/mat4f.h"
 
 namespace sge {
 
@@ -22,7 +22,7 @@ struct GeometryRenderItem : public IRenderItem {
 
 	/// The volume that the geometry occupies in world space.
 	/// Initially used to obtain witch lights affect the geometry when rendering.
-	AABox3f bboxWs;
+	Box3f bboxWs;
 };
 
 } // namespace sge

@@ -57,7 +57,7 @@ ReflBlock() {
 // Generates the vertex buffer and the bounding boxes needed to represent this geometry for both rendering and physics.
 bool TerrainGenerator::generateStairs(std::vector<Vertex>& vertices,
                                       std::vector<int>& indices,
-                                      std::vector<AABox3f>& bboxes,
+                                      std::vector<Box3f>& bboxes,
                                       const StairsDesc& desc,
                                       int* pNumVertsAdded,
                                       int* pNumIndicesAdded,
@@ -199,7 +199,7 @@ bool TerrainGenerator::generateStairs(std::vector<Vertex>& vertices,
 
 	// Add the bounding boxes.
 	for (int t = 0; t < desc.numStairs; ++t) {
-		AABox3f box;
+		Box3f box;
 
 		box.min.x = (t + 0) * singleStairWidth;
 		box.min.y = 0.f;

@@ -4,7 +4,7 @@
 #include "GameInspector.h"
 #include "sge_core/QuickDraw.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 
 #include "SelectionTool.h"
 
@@ -208,7 +208,7 @@ InspectorToolResult SelectionTool::updateTool(GameInspector* const inspector,
 		// Determine the picking region
 		const vec2f pickingPointEndCS = is.GetCursorPos();
 
-		AABox2f selectionRectCS;
+		Box2f selectionRectCS;
 		selectionRectCS.expand(m_pickingPointStartCS);
 		selectionRectCS.expand(pickingPointEndCS);
 
@@ -234,7 +234,7 @@ void SelectionTool::drawOverlay(const GameDrawSets& drawSets) {
 	if (m_isSelecting) {
 		SGEDevice* const sgedev = drawSets.rdest.sgecon->getDevice();
 
-		AABox2f rect;
+		Box2f rect;
 		rect.expand(m_pickingPointStartCS);
 		rect.expand(m_lastUpdateCursorPos);
 
@@ -245,7 +245,7 @@ void SelectionTool::drawOverlay(const GameDrawSets& drawSets) {
 }
 
 void SelectionTool::performPicking(
-    GameInspector* inspector, AABox2f selectionRectCS, const GameDrawSets& drawSets, bool ctrlDown, bool shiftDown) {
+    GameInspector* inspector, Box2f selectionRectCS, const GameDrawSets& drawSets, bool ctrlDown, bool shiftDown) {
 	const bool singleClickSelection = selectionRectCS.halfDiagonal().length() <= 3.f;
 
 	if (singleClickSelection) {

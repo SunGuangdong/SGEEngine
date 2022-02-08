@@ -1,11 +1,13 @@
 #pragma once
 
 #include "sge_utils/math/common.h"
-#include "sge_utils/math/quat.h"
+#include "sge_utils/math/quatf.h"
+#include "sge_utils/math/vec3f.h"
 
 namespace sge {
 
-inline quatf eulerToQuaternion(vec3f euler) {
+inline quatf eulerToQuaternion(vec3f euler)
+{
 	// euler.x = normalizeAnglePiRange(euler.x);
 	// sgeAssert(euler.x >= -half_pi() && euler.x <= half_pi());
 	float ex = euler.x * 0.5f;
@@ -27,11 +29,13 @@ inline quatf eulerToQuaternion(vec3f euler) {
 	return q;
 }
 
-inline quatf eulerToQuaternionDegrees(float x, float y, float z) {
+inline quatf eulerToQuaternionDegrees(float x, float y, float z)
+{
 	return eulerToQuaternion(vec3f(deg2rad(x), deg2rad(y), deg2rad(z)));
 }
 
-inline vec3f quaternionToEuler(const quatf& q) {
+inline vec3f quaternionToEuler(const quatf& q)
+{
 	const float x = q.x;
 	const float y = q.y;
 	const float z = q.z;

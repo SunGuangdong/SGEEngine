@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mat4.h"
-#include "quat.h"
+#include "mat4f.h"
+#include "quatf.h"
 
 namespace sge {
 

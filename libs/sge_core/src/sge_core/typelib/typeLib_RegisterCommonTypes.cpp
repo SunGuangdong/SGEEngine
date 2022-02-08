@@ -1,9 +1,15 @@
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/MultiCurve2D.h"
 #include "sge_utils/math/Rangef.h"
 #include "sge_utils/math/SphericalCoordinates.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/transform.h"
+#include "sge_utils/math/vec2f.h"
+#include "sge_utils/math/vec2i.h"
+#include "sge_utils/math/vec3f.h"
+#include "sge_utils/math/vec3i.h"
+#include "sge_utils/math/vec4f.h"
+#include "sge_utils/math/vec4i.h"
 
 #include <string>
 #include <vector>
@@ -41,7 +47,7 @@ ReflAddTypeId(quatf,                     20);
 ReflAddTypeId(mat4f,                     21);
 ReflAddTypeId(transf3d,                  22);
 
-ReflAddTypeId(AABox3f,                   23);
+ReflAddTypeId(Box3f,                   23);
 
 ReflAddTypeId(Rangef,                    24);
 
@@ -156,9 +162,9 @@ ReflBlock() {
 		ReflMember(transf3d, s).setPrettyName("scaling")
 	;
 
-	ReflAddType(AABox3f)
-		ReflMember(AABox3f, min)
-		ReflMember(AABox3f, max);
+	ReflAddType(Box3f)
+		ReflMember(Box3f, min)
+		ReflMember(Box3f, max);
 
 	ReflAddType(Rangef)
 		ReflMember(Rangef, min)

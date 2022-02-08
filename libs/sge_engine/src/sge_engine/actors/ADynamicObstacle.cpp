@@ -48,7 +48,7 @@ void ADynamicObstacle::postUpdate(const GameUpdateSets& UNUSED(u)) {
 	}
 }
 
-AABox3f ADynamicObstacle::getBBoxOS() const {
+Box3f ADynamicObstacle::getBBoxOS() const {
 	return m_traitModel.getBBoxOS();
 }
 

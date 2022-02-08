@@ -9,7 +9,7 @@ ReflBlock() {
 	ReflAddActor(AInvisibleRigidObstacle);
 }
 
-AABox3f AInvisibleRigidObstacle::getBBoxOS() const {
+Box3f AInvisibleRigidObstacle::getBBoxOS() const {
 	return kBBoxObjSpace;
 }
 

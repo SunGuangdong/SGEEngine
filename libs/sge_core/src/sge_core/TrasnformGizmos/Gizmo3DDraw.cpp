@@ -187,7 +187,7 @@ void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, c
 void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolume& gizmo, const mat4f& projView) {
 	const mat4f os2ws = gizmo.getEditedTrasform().toMatrix();
 
-	const AABox3f boxOs = gizmo.getInitialBBoxOS();
+	const Box3f boxOs = gizmo.getInitialBBoxOS();
 	const float handleSizeWS = gizmo.getHandleRadiusWS();
 
 	vec3f boxFaceCentersOs[signedAxis_numElements];

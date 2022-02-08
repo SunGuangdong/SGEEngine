@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/sge_utils.h"
@@ -252,13 +252,13 @@ struct SGE_CORE_API Gizmo3DScale : public Gizmo3DCommon {
 //-------------------------------------------------------------------------------
 struct SGE_CORE_API Gizmo3DScaleVolume : public Gizmo3DCommon {
 	// Changes the gizmo state back to non-m_interaction, and places it at newTargetPosition.
-	void reset(const transf3d& transform, const AABox3f& bboxOs);
+	void reset(const transf3d& transform, const Box3f& bboxOs);
 
 	// The update function of the gizmo, returns true when the "user interaction" is complete.
 	GizmoInteractResult interact(const GizmoInteractArgs& args);
 
 	transf3d getInitialTransform() const { return m_initalTransform; }
-	AABox3f getInitialBBoxOS() const { return m_initalBboxOs; }
+	Box3f getInitialBBoxOS() const { return m_initalBboxOs; }
 
 	// Retrieves the currently edited value by the user.
 	transf3d getEditedTrasform() const { return m_editedTransform; }
@@ -269,7 +269,7 @@ struct SGE_CORE_API Gizmo3DScaleVolume : public Gizmo3DCommon {
 	float handleRadiusWs = 0.f;
 
 	transf3d m_initalTransform;
-	AABox3f m_initalBboxOs;
+	Box3f m_initalBboxOs;
 
 	transf3d m_editedTransform;
 };
@@ -293,7 +293,7 @@ struct SGE_CORE_API Gizmo3D {
 
 	// TODO: Implement local space transformations.
 	// Resets the gizmo to it's inital state with the specified transformation.
-	void reset(const Mode mode, const transf3d& tr, const AABox3f& bbox);
+	void reset(const Mode mode, const transf3d& tr, const Box3f& bbox);
 
 	// The update function of the gizmo, returns true when the "user interaction" is complete.
 	GizmoInteractResult interact(const GizmoInteractArgs& args);

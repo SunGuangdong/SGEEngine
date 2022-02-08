@@ -35,7 +35,7 @@ struct SGE_ENGINE_API ALine : public Actor {
 	ALine() {}
 
 	void create() final;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 	void onMemberChanged() final;
 
 	void computeSegmentsLength();

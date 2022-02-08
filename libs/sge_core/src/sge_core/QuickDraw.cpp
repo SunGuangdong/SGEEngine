@@ -2,7 +2,7 @@
 
 #include "sge_core/ICore.h"
 #include "sge_utils/io/FileStream.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box2f.h"
 #include "sge_utils/math/color.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -176,7 +176,7 @@ vec2f DebugFont::computeTextDimensions(const char* text, float textHeight) const
 	float y = textHeight;
 	const float sizeScaling = (textHeight >= 0.f) ? textHeight / (float)height : 1.f;
 
-	AABox2f bbox;
+	Box2f bbox;
 
 	while (*text != '\0') {
 		if (*text == '\n') {
@@ -396,7 +396,7 @@ void QuickDraw::initalize3DDrawResources(SGEContext* context)
 	vertexDeclIndex_pos3d_rgba_int = sgedev->getVertexDeclIndex(vtxDecl_pos3d_rgba_int, SGE_ARRSZ(vtxDecl_pos3d_rgba_int));
 }
 
-void QuickDraw::drawRect(const RenderDestination& rdest, const AABox2f& boxPixels, const vec4f& rgba, BlendState* blendState)
+void QuickDraw::drawRect(const RenderDestination& rdest, const Box2f& boxPixels, const vec4f& rgba, BlendState* blendState)
 {
 	const vec2f boxSize = boxPixels.size();
 	drawRect(rdest, boxPixels.min.x, boxPixels.min.y, boxSize.x, boxSize.y, rgba, blendState);
@@ -435,7 +435,7 @@ void QuickDraw::drawRect(
 }
 
 void QuickDraw::drawTriLeft(
-    const RenderDestination& rdest, const AABox2f& boxPixels, float rotation, const vec4f& rgba, BlendState* blendState)
+    const RenderDestination& rdest, const Box2f& boxPixels, float rotation, const vec4f& rgba, BlendState* blendState)
 {
 	const vec2f size = boxPixels.size();
 
@@ -515,7 +515,7 @@ void QuickDraw::drawRectTexture(const RenderDestination& rdest,
 }
 
 void QuickDraw::drawRectTexture(const RenderDestination& rdest,
-                                const AABox2f& boxPixels,
+                                const Box2f& boxPixels,
                                 Texture* texture,
                                 BlendState* blendState,
                                 vec2f topUV,
@@ -726,12 +726,12 @@ void QuickDraw::drawWiredAdd_Box(const mat4f& world, const uint32 rgba)
 	GeomGen::wiredBox(m_wireframeVerts, world, rgba);
 }
 
-void QuickDraw::drawWiredAdd_Box(const AABox3f& aabb, const uint32 rgba)
+void QuickDraw::drawWiredAdd_Box(const Box3f& aabb, const uint32 rgba)
 {
 	GeomGen::wiredBox(m_wireframeVerts, aabb, rgba);
 }
 
-void QuickDraw::drawWiredAdd_Box(const mat4f& world, const AABox3f& aabb, const uint32 rgba)
+void QuickDraw::drawWiredAdd_Box(const mat4f& world, const Box3f& aabb, const uint32 rgba)
 {
 	const size_t newBoxStart = m_wireframeVerts.size();
 

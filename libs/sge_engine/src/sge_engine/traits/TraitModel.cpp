@@ -73,9 +73,9 @@ void ModelEntry::onAssetModelChanged()
 	}
 }
 
-AABox3f ModelEntry::getBBoxOS(const mat4f& invWorldTrasnform) const
+Box3f ModelEntry::getBBoxOS(const mat4f& invWorldTrasnform) const
 {
-	AABox3f bbox;
+	Box3f bbox;
 
 	// If the attached asset is a model use it to compute the bounding box.
 	if (customEvalModel) {
@@ -111,9 +111,9 @@ void TraitModel::addModel(AssetPtr& asset, bool setupCustomEvalState)
 	m_models.back().setModel(asset, setupCustomEvalState);
 }
 
-AABox3f TraitModel::getBBoxOS() const
+Box3f TraitModel::getBBoxOS() const
 {
-	AABox3f bbox;
+	Box3f bbox;
 	for (const ModelEntry& mdl : m_models) {
 		bbox.expand(mdl.getBBoxOS(mat4f::getIdentity()));
 	}

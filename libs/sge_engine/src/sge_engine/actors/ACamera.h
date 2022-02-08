@@ -68,7 +68,7 @@ struct ACamera : public Actor {
 	ACamera();
 
 	void create() final;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 	void update(const GameUpdateSets& updateSets) final;
 
 

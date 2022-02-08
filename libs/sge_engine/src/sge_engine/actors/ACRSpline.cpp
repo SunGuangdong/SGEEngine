@@ -56,8 +56,8 @@ void ACRSpline::create() {
 	computeSegmentsLength();
 }
 
-AABox3f ACRSpline::getBBoxOS() const {
-	AABox3f bbox;
+Box3f ACRSpline::getBBoxOS() const {
+	Box3f bbox;
 
 	for (const vec3f& pt : points)
 		bbox.expand(pt);

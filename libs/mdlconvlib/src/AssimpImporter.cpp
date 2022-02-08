@@ -37,8 +37,8 @@ transf3d fromAssimp(const aiMatrix4x4& m) {
 	return result;
 }
 
-AABox3f fromAssimp(const aiAABB& asmpBox) {
-	AABox3f box;
+Box3f fromAssimp(const aiAABB& asmpBox) {
+	Box3f box;
 
 	box.min = fromAssimp(asmpBox.mMin);
 	box.max = fromAssimp(asmpBox.mMax);
@@ -655,7 +655,7 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 	std::vector<char> vertexBufferData(asmpMesh->mNumVertices * stride);
 
 	// Fill the vertex buffer data channels.
-	AABox3f bboxMesh;
+	Box3f bboxMesh;
 	for (unsigned declIdx = 0; declIdx < mesh.vertexDecl.size(); ++declIdx) {
 		if (declIdx >= asmpChannelsData.size()) {
 			continue;
@@ -916,7 +916,7 @@ void AssimpImporter::importCollisionGeometry() {
 		const aiMesh* const asmpMesh = itrBoxInstantiations.first;
 
 		// CAUTION: The code assumes that the mesh vertices form a box.
-		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+		Box3f bbox = fromAssimp(asmpMesh->mAABB);
 
 		for (int const iInstance : RangeInt(int(itrBoxInstantiations.second.size()))) {
 			transf3d n2w = m_collision_transfromCorrection * itrBoxInstantiations.second[iInstance];
@@ -930,7 +930,7 @@ void AssimpImporter::importCollisionGeometry() {
 		const aiMesh* const asmpMesh = itr.first;
 
 		// CAUTION: The code assumes that the mesh vertices are untoched.
-		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+		Box3f bbox = fromAssimp(asmpMesh->mAABB);
 
 		vec3f const halfDiagonal = bbox.halfDiagonal();
 		vec3f const ssides = halfDiagonal.getSorted();
@@ -955,7 +955,7 @@ void AssimpImporter::importCollisionGeometry() {
 		const aiMesh* const asmpMesh = itrCylinderInstantiations.first;
 
 		// CAUTION: The code assumes that the mesh vertices are untoched.
-		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+		Box3f bbox = fromAssimp(asmpMesh->mAABB);
 
 		vec3f const halfDiagonal = bbox.halfDiagonal();
 		for (int const iInstance : RangeInt(int(itrCylinderInstantiations.second.size()))) {
@@ -970,7 +970,7 @@ void AssimpImporter::importCollisionGeometry() {
 		const aiMesh* const asmpMesh = itrSphereInstantiations.first;
 
 		// CAUTION: The code assumes that the mesh vertices are untoched.
-		AABox3f bbox = fromAssimp(asmpMesh->mAABB);
+		Box3f bbox = fromAssimp(asmpMesh->mAABB);
 
 		vec3f const halfDiagonal = bbox.halfDiagonal();
 		float const radius = halfDiagonal.getSorted().x;

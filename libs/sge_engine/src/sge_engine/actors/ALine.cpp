@@ -62,8 +62,8 @@ void ALine::create() {
 	points.push_back(vec3f(10.f, 0.f, 0.f));
 }
 
-AABox3f ALine::getBBoxOS() const {
-	AABox3f bbox;
+Box3f ALine::getBBoxOS() const {
+	Box3f bbox;
 
 	for (const vec3f& pt : points)
 		bbox.expand(pt);

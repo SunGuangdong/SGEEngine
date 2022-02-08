@@ -8,7 +8,7 @@ namespace sge {
 
 ReflAddTypeIdExists(AParticlesSimple);
 struct SGE_ENGINE_API AParticlesSimple : public Actor {
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 	void create() final;
 	void postUpdate(const GameUpdateSets& u) final;
 

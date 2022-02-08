@@ -1,6 +1,6 @@
 #include "MultiCurve2DEditor.h"
 #include "sge_core/SGEImGui.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/text/format.h"
 
 #include <unordered_set>
@@ -233,7 +233,7 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 				float w = std::max(widgetSize.x, widgetSize.y);
 				m_camViewSizeFS = 2.f * widgetSize * (1.f / w);
 			} else {
-				AABox2f bboxFs;
+				Box2f bboxFs;
 				if (ss.m_selectedIndices.empty() || ss.m_selectedIndices.size() == 1) {
 					for (auto& pt : m_fn.getPoints()) {
 						bboxFs.expand(pt.getPos());
@@ -265,7 +265,7 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 				float w = std::max(widgetSize.x, widgetSize.y);
 				m_camViewSizeFS = 2.f * widgetSize * (1.f / w);
 			} else {
-				AABox2f bboxFs;
+				Box2f bboxFs;
 				if (ss.m_selectedIndices.empty() || ss.m_selectedIndices.size() == 1) {
 					for (auto& pt : m_fn.getPoints()) {
 						bboxFs.expand(pt.getPos());
@@ -321,7 +321,7 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 		if (ImGui::IsMouseReleased(0)) {
 			ss.m_selectedIndices.clear();
 
-			AABox2f selectionRectFS;
+			Box2f selectionRectFS;
 			selectionRectFS.expand(client2function(ss.m_selectionRectStartPointCS));
 			selectionRectFS.expand(client2function(ss.m_selectionRectEndPointCS));
 
@@ -519,7 +519,7 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 
 	// Draw the selection rectangle.
 	if (ss.m_state == State::CreatingSelectionRect) {
-		AABox2f selectionRectCS;
+		Box2f selectionRectCS;
 		selectionRectCS.expand(ss.m_selectionRectStartPointCS);
 		selectionRectCS.expand(ss.m_selectionRectEndPointCS);
 		const vec2f selRectMinSS = clientToScreen(selectionRectCS.min);

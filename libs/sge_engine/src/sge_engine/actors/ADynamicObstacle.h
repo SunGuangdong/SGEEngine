@@ -20,7 +20,7 @@ struct SGE_ENGINE_API ADynamicObstacle : public Actor {
 	void onDuplocationComplete() final;
 	void postUpdate(const GameUpdateSets& updateSets) final;
 
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 
   public:
 	TraitModel m_traitModel;

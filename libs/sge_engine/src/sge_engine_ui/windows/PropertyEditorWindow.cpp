@@ -195,7 +195,7 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			// Locked Uniform scaling.
 			float uniformScale = v.s.x;
 			change |= SGEImGui::DragFloats("##Scaling", &uniformScale, 1, &justReleased, &justActivated, 1.f, 0.01f);
-			v.s = vec3(uniformScale);
+			v.s = vec3f(uniformScale);
 		}
 		else {
 			if (lockedScaling) {

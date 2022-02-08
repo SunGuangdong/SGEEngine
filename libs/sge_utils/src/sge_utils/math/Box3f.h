@@ -3,147 +3,138 @@
 #include <limits>
 
 #include "common.h"
-#include "mat4.h"
+#include "mat4f.h"
 #include "math_base.h"
-#include "vec.h"
+#include "vec3f.h"
 
 #if defined(min) || defined(max)
-#error min/max macros are defined
+	#error min/max macros are defined
 #endif
 
 namespace sge {
 
-template <class T, unsigned int N>
-struct AABox {
-	typedef T DATA_TYPE;
-	typedef typename vec_type_picker<DATA_TYPE, N>::type VEC_TYPE;
+struct Box3f {
+	Box3f() { setEmpty(); }
 
-
-	AABox() { setEmpty(); }
-
-	AABox(const VEC_TYPE& min, const VEC_TYPE& max)
+	Box3f(const vec3f& min, const vec3f& max)
 	    : min(min)
-	    , max(max) {}
+	    , max(max)
+	{
+	}
 
-	static AABox getFromHalfDiagonal(const VEC_TYPE& halfDiagonal, const VEC_TYPE& offset = vec3f(0.f)) {
+	static Box3f getFromHalfDiagonal(const vec3f& halfDiagonal, const vec3f& offset = vec3f(0.f))
+	{
 		sgeAssert(halfDiagonal.x >= 0 && halfDiagonal.y >= 0 && halfDiagonal.z >= 0);
 
-		AABox retval;
+		Box3f retval;
 		retval.max = halfDiagonal + offset;
 		retval.min = -halfDiagonal + offset;
 
 		return retval;
 	}
 
-	static AABox getFromHalfDiagonalWithOffset(const VEC_TYPE& halfDiagonal, const VEC_TYPE& offset) {
+	static Box3f getFromHalfDiagonalWithOffset(const vec3f& halfDiagonal, const vec3f& offset)
+	{
 		sgeAssert(halfDiagonal.x >= 0 && halfDiagonal.y >= 0 && halfDiagonal.z >= 0);
 
-		AABox retval;
+		Box3f retval;
 		retval.max = halfDiagonal + offset;
 		retval.min = -halfDiagonal + offset;
 
 		return retval;
 	}
 
-	static AABox getFromXZBaseAndSize(const VEC_TYPE& base, const VEC_TYPE& sizes) {
-		VEC_TYPE min = base;
-		min.x -= sizes.x / (DATA_TYPE)2;
-		min.z -= sizes.z / (DATA_TYPE)2;
+	static Box3f getFromXZBaseAndSize(const vec3f& base, const vec3f& sizes)
+	{
+		vec3f min = base;
+		min.x -= sizes.x * 0.5f;
+		min.z -= sizes.z * 0.5f;
 
-		VEC_TYPE max = base;
-		max.x += sizes.x / (DATA_TYPE)2;
+		vec3f max = base;
+		max.x += sizes.x * 0.5f;
 		max.y += sizes.y;
-		max.z += sizes.z / (DATA_TYPE)2;
+		max.z += sizes.z * 0.5f;
 
-		return AABox(min, max);
+		return Box3f(min, max);
 	}
 
-	void move(const VEC_TYPE& offset) {
+	void move(const vec3f& offset)
+	{
 		min += offset;
 		max += offset;
 	}
 
-	VEC_TYPE center() const { return (max + min) / (DATA_TYPE)2; }
+	vec3f center() const { return (max + min) * 0.5f; }
 
-	VEC_TYPE halfDiagonal() const { return (max - min) / (DATA_TYPE)2; }
+	vec3f halfDiagonal() const { return (max - min) * 0.5f; }
 
-	VEC_TYPE diagonal() const { return (max - min); }
+	vec3f diagonal() const { return (max - min); }
 
-	VEC_TYPE bottomMiddle() const {
-		VEC_TYPE ret = center() - halfDiagonal().yOnly();
+	vec3f bottomMiddle() const
+	{
+		vec3f ret = center() - halfDiagonal().yOnly();
 		return ret;
 	}
 
-	VEC_TYPE topMiddle() const {
-		VEC_TYPE ret = center() + halfDiagonal().yOnly();
+	vec3f topMiddle() const
+	{
+		vec3f ret = center() + halfDiagonal().yOnly();
 		return ret;
 	}
 
-	VEC_TYPE size() const { return max - min; }
+	vec3f size() const { return max - min; }
 
-	void setEmpty() {
-		min = VEC_TYPE(std::numeric_limits<DATA_TYPE>::max());
-		max = VEC_TYPE(std::numeric_limits<DATA_TYPE>::lowest());
+	void setEmpty()
+	{
+		min = vec3f(std::numeric_limits<float>::max());
+		max = vec3f(std::numeric_limits<float>::lowest());
 	}
 
-	bool IsEmpty() const {
-		return min == VEC_TYPE(std::numeric_limits<DATA_TYPE>::max()) && max == VEC_TYPE(std::numeric_limits<DATA_TYPE>::lowest());
-	}
+	bool IsEmpty() const { return min == vec3f(std::numeric_limits<float>::max()) && max == vec3f(std::numeric_limits<float>::lowest()); }
 
-	void expand(const VEC_TYPE& point) {
+	void expand(const vec3f& point)
+	{
 		min = min.pickMin(point);
 		max = max.pickMax(point);
 	}
 
-	void expandEdgesByCoefficient(float value) {
-		VEC_TYPE exp = halfDiagonal() * value;
+	void expandEdgesByCoefficient(float value)
+	{
+		vec3f exp = halfDiagonal() * value;
 		min -= exp;
 		max += exp;
 	}
 
-	void scale(const DATA_TYPE& s) {
+	void scale(const float& s)
+	{
 		min *= s;
 		max *= s;
 	}
 
-	void scale(const VEC_TYPE& s) {
-		for (int t = 0; t < VEC_TYPE::NUM_ELEMS; ++t) {
-			min.data[t] *= s.data[t];
-			max.data[t] *= s.data[t];
-		}
-	}
-
-	AABox getScaled(const VEC_TYPE& s) const {
-		AABox result = *this;
-		for (int t = 0; t < VEC_TYPE::NUM_ELEMS; ++t) {
-			result.min.data[t] *= s.data[t];
-			result.max.data[t] *= s.data[t];
-		}
-
-		return result;
-	}
-
-	AABox getScaledCentered(const VEC_TYPE& s) const {
-		const VEC_TYPE c = center();
-		VEC_TYPE h = halfDiagonal();
-		AABox result;
+	Box3f getScaledCentered(const vec3f& s) const
+	{
+		const vec3f c = center();
+		vec3f h = halfDiagonal();
+		Box3f result;
 		result.expand(c - h * s);
 		result.expand(c + h * s);
 		return result;
 	}
 
-	void scaleAroundCenter(const VEC_TYPE& s) {
-		const VEC_TYPE oldCenter = center();
-		const VEC_TYPE oldSize = size();
+	void scaleAroundCenter(const vec3f& s)
+	{
+		const vec3f oldCenter = center();
+		const vec3f oldSize = size();
 
-		const VEC_TYPE newSize = oldSize * s;
+		const vec3f newSize = oldSize * s;
 
 		setEmpty();
 		expand(oldCenter + newSize * 0.5f);
 		expand(oldCenter - newSize * 0.5f);
 	}
 
-	void expand(const AABox& other) {
+	void expand(const Box3f& other)
+	{
 		if (other.IsEmpty() == false) {
 			min = min.pickMin(other.min);
 			min = min.pickMin(other.max);
@@ -153,37 +144,41 @@ struct AABox {
 		}
 	}
 
-	bool isInside(const VEC_TYPE& point) const {
+	bool isInside(const vec3f& point) const
+	{
 		bool res = true;
-		for (int t = 0; t < VEC_TYPE::NUM_ELEMS; ++t) {
-			res &= point.data[t] >= min.data[t] && point.data[t] <= max.data[t];
-		}
+
+		res &= point.data[0] >= min.data[0] && point.data[0] <= max.data[0];
+		res &= point.data[1] >= min.data[1] && point.data[1] <= max.data[1];
+		res &= point.data[2] >= min.data[2] && point.data[2] <= max.data[2];
 
 		return res;
 	}
 
-	bool overlaps(const AABox& other) const {
+	bool overlaps(const Box3f& other) const
+	{
 		const bool xOverlap = doesOverlap1D(min.x, max.x, other.min.x, other.max.x);
 		const bool yOverlap = doesOverlap1D(min.y, max.y, other.min.y, other.max.y);
 		const bool zOverlap = doesOverlap1D(min.z, max.z, other.min.z, other.max.z);
 		return xOverlap && yOverlap && zOverlap;
 	}
 
-	AABox getOverlapBox(const AABox& other) const {
+	Box3f getOverlapBox(const Box3f& other) const
+	{
 		if (this->IsEmpty() || other.IsEmpty()) {
-			return AABox();
+			return Box3f();
 		}
 
-		AABox result;
+		Box3f result;
 
-		for (unsigned int t = 0; t < N; ++t) {
+		for (unsigned int t = 0; t < 3; ++t) {
 			float omin, omax;
 			overlapSegment1D(min.data[t], max.data[t], other.min.data[t], other.max.data[t], omin, omax);
 
 			// If the overlap is negative, that means that the boxes do not overlap.
 			// In this case just return an empty box.
 			if (omin > omax) {
-				return AABox();
+				return Box3f();
 			}
 
 			result.min[t] = omin;
@@ -194,43 +189,53 @@ struct AABox {
 	}
 
 	/// Retireves the AABB corner points by index (0-7).
-	VEC_TYPE getPoint(const int idx) const {
+	vec3f getPoint(const int idx) const
+	{
 		if (idx == 0)
 			return min;
 		else if (idx == 1)
-			return VEC_TYPE(min.x, min.y, max.z);
+			return vec3f(min.x, min.y, max.z);
 		else if (idx == 2)
-			return VEC_TYPE(max.x, min.y, max.z);
+			return vec3f(max.x, min.y, max.z);
 		else if (idx == 3)
-			return VEC_TYPE(max.x, min.y, min.z);
+			return vec3f(max.x, min.y, min.z);
 		else if (idx == 4)
-			return VEC_TYPE(min.x, max.y, min.z);
+			return vec3f(min.x, max.y, min.z);
 		else if (idx == 5)
-			return VEC_TYPE(min.x, max.y, max.z);
+			return vec3f(min.x, max.y, max.z);
 		else if (idx == 6)
 			return max;
 		else if (idx == 7)
-			return VEC_TYPE(max.x, max.y, min.z);
+			return vec3f(max.x, max.y, min.z);
 
 		sgeAssert(false && "idx out of bounds! Needs to be in [0;7]");
-		return VEC_TYPE(0.f);
+		return vec3f(0.f);
 	}
 
 	/// Returns the transformed AXIS ALIGNED Bounding box.
 	/// Performs a column-major matrix multiplication for every point.
-	AABox getTransformed(const mat4<DATA_TYPE>& transform) const {
+	Box3f getTransformed(const mat4f& transform) const
+	{
 		if (this->IsEmpty())
-			return *this;
+			return Box3f();
 
-		AABox retval;
-		for (int t = 0; t < 8; ++t) {
-			retval.expand((transform * vec4<DATA_TYPE>(getPoint(t), (DATA_TYPE)1)).xyz());
-		}
+		Box3f retval;
+
+		retval.expand(mat_mul_pos(transform, getPoint(0)));
+		retval.expand(mat_mul_pos(transform, getPoint(1)));
+		retval.expand(mat_mul_pos(transform, getPoint(2)));
+		retval.expand(mat_mul_pos(transform, getPoint(3)));
+		retval.expand(mat_mul_pos(transform, getPoint(4)));
+		retval.expand(mat_mul_pos(transform, getPoint(5)));
+		retval.expand(mat_mul_pos(transform, getPoint(6)));
+		retval.expand(mat_mul_pos(transform, getPoint(7)));
+
 
 		return retval;
 	}
 
-	bool intersectFast(const vec3f& origin, const vec3f& invDir, float& t) const {
+	bool intersectFast(const vec3f& origin, const vec3f& invDir, float& t) const
+	{
 		const float t1 = (min.x - origin.x) * invDir.x;
 		const float t2 = (max.x - origin.x) * invDir.x;
 		const float t3 = (min.y - origin.y) * invDir.y;
@@ -257,13 +262,15 @@ struct AABox {
 		return true;
 	}
 
-	bool intersect(const vec3f& origin, const vec3f& dir, float& t0, float& t1) const {
+	bool intersect(const vec3f& origin, const vec3f& dir, float& t0, float& t1) const
+	{
 		float tmin, tmax, tymin, tymax, tzmin, tzmax;
 
 		if (dir.x >= 0.f) {
 			tmin = (min.x - origin.x) / dir.x;
 			tmax = (max.x - origin.x) / dir.x;
-		} else {
+		}
+		else {
 			tmin = (max.x - origin.x) / dir.x;
 			tmax = (min.x - origin.x) / dir.x;
 		}
@@ -271,7 +278,8 @@ struct AABox {
 		if (dir.y >= 0.f) {
 			tymin = (min.y - origin.y) / dir.y;
 			tymax = (max.y - origin.y) / dir.y;
-		} else {
+		}
+		else {
 			tymin = (max.y - origin.y) / dir.y;
 			tymax = (min.y - origin.y) / dir.y;
 		}
@@ -288,7 +296,8 @@ struct AABox {
 		if (dir.z >= 0.f) {
 			tzmin = (min.z - origin.z) / dir.z;
 			tzmax = (max.z - origin.z) / dir.z;
-		} else {
+		}
+		else {
 			tzmin = (max.z - origin.z) / dir.z;
 			tzmax = (min.z - origin.z) / dir.z;
 		}
@@ -310,8 +319,8 @@ struct AABox {
 	}
 
 	/// Moves the specified face of the bounding box along its normal.
-	// AABox3f movedFaceBy(const SignedAxis axis, float amount) const {
-	//	AABox3f tmp = *this;
+	// Box3f movedFaceBy(const SignedAxis axis, float amount) const {
+	//	Box3f tmp = *this;
 	//	switch (axis) {
 	//		case axis_x_pos: {
 	//			tmp.max.x += amonut;
@@ -334,7 +343,7 @@ struct AABox {
 	//	}
 
 	//	// Handle the situation where the amonut swapped the position of min/max points.
-	//	AABox3f result;
+	//	Box3f result;
 	//	result.expand(tmp.min);
 	//	result.expand(tmp.max);
 
@@ -342,8 +351,9 @@ struct AABox {
 	//}
 
 	/// Moves the specified face of the bounding box to the specified value along it's normal.
-	AABox movedFaceTo(const SignedAxis axis, float pos) const {
-		AABox tmp = *this;
+	Box3f movedFaceTo(const SignedAxis axis, float pos) const
+	{
+		Box3f tmp = *this;
 		switch (axis) {
 			case axis_x_pos: {
 				tmp.max.x = pos;
@@ -366,16 +376,17 @@ struct AABox {
 		}
 
 		// Handle the situation where the amonut swapped the position of min/max points.
-		AABox result;
+		Box3f result;
 		result.expand(tmp.min);
 		result.expand(tmp.max);
 
 		return result;
 	}
 
-	vec3f getFaceCenter(SignedAxis axis) const {
-		const VEC_TYPE c = center();
-		const VEC_TYPE halfDiag = halfDiagonal();
+	vec3f getFaceCenter(SignedAxis axis) const
+	{
+		const vec3f c = center();
+		const vec3f halfDiag = halfDiagonal();
 
 		if (axis == axis_x_pos)
 			return c + halfDiag.xOnly();
@@ -394,9 +405,10 @@ struct AABox {
 		return vec3f(0.f);
 	}
 
-	void getFacesCenters(VEC_TYPE facesCenters[signedAxis_numElements]) const {
-		const VEC_TYPE c = center();
-		const VEC_TYPE halfDiag = halfDiagonal();
+	void getFacesCenters(vec3f facesCenters[signedAxis_numElements]) const
+	{
+		const vec3f c = center();
+		const vec3f halfDiag = halfDiagonal();
 
 		facesCenters[axis_x_pos] = c + halfDiag.xOnly();
 		facesCenters[axis_y_pos] = c + halfDiag.yOnly();
@@ -406,26 +418,21 @@ struct AABox {
 		facesCenters[axis_z_neg] = c - halfDiag.zOnly();
 	}
 
-	void getFacesNormals(VEC_TYPE facesCenters[signedAxis_numElements]) const {
-		facesCenters[axis_x_pos] = VEC_TYPE::getAxis(0);
-		facesCenters[axis_y_pos] = VEC_TYPE::getAxis(1);
-		facesCenters[axis_z_pos] = VEC_TYPE::getAxis(2);
-		facesCenters[axis_x_neg] = -VEC_TYPE::getAxis(0);
-		facesCenters[axis_y_neg] = -VEC_TYPE::getAxis(1);
-		facesCenters[axis_z_neg] = -VEC_TYPE::getAxis(2);
+	void getFacesNormals(vec3f facesCenters[signedAxis_numElements]) const
+	{
+		facesCenters[axis_x_pos] = vec3f::getAxis(0);
+		facesCenters[axis_y_pos] = vec3f::getAxis(1);
+		facesCenters[axis_z_pos] = vec3f::getAxis(2);
+		facesCenters[axis_x_neg] = -vec3f::getAxis(0);
+		facesCenters[axis_y_neg] = -vec3f::getAxis(1);
+		facesCenters[axis_z_neg] = -vec3f::getAxis(2);
 	}
 
-	bool operator==(const AABox& other) const { return (min == other.min) && (max == other.max); }
+	bool operator==(const Box3f& other) const { return (min == other.min) && (max == other.max); }
 
-	bool operator!=(const AABox& other) const { return !(*this == other); }
+	bool operator!=(const Box3f& other) const { return !(*this == other); }
 
-	VEC_TYPE min, max;
+	vec3f min, max;
 };
-
-typedef AABox<float, 2> AABox2f;
-typedef AABox<int, 2> AABox2i;
-typedef AABox<short, 2> AABox2s;
-typedef AABox<float, 3> AABox3f;
-typedef AABox<int, 3> AABox3i;
 
 } // namespace sge

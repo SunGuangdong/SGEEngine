@@ -3,7 +3,7 @@
 #include "ShadingProgramPermuator.h"
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/other/OptionPermutator.h"
 #include "sge_utils/containers/Optional.h"
 

@@ -33,7 +33,7 @@ void PhysicsWorldQuery::rayTest(PhysicsWorld& physWorld,
 }
 
 
-SGE_ENGINE_API void PhysicsWorldQuery::boxTest(PhysicsWorld& physWorld, const AABox3f& bbox, btBroadphaseAabbCallback& cb)
+SGE_ENGINE_API void PhysicsWorldQuery::boxTest(PhysicsWorld& physWorld, const Box3f& bbox, btBroadphaseAabbCallback& cb)
 {
 	const btVector3 bmin = toBullet(bbox.min);
 	const btVector3 bmax = toBullet(bbox.max);

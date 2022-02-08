@@ -8,8 +8,8 @@
 #include "sge_core/model/Model.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/containers/ArrayView.h"
 #include "sge_utils/containers/vector_map.h"
@@ -21,7 +21,7 @@ struct Asset;
 
 struct EvaluatedNode {
 	mat4f evalGlobalTransform = mat4f::getIdentity();
-	AABox3f aabbGlobalSpace; // untransformed contents bounding box.
+	Box3f aabbGlobalSpace; // untransformed contents bounding box.
 };
 
 struct EvaluatedMesh {
@@ -42,7 +42,7 @@ struct EvaluatedMeshInstance {
 	/// The transform of the geometry(mesh) with all nodes hierarchy applied.
 	mat4f modelSpaceTransform = mat4f::getIdentity();
 
-	AABox3f modelSpaceBBox;
+	Box3f modelSpaceBBox;
 };
 
 struct SGE_CORE_API EvaluatedModel {
@@ -128,7 +128,7 @@ struct SGE_CORE_API EvaluatedModel {
 	/// A list of all instances and their transforms to be rendered.
 	std::vector<EvaluatedMeshInstance> m_evalAllMeshInstances;
 
-	AABox3f aabox;
+	Box3f aabox;
 
 	/// Temporaries used to avoid allocating memory again and again for each evaluation.
 	std::vector<mat4f> bonesTransformTexDataForAllMeshes;

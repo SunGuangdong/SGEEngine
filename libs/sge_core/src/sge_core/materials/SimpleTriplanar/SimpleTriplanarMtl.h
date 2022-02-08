@@ -3,7 +3,7 @@
 #include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_core/materials/IMaterial.h"
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/containers/Optional.h"
 
 namespace sge {

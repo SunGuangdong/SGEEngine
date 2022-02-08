@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sge_utils/math/mat4.h"
-#include "sge_utils/math/vec2.h"
+#include "sge_utils/math/mat4f.h"
+#include "sge_utils/math/vec2f.h"
 
 #include <array>
 #include <cfloat>

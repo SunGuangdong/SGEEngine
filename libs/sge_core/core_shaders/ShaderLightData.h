@@ -2,7 +2,7 @@
 #define SHADERLIGHTDATA_H
 
 #ifdef __cplusplus
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
 #endif
 
 #ifdef __cplusplus

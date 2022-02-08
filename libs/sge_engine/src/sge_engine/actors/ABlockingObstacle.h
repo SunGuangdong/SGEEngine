@@ -27,7 +27,7 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 	void create() final;
 	void onPlayStateChanged(bool const isStartingToPlay) override;
 	void postUpdate(const GameUpdateSets& updateSets) final;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 
 	void doAttributeEditor(GameInspector* inspector) override;
 
@@ -45,7 +45,7 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 	float m_textureYScale = 1.f;
 
 	// Properties of the geometry and the material.
-	AABox3f boundingBox;
+	Box3f boundingBox;
 	GpuHandle<Buffer> vertexBuffer;
 	GpuHandle<Buffer> indexBuffer;
 	Geometry geometry;

@@ -9,8 +9,8 @@
 #include "sge_utils/containers/StaticArray.h"
 #include <type_traits>
 
-#include "sge_utils/math/quat.h"
-#include "sge_utils/math/vec4.h"
+#include "sge_utils/math/quatf.h"
+#include "sge_utils/math/vec4f.h"
 #include "sge_utils/containers/vector_map.h"
 
 namespace sge {

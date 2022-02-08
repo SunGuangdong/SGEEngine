@@ -43,7 +43,7 @@ struct SGE_ENGINE_API ANavMesh : public Actor, public IActorCustomAttributeEdito
 	ANavMesh() = default;
 
 	void create() final;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 	void update(const GameUpdateSets& updateSets) final;
 
 	void build();

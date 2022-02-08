@@ -15,27 +15,33 @@ namespace sge::gamegui {
 //----------------------------------------------------
 // std::atomic<int> IWidget::count = 0;
 
-AABox2f IWidget::getParentBBoxSS() const {
+Box2f IWidget::getParentBBoxSS() const
+{
 	if (auto parent = getParent(); parent) {
-		AABox2f parentBBox = parent->getBBoxPixels();
+		Box2f parentBBox = parent->getBBoxPixels();
 		return parentBBox;
-	} else {
-		AABox2f result;
+	}
+	else {
+		Box2f result;
 		result.expand(vec2f(0.f));
-		result.expand(vec2f(m_owningContext.getCanvasSize()));
+		vec2i canvasSize = m_owningContext.getCanvasSize();
+		result.expand(vec2f(float(canvasSize.x), float(canvasSize.y)));
 		return result;
 	}
 }
 
-Pos IWidget::getParentContentOrigin() const {
+Pos IWidget::getParentContentOrigin() const
+{
 	if (auto parent = getParent(); parent) {
 		return parent->m_contentsOrigin;
-	} else {
+	}
+	else {
 		return Pos();
 	}
 }
 
-void IWidget::addChild(std::shared_ptr<IWidget> widget) {
+void IWidget::addChild(std::shared_ptr<IWidget> widget)
+{
 	auto itr = std::find(m_children.begin(), m_children.end(), widget);
 	if (itr == m_children.end()) {
 		widget->m_parentWidget = shared_from_this();
@@ -43,31 +49,36 @@ void IWidget::addChild(std::shared_ptr<IWidget> widget) {
 	}
 }
 
-void IWidget::setLayout(ILayout* layout) {
+void IWidget::setLayout(ILayout* layout)
+{
 	sgeAssert(m_layout == nullptr);
 	m_layout.reset(layout);
 }
 
-ILayout* IWidget::getLayout() {
+ILayout* IWidget::getLayout()
+{
 	return m_layout.get();
 }
 
-const ILayout* IWidget::getLayout() const {
+const ILayout* IWidget::getLayout() const
+{
 	return m_layout.get();
 }
 
-AABox2f IWidget::getScissorBoxSS() const {
-	AABox2f scissorBboxSS = getBBoxPixels();
+Box2f IWidget::getScissorBoxSS() const
+{
+	Box2f scissorBboxSS = getBBoxPixels();
 	if (auto parent = getParent(); parent) {
-		AABox2f parentScissorBBoxSS = parent->getScissorBoxSS();
+		Box2f parentScissorBBoxSS = parent->getScissorBoxSS();
 		scissorBboxSS = parentScissorBBoxSS.getOverlapBox(scissorBboxSS);
 	}
 
 	return scissorBboxSS;
 }
 
-Rect2s IWidget::getScissorRect() const {
-	const AABox2f scissorBoxSS = getScissorBoxSS();
+Rect2s IWidget::getScissorRect() const
+{
+	const Box2f scissorBoxSS = getScissorBoxSS();
 	const vec2f bboxSizeSS = scissorBoxSS.size();
 
 	Rect2s scissors;
@@ -82,31 +93,34 @@ Rect2s IWidget::getScissorRect() const {
 //----------------------------------------------------
 // ColoredWidget
 //----------------------------------------------------
-std::shared_ptr<ColoredWidget> ColoredWidget::create(UIContext& owningContext, Pos position, Size size) {
+std::shared_ptr<ColoredWidget> ColoredWidget::create(UIContext& owningContext, Pos position, Size size)
+{
 	auto panel = std::make_shared<ColoredWidget>(owningContext, position, size);
 	return panel;
 }
 
-void ColoredWidget::draw(const UIDrawSets& drawSets) {
-	const AABox2f bboxScissorsSS = getScissorBoxSS();
+void ColoredWidget::draw(const UIDrawSets& drawSets)
+{
+	const Box2f bboxScissorsSS = getScissorBoxSS();
 	drawSets.quickDraw->drawRect(drawSets.rdest, bboxScissorsSS.min.x, bboxScissorsSS.min.y, bboxScissorsSS.size().x,
 	                             bboxScissorsSS.size().y, m_color, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
-void TextWidget::draw(const UIDrawSets& drawSets) {
+void TextWidget::draw(const UIDrawSets& drawSets)
+{
 	if (m_text.empty()) {
 		return;
 	}
 
 	DebugFont* const font = m_font ? m_font : getContext().getDefaultFont();
 
-	const AABox2f bboxSS = getBBoxPixels();
+	const Box2f bboxSS = getBBoxPixels();
 
 	const float textHeight = m_fontSize.computeSizePixels(false, bboxSS.size());
 
 	const vec2f textDim = font->computeTextDimensions(m_text.c_str(), textHeight);
 
-		this->getSize().minSizeX = Unit::fromPixels(textDim.x);
+	this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
 	const float textPosX = bboxSS.center().x - textDim.x * 0.5f;
 	const float textPosY = bboxSS.center().y + textHeight * 0.5f - textDim.y * 0.5f;
@@ -121,7 +135,8 @@ void TextWidget::draw(const UIDrawSets& drawSets) {
 //----------------------------------------------------
 // ImageWidget
 //----------------------------------------------------
-std::shared_ptr<ImageWidget> ImageWidget::create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture) {
+std::shared_ptr<ImageWidget> ImageWidget::create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture)
+{
 	float(texture->getDesc().texture2D.width), float(texture->getDesc().texture2D.height);
 	gamegui::Size size;
 	size.sizeX = width;
@@ -133,7 +148,8 @@ std::shared_ptr<ImageWidget> ImageWidget::create(UIContext& owningContext, Pos p
 	return w;
 }
 
-std::shared_ptr<ImageWidget> ImageWidget::createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture) {
+std::shared_ptr<ImageWidget> ImageWidget::createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture)
+{
 	float(texture->getDesc().texture2D.width), float(texture->getDesc().texture2D.height);
 	gamegui::Size size;
 	size.sizeX = height;
@@ -146,9 +162,10 @@ std::shared_ptr<ImageWidget> ImageWidget::createByHeight(UIContext& owningContex
 }
 
 
-void ImageWidget::draw(const UIDrawSets& drawSets) {
+void ImageWidget::draw(const UIDrawSets& drawSets)
+{
 	if (m_texture.IsResourceValid()) {
-		const AABox2f bboxSS = getBBoxPixels();
+		const Box2f bboxSS = getBBoxPixels();
 		float opacity = calcTotalOpacity();
 		drawSets.quickDraw->drawRectTexture(drawSets.rdest, bboxSS, m_texture, getCore()->getGraphicsResources().BS_backToFrontAlpha,
 		                                    vec2f(0), vec2f(1.f), opacity);
@@ -158,7 +175,8 @@ void ImageWidget::draw(const UIDrawSets& drawSets) {
 //----------------------------------------------------
 // ButtonWidget
 //----------------------------------------------------
-std::shared_ptr<ButtonWidget> ButtonWidget::create(UIContext& owningContext, Pos position, Size size, const char* const text) {
+std::shared_ptr<ButtonWidget> ButtonWidget::create(UIContext& owningContext, Pos position, Size size, const char* const text)
+{
 	auto btn = std::make_shared<ButtonWidget>(owningContext, position, size);
 	if (text != nullptr) {
 		btn->setText(text);
@@ -166,16 +184,18 @@ std::shared_ptr<ButtonWidget> ButtonWidget::create(UIContext& owningContext, Pos
 	return btn;
 }
 
-void ButtonWidget::draw(const UIDrawSets& drawSets) {
-	const AABox2f bboxSS = getBBoxPixels();
-	const AABox2f bboxScissorsSS = getScissorBoxSS();
+void ButtonWidget::draw(const UIDrawSets& drawSets)
+{
+	const Box2f bboxSS = getBBoxPixels();
+	const Box2f bboxScissorsSS = getScissorBoxSS();
 
 	const float textHeight = m_fontSize.computeSizePixels(false, bboxSS.size());
 
 	vec4f bgColor = m_bgColorUp;
 	if (m_isPressed) {
 		bgColor = m_bgColorPressed;
-	} else if (m_isHovered) {
+	}
+	else if (m_isHovered) {
 		bgColor = m_bgColorHovered;
 	}
 
@@ -200,13 +220,16 @@ void ButtonWidget::draw(const UIDrawSets& drawSets) {
 
 		if (m_triangleDir == axis_x_pos) {
 			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, 0, m_textColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
-		} else if (m_triangleDir == axis_y_neg) {
+		}
+		else if (m_triangleDir == axis_y_neg) {
 			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, deg2rad(90.f), m_textColor,
 			                                getCore()->getGraphicsResources().BS_backToFrontAlpha);
-		} else if (m_triangleDir == axis_x_neg) {
+		}
+		else if (m_triangleDir == axis_x_neg) {
 			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, deg2rad(180.f), m_textColor,
 			                                getCore()->getGraphicsResources().BS_backToFrontAlpha);
-		} else if (m_triangleDir == axis_x_neg) {
+		}
+		else if (m_triangleDir == axis_x_neg) {
 			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, deg2rad(-90.f), m_textColor,
 			                                getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
@@ -217,12 +240,14 @@ void ButtonWidget::draw(const UIDrawSets& drawSets) {
 // HorizontalComboBox
 //----------------------------------------------------
 HorizontalComboBox::HorizontalComboBox(UIContext& owningContext, Pos position, Size size)
-    : IWidget(owningContext) {
+    : IWidget(owningContext)
+{
 	setPosition(position);
 	setSize(size);
 }
 
-std::shared_ptr<HorizontalComboBox> HorizontalComboBox::create(UIContext& owningContext, Pos position, Size size) {
+std::shared_ptr<HorizontalComboBox> HorizontalComboBox::create(UIContext& owningContext, Pos position, Size size)
+{
 	using namespace literals;
 
 	std::shared_ptr<HorizontalComboBox> hcombo = std::make_shared<HorizontalComboBox>(owningContext, position, size);
@@ -246,9 +271,10 @@ std::shared_ptr<HorizontalComboBox> HorizontalComboBox::create(UIContext& owning
 	return hcombo;
 }
 
-void HorizontalComboBox::draw(const UIDrawSets& drawSets) {
+void HorizontalComboBox::draw(const UIDrawSets& drawSets)
+{
 	if (m_currentOption >= 0 && m_currentOption < int(m_options.size())) {
-		const AABox2f bboxPixels = getBBoxPixels();
+		const Box2f bboxPixels = getBBoxPixels();
 
 		const std::string& text = m_options[m_currentOption];
 
@@ -270,19 +296,22 @@ void HorizontalComboBox::draw(const UIDrawSets& drawSets) {
 	}
 }
 
-void HorizontalComboBox::leftPressed() {
+void HorizontalComboBox::leftPressed()
+{
 	m_currentOption--;
 	if (m_currentOption < 0) {
 		m_currentOption = int(m_options.size()) - 1;
 	}
 }
 
-void HorizontalComboBox::rightPressed() {
+void HorizontalComboBox::rightPressed()
+{
 	m_currentOption++;
 	if (m_currentOption >= m_options.size()) {
 		if (m_options.empty()) {
 			m_currentOption = -1;
-		} else {
+		}
+		else {
 			m_currentOption = 0;
 		}
 	}
@@ -291,7 +320,8 @@ void HorizontalComboBox::rightPressed() {
 //----------------------------------------------------
 // Checkbox
 //----------------------------------------------------
-std::shared_ptr<Checkbox> Checkbox::create(UIContext& owningContext, Pos position, Size size, const char* const text, bool isOn) {
+std::shared_ptr<Checkbox> Checkbox::create(UIContext& owningContext, Pos position, Size size, const char* const text, bool isOn)
+{
 	auto checkbox = std::make_shared<gamegui::Checkbox>(owningContext, position, size);
 	if (text) {
 		checkbox->setText(text);
@@ -301,11 +331,12 @@ std::shared_ptr<Checkbox> Checkbox::create(UIContext& owningContext, Pos positio
 	return checkbox;
 }
 
-void Checkbox::draw(const UIDrawSets& drawSets) {
+void Checkbox::draw(const UIDrawSets& drawSets)
+{
 	using namespace literals;
 
-	const AABox2f bboxPixels = getBBoxPixels();
-	const AABox2f bboxScissors = getScissorBoxSS();
+	const Box2f bboxPixels = getBBoxPixels();
+	const Box2f bboxScissors = getScissorBoxSS();
 	const Rect2s scissors = getScissorRect();
 
 	if (m_isPressed) {
@@ -328,19 +359,21 @@ void Checkbox::draw(const UIDrawSets& drawSets) {
 	const Pos checboxPos(1_f, 0_f, vec2f(1.f, 0.f));
 	const Size checkboxSize(1_hf, 1_hf);
 
-	const AABox2f checkBoxRectPixelSpace =
+	const Box2f checkBoxRectPixelSpace =
 	    checboxPos.getBBoxPixels(bboxPixels, getParentContentOrigin().toPixels(bboxPixels.size()), checkboxSize);
 	const vec4f checkBoxColor = m_isOn ? vec4f(0.f, 1.f, 0.f, 1.f) : vec4f(0.3f, 0.3f, 0.3f, 1.f);
 	drawSets.quickDraw->drawRect(drawSets.rdest, checkBoxRectPixelSpace, checkBoxColor,
 	                             getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
-bool Checkbox::onPress() {
+bool Checkbox::onPress()
+{
 	m_isPressed = true;
 	return true;
 }
 
-void Checkbox::onRelease(bool wasReleaseInside) {
+void Checkbox::onRelease(bool wasReleaseInside)
+{
 	m_isPressed = false;
 	if (wasReleaseInside) {
 		m_isOn = !m_isOn;

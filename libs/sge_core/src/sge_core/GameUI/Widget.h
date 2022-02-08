@@ -4,12 +4,12 @@
 #include <vector>
 
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/containers/Optional.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/Random.h"
 #include "sge_utils/math/color.h"
-#include "sge_utils/math/vec4.h"
+#include "sge_utils/math/vec4f.h"
 #include "sge_utils/react/Event.h"
-#include "sge_utils/containers/Optional.h"
 
 #include "sge_renderer/renderer/renderer.h"
 
@@ -37,7 +37,9 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	friend UIContext;
 
 	IWidget(UIContext& owningContext)
-	    : m_owningContext(owningContext) {}
+	    : m_owningContext(owningContext)
+	{
+	}
 	virtual ~IWidget() {}
 
 	virtual bool isGamepadTargetable() { return false; }
@@ -63,19 +65,21 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 
 	void setSize(Size newSize) { m_size = newSize; }
 
-	AABox2f getBBoxPixels() const {
-		AABox2f parentBBoxSS = getParentBBoxSS();
-		const AABox2f bboxSS = m_position.getBBoxPixels(parentBBoxSS, getParentContentOrigin().toPixels(parentBBoxSS.size()), m_size);
+	Box2f getBBoxPixels() const
+	{
+		Box2f parentBBoxSS = getParentBBoxSS();
+		const Box2f bboxSS = m_position.getBBoxPixels(parentBBoxSS, getParentContentOrigin().toPixels(parentBBoxSS.size()), m_size);
 		return bboxSS;
 	}
 
-	AABox2f getScissorBoxSS() const;
+	Box2f getScissorBoxSS() const;
 	Rect2s getScissorRect() const;
 
 	void addChild(std::shared_ptr<IWidget> widget);
 
 	template <typename TWidget>
-	std::shared_ptr<TWidget> addChildT(std::shared_ptr<TWidget> widget) {
+	std::shared_ptr<TWidget> addChildT(std::shared_ptr<TWidget> widget)
+	{
 		addChild(widget);
 		return widget;
 	}
@@ -92,7 +96,8 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 
 	void suspend() { m_isSuspended = true; }
 	void unsuspend() { m_isSuspended = false; }
-	bool isSuspended() const {
+	bool isSuspended() const
+	{
 		if (m_isSuspended) {
 			return true;
 		}
@@ -111,7 +116,8 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	float getOpacity() const { return opacity; }
 	void setOpacity(float opacity) { this->opacity = opacity; }
 
-	float calcTotalOpacity() {
+	float calcTotalOpacity()
+	{
 		std::shared_ptr<IWidget> parent = getParent();
 		if (parent) {
 			return parent->calcTotalOpacity() * opacity;
@@ -120,7 +126,7 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	}
 
   protected:
-	AABox2f getParentBBoxSS() const;
+	Box2f getParentBBoxSS() const;
 	Pos getParentContentOrigin() const;
 
   private:
@@ -143,12 +149,14 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 /// useful for position and aligning objects or root widget for menus.
 struct SGE_CORE_API InvisibleWidget final : public IWidget {
 	InvisibleWidget(UIContext& owningContext, Pos position, Size size)
-	    : IWidget(owningContext) {
+	    : IWidget(owningContext)
+	{
 		setPosition(position);
 		setSize(size);
 	}
 
-	static std::shared_ptr<InvisibleWidget> create(UIContext& owningContext, Pos position, Size size) {
+	static std::shared_ptr<InvisibleWidget> create(UIContext& owningContext, Pos position, Size size)
+	{
 		std::shared_ptr<InvisibleWidget> w = std::make_shared<InvisibleWidget>(owningContext, position, size);
 		return w;
 	}
@@ -159,7 +167,8 @@ struct SGE_CORE_API InvisibleWidget final : public IWidget {
 /// @brief ColoredWidget is non-interactable widget with a constant color.
 struct SGE_CORE_API ColoredWidget final : public IWidget {
 	ColoredWidget(UIContext& owningContext, Pos position, Size size)
-	    : IWidget(owningContext) {
+	    : IWidget(owningContext)
+	{
 		setPosition(position);
 		setSize(size);
 	}
@@ -170,7 +179,8 @@ struct SGE_CORE_API ColoredWidget final : public IWidget {
 
 	void setColor(const vec4f& c) { m_color = c; }
 
-	bool onMouseWheel(int cnt) override {
+	bool onMouseWheel(int cnt) override
+	{
 		Pos co = getContentsOrigin().getAsFraction(getParentBBoxSS().size());
 		co.posY.value -= float(cnt) * 0.2f;
 		setContentsOrigin(co);
@@ -186,12 +196,14 @@ struct SGE_CORE_API ColoredWidget final : public IWidget {
 //----------------------------------------------------
 struct SGE_CORE_API TextWidget final : public IWidget {
 	TextWidget(UIContext& owningContext, Pos position, Size size)
-	    : IWidget(owningContext) {
+	    : IWidget(owningContext)
+	{
 		setPosition(position);
 		setSize(size);
 	}
 
-	static std::shared_ptr<TextWidget> create(UIContext& owningContext, Pos position, Size size, const char* text) {
+	static std::shared_ptr<TextWidget> create(UIContext& owningContext, Pos position, Size size, const char* text)
+	{
 		auto w = std::make_shared<TextWidget>(owningContext, position, size);
 		if (text) {
 			w->setText(text);
@@ -223,7 +235,8 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 /// ImageWidget is a widget that display a texture.
 struct SGE_CORE_API ImageWidget final : public IWidget {
 	ImageWidget(UIContext& owningContext, Pos position, Size size)
-	    : IWidget(owningContext) {
+	    : IWidget(owningContext)
+	{
 		setPosition(position);
 		setSize(size);
 	}
@@ -242,7 +255,8 @@ struct SGE_CORE_API ImageWidget final : public IWidget {
 //----------------------------------------------------
 struct SGE_CORE_API ButtonWidget final : public IWidget {
 	ButtonWidget(UIContext& owningContext, Pos position, Size size)
-	    : IWidget(owningContext) {
+	    : IWidget(owningContext)
+	{
 		setPosition(position);
 		setSize(size);
 	}
@@ -256,7 +270,8 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 	void draw(const UIDrawSets& drawSets) override;
 
 	void setColor(const vec4f& c) { m_textColor = c; }
-	void setBgColor(const vec4f& up, const vec4f& hovered, const vec4f& pressed) {
+	void setBgColor(const vec4f& up, const vec4f& hovered, const vec4f& pressed)
+	{
 		m_bgColorUp = up;
 		m_bgColorHovered = hovered;
 		m_bgColorPressed = pressed;
@@ -266,22 +281,26 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 	void setFont(DebugFont* font) { m_font = font; }
 	void setFontSize(Unit fontSize) { m_fontSize = fontSize; }
 
-	bool onHoverEnter() override {
+	bool onHoverEnter() override
+	{
 		m_isHovered = true;
 		return true;
 	}
 
-	bool onHoverLeave() override {
+	bool onHoverLeave() override
+	{
 		m_isHovered = false;
 		return true;
 	}
 
-	bool onPress() override {
+	bool onPress() override
+	{
 		m_isPressed = true;
 		return true;
 	}
 
-	void onRelease(bool wasReleaseInside) override {
+	void onRelease(bool wasReleaseInside) override
+	{
 		m_isPressed = false;
 		if (wasReleaseInside) {
 			m_onReleaseListeners.invokeEvent();
@@ -316,7 +335,8 @@ struct SGE_CORE_API HorizontalComboBox final : public IWidget {
 	static std::shared_ptr<HorizontalComboBox> create(UIContext& owningContext, Pos position, Size size);
 	void draw(const UIDrawSets& drawSets) override;
 
-	void addOption(std::string option) {
+	void addOption(std::string option)
+	{
 		m_options.emplace_back(std::move(option));
 		if (m_currentOption < 0) {
 			m_currentOption = 0;
@@ -342,7 +362,8 @@ struct SGE_CORE_API HorizontalComboBox final : public IWidget {
 //----------------------------------------------------
 struct SGE_CORE_API Checkbox final : public IWidget {
 	Checkbox(UIContext& owningContext, Pos position, Size size)
-	    : IWidget(owningContext) {
+	    : IWidget(owningContext)
+	{
 		setPosition(position);
 		setSize(size);
 	}

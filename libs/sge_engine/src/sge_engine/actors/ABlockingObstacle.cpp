@@ -67,7 +67,7 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 		std::vector<int> indices;
 
 		// Collision geometry.
-		std::vector<AABox3f> bboxes;
+		std::vector<Box3f> bboxes;
 
 		ModelCollisionMesh slopeCollisionMesh;
 
@@ -85,7 +85,7 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 
 			// Create the physics rigid body.
 			std::vector<CollsionShapeDesc> bboxesShapeDescs;
-			for (const AABox3f& box : bboxes) {
+			for (const Box3f& box : bboxes) {
 				bboxesShapeDescs.emplace_back(CollsionShapeDesc::createBox(box));
 			}
 
@@ -94,7 +94,7 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 
 			// Compute the bounding box of the whole thing:
 			boundingBox.setEmpty();
-			for (const AABox3f& box : bboxes) {
+			for (const Box3f& box : bboxes) {
 				boundingBox.expand(box);
 			}
 
@@ -190,7 +190,7 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 	}
 }
 
-AABox3f ABlockingObstacle::getBBoxOS() const
+Box3f ABlockingObstacle::getBBoxOS() const
 {
 	return boundingBox;
 }

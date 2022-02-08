@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/transform.h"
 
 #include "sge_engine/GameObject.h"
@@ -53,7 +53,7 @@ struct SGE_ENGINE_API Actor : public GameObject {
 	/// Returns the bounding box in object space. The box may be empty if not applicable.
 	/// This is not intended for physics or any game logic.
 	/// This should be used for the editor and the rendering.
-	virtual AABox3f getBBoxOS() const = 0;
+	virtual Box3f getBBoxOS() const = 0;
 
 	/// These functions tells the editor that the actor provides sub-objects that can be edited in the viewport.
 	/// For example the Splines have control points that we can move via the transform tools.

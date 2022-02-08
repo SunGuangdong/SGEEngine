@@ -89,7 +89,7 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 		// if the light is not inside the view frsutum do no update its shadow map.
 		// If the camera frustum is present, try to clip the object.
 		if (gameCameraFrustumWs != nullptr) {
-			const AABox3f bboxOS = light->getBBoxOS();
+			const Box3f bboxOS = light->getBBoxOS();
 			if (!bboxOS.IsEmpty()) {
 				if (gameCameraFrustumWs->isObjectOrientedBoxOutside(bboxOS, light->getTransform().toMatrix())) {
 					continue;
@@ -238,7 +238,7 @@ bool DefaultGameDrawer::isInFrustum(const GameDrawSets& drawSets, Actor* actor) 
 {
 	// If the camera frustum is present, try to clip the object.
 	const Frustum* const pFrustum = drawSets.drawCamera->getFrustumWS();
-	const AABox3f bboxOS = actor->getBBoxOS();
+	const Box3f bboxOS = actor->getBBoxOS();
 	if (pFrustum != nullptr) {
 		if (!bboxOS.IsEmpty()) {
 			const transf3d& tr = actor->getTransform();
@@ -261,7 +261,7 @@ bool DefaultGameDrawer::isInFrustum(const GameDrawSets& drawSets, Actor* actor) 
 	return true;
 }
 
-void DefaultGameDrawer::getLightingForLocation(const AABox3f& bboxWs, ObjectLighting& lighting)
+void DefaultGameDrawer::getLightingForLocation(const Box3f& bboxWs, ObjectLighting& lighting)
 {
 	m_shadingLightPerObject.clear();
 
@@ -280,8 +280,8 @@ void DefaultGameDrawer::getLightingForLocation(const AABox3f& bboxWs, ObjectLigh
 void DefaultGameDrawer::getActorObjectLighting(Actor* actor, ObjectLighting& lighting)
 {
 	// Find all the lights that can affect this object.
-	const AABox3f bboxOS = actor->getBBoxOS();
-	const AABox3f actorBBoxWs = bboxOS.getTransformed(actor->getTransformMtx());
+	const Box3f bboxOS = actor->getBBoxOS();
+	const Box3f actorBBoxWs = bboxOS.getTransformed(actor->getTransformMtx());
 	getLightingForLocation(actorBBoxWs, lighting);
 }
 
@@ -495,7 +495,7 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 	    [this, &drawSets, &drawReason](GameObject* object) -> bool {
 		    // TODO: Skip this check for whole types. We know they are not actors...
 		    if (Actor* actor = object->getActor()) {
-			    AABox3f actorBboxOS = actor->getBBoxOS();
+			    Box3f actorBboxOS = actor->getBBoxOS();
 			    SelectedItemDirect item;
 			    item.editMode = editMode_actors;
 			    item.gameObject = actor;

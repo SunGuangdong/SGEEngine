@@ -45,7 +45,7 @@ struct SGE_ENGINE_API ModelEntry {
 	/// Including the m_additionalTransform,
 	/// @worldTrasnform is used to compute correctly the bounding box
 	/// when ignoreActorTransform is used.
-	AABox3f getBBoxOS(const mat4f& invWorldTrasnform) const;
+	Box3f getBBoxOS(const mat4f& invWorldTrasnform) const;
 
   private:
 	/// Called when the asset model has been changed.
@@ -110,7 +110,7 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	}
 
 	/// Returns the bounding box of all models.
-	AABox3f getBBoxOS() const;
+	Box3f getBBoxOS() const;
 
 	void getRenderItems(DrawReason drawReason, std::vector<GeometryRenderItem>& renderItems);
 

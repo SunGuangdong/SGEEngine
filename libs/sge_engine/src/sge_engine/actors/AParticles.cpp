@@ -19,7 +19,7 @@ ReflBlock() {
 }
 // clang-format on
 
-AABox3f AParticlesSimple::getBBoxOS() const
+Box3f AParticlesSimple::getBBoxOS() const
 {
 	return m_particles.getBBoxOS();
 }

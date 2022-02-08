@@ -25,7 +25,7 @@ struct Player : public Actor {
 	float jumpButtonHeldTime = 0.f;
 	static inline const float kMaxJumpHeldTime = 1.f;
 
-	AABox3f getBBoxOS() const override {
+	Box3f getBBoxOS() const override {
 		return ttModel.getBBoxOS();
 	}
 

@@ -182,7 +182,7 @@ struct SGE_ENGINE_API ParticleGroupState {
 	}
 
   private:
-	AABox3f m_bboxFromLastUpdate;
+	Box3f m_bboxFromLastUpdate;
 	Random m_rnd;
 
 
@@ -218,7 +218,7 @@ struct SGE_ENGINE_API ParticleGroupState {
 	}
 
 	/// Returns the bounding box in the space they are being simulated (world or node).
-	AABox3f getBBox() const
+	Box3f getBBox() const
 	{
 		return m_bboxFromLastUpdate;
 	}
@@ -240,7 +240,7 @@ struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 		m_pgroupState.clear();
 	}
 
-	AABox3f getBBoxOS() const;
+	Box3f getBBoxOS() const;
 
 	void getRenderItems(std::vector<TraitParticlesSimpleRenderItem>& renderItems);
 
@@ -282,7 +282,7 @@ struct SGE_ENGINE_API TraitParticlesProgrammable : public Trait {
 		std::vector<ParticleData> allParticles;
 		AssetPtr spriteTexture;
 		vec2i spriteFramsCount = vec2i(1); /// The number of sub-images in X and Y direction.
-		AABox3f bbox;                      /// The bounding box of the particles in world or in object space depending on @isInWorldSpace.
+		Box3f bbox;                      /// The bounding box of the particles in world or in object space depending on @isInWorldSpace.
 		bool needsZAlphaSorting = false;
 	};
 

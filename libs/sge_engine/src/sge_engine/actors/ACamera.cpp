@@ -59,8 +59,8 @@ void ACamera::create() {
 	registerTrait(m_traitCamera);
 }
 
-AABox3f ACamera::getBBoxOS() const {
-	return AABox3f::getFromHalfDiagonal(vec3f(1.f, 1.f, 1.f));
+Box3f ACamera::getBBoxOS() const {
+	return Box3f::getFromHalfDiagonal(vec3f(1.f, 1.f, 1.f));
 }
 
 

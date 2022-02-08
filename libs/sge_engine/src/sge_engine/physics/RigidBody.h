@@ -3,7 +3,7 @@
 #include "BulletHelper.h"
 #include "CollisionShape.h"
 #include "sge_engine/sge_engine_api.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/sge_utils.h"
 
@@ -219,7 +219,7 @@ struct SGE_ENGINE_API RigidBody {
 	bool isInWorld() const;
 
 	/// @brief Returns the axis aligned bounding box according to the physics engine in world space.
-	AABox3f getBBoxWs() const;
+	Box3f getBBoxWs() const;
 
 
 	ubyte getMaskIdentifiesAs() const { return m_maskIndetifiedAs; }

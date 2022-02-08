@@ -5,8 +5,8 @@
 #include "sge_utils/containers/StaticArray.h"
 #include "sge_utils/containers/vector_map.h"
 #include "sge_utils/containers/vector_set.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/vec3.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/vec3f.h"
 #include "sge_utils/sge_utils.h"
 
 #include <functional>
@@ -60,7 +60,7 @@ namespace PhysicsWorldQuery {
 
 	/// A callback for finding all potential collisions with thhe specified box.
 	/// @param cb a callback to be called. You can use BoxTestCallback for quick results.
-	SGE_ENGINE_API void boxTest(PhysicsWorld& physWorld, const AABox3f& bbox, btBroadphaseAabbCallback& cb);
+	SGE_ENGINE_API void boxTest(PhysicsWorld& physWorld, const Box3f& bbox, btBroadphaseAabbCallback& cb);
 }; // namespace PhysicsWorldQuery
 
 //-------------------------------------------------------------------------

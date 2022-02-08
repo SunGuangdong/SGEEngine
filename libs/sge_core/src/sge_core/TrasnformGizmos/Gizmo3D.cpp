@@ -511,7 +511,7 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args) {
 //-------------------------------------------------------------------------------
 // Gizmo3DScaleVolume
 //-------------------------------------------------------------------------------
-void Gizmo3DScaleVolume::reset(const transf3d& transform, const AABox3f& bboxOs) {
+void Gizmo3DScaleVolume::reset(const transf3d& transform, const Box3f& bboxOs) {
 	resetCommon();
 	m_initalTransform = transform;
 	m_editedTransform = transform;
@@ -581,9 +581,9 @@ GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args) 
 
 		// Compute the new scaling needed. Note that we ignore the rotation of the object.
 		// this is simply done because it is easier to compute the scaling (no axes as swapped or in akward angles that we would need to
-		// compansate to) and AABox3f represents (as the name suggests) axis-aligned bounding.
+		// compansate to) and Box3f represents (as the name suggests) axis-aligned bounding.
 		const transf3d initalTrNoRot = m_initalTransform.getSelfNoRotation();
-		const AABox3f initBoxWSNoRot = m_initalBboxOs.getTransformed(initalTrNoRot.toMatrix());
+		const Box3f initBoxWSNoRot = m_initalBboxOs.getTransformed(initalTrNoRot.toMatrix());
 
 		const vec3f pointOnFaceNormalWsNoRot = mat_mul_pos(initalTrNoRot.toMatrix(), pointOnFaceNormalOs);
 
@@ -594,7 +594,7 @@ GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args) 
 		}
 
 		// Move the face of the box.
-		AABox3f editedBoxWsNoRot = initBoxWSNoRot;
+		Box3f editedBoxWsNoRot = initBoxWSNoRot;
 		editedBoxWsNoRot = editedBoxWsNoRot.movedFaceTo(m_interaction.getSingleInteractionAxis(), faceNewPosWsNoRot);
 
 		// Compute the new scaling.
@@ -631,7 +631,7 @@ void Gizmo3D::setSizeMultipler(const float scalingCoefficient) {
 	m_gizmoScaling.setSizeMultiplier(scalingCoefficient);
 }
 
-void Gizmo3D::reset(const Mode newMode, const transf3d& tr, const AABox3f& bbox) {
+void Gizmo3D::reset(const Mode newMode, const transf3d& tr, const Box3f& bbox) {
 	m_initalTransform = tr;
 
 	m_mode = newMode;

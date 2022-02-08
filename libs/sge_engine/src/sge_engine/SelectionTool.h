@@ -3,7 +3,7 @@
 #include "InspectorTool.h"
 #include "sge_engine/GameObject.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 
 namespace sge {
 
@@ -87,7 +87,7 @@ struct SGE_ENGINE_API SelectionTool : public IInspectorTool {
 	void drawOverlay(const GameDrawSets& drawSets) override final;
 
   private:
-	void performPicking(GameInspector* inspector, AABox2f selectionRectCS, const GameDrawSets& drawSets, bool ctrlDown, bool shiftDown);
+	void performPicking(GameInspector* inspector, Box2f selectionRectCS, const GameDrawSets& drawSets, bool ctrlDown, bool shiftDown);
 };
 
 } // namespace sge

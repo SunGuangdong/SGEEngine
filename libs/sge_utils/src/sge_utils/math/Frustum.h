@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Box.h"
-#include "mat4.h"
-#include "primitives.h"
 #include "sge_utils/containers/Optional.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/mat4f.h"
+#include "sge_utils/math/primitives.h"
 
 namespace sge {
 
@@ -11,7 +11,8 @@ struct Frustum {
 	Plane l, r, b, t, n, f;
 
   public:
-	const Plane& plane(const int i) const {
+	const Plane& plane(const int i) const
+	{
 		sgeAssert(i >= 0 && i < 6);
 		if (i == 0)
 			return l;
@@ -31,8 +32,8 @@ struct Frustum {
 	// Returns true if the sphere is outside of the frustum.
 	bool isSphereOutside(const vec3f& pos, float const radius) const;
 	bool is8PointConvexHullOutside(const vec3f points[8]) const;
-	bool isBoxOutside(const AABox3f& aabbWs) const;
-	bool isObjectOrientedBoxOutside(const AABox3f& aabbOs, const mat4f& objToFrustumSpace) const;
+	bool isBoxOutside(const Box3f& aabbWs) const;
+	bool isObjectOrientedBoxOutside(const Box3f& aabbOs, const mat4f& objToFrustumSpace) const;
 
 	void getCorners(vec3f result[8], Optional<float> overrideNearToFarDistance = NullOptional()) const;
 

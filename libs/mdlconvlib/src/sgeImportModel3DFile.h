@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_core/model/Model.h"
-#include "sge_utils/math/vec4.h"
+#include "sge_utils/math/vec4f.h"
 #include <set>
 #include <string>
 #include <vector>

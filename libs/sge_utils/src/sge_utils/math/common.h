@@ -239,6 +239,7 @@ template <class T>
 inline T sign(const T& f) {
 	return (f < (T)(0)) ? -(T)(1) : T(1);
 }
+
 /// @brief Returns a sigmoid like remapping of the specified variable.
 /// @k is expected to be in [0;1] range.
 inline float smoothstep(float k) {
@@ -248,7 +249,7 @@ inline float smoothstep(float k) {
 /// Acosf would crash if the input parameter is out of bounds, however when we do maths
 /// it sometimes happen due to floating point precision for that value to get slightly out of range.
 /// in that case we really do not want to crash.
-inline float acosUnorm(const float v) {
+inline float acosSafe(const float v) {
 	return acos(clamp(v, -1.f, 1.f));
 }
 

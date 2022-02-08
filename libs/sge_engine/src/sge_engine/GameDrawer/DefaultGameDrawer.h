@@ -10,7 +10,7 @@
 #include "sge_engine/actors/ALight.h"
 #include "sge_engine/traits/TraitParticles.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
 
 #include "sge_engine/GameDrawer/RenderItems/GeometryRenderItem.h"
 #include "sge_engine/GameDrawer/RenderItems/HelperDrawRenderItem.h"
@@ -101,7 +101,7 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	/// draw camera frustum.
 	bool isInFrustum(const GameDrawSets& drawSets, Actor* actor) const;
 	void getActorObjectLighting(Actor* actor, ObjectLighting& lighting);
-	void getLightingForLocation(const AABox3f& bboxWs, ObjectLighting& lighting);
+	void getLightingForLocation(const Box3f& bboxWs, ObjectLighting& lighting);
 
 	void clearRenderItems()
 	{

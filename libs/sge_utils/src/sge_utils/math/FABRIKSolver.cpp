@@ -1,7 +1,7 @@
 #include "FABRIKSolver.h"
 #include "primitives.h"
-#include "quat.h"
-#include "vec3.h"
+#include "quatf.h"
+#include "vec3f.h"
 
 namespace sge {
 
@@ -11,7 +11,8 @@ void FABRIKSolver(const int numPoints,
                   const vec3f& endAffector,
                   const vec3f* pPole,
                   int maxIterations,
-                  float earlyExitDelta) {
+                  float earlyExitDelta)
+{
 	sgeAssert(numPoints >= 2);
 	sgeAssert(linkLengths != nullptr);
 	maxIterations = maxOf(1, maxIterations);
@@ -67,7 +68,7 @@ void FABRIKSolver(const int numPoints,
 			const vec3f pointOnPlane = (p.Project(inoutPoints[t]) - planePosition).normalized0();
 
 			const float dotProd = dot(poleOnPlane, pointOnPlane);
-			float angle = acosUnorm(dotProd);
+			float angle = acosSafe(dotProd);
 			vec3f crossProd = cross(pointOnPlane, poleOnPlane);
 
 			if (crossProd.lengthSqr() < 1e-5f && isEpsEqual(dotProd, 0.f)) {

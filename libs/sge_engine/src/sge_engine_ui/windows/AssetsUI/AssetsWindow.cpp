@@ -313,7 +313,7 @@ Texture* AssetsWindow::getThumbnailForModel3D(const std::string& localAssetPath)
 	else {
 		AssetPtr thumbnailAsset = getCore()->getAssetLib()->getAssetFromFile(localAssetPath.c_str(), nullptr, true);
 		if (isAssetLoaded(thumbnailAsset, assetIface_model3d)) {
-			AABox3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(thumbnailAsset)->getStaticEval().aabox;
+			Box3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(thumbnailAsset)->getStaticEval().aabox;
 			if (bboxModel.IsEmpty() == false) {
 				orbit_camera camera;
 
@@ -880,7 +880,7 @@ void AssetsWindow::openMaterialEditWindow(std::shared_ptr<sge::AssetIface_Materi
 void AssetsWindow::doPreviewAssetModel(const InputState& is, bool explorePreviewAssetChanged)
 {
 	if (explorePreviewAssetChanged) {
-		AABox3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
+		Box3f bboxModel = getLoadedAssetIface<AssetIface_Model3D>(explorePreviewAsset)->getStaticEval().aabox;
 		if (bboxModel.IsEmpty() == false) {
 			m_exploreModelPreviewWidget.camera.orbitPoint = bboxModel.center();
 			m_exploreModelPreviewWidget.camera.radius = bboxModel.diagonal().length() * 1.25f;

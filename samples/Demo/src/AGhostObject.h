@@ -45,7 +45,7 @@ struct CameraFollowMe {
 struct SGE_ENGINE_API AGhostObject : public Actor {
 	void create() final;
 	void postUpdate(const GameUpdateSets& updateSets) final;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 
 	void onPlayStateChanged(bool const isStartingToPlay) override;
 

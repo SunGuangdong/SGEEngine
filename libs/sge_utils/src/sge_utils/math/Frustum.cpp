@@ -3,7 +3,8 @@
 namespace sge {
 
 // Returns true if the sphere is outside of the frustum.
-bool Frustum::isSphereOutside(const vec3f& pos, float const radius) const {
+bool Frustum::isSphereOutside(const vec3f& pos, float const radius) const
+{
 	for (int t = 0; t < 6; ++t) {
 		float const dist = plane(t).Distance(pos);
 		if (dist + radius < 0.f)
@@ -13,7 +14,8 @@ bool Frustum::isSphereOutside(const vec3f& pos, float const radius) const {
 	return false;
 }
 
-bool Frustum::is8PointConvexHullOutside(const vec3f points[8]) const {
+bool Frustum::is8PointConvexHullOutside(const vec3f points[8]) const
+{
 	bool isInsideOrIntersects = true;
 	for (int iPlane = 0; iPlane < 6; ++iPlane) {
 		int in = 0;
@@ -36,7 +38,8 @@ bool Frustum::is8PointConvexHullOutside(const vec3f points[8]) const {
 	return !isInsideOrIntersects;
 }
 
-bool Frustum::isBoxOutside(const AABox3f& aabbWs) const {
+bool Frustum::isBoxOutside(const Box3f& aabbWs) const
+{
 	const vec3f points[8] = {
 	    aabbWs.getPoint(0), aabbWs.getPoint(1), aabbWs.getPoint(2), aabbWs.getPoint(3),
 	    aabbWs.getPoint(4), aabbWs.getPoint(5), aabbWs.getPoint(6), aabbWs.getPoint(7),
@@ -46,11 +49,13 @@ bool Frustum::isBoxOutside(const AABox3f& aabbWs) const {
 	return result;
 }
 
-bool Frustum::isObjectOrientedBoxOutside(const AABox3f& aabbOs, const mat4f& objToFrustumSpace) const {
+bool Frustum::isObjectOrientedBoxOutside(const Box3f& aabbOs, const mat4f& objToFrustumSpace) const
+{
 	return isBoxOutside(aabbOs.getTransformed(objToFrustumSpace));
 }
 
-void Frustum::getCorners(vec3f result[8], Optional<float> overrideNearToFarDistance) const {
+void Frustum::getCorners(vec3f result[8], Optional<float> overrideNearToFarDistance) const
+{
 	const auto intersectPlanes = [](const Plane& p0, const Plane& p1, const Plane& p2) -> vec3f {
 		// http://www.ambrsoft.com/TrigoCalc/Plan3D/3PlanesIntersection_.htm
 		float const det = -triple(p0.norm(), p1.norm(), p2.norm()); // Caution: I'm not sure about that minus...
@@ -84,7 +89,8 @@ void Frustum::getCorners(vec3f result[8], Optional<float> overrideNearToFarDista
 	result[7] = intersectPlanes(b, r, fPlane);
 }
 
-Frustum Frustum ::extractClippingPlanes(mat4f mtx, bool d3dStyle) {
+Frustum Frustum ::extractClippingPlanes(mat4f mtx, bool d3dStyle)
+{
 	mtx = mtx.transposed();
 
 	Frustum f;

@@ -476,11 +476,11 @@ bool RigidBody::isInWorld() const
 	return false;
 }
 
-AABox3f RigidBody::getBBoxWs() const
+Box3f RigidBody::getBBoxWs() const
 {
 	btVector3 btMin, btMax;
 	getBulletRigidBody()->getAabb(btMin, btMax);
-	AABox3f result(fromBullet(btMin), fromBullet(btMax));
+	Box3f result(fromBullet(btMin), fromBullet(btMax));
 	return result;
 }
 

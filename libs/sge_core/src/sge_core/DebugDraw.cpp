@@ -50,11 +50,11 @@ void DebugDraw::WiredCommandData::box(const mat4f& world, const int rgba) {
 	GeomGen::wiredBox(m_verts, world, rgba);
 }
 
-void DebugDraw::WiredCommandData::box(const AABox3f& aabb, const int rgba) {
+void DebugDraw::WiredCommandData::box(const Box3f& aabb, const int rgba) {
 	GeomGen::wiredBox(m_verts, aabb, rgba);
 }
 
-void DebugDraw::WiredCommandData::box(const mat4f& world, const AABox3f& aabb, const int rgba) {
+void DebugDraw::WiredCommandData::box(const mat4f& world, const Box3f& aabb, const int rgba) {
 	const size_t newBoxStart = m_verts.size();
 
 	GeomGen::wiredBox(m_verts, aabb, rgba);

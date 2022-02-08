@@ -1,8 +1,9 @@
 #pragma once
 
-#include "sge_utils/math/vec4.h"
-#include "sgecore_api.h"
 #include "sge_core/AssetLibrary/IAsset.h"
+#include "sge_utils/math/vec4f.h"
+#include "sge_utils/math/vec2i.h"
+#include "sgecore_api.h"
 #include <memory>
 #include <string>
 #include <vector>
@@ -63,7 +64,8 @@ struct SGE_CORE_API SpriteAnimationWithTextures {
 	/// @param [in] filename the path to the json file to be imported.
 	/// @param [in] assetLib the asset library needed to loaded the image texture.
 	/// @return true if succeeded.
-	static bool importFromAsepriteSpriteSheetJsonFile(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib);
+	static bool
+	    importFromAsepriteSpriteSheetJsonFile(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib);
 
 	SpriteAnimation spriteAnimation;
 	AssetPtr textureAsset; /// The texture that holds the frames of the sprite.

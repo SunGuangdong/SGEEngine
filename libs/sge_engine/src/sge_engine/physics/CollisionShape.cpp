@@ -52,7 +52,7 @@ CollsionShapeDesc CollsionShapeDesc::createBox(const vec3f& halfDiagonal, const 
 	return r;
 }
 
-CollsionShapeDesc CollsionShapeDesc::createBox(const AABox3f& box)
+CollsionShapeDesc CollsionShapeDesc::createBox(const Box3f& box)
 {
 	sgeAssert(box.IsEmpty() == false);
 

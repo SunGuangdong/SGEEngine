@@ -97,7 +97,7 @@ mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
 	return mat4f::getIdentity();
 }
 
-AABox3f TraitSpriteImageSets::computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const {
+Box3f TraitSpriteImageSets::computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const {
 	// What is happening here is the following:
 	// When there is no billboarding applied the bounding box computation is pretty strait forward:
 	// Transform the verticies of of quad by object-to-node space transfrom and we are done.
@@ -116,7 +116,7 @@ AABox3f TraitSpriteImageSets::computeBBoxOS(const Asset& asset, const mat4f& add
 	const mat4f noAdditionalTransform = mat4f::getIdentity();
 	const mat4f planeTransfromObjectToNode = computeObjectToWorldTransform(asset, nullptr, fakeNodeToWorld, noAdditionalTransform);
 
-	AABox3f bboxOs;
+	Box3f bboxOs;
 
 	vec3f p0 = mat_mul_pos(planeTransfromObjectToNode, vec3f(0.f));
 	vec3f p1 = mat_mul_pos(planeTransfromObjectToNode, vec3f(0.f, 1.f, 1.f));
@@ -179,8 +179,8 @@ void TraitSprite::addImage(const char* const assetPath) {
 	addImage(getCore()->getAssetLib()->getAssetFromFile(assetPath));
 }
 
-AABox3f TraitSprite::getBBoxOS() const {
-	AABox3f bbox;
+Box3f TraitSprite::getBBoxOS() const {
+	Box3f bbox;
 
 	for (const TraitSpriteEntry& image : images) {
 		const AssetIface_SpriteAnim* const spriteIface = image.m_assetProperty.getAssetInterface<AssetIface_SpriteAnim>();

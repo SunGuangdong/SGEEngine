@@ -32,7 +32,7 @@ struct SGE_ENGINE_API ACRSpline : public Actor {
 	ACRSpline() = default;
 
 	void create() final;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 	void onMemberChanged() final;
 
 	void getPointsForSegment(vec3f result[4], const int iSegment) const;

@@ -5,8 +5,8 @@
 
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/containers/ChunkContainer.h"
@@ -143,7 +143,7 @@ struct SGE_CORE_API ModelMesh {
 	std::vector<char> vertexBufferRaw; ///< The raw data containing all vertices in the vertex buffer,
 	std::vector<char> indexBufferRaw;  ///< The raw data containing all indices in the vertex buffer,
 
-	AABox3f aabox; ///< The bounding box around the vertices of the mesh, without any deformation by skinning or anything else.
+	Box3f aabox; ///< The bounding box around the vertices of the mesh, without any deformation by skinning or anything else.
 
 	///< A list of bones affecting the mesh.
 	std::vector<ModelMeshBone> bones;

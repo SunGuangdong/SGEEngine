@@ -13,9 +13,9 @@ ReflBlock()
 }
 // clang-format on
 
-AABox3f AInfinitePlaneObstacle::getBBoxOS() const
+Box3f AInfinitePlaneObstacle::getBBoxOS() const
 {
-	return AABox3f();
+	return Box3f();
 }
 
 void AInfinitePlaneObstacle::create()

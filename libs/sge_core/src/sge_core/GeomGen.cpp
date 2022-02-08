@@ -240,7 +240,7 @@ void GeomGen::wiredBox(std::vector<PosColorVert>& verts, const mat4f& transform,
 	addVert(base + (+xAxis - yAxis + zAxis));
 }
 
-void GeomGen::wiredBox(std::vector<PosColorVert>& verts, const AABox3f& aabb, const uint32 rgba) {
+void GeomGen::wiredBox(std::vector<PosColorVert>& verts, const Box3f& aabb, const uint32 rgba) {
 	const vec3f halfDiag = aabb.halfDiagonal();
 	const vec3f center = aabb.center();
 

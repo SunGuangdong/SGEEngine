@@ -14,7 +14,7 @@
 #include "sge_engine/traits/TraitRigidBody.h"
 #include "sge_engine/typelibHelper.h"
 #include "sge_engine_ui/windows/PropertyEditorWindow.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/text/format.h"
 #include <vector>
 
@@ -323,9 +323,9 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 //--------------------------------------------------------
 // ATimeline
 //--------------------------------------------------------
-AABox3f ATimeline::getBBoxOS() const
+Box3f ATimeline::getBBoxOS() const
 {
-	return AABox3f();
+	return Box3f();
 }
 
 void ATimeline::create()

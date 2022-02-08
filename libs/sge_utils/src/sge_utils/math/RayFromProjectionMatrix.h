@@ -1,9 +1,9 @@
 #pragma once
 
 #include "sge_utils/math/common.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/primitives.h"
-#include "sge_utils/math/vec3.h"
+#include "sge_utils/math/vec3f.h"
 
 namespace sge {
 

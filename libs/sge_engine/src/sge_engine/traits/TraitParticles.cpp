@@ -234,7 +234,7 @@ vec3f computeAddedVelocity(Random& rnd, const vec3f& particlePosition, const Vel
 
 void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, const ParticleGroupDesc& pgDesc, float dt)
 {
-	m_bboxFromLastUpdate = AABox3f();
+	m_bboxFromLastUpdate = Box3f();
 	m_isInWorldSpace = isInWorldSpace;
 	m_n2w = node2world;
 
@@ -575,18 +575,18 @@ void TraitParticlesSimple::update(const GameUpdateSets& u)
 	}
 }
 
-AABox3f TraitParticlesSimple::getBBoxOS() const
+Box3f TraitParticlesSimple::getBBoxOS() const
 {
 	if (m_isInWorldSpace) {
 		const mat4f ownerWorld2Object = inverse(getActor()->getTransformMtx());
-		AABox3f bbox;
+		Box3f bbox;
 		for (auto& pair : m_pgroupState) {
 			bbox.expand(pair.second.getBBox().getTransformed(ownerWorld2Object));
 		}
 		return bbox;
 	}
 	else {
-		AABox3f bbox;
+		Box3f bbox;
 		for (auto& pair : m_pgroupState) {
 			bbox.expand(pair.second.getBBox());
 		}

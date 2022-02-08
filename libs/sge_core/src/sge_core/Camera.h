@@ -1,7 +1,8 @@
 #pragma once
 
 #include "sge_utils/math/Frustum.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
+#include "sge_utils/math/vec2i.h"
 #include "sgecore_api.h"
 
 namespace sge {

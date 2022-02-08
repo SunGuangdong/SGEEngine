@@ -1,8 +1,9 @@
 #pragma once
 
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/Box2f.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/primitives.h"
 #include "sgecore_api.h"
 #include <stb_truetype.h>
@@ -49,7 +50,9 @@ struct SGE_CORE_API QuickDraw {
 
 		Vertex2D(sge::vec2f p, sge::vec2f uv)
 		    : p(p)
-		    , uv(uv) {}
+		    , uv(uv)
+		{
+		}
 
 		sge::vec2f p;
 		sge::vec2f uv;
@@ -60,7 +63,7 @@ struct SGE_CORE_API QuickDraw {
 	bool initialize(SGEContext* context);
 
 	// 2D and Text drawing.
-	void drawRect(const RenderDestination& rdest, const AABox2f& boxPixels, const vec4f& rgba, BlendState* blendState = nullptr);
+	void drawRect(const RenderDestination& rdest, const Box2f& boxPixels, const vec4f& rgba, BlendState* blendState = nullptr);
 	void drawRect(const RenderDestination& rdest,
 	              float xPixels,
 	              float yPixels,
@@ -69,7 +72,7 @@ struct SGE_CORE_API QuickDraw {
 	              const vec4f& rgba,
 	              BlendState* blendState = nullptr);
 	void drawTriLeft(
-	    const RenderDestination& rdest, const AABox2f& boxPixels, float rotation, const vec4f& rgba, BlendState* blendState = nullptr);
+	    const RenderDestination& rdest, const Box2f& boxPixels, float rotation, const vec4f& rgba, BlendState* blendState = nullptr);
 
 	void drawRectTexture(const RenderDestination& rdest,
 	                     float xPixels,
@@ -84,7 +87,7 @@ struct SGE_CORE_API QuickDraw {
 
 
 	void drawRectTexture(const RenderDestination& rdest,
-	                     const AABox2f& boxPixels,
+	                     const Box2f& boxPixels,
 	                     Texture* texture,
 	                     BlendState* blendState = nullptr,
 	                     vec2f topUV = vec2f(0),
@@ -117,8 +120,8 @@ struct SGE_CORE_API QuickDraw {
 	void drawWiredAdd_Arrow(const vec3f& from, const vec3f& to, const uint32 rgba);
 	void drawWiredAdd_EllipseXZ(const mat4f& transformMtx, float xSize, float ySize, const uint32 rgba);
 	void drawWiredAdd_Box(const mat4f& world, const uint32 rgba);
-	void drawWiredAdd_Box(const AABox3f& aabb, const uint32 rgba);
-	void drawWiredAdd_Box(const mat4f& world, const AABox3f& aabb, const uint32 rgba);
+	void drawWiredAdd_Box(const Box3f& aabb, const uint32 rgba);
+	void drawWiredAdd_Box(const mat4f& world, const Box3f& aabb, const uint32 rgba);
 	void drawWiredAdd_Sphere(const mat4f& world, const uint32 rgba, float radius, int numSides = 3);
 	void drawWiredAdd_Capsule(const mat4f& world, const uint32 rgba, float height, float radius, int numSides = 3);
 	void drawWiredAdd_Cylinder(const mat4f& world, const uint32 rgba, float height, float radius, int numSides = 3);

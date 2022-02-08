@@ -42,13 +42,13 @@ void ALight::create() {
 	m_traitViewportIcon.setTexture("assets/editor/textures/icons/obj/ALight.png", true);
 }
 
-AABox3f ALight::getBBoxOS() const {
+Box3f ALight::getBBoxOS() const {
 	switch (m_lightDesc.type) {
 		case light_directional: {
-			return AABox3f();
+			return Box3f();
 		} break;
 		case light_point: {
-			AABox3f result;
+			Box3f result;
 			result.expand(vec3f(vec3f(m_lightDesc.range)));
 			result.expand(vec3f(vec3f(-m_lightDesc.range)));
 			return result;
@@ -56,7 +56,7 @@ AABox3f ALight::getBBoxOS() const {
 		case light_spot: {
 			const float coneLength = maxOf(m_lightDesc.range, 2.f);
 			const float coneRadius = tanf(m_lightDesc.spotLightAngle) * coneLength;
-			AABox3f result;
+			Box3f result;
 			result.expand(vec3f(0.f));
 			result.expand(vec3f(coneRadius, coneRadius, -coneLength));
 			result.expand(vec3f(-coneRadius, -coneRadius, -coneLength));
@@ -64,7 +64,7 @@ AABox3f ALight::getBBoxOS() const {
 		};
 		default:
 			sgeAssert(false && "Not implemented for this light type");
-			return AABox3f();
+			return Box3f();
 	}
 }
 

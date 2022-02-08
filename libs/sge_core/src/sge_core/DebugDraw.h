@@ -16,8 +16,8 @@ struct SGE_CORE_API DebugDraw {
 
 		void line(const vec3f& a, const vec3f& b, const int rgba);
 		void box(const mat4f& world, const int rgba);
-		void box(const AABox3f& aabb, const int rgba);
-		void box(const mat4f& world, const AABox3f& aabb, const int rgba);
+		void box(const Box3f& aabb, const int rgba);
+		void box(const mat4f& world, const Box3f& aabb, const int rgba);
 		void sphere(const mat4f& world, const int rgba, float radius, int numSides = 3);
 		void capsule(const mat4f& world, const int rgba, float height, float radius, int numSides = 3);
 		void cylinder(const mat4f& world, const int rgba, float height, float radius, int numSides = 3);

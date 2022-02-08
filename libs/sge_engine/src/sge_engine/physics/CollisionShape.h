@@ -1,7 +1,7 @@
 #pragma once
 
 #include "sge_engine/sge_engine_api.h"
-#include "sge_utils/math/Box.h"
+#include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/transform.h"
 #include "BulletHelper.h"
 
@@ -35,7 +35,7 @@ struct SGE_ENGINE_API CollsionShapeDesc {
 	CollsionShapeDesc() = default;
 
 	static CollsionShapeDesc createBox(const vec3f& halfDiagonal, const transf3d& offset = transf3d());
-	static CollsionShapeDesc createBox(const AABox3f& box);
+	static CollsionShapeDesc createBox(const Box3f& box);
 	static CollsionShapeDesc createSphere(const float radius, const transf3d& offset = transf3d());
 	static CollsionShapeDesc createCapsule(const float height, const float radius, const transf3d& offset = transf3d());
 	static CollsionShapeDesc createCylinder(const vec3f& halfDiagonal, const transf3d& offset = transf3d());

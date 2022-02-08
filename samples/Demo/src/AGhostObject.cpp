@@ -13,9 +13,9 @@ struct ACoin : public Actor {
 	TraitModel ttModel;
 	TraitRigidBody ttRb;
 
-	AABox3f getBBoxOS() const
+	Box3f getBBoxOS() const
 	{
-		AABox3f bbox = ttModel.getBBoxOS();
+		Box3f bbox = ttModel.getBBoxOS();
 		return bbox;
 	}
 
@@ -89,9 +89,9 @@ ReflBlock()
 }
 // clang-format on
 
-AABox3f AGhostObject::getBBoxOS() const
+Box3f AGhostObject::getBBoxOS() const
 {
-	AABox3f bbox = m_traitModel.getBBoxOS();
+	Box3f bbox = m_traitModel.getBBoxOS();
 	return bbox;
 }
 

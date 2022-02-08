@@ -38,7 +38,7 @@ struct TraitSpriteImageSets {
 	                                    const transf3d& nodeToWorldTransform,
 	                                    const mat4f& additionaTransform) const;
 
-	AABox3f computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const;
+	Box3f computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const;
 
 	/// Adds a color tint to the final color and the alpha of the object.
 	vec4f colorTint = vec4f(1.f);
@@ -114,7 +114,7 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 		return updateAssetProperty();
 	}
 
-	AABox3f getBBoxOS() const;
+	Box3f getBBoxOS() const;
 
 	/// Generates the list of render items for this trait.
 	void getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);

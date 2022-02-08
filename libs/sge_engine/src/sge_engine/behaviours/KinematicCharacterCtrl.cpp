@@ -5,6 +5,7 @@
 #include "sge_engine/physics/PhysicsWorld.h"
 #include "sge_engine/physics/PhysicsWorldQuery.h"
 #include "sge_engine/physics/RigidBody.h"
+#include "sge_utils/math/vec3f.h"
 
 namespace sge {
 

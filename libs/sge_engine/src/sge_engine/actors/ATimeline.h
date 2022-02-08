@@ -20,7 +20,7 @@ struct ATimeline : public Actor, public IActorCustomAttributeEditorTrait {
 		playbackMethod_flipflop,
 	};
 
-	AABox3f getBBoxOS() const override;
+	Box3f getBBoxOS() const override;
 
 	void create() override;
 	void postUpdate(const GameUpdateSets& updateSets) override;

@@ -18,7 +18,7 @@ struct AKnight : public Actor {
 	ObjectId navMeshActorId;
 	std::vector<vec3f> walkingPathTemp;
 
-	AABox3f getBBoxOS() const override
+	Box3f getBBoxOS() const override
 	{
 		return ttModel.getBBoxOS();
 	}

@@ -9,7 +9,7 @@ namespace sge {
 struct AInfinitePlaneObstacle : public Actor {
 	void create() final;
 	void onPlayStateChanged(bool const isStartingToPlay) override;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 
   public:
 	TraitRigidBody ttRigidBody;

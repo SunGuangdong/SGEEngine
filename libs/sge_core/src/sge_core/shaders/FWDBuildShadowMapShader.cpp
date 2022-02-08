@@ -5,7 +5,7 @@
 #include "sge_core/model/Model.h"
 #include "sge_core/shaders/LightDesc.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/mat4.h"
+#include "sge_utils/math/mat4f.h"
 #include "sge_utils/io/FileStream.h"
 
 // Caution:

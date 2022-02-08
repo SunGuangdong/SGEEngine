@@ -20,7 +20,7 @@ void TransformTool::onSetActive(GameInspector* const inspector) {
 	clear();
 	perItemData.resize(inspector->getSelection().size());
 
-	AABox3f allBBoxesWs;
+	Box3f allBBoxesWs;
 
 	for (int iItem = 0; iItem < int(inspector->getSelection().size()); ++iItem) {
 		const SelectedItem& sel = inspector->m_selection[iItem];
@@ -56,7 +56,7 @@ void TransformTool::onSetActive(GameInspector* const inspector) {
 
 	// Determine the inital trasformation of the gizmo.
 	transf3d gizmoTransform = transf3d::getIdentity();
-	AABox3f gizmoBBoxScaleVolume;
+	Box3f gizmoBBoxScaleVolume;
 	if (m_mode == Gizmo3D::Mode_ScaleVolume) {
 		if (inspector->getSelection().size() > 1) {
 			gizmoTransform = transf3d::getIdentity();

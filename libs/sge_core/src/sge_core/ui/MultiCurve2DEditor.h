@@ -2,7 +2,7 @@
 
 #include "sge_core/sgecore_api.h"
 #include "sge_utils/math/MultiCurve2D.h"
-#include "sge_utils/math/vec2.h"
+#include "sge_utils/math/vec2f.h"
 
 namespace sge {
 SGE_CORE_API void MultiCurve2DEditor(const char* const widgetName,

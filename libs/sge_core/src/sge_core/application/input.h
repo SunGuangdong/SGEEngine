@@ -2,8 +2,9 @@
 
 #include "sge_core/sgecore_api.h"
 #include "sge_utils/containers/Optional.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/vec2.h"
+#include "sge_utils/math/Box2f.h"
+#include "sge_utils/math/vec2f.h"
+#include "sge_utils/math/vec3f.h"
 #include "sge_utils/sge_utils.h"
 #include <string>
 #include <vector>
@@ -170,13 +171,13 @@ struct SGE_CORE_API InputState {
 	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a fullscreen
 	/// application.
 	/// This function sets the region of that domain in client space starting form (0,0) to the desireded size.
-	void setDomainSpaceFromSize(const vec2f& size) { m_domain = AABox2f(vec2f(0.f), vec2f(size.x - 1.f, size.y - 1.f)); }
+	void setDomainSpaceFromSize(const vec2f& size) { m_domain = Box2f(vec2f(0.f), vec2f(size.x - 1.f, size.y - 1.f)); }
 
 	/// When the input state is going to get passed to some sub-system. For example the Gameplay Window in the SGEEditor
 	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a fullscreen
 	/// application.
 	/// This function sets the region of that domain in client to the one specified.
-	void setDomainFromPosAndSize(const vec2f& pos, const vec2f& size) { m_domain = AABox2f(pos, pos + vec2f(size.x - 1.f, size.y - 1.f)); }
+	void setDomainFromPosAndSize(const vec2f& pos, const vec2f& size) { m_domain = Box2f(pos, pos + vec2f(size.x - 1.f, size.y - 1.f)); }
 
 	/// @brief Converts the specified client space point to domain space.
 	vec2f clientToDomain(const vec2f& ptClient) const { return ptClient - m_domain.min; }
@@ -251,7 +252,7 @@ struct SGE_CORE_API InputState {
 	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a fullscreen
 	/// application.
 	/// @m_domain specifies where the "sub window" is and how big it is, so we can convert coordinates to it.
-	AABox2f m_domain;
+	Box2f m_domain;
 
 	/// True if the window was active while polling. We still recieve events even if our window is not the focused one.
 	/// If our window is not the focused one, we probably do not want to accept any input.

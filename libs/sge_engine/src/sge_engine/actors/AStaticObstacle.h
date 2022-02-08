@@ -15,7 +15,7 @@ namespace sge {
 struct SGE_ENGINE_API AStaticObstacle : public Actor {
 	void create() final;
 	void postUpdate(const GameUpdateSets& updateSets) final;
-	AABox3f getBBoxOS() const final;
+	Box3f getBBoxOS() const final;
 
   public:
 	TraitRigidBody m_traitRB;

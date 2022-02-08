@@ -2,8 +2,8 @@
 
 #include "sge_core/model/CollisionMesh.h"
 #include "sge_engine/sge_engine_api.h"
-#include "sge_utils/math/Box.h"
-#include "sge_utils/math/vec3.h"
+#include "sge_utils/math/Box3f.h"
+#include "sge_utils/math/vec3f.h"
 
 namespace sge {
 
@@ -71,7 +71,7 @@ struct SGE_ENGINE_API TerrainGenerator {
 	// Generates the vertex buffer and the bounding boxes needed to represent this geometry for both rendering and physics.
 	static bool generateStairs(std::vector<Vertex>& vertices,
 	                           std::vector<int>& indices,
-	                           std::vector<AABox3f>& bboxes,
+	                           std::vector<Box3f>& bboxes,
 	                           const StairsDesc& desc,
 	                           int* pNumVertsAdded = nullptr,
 	                           int* pNumIndicesAdded = nullptr,

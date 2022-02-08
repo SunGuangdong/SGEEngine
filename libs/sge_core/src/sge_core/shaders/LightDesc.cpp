@@ -21,7 +21,7 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 
 			const mat4f ls2ws = lightToWsNoScaling.toMatrix();
 			const mat4f ws2ls = inverse(ls2ws);
-			AABox3f frustumLSBBox;
+			Box3f frustumLSBBox;
 			for (int t = 0; t < SGE_ARRSZ(mainCameraFrustumCornersWs); ++t) {
 				frustumLSBBox.expand(mat_mul_pos(ws2ls, mainCameraFrustumCornersWs[t]));
 			}

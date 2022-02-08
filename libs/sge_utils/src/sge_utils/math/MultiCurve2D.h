@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sge_utils/math/vec2.h"
+#include "sge_utils/math/vec2f.h"
 #include <unordered_map>
 #include <vector>
 
