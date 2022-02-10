@@ -187,13 +187,17 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 	if (doesInheritsObject && isAllocateable) {
 		// Caution:
 		// Object must be the leftmost parent!
-		GameObject* const object = reinterpret_cast<GameObject*>(newActorTypeDesc->newFn());
+		// Allocate the object.
+		void* gameObjectVoid = nullptr;
+		MultiObjectArena::Handle h = gameObjectsArena.newElement(type, &gameObjectVoid);
+		GameObject* const object = reinterpret_cast<GameObject*>(gameObjectVoid);
 
 		if (!object) {
 			sgeAssert(false && "Failed to allocate a game object.");
 			return nullptr;
 		}
 
+		// Initialize the object.
 		ObjectId const newObjectId = specificId.isNull() ? getNewId() : specificId;
 		std::string displayName =
 		    (name != nullptr) ? name : std::string(typeLib().find(type)->name) + string_format("_%d", getNextNameIndex());
@@ -201,11 +205,14 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 		object->private_GameWorld_performInitialization(this, newObjectId, type, std::move(displayName));
 		object->create();
 
+		// Add the object to the queue for newly created objects that are going to start playing on the next update.
 		objectsAwaitingCreation.push_back(object);
 
-		// Add the object to the id-to-object loop up table.
+		// Add the object to the id-to-object look-up-table.
 		sgeAssert(m_gameObjectByIdLUT.count(object->getId()) == 0 && "it is expect that this element does not exists");
 		m_gameObjectByIdLUT[object->getId()] = object;
+
+		gameObjectIdToHandle[object->getId()] = h;
 
 		return object;
 	}
@@ -254,18 +261,18 @@ void GameWorld::clear()
 		}
 	}
 
-	for (auto& itrObjByType : playingObjects) {
-		for (int t = 0; t < itrObjByType.second.size(); ++t) {
-			GameObject* const object = itrObjByType.second[t];
-			delete object;
-		}
-	}
+	//for (auto& itrObjByType : playingObjects) {
+	//	for (int t = 0; t < itrObjByType.second.size(); ++t) {
+	//		GameObject* const object = itrObjByType.second[t];
+	//		delete object;
+	//	}
+	//}
 
 	playingObjects.clear();
 
-	for (GameObject* const object : objectsAwaitingCreation) {
+	/*for (GameObject* const object : objectsAwaitingCreation) {
 		delete object;
-	}
+	}*/
 	objectsAwaitingCreation.clear();
 	m_gameObjectByIdLUT.clear();
 
@@ -303,6 +310,8 @@ void GameWorld::clear()
 	m_ambientLight = vec3f(1.f);
 	m_ambientLightIntensity = 1.f;
 	m_ambientLightFakeDetailAmount = 1.f;
+
+	gameObjectsArena.clear();
 }
 
 void GameWorld::update(const GameUpdateSets& updateSets)
@@ -358,7 +367,10 @@ void GameWorld::update(const GameUpdateSets& updateSets)
 					}
 
 					gameObjectsOfType.erase(gameObjectsOfType.begin() + t);
-					delete objectToKill;
+					MultiObjectArena::Handle h = gameObjectIdToHandle[objectToKill->getId()];
+					gameObjectsArena.deleteElement(h);
+					gameObjectIdToHandle.erase(objectToKill->getId());
+
 					objectToKill = nullptr;
 					break;
 				}
@@ -425,26 +437,14 @@ void GameWorld::update(const GameUpdateSets& updateSets)
 		}
 	}
 
-	// Call GameObject::postUpdate for all playing game objects.
-	for (auto& itrActorByType : playingObjects) {
-		// TODO: skip object that have no update.
-		for (int t = 0; t < itrActorByType.second.size(); ++t) {
-			GameObject* const object = itrActorByType.second[t];
-			if (object != nullptr) {
-				object->postUpdate(updateSets);
-			}
-			else {
-				sgeAssertFalse("It is expected that all actors in GameWorld::playingObjects are not nullptr!");
-			}
-		}
-	}
-
 	// Call postUpdate for world scripts.
 	for (ObjectId scriptObj : m_scriptObjects) {
 		if (IWorldScript* script = dynamic_cast<IWorldScript*>(getObjectById(scriptObj))) {
 			script->onPostUpdate(updateSets);
 		}
 	}
+
+	onPostUpdate.invokeEvent(updateSets);
 
 	if (updateSets.isSimulationPaused() == false) {
 		timeSpendPlaying += updateSets.dt;

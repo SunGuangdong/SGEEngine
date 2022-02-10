@@ -23,7 +23,7 @@ struct ATimeline : public Actor, public IActorCustomAttributeEditorTrait {
 	Box3f getBBoxOS() const override;
 
 	void create() override;
-	void postUpdate(const GameUpdateSets& updateSets) override;
+	void update(const GameUpdateSets& updateSets) override;
 
 	// IActorCustomAttributeEditorTrait
 	void doAttributeEditor(GameInspector* inspector) override;

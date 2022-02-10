@@ -18,7 +18,7 @@ struct SGE_ENGINE_API ADynamicObstacle : public Actor {
 	void create() final;
 	void onPlayStateChanged(bool const isStartingToPlay) override;
 	void onDuplocationComplete() final;
-	void postUpdate(const GameUpdateSets& updateSets) final;
+	void update(const GameUpdateSets& updateSets) final;
 
 	Box3f getBBoxOS() const final;
 

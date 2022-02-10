@@ -9,6 +9,7 @@ struct transf3d;
 struct EvaluatedModel;
 
 /// @brief TraitRigidBody provides a trait for Actors to have a rigid body in the physics world.
+/// You are not obligated to have a rigid body created with this trait you can manually make one yourself.
 struct TraitRigidBody;
 ReflAddTypeIdExists(TraitRigidBody);
 struct SGE_ENGINE_API TraitRigidBody : public Trait {

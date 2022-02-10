@@ -60,7 +60,7 @@ void RigidBodyPropertiesConfigurator::applyProperties(Actor& actor) const
 {
 	TraitRigidBody* const traitRb = getTrait<TraitRigidBody>(&actor);
 
-	if (traitRb && traitRb->getRigidBody()) {
+	if (traitRb && traitRb->getRigidBody() && traitRb->getRigidBody()->isValid()) {
 		applyProperties(*traitRb->getRigidBody());
 	}
 }

@@ -31,13 +31,7 @@ void AParticlesSimple::create()
 	m_traitViewportIcon.setTexture("assets/editor/textures/icons/obj/AParticles.png", true);
 }
 
-
-
-
-
-
-
-void AParticlesSimple::postUpdate(const GameUpdateSets& u)
+void AParticlesSimple::update(const GameUpdateSets& u)
 {
 	m_particles.update(u);
 }

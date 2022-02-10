@@ -21,7 +21,6 @@ struct SkyShaderSettings {
 	Mode mode = mode_colorGradinet;
 	vec3f topColor = vec3f(0.75f);
 	vec3f bottomColor = vec3f(0.25f);
-	vec3f sunDirection = vec3f(0.f, 0.f, 1.f);
 	Texture* texture = nullptr;
 };
 

@@ -83,10 +83,6 @@ struct SGE_ENGINE_API GameObject : public NoCopy {
 	// use the postUpdate() for such manipulations.
 	virtual void update(const GameUpdateSets& UNUSED(updateSets)) {}
 
-	// This is the place where the object can freely modify themselves,
-	// you cannot rely on other objects, as they can modify themselves here.
-	virtual void postUpdate(const GameUpdateSets& UNUSED(updateSets)) {}
-
 	/// Called when the object enters or leaves the game.
 	/// If you override this, make sure you've called this method as well.
 	virtual void onPlayStateChanged(bool const isStartingToPlay);

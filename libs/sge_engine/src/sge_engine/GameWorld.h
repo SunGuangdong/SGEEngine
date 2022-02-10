@@ -8,6 +8,7 @@
 #include "Actor.h"
 #include "EditorCamera.h"
 #include "sge_core/application/input.h"
+#include "sge_core/containers/MultiObjectArena.h"
 #include "sge_engine/physics/PhysicsDebugDraw.h"
 #include "sge_engine/physics/PhysicsWorld.h"
 #include "sge_renderer/renderer/renderer.h"
@@ -69,16 +70,10 @@ struct GameUpdateSets {
 	}
 
 	/// @brief Returns true if the game is paused for some reason.
-	bool isSimulationPaused() const
-	{
-		return isSimPaused;
-	}
+	bool isSimulationPaused() const { return isSimPaused; }
 
 	/// @brief Returns true if the game is not paused.
-	bool isPlaying() const
-	{
-		return !isSimulationPaused();
-	}
+	bool isPlaying() const { return !isSimulationPaused(); }
 
 	float dt = 0.f; ///< The delta time to be used when updateing.
 	bool isSimPaused =
@@ -97,10 +92,7 @@ struct SGE_ENGINE_API GameWorld {
 		userProjectionSettings.far = 10000.f;
 	}
 
-	~GameWorld()
-	{
-		clear();
-	}
+	~GameWorld() { clear(); }
 
 	void create();
 
@@ -118,9 +110,11 @@ struct SGE_ENGINE_API GameWorld {
 
 	/// Create a new object of the specified type.
 	GameObject* allocObject(TypeId const type, ObjectId const specificId = ObjectId(), const char* name = nullptr);
+
+	/// A shortcut for @allocObject.
 	Actor* allocActor(TypeId const type, ObjectId const specificId = ObjectId(), const char* name = nullptr);
 
-	/// @brief Type-safe allocation of a GameObject.
+	/// @brief Type-safe allocation of a GameObject. A shortcut for @allocObject.
 	template <typename T>
 	T* allocObjectT(ObjectId const specificId = ObjectId(), const char* name = nullptr)
 	{
@@ -252,27 +246,15 @@ struct SGE_ENGINE_API GameWorld {
 	int getNextNameIndex();
 
 	/// @brief Returns the attached inspector (if any).
-	GameInspector* getInspector()
-	{
-		return inspector;
-	}
+	GameInspector* getInspector() { return inspector; }
 
 	/// @brief Retrieves the amount of time passed while not being paused.
-	float getGameTime() const
-	{
-		return timeSpendPlaying;
-	}
+	float getGameTime() const { return timeSpendPlaying; }
 
 	/// @brief Returns true if the scene is in edit mode. Could be true only in the SGEEditor.
-	bool isInEditMode() const
-	{
-		return isEdited;
-	}
+	bool isInEditMode() const { return isEdited; }
 
-	void toggleEditMode()
-	{
-		isEdited = !isEdited;
-	}
+	void toggleEditMode() { isEdited = !isEdited; }
 
 	/// @brief Adds a task to be executed after the scene update has finished.
 	/// @param task A pointer to DYNAMICALLY allocated with new to task to be executed.
@@ -282,6 +264,8 @@ struct SGE_ENGINE_API GameWorld {
 	/// @brief A shortcut for addPostSceneTask. Useful for changeing the levels.
 	void addPostSceneTaskLoadWorldFormFile(const char* filename);
 
+	/// A function useful during gameplay to find all colliding game objects.
+	/// The list is updated each time a rigid body is removed form the world.
 	ArrayView<const btPersistentManifold* const> getRigidBodyManifolds(const RigidBody* rb) const;
 
 	/// @brief Removes all manifold for the specified rigid body.
@@ -311,6 +295,9 @@ struct SGE_ENGINE_API GameWorld {
 	/// A pointer to the attached inspector(if any).
 	GameInspector* inspector = nullptr;
 
+	MultiObjectArena gameObjectsArena;
+	std::unordered_map<ObjectId, MultiObjectArena::Handle> gameObjectIdToHandle;
+
 	/// A set of object ready to start playing at the beginning of the next step.
 	std::vector<GameObject*> objectsAwaitingCreation;
 	// All playing game object sorted by type.
@@ -326,12 +313,19 @@ struct SGE_ENGINE_API GameWorld {
 	std::unordered_map<ObjectId, vector_set<ObjectId>> m_childernOf;
 	std::unordered_map<ObjectId, ObjectId> m_parentOf;
 
+	// Events:
+
+	/// Each subscriber will get called after the update step has finished.
+	/// This is the right place to modify the self object without distupting the gameplay.
+	/// For example if a rigid body needs to change.
+	EventEmitter<const GameUpdateSets&> onPostUpdate;
+
 	// Physics
 	PhysicsWorld physicsWorld;
 	BulletPhysicsDebugDraw m_physicsDebugDraw;
 
 	/// Per frame physics contact manifold list.
-	/// Updated each frame after the physics simulation has ended.
+	/// Updated each frame after the physics simulation has ended and refresh if a game object is deleted.
 	std::unordered_map<const RigidBody*, std::vector<const btPersistentManifold*>> m_physicsManifoldList;
 
 	/// The next free game object id.

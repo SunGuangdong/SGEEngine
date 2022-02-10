@@ -36,6 +36,8 @@ void ABlockingObstacle::create()
 	// Disable making the rigid body dynamic. This Actor represents a static object.
 	m_rbPropConfig.extractPropsFromRigidBody(*m_traitRB.getRigidBody());
 	m_rbPropConfig.dontShowDynamicProperties = true;
+
+	postUpdateSubscription = Actor::getWorld()->onPostUpdate.subscribe([this](const GameUpdateSets& u) { postUpdate(u); });
 }
 
 void ABlockingObstacle::onPlayStateChanged(bool const isStartingToPlay)

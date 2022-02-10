@@ -337,7 +337,7 @@ void ATimeline::create()
 }
 
 
-void ATimeline::postUpdate(const GameUpdateSets& u)
+void ATimeline::update(const GameUpdateSets& u)
 {
 	const float frameLengthSeconds = 1.f / framesPerSecond;
 

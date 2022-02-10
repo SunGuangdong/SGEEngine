@@ -36,7 +36,7 @@ void ASky::create()
 	ttViewportIcon.setTexture(getEngineGlobal()->getEngineAssets().getIconForObjectType(sgeTypeId(ASky)), true);
 }
 
-void ASky::postUpdate(const GameUpdateSets& UNUSED(updateSets))
+void ASky::update(const GameUpdateSets& UNUSED(updateSets))
 {
 	m_textureAssetProp.update();
 }

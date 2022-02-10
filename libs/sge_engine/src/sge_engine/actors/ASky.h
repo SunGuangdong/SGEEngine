@@ -16,7 +16,7 @@ struct ASky : public Actor, public IActorCustomAttributeEditorTrait {
 	Box3f getBBoxOS() const override { return Box3f(); }
 
 	void create() override;
-	void postUpdate(const GameUpdateSets& updateSets) override;
+	void update(const GameUpdateSets& updateSets) override;
 
 	// IActorCustomAttributeEditorTrait
 	void doAttributeEditor(GameInspector* inspector) override;

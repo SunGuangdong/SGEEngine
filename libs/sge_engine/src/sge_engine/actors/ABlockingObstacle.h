@@ -10,6 +10,7 @@
 #include "sge_engine/traits/TraitModel.h"
 #include "sge_engine/traits/TraitRenderGeometry.h"
 #include "sge_engine/traits/TraitRigidBody.h"
+#include "sge_utils/react/Event.h"
 
 namespace sge {
 
@@ -26,12 +27,15 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 
 	void create() final;
 	void onPlayStateChanged(bool const isStartingToPlay) override;
-	void postUpdate(const GameUpdateSets& updateSets) final;
+	void update(const GameUpdateSets& UNUSED(updateSets)) final {}
+	void postUpdate(const GameUpdateSets& updateSets);
 	Box3f getBBoxOS() const final;
 
 	void doAttributeEditor(GameInspector* inspector) override;
 
   public:
+	EventSubscription postUpdateSubscription;
+
 	TraitRenderGeometry tt_rendGeom;
 	TraitRigidBody m_traitRB;
 

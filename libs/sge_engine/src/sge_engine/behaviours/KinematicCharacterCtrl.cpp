@@ -98,7 +98,7 @@ ScanCollisionsResult
 
 void CharacterCtrlKinematic::update(const CharacterCtrlInput& input, RigidBody& rb, float deltaTime)
 {
-	btCollisionObject* rbBullet = rb.getCollisionShape();
+	btCollisionObject* rbBullet = rb.getBulletCollisionObject();
 
 	Actor* actor = (Actor*)rb.actor;
 	if (!actor) {

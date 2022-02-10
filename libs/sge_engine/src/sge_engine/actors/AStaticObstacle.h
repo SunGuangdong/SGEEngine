@@ -4,8 +4,8 @@
 
 #include "sge_engine/Actor.h"
 #include "sge_engine/traits/TraitModel.h"
-#include "sge_engine/traits/TraitSprite.h"
 #include "sge_engine/traits/TraitRigidBody.h"
+#include "sge_engine/traits/TraitSprite.h"
 
 namespace sge {
 
@@ -14,7 +14,7 @@ namespace sge {
 //--------------------------------------------------------------------
 struct SGE_ENGINE_API AStaticObstacle : public Actor {
 	void create() final;
-	void postUpdate(const GameUpdateSets& updateSets) final;
+	void update(const GameUpdateSets& updateSets) final;
 	Box3f getBBoxOS() const final;
 
   public:

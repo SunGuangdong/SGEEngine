@@ -136,7 +136,7 @@ void AGhostObject::onPlayStateChanged(bool const isStartingToPlay)
 	}
 }
 
-void AGhostObject::postUpdate(const GameUpdateSets& updateSets)
+void AGhostObject::update(const GameUpdateSets& updateSets)
 {
 	animator.advanceAnimation(updateSets.dt);
 	std::vector<mat4f> transfBones;

@@ -26,13 +26,15 @@ ReflBlock() {
 }
 // clang-format on
 
-Box3f AStaticObstacle::getBBoxOS() const {
+Box3f AStaticObstacle::getBBoxOS() const
+{
 	Box3f bbox = m_traitModel.getBBoxOS();
 	bbox.expand(m_traitSprite.getBBoxOS());
 	return bbox;
 }
 
-void AStaticObstacle::create() {
+void AStaticObstacle::create()
+{
 	registerTrait(m_traitRB);
 	registerTrait(m_traitModel);
 	registerTrait(m_traitSprite);
@@ -42,7 +44,8 @@ void AStaticObstacle::create() {
 	m_traitModel.m_models[0].m_assetProperty.setAsset("assets/editor/models/box.mdl");
 }
 
-void AStaticObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
+void AStaticObstacle::update(const GameUpdateSets& UNUSED(updateSets))
+{
 	m_traitSprite.postUpdate();
 
 	if (m_traitModel.postUpdate()) {
@@ -60,7 +63,8 @@ void AStaticObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets)) {
 			// TODO: Check if it would be better if we explicitly set it here.
 			setTransform(getTransform(), true);
 			getWorld()->physicsWorld.addPhysicsObject(*m_traitRB.getRigidBody());
-		} else {
+		}
+		else {
 			sgeLogError("Static obstacle failed to create rigid body, the shape isn't valid!\n");
 		}
 	}

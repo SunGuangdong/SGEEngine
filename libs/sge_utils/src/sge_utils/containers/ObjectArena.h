@@ -5,30 +5,31 @@
 
 namespace sge {
 
-/// ArenaItem is a handle specifiying a specific item in an ObjectArena.
-struct ArenaItem {
-	ArenaItem() = default;
-	ArenaItem(int elementId, int revision)
-	    : elementId(elementId)
-	    , revision(revision)
-	{
-	}
+/// The sole pupouse of the class is to allow using the ObjectArena::Handle to point
+/// at ObjectArenaBase::Handle.
+struct ObjectArenaBase {
+	/// Handle is a handle specifiying a specific item in an ObjectArena.
+	struct Handle {
+		Handle() = default;
+		Handle(int elementId, int revision)
+		    : elementId(elementId)
+		    , revision(revision)
+		{
+		}
 
-	bool isValid() const
-	{
-		return elementId >= 0;
-	}
+		bool isValid() const { return elementId >= 0; }
 
-	int elementId = -1;
-	int revision = 0;
+		int elementId = -1;
+		int revision = 0;
+	};
 };
 
-/// ObjectArena is space that hold objects.
-/// These object are uniquely identified by a @ArenaItem during their lifetime.
-/// Use the @ArenaItem to access the object.
+/// ObjectArena is space that holds objects.
+/// These object are uniquely identified by a @ObjectArena::Handle during their lifetime.
+/// Use the @ObjectArena::Handle to access the object.
 /// To not cache pointers to the returned objects, use the handle.
 template <class TEelement>
-struct ObjectArena {
+struct ObjectArena : public ObjectArenaBase {
 	static constexpr size_t TNumElementsInChunk = 128;
 
 	struct ChunkElement {
@@ -49,10 +50,7 @@ struct ObjectArena {
 		Chunk(const Chunk&) = delete;
 		Chunk& operator=(const Chunk&) = delete;
 
-		Chunk()
-		{
-			chunkData = std::make_unique<ChunkElement[]>(TNumElementsInChunk);
-		}
+		Chunk() { chunkData = std::make_unique<ChunkElement[]>(TNumElementsInChunk); }
 
 		~Chunk()
 		{
@@ -65,10 +63,7 @@ struct ObjectArena {
 			}
 		}
 
-		bool isFull() const
-		{
-			return touchCount >= TNumElementsInChunk && freeList.empty();
-		}
+		bool isFull() const { return touchCount >= TNumElementsInChunk && freeList.empty(); }
 
 		ChunkElement* findFreeElementNoConstructor(int& outIndexInChunk)
 		{
@@ -116,7 +111,7 @@ struct ObjectArena {
 
   public:
 	template <typename... TArgs>
-	ArenaItem newElement(TArgs&&... args)
+	Handle newElement(TArgs&&... args)
 	{
 		int chunkIndex;
 		int indexInChunk;
@@ -128,14 +123,14 @@ struct ObjectArena {
 
 			// Create the handle.
 			int elementId = chunkIndex * TNumElementsInChunk + indexInChunk;
-			ArenaItem handle = ArenaItem(elementId, chunkElement->revision);
+			Handle handle = Handle(elementId, chunkElement->revision);
 			return handle;
 		}
 
-		return ArenaItem();
+		return Handle();
 	}
 
-	void deleteElement(const ArenaItem& handle)
+	void deleteElement(const Handle& handle)
 	{
 		if (handle.isValid() == false) {
 			return;
@@ -147,7 +142,7 @@ struct ObjectArena {
 		m_chunks[chunkIndex]->deleteElementCallDestructor(indexInChunk, handle.revision);
 	}
 
-	TEelement* get(const ArenaItem& handle)
+	TEelement* get(const Handle& handle)
 	{
 		if (handle.isValid() == false) {
 			return nullptr;
@@ -165,7 +160,7 @@ struct ObjectArena {
 		return nullptr;
 	}
 
-	const TEelement* get(const ArenaItem& handle) const
+	const TEelement* get(const Handle& handle) const
 	{
 		if (handle.isValid() == false) {
 			return nullptr;

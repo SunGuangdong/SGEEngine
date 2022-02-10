@@ -97,7 +97,7 @@ struct TraitSpriteEntry {
 	TraitSpriteImageSets imageSettings;
 };
 
-/// TraitSprite provides a way to render 2D texture and sprites as textured planes and billboards.
+/// TraitSprite provides a way to render 2D texture and sprites as textured planes and billboards in the 3D world.
 struct SGE_ENGINE_API TraitSprite : public Trait {
 	SGE_TraitDecl_Full(TraitSprite);
 

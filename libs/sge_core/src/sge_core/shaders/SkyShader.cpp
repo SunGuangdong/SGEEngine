@@ -12,8 +12,6 @@ struct SkyShaderCBufferParams {
 	vec3f uColorBottom;
 	float uColorBottom_padding;
 	vec3f uColorTop;
-	float uColorTop_padding;
-	vec3f uSunDir;
 	int skyShaderMode;
 };
 
@@ -105,7 +103,6 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 	cbParamsData.uProj = proj;
 	cbParamsData.uWorld = mat4f::getScaling(sphereScaling);
 	cbParamsData.uColorTop = sets.topColor;
-	cbParamsData.uSunDir = sets.sunDirection.normalized0();
 	cbParamsData.uColorBottom = sets.bottomColor;
 	cbParamsData.skyShaderMode = int(sets.mode);
 

@@ -10,7 +10,7 @@ ReflAddTypeIdExists(AParticlesSimple);
 struct SGE_ENGINE_API AParticlesSimple : public Actor {
 	Box3f getBBoxOS() const final;
 	void create() final;
-	void postUpdate(const GameUpdateSets& u) final;
+	void update(const GameUpdateSets& u) final;
 
   public:
 	TraitParticlesSimple m_particles;

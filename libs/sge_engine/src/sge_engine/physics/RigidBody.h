@@ -57,7 +57,8 @@ enum RigidBodyFilterMask : ubyte {
 /// This class represents our own wrapper around bullet rigid bodies.
 /// User for Static, Dynamic and Ghost (kinematic) objects.
 /// We add our custom information in the user point of the created btCollisionObject,
-/// uou can get the RigidBody by calling @fromBullet(btCollisionObject*).
+/// you can get the RigidBody by calling @fromBullet(btCollisionObject*).
+/// In order to use it you should add it to a physics world and when you are done with it (or you wana delete it) remove it.
 struct SGE_ENGINE_API RigidBody {
 	RigidBody()
 	    : m_motionState(this)
@@ -189,9 +190,8 @@ struct SGE_ENGINE_API RigidBody {
 	transf3d getTransformAndScaling() const;
 	void setTransformAndScaling(const transf3d& tr, bool killVelocity);
 
-	btCollisionObject* getCollisionShape() { return m_collisionObject.get(); }
-
-	const btCollisionObject* getCollisionShape() const { return m_collisionObject.get(); }
+	btCollisionObject* getBulletCollisionObject() { return m_collisionObject.get(); }
+	const btCollisionObject* getBulletCollisionObject() const { return m_collisionObject.get(); }
 
 	/// @brief Retrieves the Bullet Physics representation of the rigid body.
 	btRigidBody* getBulletRigidBody()
