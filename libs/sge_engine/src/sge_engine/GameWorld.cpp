@@ -189,7 +189,7 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 		// Object must be the leftmost parent!
 		// Allocate the object.
 		void* gameObjectVoid = nullptr;
-		MultiObjectArena::Handle h = gameObjectsArena.newElement(type, &gameObjectVoid);
+		MultiObjectArena::Handle objectHandle = gameObjectsArena.newElement(type, &gameObjectVoid);
 		GameObject* const object = reinterpret_cast<GameObject*>(gameObjectVoid);
 
 		if (!object) {
@@ -212,7 +212,8 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 		sgeAssert(m_gameObjectByIdLUT.count(object->getId()) == 0 && "it is expect that this element does not exists");
 		m_gameObjectByIdLUT[object->getId()] = object;
 
-		gameObjectIdToHandle[object->getId()] = h;
+		// Add the object id to memory handle remap.
+		gameObjectIdToHandle[object->getId()] = objectHandle;
 
 		return object;
 	}
@@ -366,10 +367,16 @@ void GameWorld::update(const GameUpdateSets& updateSets)
 						m_gameObjectByIdLUT.erase(itrInIdLUT);
 					}
 
+					// Deallocate the object, call its destructor.
 					gameObjectsOfType.erase(gameObjectsOfType.begin() + t);
-					MultiObjectArena::Handle h = gameObjectIdToHandle[objectToKill->getId()];
-					gameObjectsArena.deleteElement(h);
-					gameObjectIdToHandle.erase(objectToKill->getId());
+					auto objectMemoryHandleItr = gameObjectIdToHandle.find(objectToKill->getId());
+					if (objectMemoryHandleItr != gameObjectIdToHandle.end()) {
+						gameObjectsArena.deleteElement(objectMemoryHandleItr->second);
+						gameObjectIdToHandle.erase(objectToKill->getId());
+					}
+					else {
+						sgeAssert(false);
+					}
 
 					objectToKill = nullptr;
 					break;
