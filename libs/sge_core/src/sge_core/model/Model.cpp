@@ -1,6 +1,7 @@
 #include "Model.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
+#include "sge_utils/text/format.h"
 #include <functional>
 
 namespace sge {
@@ -18,6 +19,13 @@ void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib)
 			const BufferDesc vbd = BufferDesc::GetDefaultVertexBuffer((uint32)mesh->vertexBufferRaw.size(), usage);
 			mesh->vertexBuffer->create(vbd, mesh->vertexBufferRaw.data());
 
+			if (getModelLoadSetting().assetDir.empty()) {
+				mesh->vertexBuffer->setDebugName(string_format("Vertex Buffer for %s model", getModelLoadSetting().assetDir.c_str()));
+			}
+			else {
+				mesh->vertexBuffer->setDebugName(string_format("Vertex Buffer from a model"));
+			}
+
 			mesh->vertexDeclIndex = sgedev.getVertexDeclIndex(mesh->vertexDecl.data(), int(mesh->vertexDecl.size()));
 
 			mesh->hasUsableTangetSpace = mesh->vbNormalOffsetBytes >= 0 && mesh->vbNormalOffsetBytes >= 0 &&
@@ -27,6 +35,13 @@ void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib)
 				mesh->indexBuffer = sgedev.requestResource<Buffer>();
 				const BufferDesc ibd = BufferDesc::GetDefaultIndexBuffer((uint32)mesh->indexBufferRaw.size(), usage);
 				mesh->indexBuffer->create(ibd, mesh->indexBufferRaw.data());
+
+				if (getModelLoadSetting().assetDir.empty()) {
+					mesh->indexBuffer->setDebugName(string_format("Index Buffer for %s model", getModelLoadSetting().assetDir.c_str()));
+				}
+				else {
+					mesh->indexBuffer->setDebugName(string_format("Index Buffer from a model"));
+				}
 			}
 		}
 	}

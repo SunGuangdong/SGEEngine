@@ -122,6 +122,7 @@ bool EvaluatedModel::evaluate_Skinning() {
 
 			m_skinningBoneTransfsTex = context->getDevice()->requestResource<Texture>();
 			m_skinningBoneTransfsTex->create(td, &data, sd);
+			m_skinningBoneTransfsTex->setDebugName("Skinning bones texture for a model.");
 		} else {
 			context->updateTextureData(m_skinningBoneTransfsTex.GetPtr(), data);
 		}

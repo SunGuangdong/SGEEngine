@@ -4,24 +4,27 @@
 
 namespace sge {
 
-//------------------------------------------------
-// state accum helper function
-// returns true if
-//------------------------------------------------
 namespace {
+	/// Checks if @Variable has a value of @Value.
+	/// If they are the same the function returns false.
+	/// If they are different the @Variable gets update and returns true.
 	template <typename T>
-	bool UPDATE_ON_DIFF(T& Variable, const T& Value) {
-		if (Variable == Value)
+	bool UPDATE_ON_DIFF(T& Variable, const T& Value)
+	{
+		if (Variable == Value) {
 			return false;
+		}
+
 		Variable = Value;
 		return true;
 	}
 } // namespace
 
-////////////////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------------
 // GLContextStateCache
-////////////////////////////////////////////////////////////////////
-void* GLContextStateCache::MapBuffer(const GLenum target, const GLenum access) {
+//---------------------------------------------------------------------------------
+void* GLContextStateCache::MapBuffer(const GLenum target, const GLenum access)
+{
 #if !defined(__EMSCRIPTEN__)
 	// add some debug error checking because
 	// not all buffer targets are supported
@@ -39,10 +42,14 @@ void* GLContextStateCache::MapBuffer(const GLenum target, const GLenum access) {
 	void* result = glMapBuffer(target, access);
 	DumpAllGLErrors();
 	return result;
+#else
+	sgeLogError("WebGL doesn't support glMapBuffer");
+	return nullptr;
 #endif
 }
 
-void GLContextStateCache::UnmapBuffer(const GLenum target) {
+void GLContextStateCache::UnmapBuffer(const GLenum target)
+{
 #if !defined(__EMSCRIPTEN__)
 	// add some debug error checking because
 	// not all buffer targets are supported
@@ -59,21 +66,13 @@ void GLContextStateCache::UnmapBuffer(const GLenum target) {
 
 	m_boundBuffers[freq].isMapped = false;
 	glUnmapBuffer(target);
+#else
+	sgeLogError("WebGL doesn't support glUnmapBuffer");
 #endif
 }
 
-// void* GLContextStateCache::MapNamedBuffer(const GLuint buffer, const GLenum access)
-//{
-//	return glMapNamedBufferEXT(buffer, access);
-//}
-//
-// void GLContextStateCache::UnmapNamedBuffer(const GLuint buffer)
-//{
-//	glUnmapNamedBufferEXT(buffer);
-//}
-
-//---------------------------------------------------------------------
-void GLContextStateCache::BindBuffer(const GLenum bufferTarget, const GLuint buffer) {
+void GLContextStateCache::BindBuffer(const GLenum bufferTarget, const GLuint buffer)
+{
 	// add some debug error checking because
 	// not all buffer targets are supported
 	IsBufferTargetSupported(bufferTarget);
@@ -99,7 +98,8 @@ void GLContextStateCache::SetVertexAttribSlotState(const bool bEnabled,
                                                    const GLenum type,
                                                    const GLboolean normalized,
                                                    const GLuint stride,
-                                                   const GLuint byteOffset) {
+                                                   const GLuint byteOffset)
+{
 	VertexAttribSlotDesc& currentState = m_vertAttribPointers[index];
 
 	// If currently the slot is enabled just disable it and bypass the call to
@@ -112,7 +112,8 @@ void GLContextStateCache::SetVertexAttribSlotState(const bool bEnabled,
 		if (currentState.isEnabled) {
 			justEnabled = true;
 			glEnableVertexAttribArray(index);
-		} else {
+		}
+		else {
 			glDisableVertexAttribArray(index);
 		}
 
@@ -144,7 +145,8 @@ void GLContextStateCache::SetVertexAttribSlotState(const bool bEnabled,
 			if (currentState.type == GL_INT || currentState.type == GL_UNSIGNED_INT) {
 				glVertexAttribIPointer(index, currentState.size, currentState.type, currentState.stride,
 				                       (GLvoid*)(std::ptrdiff_t(currentState.byteOffset)));
-			} else {
+			}
+			else {
 				glVertexAttribPointer(index, currentState.size, currentState.type, currentState.normalized, currentState.stride,
 				                      (GLvoid*)(std::ptrdiff_t(currentState.byteOffset)));
 			}
@@ -153,77 +155,60 @@ void GLContextStateCache::SetVertexAttribSlotState(const bool bEnabled,
 	}
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::UseProgram(const GLuint program) {
+void GLContextStateCache::UseProgram(const GLuint program)
+{
 	if (UPDATE_ON_DIFF(m_program, program)) {
 		glUseProgram(program);
 	}
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::BindUniformBuffer(const GLuint index, const GLuint buffer) {
+void GLContextStateCache::BindUniformBuffer(const GLuint index, const GLuint buffer)
+{
 	if (UPDATE_ON_DIFF(m_uniformBuffers[index], buffer)) {
 		glBindBufferBase(GL_UNIFORM_BUFFER, index, buffer);
 	}
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::SetActiveTexture(const GLenum activeSlot) {
-	sgeAssert(activeSlot >= GL_TEXTURE0 && activeSlot <= GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
+void GLContextStateCache::SetActiveTexture(const GLenum activeSlot)
+{
+	sgeAssert(activeSlot >= GL_TEXTURE0 && activeSlot < GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS);
 
-	if (m_activeTexture != activeSlot) {
-		m_activeTexture = activeSlot;
+	if (m_activeTextureSlot != activeSlot) {
+		m_activeTextureSlot = activeSlot;
 		glActiveTexture(activeSlot);
 		DumpAllGLErrors();
 	}
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::BindTexture(const GLenum texTarget, const GLuint texture) {
-	BoundTexture* pSlotData = nullptr;
+void GLContextStateCache::BindTexture(const GLenum texTarget, const GLuint texture)
+{
+	const int slotIndex = m_activeTextureSlot - GL_TEXTURE0;
+	sgeAssert(slotIndex >= 0 && slotIndex < m_textures.size());
 
-	for (int t = 0; t < m_textures.size(); ++t) {
-		auto& tex = m_textures[t];
+	BoundTexture& texSlotState = m_textures[slotIndex];
 
-		if (tex.activeSlot == m_activeTexture && tex.type == texTarget) {
-			if (tex.resource == texture)
-				return;
-			pSlotData = &tex;
-		}
+	// Check if the texture is already bound.
+	if (texSlotState.resource == texture && texSlotState.texTarget == texTarget) {
+		return;
 	}
 
-	if (pSlotData) // the binding location(slot, texTarget) is found but the resource is different
-	{
-		pSlotData->resource = texture;
-		glBindTexture(texTarget, texture);
-	} else {
-		// the binding location isn't found
-		BoundTexture boundTex;
-		boundTex.activeSlot = m_activeTexture;
-		boundTex.type = texTarget;
-		boundTex.resource = texture;
+	// Update the cache and call the OpenGL API to actually bind the texture.
+	texSlotState.resource = texture;
+	texSlotState.texTarget = texTarget;
 
-		// add the bound slot
-		const bool success = m_textures.push_back(boundTex);
-
-		//[nODE]that assert mean thet the m_textures hasn't enough elemenets
-		// increase the array size and recompile or something
-		sgeAssert(success);
-
-		glBindTexture(texTarget, texture);
-		DumpAllGLErrors();
-	}
+	glBindTexture(texTarget, texture);
+	DumpAllGLErrors();
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::BindTextureEx(const GLenum texTarget, const GLenum activeSlot, const GLuint texture) {
+void GLContextStateCache::BindTextureEx(const GLenum texTarget, const GLenum activeSlot, const GLuint texture)
+{
 	SetActiveTexture(activeSlot);
 	BindTexture(texTarget, texture);
 	DumpAllGLErrors();
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::BindFBO(const GLuint fbo) {
+void GLContextStateCache::BindFBO(const GLuint fbo)
+{
 	if (m_frameBuffer == fbo)
 		return;
 	m_frameBuffer = fbo;
@@ -234,17 +219,17 @@ void GLContextStateCache::BindFBO(const GLuint fbo) {
 	DumpAllGLErrors();
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::setViewport(const sge::GLViewport& vp) {
-	if (UPDATE_ON_DIFF(m_viewport.second, vp) || !m_viewport.first) {
+void GLContextStateCache::setViewport(const sge::GLViewport& vp)
+{
+	if (!m_viewport.hasValue() || UPDATE_ON_DIFF(m_viewport.get(), vp)) {
 		glViewport(vp.x, vp.y, vp.width, vp.height);
-		m_viewport.first = true;
+		m_viewport = vp;
 		DumpAllGLErrors();
 	}
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc) {
+void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc)
+{
 	// Backface culling.
 	if (UPDATE_ON_DIFF(m_rasterDesc.cullMode, desc.cullMode)) {
 		switch (desc.cullMode) {
@@ -278,7 +263,7 @@ void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc) {
 	DumpAllGLErrors();
 
 	// Fillmode.
-#if !defined(__EMSCRIPTEN__) // WebGL 2 does't support fill mode.
+#if !defined(__EMSCRIPTEN__) // WebGL 2 does't support fill mode, it is all solid.
 	if (UPDATE_ON_DIFF(m_rasterDesc.fillMode, desc.fillMode)) {
 		switch (desc.fillMode) {
 			case FillMode::Solid:
@@ -322,7 +307,8 @@ void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc) {
 			}
 
 			glPolygonOffset(m_rasterDesc.depthBiasSlope, m_rasterDesc.depthBiasAdd);
-		} else {
+		}
+		else {
 			glPolygonOffset(0.f, 0.f);
 		}
 	}
@@ -338,8 +324,8 @@ void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc) {
 	DumpAllGLErrors();
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::ApplyScissorsRect(GLint x, GLint y, GLsizei width, GLsizei height) {
+void GLContextStateCache::ApplyScissorsRect(GLint x, GLint y, GLsizei width, GLsizei height)
+{
 	const bool diff = m_scissorsRect.x != x || m_scissorsRect.y != y || m_scissorsRect.width != width || m_scissorsRect.height != height;
 
 	if (diff == false) {
@@ -355,7 +341,8 @@ void GLContextStateCache::ApplyScissorsRect(GLint x, GLint y, GLsizei width, GLs
 	DumpAllGLErrors();
 }
 
-void GLContextStateCache::DepthMask(const GLboolean enabled) {
+void GLContextStateCache::DepthMask(const GLboolean enabled)
+{
 	if (UPDATE_ON_DIFF(m_depthStencilDesc.depthWriteEnabled, enabled == GL_TRUE)) {
 		if (enabled)
 			glDepthMask(GL_TRUE);
@@ -365,7 +352,8 @@ void GLContextStateCache::DepthMask(const GLboolean enabled) {
 	}
 }
 
-void GLContextStateCache::ApplyDepthStencilDesc(const DepthStencilDesc& desc) {
+void GLContextStateCache::ApplyDepthStencilDesc(const DepthStencilDesc& desc)
+{
 	if (UPDATE_ON_DIFF(m_depthStencilDesc.depthTestEnabled, desc.depthTestEnabled)) {
 		if (desc.depthTestEnabled)
 			glEnable(GL_DEPTH_TEST);
@@ -382,7 +370,8 @@ void GLContextStateCache::ApplyDepthStencilDesc(const DepthStencilDesc& desc) {
 	}
 }
 
-void GLContextStateCache::ApplyBlendState(const BlendDesc& blendDesc) {
+void GLContextStateCache::ApplyBlendState(const BlendDesc& blendDesc)
+{
 	if (UPDATE_ON_DIFF(m_blendDesc, blendDesc)) {
 		if (m_blendDesc.enabled)
 			glEnable(GL_BLEND);
@@ -403,12 +392,12 @@ void GLContextStateCache::ApplyBlendState(const BlendDesc& blendDesc) {
 	DumpAllGLErrors();
 }
 
-//---------------------------------------------------------------------
 void GLContextStateCache::DrawElements(const GLenum primTopology,
                                        const GLuint numIndices,
                                        const GLenum elemArrayBufferFormat,
                                        const GLvoid* indices,
-                                       const GLsizei instanceCount) {
+                                       const GLsizei instanceCount)
+{
 	if (instanceCount == 1)
 		glDrawElements(primTopology, numIndices, elemArrayBufferFormat, indices);
 	else
@@ -417,11 +406,11 @@ void GLContextStateCache::DrawElements(const GLenum primTopology,
 	DumpAllGLErrors();
 }
 
-//---------------------------------------------------------------------
 void GLContextStateCache::DrawArrays(const GLenum primTopology,
                                      const GLuint startVertex,
                                      const GLuint numVerts,
-                                     const GLsizei instanceCount) {
+                                     const GLsizei instanceCount)
+{
 	if (instanceCount == 1)
 		glDrawArrays(primTopology, startVertex, numVerts);
 	else
@@ -430,13 +419,14 @@ void GLContextStateCache::DrawArrays(const GLenum primTopology,
 	DumpAllGLErrors();
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::GenBuffers(const GLsizei numBuffers, GLuint* const buffers) {
+void GLContextStateCache::GenBuffers(const GLsizei numBuffers, GLuint* const buffers)
+{
 	sgeAssert(buffers != nullptr && numBuffers > 0);
 	glGenBuffers(numBuffers, buffers);
 }
 
-void GLContextStateCache::DeleteBuffers(const GLsizei numBuffers, GLuint* const buffers) {
+void GLContextStateCache::DeleteBuffers(const GLsizei numBuffers, GLuint* const buffers)
+{
 	sgeAssert(buffers != nullptr && numBuffers > 0);
 
 	// The tricky part. remove all mentions of any buffer from buffers
@@ -473,23 +463,23 @@ void GLContextStateCache::DeleteBuffers(const GLsizei numBuffers, GLuint* const 
 	glDeleteBuffers(numBuffers, buffers);
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::GenTextures(const GLsizei numTextures, GLuint* const textures) {
+void GLContextStateCache::GenTextures(const GLsizei numTextures, GLuint* const textures)
+{
 	sgeAssert(textures != nullptr && numTextures > 0);
 	glGenTextures(numTextures, textures);
 	DumpAllGLErrors();
 }
 
-void GLContextStateCache::DeleteTextures(const GLsizei numTextures, GLuint* const textures) {
+void GLContextStateCache::DeleteTextures(const GLsizei numTextures, GLuint* const textures)
+{
 	// "Unbind" the texture form the state cache.
 	for (int iTexture = 0; iTexture < numTextures; ++iTexture) {
 		const GLuint tex = textures[iTexture];
 
-		for (int t = 0; t < m_textures.size(); ++t) {
-			BoundTexture& boundTex = m_textures[t];
+		for (int iSlot = 0; iSlot < m_textures.size(); ++iSlot) {
+			BoundTexture& boundTex = m_textures[iSlot];
 			if (boundTex.resource == tex) {
-				SetActiveTexture(boundTex.activeSlot);
-				BindTextureEx(boundTex.type, boundTex.activeSlot, 0);
+				BindTextureEx(boundTex.texTarget, GL_TEXTURE0 + iSlot, 0);
 			}
 		}
 	}
@@ -497,14 +487,14 @@ void GLContextStateCache::DeleteTextures(const GLsizei numTextures, GLuint* cons
 	glDeleteTextures(numTextures, textures);
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::GenFrameBuffers(const GLsizei n, GLuint* ids) {
+void GLContextStateCache::GenFrameBuffers(const GLsizei n, GLuint* ids)
+{
 	sgeAssert(n > 0 && ids != NULL);
 	glGenFramebuffers(n, ids);
 }
 
-//---------------------------------------------------------------------
-void GLContextStateCache::DeleteFrameBuffers(const GLsizei n, GLuint* ids) {
+void GLContextStateCache::DeleteFrameBuffers(const GLsizei n, GLuint* ids)
+{
 	for (int t = 0; t < n; ++t) {
 		// HACK: if the currently bound fbo is deleted, I really don't know what happens to the OpenGL state.
 		// In order to make the next fbo call successful we imagine that a fbo with index max(GLuint) is bound.
@@ -516,8 +506,8 @@ void GLContextStateCache::DeleteFrameBuffers(const GLsizei n, GLuint* ids) {
 	sgeAssert(n > 0 && ids != NULL);
 	glDeleteFramebuffers(n, ids);
 }
-//---------------------------------------------------------------------
-void GLContextStateCache::DeleteProgram(GLuint program) {
+void GLContextStateCache::DeleteProgram(GLuint program)
+{
 	if (program == m_program) {
 		m_program = 0;
 	}
@@ -525,8 +515,8 @@ void GLContextStateCache::DeleteProgram(GLuint program) {
 	glDeleteProgram(program);
 }
 
-//---------------------------------------------------------------------
-GLContextStateCache::BUFFER_FREQUENCY GLContextStateCache::GetBufferTargetByFrequency(const GLenum bufferTarget) {
+GLContextStateCache::BUFFER_FREQUENCY GLContextStateCache::GetBufferTargetByFrequency(const GLenum bufferTarget)
+{
 	switch (bufferTarget) {
 		case GL_ARRAY_BUFFER:
 			return BUFFER_FREQUENCY_ARRAY;
@@ -539,11 +529,12 @@ GLContextStateCache::BUFFER_FREQUENCY GLContextStateCache::GetBufferTargetByFreq
 	// unimplemented frequency type
 	sgeAssert(false);
 
-	// make the compiler happy
+	// Make the compiler happy and return something.
 	return BUFFER_FREQUENCY_ARRAY;
 }
 
-bool GLContextStateCache::IsBufferTargetSupported(const GLenum bufferTarget) {
+bool GLContextStateCache::IsBufferTargetSupported(const GLenum bufferTarget)
+{
 	switch (bufferTarget) {
 		case GL_ARRAY_BUFFER:
 		case GL_ELEMENT_ARRAY_BUFFER:
@@ -551,14 +542,16 @@ bool GLContextStateCache::IsBufferTargetSupported(const GLenum bufferTarget) {
 			return true;
 	}
 #ifdef SGE_USE_DEBUG
-	sgeAssert(false && "Unsupported buffer target encountered!");
+	sgeAssert(false &&
+	          "Unsupported buffer target encountered! Everything might be fine, but this something really rare so I wanted to let you know "
+	          "that it happend.");
 #endif
 	return false;
 }
-
-struct BoundBufferState {
-	bool isMapped = false;
-	GLuint buffer = 0;
-};
+//
+//struct BoundBufferState {
+//	bool isMapped = false;
+//	GLuint buffer = 0;
+//};
 
 } // namespace sge

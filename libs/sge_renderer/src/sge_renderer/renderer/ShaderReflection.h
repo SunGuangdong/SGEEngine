@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sge_utils/sge_utils.h"
 #include "sge_utils/containers/vector_map.h"
+#include "sge_utils/sge_utils.h"
 #include <unordered_map>
 
 #include "GraphicsCommon.h"
@@ -16,14 +16,16 @@ struct ShadingProgram;
 //---------------------------------------------------
 struct BindLocation {
 	BindLocation()
-	    : raw(0) {
+	    : raw(0)
+	{
 		static_assert(sizeof(BindLocation) == sizeof(uint64), "");
 	}
 
 	bool isNull() const { return raw == 0; }
 
 #ifdef SGE_RENDERER_GL
-	BindLocation(short const bindLocation, short const uniformType, short const arraySize, short bindUnitTexture) {
+	BindLocation(short const bindLocation, short const uniformType, short const arraySize, short bindUnitTexture)
+	{
 		raw = 0;
 		this->bindLocation = bindLocation;
 		this->uniformType = uniformType;
@@ -33,13 +35,16 @@ struct BindLocation {
 #endif
 
 	BindLocation(const BindLocation& ref)
-	    : raw(ref.raw) {}
+	    : raw(ref.raw)
+	{
+	}
 
 #ifdef SGE_RENDERER_D3D11
 	BindLocation(ShaderType::Enum shaderFreq,
 	             short bindLocation,
 	             short const uniformType,
-	             short const texArraySize_or_numericUniformSizeBytes = 0) {
+	             short const texArraySize_or_numericUniformSizeBytes = 0)
+	{
 		raw = 0;
 		this->shaderFreq = short(shaderFreq);
 		this->bindLocation = bindLocation;
@@ -51,11 +56,14 @@ struct BindLocation {
 	union {
 		uint64 raw;
 		struct {
-			short bindLocation; // OpenGL BindLocation, D3D11 slot. If this is a Numeric Uniform under D3D11, then this is a byteOffset of
-			                    // the variable in the buffer!
-			short uniformType;  // Element of UniformType::enum describing what tyoe of uniform is this.
+			/// OpenGL: BindLocation,
+			/// D3D11: slot. If this is a Numeric Uniform under D3D11, then this is a byteOffset of
+			/// the variable in the buffer!
+			short bindLocation;
+			/// Element of UniformType::enum describing what tyoe of uniform is this.
+			short uniformType;
 #ifdef SGE_RENDERER_D3D11
-			short shaderFreq; // Is tha a vertex, geometry, pixel or so on shader.
+			short shaderFreq;
 			short texArraySize_or_numericUniformSizeBytes;
 #else
 			short glTextureUnit;
@@ -74,7 +82,8 @@ struct BindLocation {
 
 template <>
 struct std::hash<sge::BindLocation> {
-	std::size_t operator()(const sge::BindLocation& k) const {
+	std::size_t operator()(const sge::BindLocation& k) const
+	{
 		std::hash<decltype(k.raw)> h;
 		return h(k.raw);
 	}
@@ -197,15 +206,17 @@ struct UniformContainer {
 	typedef std::pair<unsigned, BindLocation> UniformLUTPair;
 	std::vector<UniformLUTPair> m_nameStrIdxLUT;
 
-	void add(const T& uniform) {
+	void add(const T& uniform)
+	{
 		BindLocation loc = uniform.computeBindLocation();
 		m_uniforms.emplace_back(UniformPair(loc, uniform));
 		m_nameStrIdxLUT.emplace_back(UniformLUTPair(uniform.nameStrIdx, loc));
 	}
 
-	BindLocation findUniform(const char* const name, [[maybe_unused]] ShaderType::Enum shaderType) const {
+	BindLocation findUniform(const char* const name, [[maybe_unused]] ShaderType::Enum shaderType) const
+	{
 		for (const auto& itr : m_uniforms) {
-			// @shaderType is ignored on OpenGL as all shader reflection there cannot 
+			// @shaderType is ignored on OpenGL as all shader reflection there cannot
 			// tell us which shader stage needs them, they are all uniforms to the shading program.
 			// OpenGL manages to handle shader uniforms (those used by multiple shader stages at once)
 			// internally.
@@ -223,7 +234,8 @@ struct UniformContainer {
 		return BindLocation();
 	}
 
-	BindLocation findUniform(unsigned const nameStrIdx, ShaderType::Enum shaderType) const {
+	BindLocation findUniform(unsigned const nameStrIdx, ShaderType::Enum shaderType) const
+	{
 		for (const auto& pair : m_nameStrIdxLUT) {
 			if (pair.first == nameStrIdx) {
 				return pair.second;

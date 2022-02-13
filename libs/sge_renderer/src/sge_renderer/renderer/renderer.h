@@ -24,14 +24,21 @@ struct RasterizerState;
 struct DepthStencilState;
 struct BlendState;
 
+enum SGERendApi {
+	SGERendApi_D3D,
+	SGERendApi_OpenGL,
+};
+
 #ifdef SGE_RENDERER_D3D11
 constexpr bool kIsTexcoordStyleD3D = true;
 constexpr float kNDCNear = 0.f;
+constexpr SGERendApi kSgeRendApi = SGERendApi_D3D;
 #endif
 
 #ifdef SGE_RENDERER_GL
 constexpr bool kIsTexcoordStyleD3D = false;
 constexpr float kNDCNear = -1.f;
+constexpr SGERendApi kSgeRendApi = SGERendApi_OpenGL;
 #endif
 
 //-----------------------------------------------------------------------
@@ -52,7 +59,8 @@ struct RAIResource {
 	const SGEDevice* getDevice() const { return m_device; }
 
 	template <typename T>
-	T* getDevice() {
+	T* getDevice()
+	{
 		return static_cast<T*>(getDevice());
 	}
 
@@ -61,6 +69,18 @@ struct RAIResource {
 	virtual ResourceType::Enum getResourceType() const = 0;
 	virtual void destroy() = 0;
 	virtual bool isValid() const = 0;
+
+#if SGE_USE_DEBUG
+	// Set a name to the GPU resouce so it is a bit easier when debugging.
+	void setDebugName(const std::string debugName) { this->debugName = std::move(debugName); }
+#else
+	void setDebugName(const std::string UNUSED(debugName)) { this->debugName = debugName; }
+#endif
+
+  private:
+#if SGE_USE_DEBUG
+	std::string debugName;
+#endif
 
   protected:
 	SGEDevice* m_device = nullptr;
@@ -153,7 +173,8 @@ struct Texture : public RAIResource {
 	virtual SamplerState* getSamplerState() = 0;
 	virtual void setSamplerState(SamplerState* ss) = 0;
 
-	bool is2DWithSize(const int width, const int height) const {
+	bool is2DWithSize(const int width, const int height) const
+	{
 		return getDesc().textureType == UniformType::Texture2D && getDesc().texture2D.width == width &&
 		       getDesc().texture2D.height == height;
 	}
@@ -166,7 +187,9 @@ struct CreateShaderResult {
 	CreateShaderResult() = default;
 	CreateShaderResult(bool succeeded, std::string errors)
 	    : succeeded(succeeded)
-	    , errors(errors) {}
+	    , errors(errors)
+	{
+	}
 
 	bool succeeded = false;
 	std::string errors;
@@ -200,7 +223,8 @@ struct ShadingProgram : public RAIResource {
 	virtual bool create(Shader* vertShdr, Shader* pixelShdr) = 0;
 	virtual CreateShaderResult createFromNativeCode(const char* const pVSCode, const char* const pPSCode) = 0;
 
-	CreateShaderResult createFromCustomHLSL(const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles = nullptr);
+	CreateShaderResult
+	    createFromCustomHLSL(const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles = nullptr);
 
 	virtual Shader* getVertexShader() const = 0;
 	virtual Shader* getPixelShader() const = 0;
@@ -330,26 +354,32 @@ struct SGEContext {
 template <typename T>
 struct GpuHandle {
 	GpuHandle()
-	    : m_pResourceInstance(NULL) {}
+	    : m_pResourceInstance(NULL)
+	{
+	}
 
 
 	template <typename S>
 	GpuHandle(S* pInstance)
-	    : m_pResourceInstance(static_cast<T*>(pInstance)) {
+	    : m_pResourceInstance(static_cast<T*>(pInstance))
+	{
 		ProxyIncrease();
 	}
 
-	~GpuHandle() {
+	~GpuHandle()
+	{
 		ProxyDecrease();
 		m_pResourceInstance = NULL;
 	}
 
-	GpuHandle(const GpuHandle& other) {
+	GpuHandle(const GpuHandle& other)
+	{
 		m_pResourceInstance = other.m_pResourceInstance;
 		ProxyIncrease();
 	}
 
-	GpuHandle& operator=(const GpuHandle& other) {
+	GpuHandle& operator=(const GpuHandle& other)
+	{
 		if (IsEqual(other) == false) {
 			ProxyDecrease();
 			m_pResourceInstance = other.m_pResourceInstance;
@@ -360,7 +390,8 @@ struct GpuHandle {
 	}
 
 	template <typename S>
-	GpuHandle& operator=(S* ptr) {
+	GpuHandle& operator=(S* ptr)
+	{
 		if (IsEqual(ptr) == false) {
 			ProxyDecrease();
 			m_pResourceInstance = static_cast<T*>(ptr);
@@ -377,7 +408,8 @@ struct GpuHandle {
 	bool IsEqual(RAIResource* pOther) const { return pOther == static_cast<RAIResource*>(m_pResourceInstance); }
 
 	template <class S>
-	bool IsEqual(const GpuHandle<S>& other) const {
+	bool IsEqual(const GpuHandle<S>& other) const
+	{
 		return static_cast<RAIResource*>(m_pResourceInstance) == static_cast<RAIResource*>(other.m_pResourceInstance);
 	}
 
@@ -388,23 +420,27 @@ struct GpuHandle {
 	T** PtrPtr() { return &m_pResourceInstance; }
 
 	template <typename S>
-	S* as() {
+	S* as()
+	{
 		return m_pResourceInstance ? static_cast<S*>(m_pResourceInstance) : NULL;
 	}
 
 	template <typename S>
-	const S* as() const {
+	const S* as() const
+	{
 		return m_pResourceInstance ? static_cast<const S*>(m_pResourceInstance) : NULL;
 	}
 
   private:
-	void ProxyIncrease() {
+	void ProxyIncrease()
+	{
 		if (m_pResourceInstance != NULL) {
 			m_pResourceInstance->addRef();
 		}
 	}
 
-	void ProxyDecrease() {
+	void ProxyDecrease()
+	{
 		if (m_pResourceInstance != NULL) {
 			m_pResourceInstance->releaseRef();
 
@@ -425,26 +461,30 @@ struct GpuHandle {
 struct RenderDestination {
 	RenderDestination() = default;
 
-	RenderDestination(SGEContext* const sgecon, FrameTarget* const frameTarget) {
+	RenderDestination(SGEContext* const sgecon, FrameTarget* const frameTarget)
+	{
 		sgeAssert(sgecon && frameTarget);
 		this->sgecon = sgecon;
 		this->frameTarget = frameTarget;
 		this->viewport = frameTarget->getViewport();
 	}
 
-	RenderDestination(SGEContext* const sgecon, FrameTarget* const frameTarget, const Rect2s& viewport) {
+	RenderDestination(SGEContext* const sgecon, FrameTarget* const frameTarget, const Rect2s& viewport)
+	{
 		sgeAssert(sgecon && frameTarget);
 		this->sgecon = sgecon;
 		this->frameTarget = frameTarget;
 		this->viewport = viewport;
 	}
 
-	SGEDevice* getDevice() const {
+	SGEDevice* getDevice() const
+	{
 		sgeAssert(sgecon);
 		return sgecon->getDevice();
 	}
 
-	void executeDrawCall(DrawCall& dc, const Rect2s* const scissorsRect = nullptr) const {
+	void executeDrawCall(DrawCall& dc, const Rect2s* const scissorsRect = nullptr) const
+	{
 		sgeAssert(sgecon && frameTarget);
 		sgecon->executeDrawCall(dc, frameTarget, &viewport, scissorsRect);
 	}

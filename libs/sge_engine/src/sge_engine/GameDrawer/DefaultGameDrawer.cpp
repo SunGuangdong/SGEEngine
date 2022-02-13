@@ -131,6 +131,8 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 			// Keep that in mind when testing and developing.
 			shadowFrameTarget = getCore()->getDevice()->requestResource<FrameTarget>();
 			shadowFrameTarget->create2D(shadowMapWidth, shadowMapHegiht, TextureFormat::Unknown, TextureFormat::D24_UNORM_S8_UINT);
+
+			shadowFrameTarget->getDepthStencil()->setDebugName("Light Shadow Map Depth");
 		}
 
 		// Draws the shadow map to the created frame target.

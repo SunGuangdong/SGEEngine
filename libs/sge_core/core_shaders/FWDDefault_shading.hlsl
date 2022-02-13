@@ -50,9 +50,6 @@ cbuffer ParamsCbFWDDefaultShading {
 
 // Material.
 uniform sampler2D texDiffuse;
-uniform sampler2D texDiffuseX;
-uniform sampler2D texDiffuseY;
-uniform sampler2D texDiffuseZ;
 uniform sampler2D uTexNormalMap;
 uniform sampler2D uTexMetalness;
 uniform sampler2D uTexRoughness;

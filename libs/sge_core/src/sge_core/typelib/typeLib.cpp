@@ -1,7 +1,6 @@
 #include "typeLib.h"
 #include "sge_utils/stl_algorithm_ex.h"
 #include <cctype>
-#include <functional>
 
 template class std::vector<sge::MemberDesc>;
 template class std::map<sge::TypeId, sge::TypeDesc>;

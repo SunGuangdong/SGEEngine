@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/containers/StaticArray.h"
@@ -56,7 +58,7 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	/// if you don't wanna use caching just pass nullptr for @precompiledCacheFile.
 	bool createFromFile(SGEDevice* sgedev,
 	                    const char* const fileName,
-	                    const char* const precompiledCacheFile,
+	                    std::string precompiledCacheFile,
 	                    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
 	                    const std::vector<Unform>& uniformsToCacheInLUT,
 	                    std::set<std::string>* outIncludedFiles = nullptr);
@@ -65,7 +67,7 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	bool create(SGEDevice* sgedev,
 	            const char* const shaderCode,
 	            const char* const shaderCodeFileName,
-	            const char* const precompiledCacheFile,
+	            std::string precompiledCacheFilePrefix,
 	            const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
 	            const std::vector<Unform>& uniformsToCacheInLUT,
 	            std::set<std::string>* outIncludedFiles = nullptr);
@@ -84,7 +86,7 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	bool createInternal(SGEDevice* sgedev,
 	                    const char* const shaderCode,
 	                    const char* const shaderCodeFileName,
-	                    const char* const precompiledCacheFile,
+	                    std::string precompiledCacheFilePrefix,
 	                    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
 	                    const std::vector<Unform>& uniformsToCacheInLUT,
 	                    std::set<std::string>* outIncludedFiles = nullptr);

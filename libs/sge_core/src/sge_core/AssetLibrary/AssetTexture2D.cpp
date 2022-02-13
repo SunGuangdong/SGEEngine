@@ -233,6 +233,7 @@ bool AssetTexture2d::loadAssetFromFile(const char* path) {
 
 	m_texture = getCore()->getDevice()->requestResource<Texture>();
 	m_texture->create(textureDesc, &textureDataDesc, m_textureMeta.assetSamplerDesc);
+	m_texture->setDebugName(path);
 
 	if (textureData != nullptr) {
 		stbi_image_free((void*)textureData);

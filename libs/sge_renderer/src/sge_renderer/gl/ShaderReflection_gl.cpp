@@ -126,7 +126,7 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 			texture.nameStrIdx = device->getStringIndex(name);
 			texture.gl_bindLocation = bindLocation;
 			texture.gl_bindUnit = texBindUnit;
-			texBindUnit += 1;
+			texBindUnit += size;
 			texture.gl_textureTarget = GLUniformTypeToTextureType(gl_type);
 
 			texture.arraySize = size;

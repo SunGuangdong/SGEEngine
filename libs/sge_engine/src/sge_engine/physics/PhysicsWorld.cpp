@@ -42,9 +42,9 @@ void PhysicsWorld::addPhysicsObject(RigidBody& obj)
 	else {
 		// Caution: [SGE_BULLET_GHOSTS]
 		// By default ghost (kinematic) objects generate contacts with dynamic objects only.
-		// No static objects. In order to generate contacts with them 
+		// No static objects. In order to generate contacts with them
 		// we need to change their bullet filter mask.
-		// We wanna do this as for example kinematic characters 
+		// We wanna do this as for example kinematic characters
 		// need to be able to recover form collision with the level.
 		dynamicsWorld->addCollisionObject(obj.m_collisionObject.get(), btBroadphaseProxy::AllFilter, btBroadphaseProxy::AllFilter);
 	}

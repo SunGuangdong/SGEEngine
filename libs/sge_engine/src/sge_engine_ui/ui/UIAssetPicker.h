@@ -5,12 +5,14 @@
 #include <string>
 
 #include "sge_core/AssetLibrary/AssetLibrary.h"
+#include "sge_core/typelib/typeLib.h"
 #include "sge_engine/sge_engine_api.h"
 
 namespace sge {
 
 struct ObjectId;
 struct GameWorld;
+struct GameObject;
 struct Actor;
 struct Asset;
 

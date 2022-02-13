@@ -13,17 +13,21 @@
 
 #include "sge_renderer/renderer/GraphicsCommon.h"
 #include "sge_utils/containers/Pair.h"
+#include "sge_utils/containers/Optional.h"
 #include "sge_utils/containers/StaticArray.h"
-
-#include <sge_utils/math/Box.h>
 
 namespace sge {
 
-////////////////////////////////////////////////////////////////////
-// GLContextStateCache
-////////////////////////////////////////////////////////////////////
+/// GLContextStateCache is the API wrapper around OpenGL.
+/// Please make all OpenGL API calls trough this class. It keeps tracks of the current state
+/// of all bound resources and and rendering states. This way we can reduce the needless API calls
+/// to OpenGL if we are apply the same state that is already bound.
+/// In addition this will automatically unbind all delete resources.
+/// 
+/// Known problems :
+/// - Deleteing a frame buffer, that also deletes it's attachements, 
+///   WILL NOT unbind its attachements form if any of them is bound.
 struct GLContextStateCache {
-  public:
 	struct ScissorRect {
 		ScissorRect() = default;
 		GLint x = 0;
@@ -63,9 +67,8 @@ struct GLContextStateCache {
 
 	// Bond textures description.
 	struct BoundTexture {
-		GLuint activeSlot = GL_TEXTURE0; // bound location in GL_TEXTURE0 + index
-		GLenum type = GL_NONE;           // GL_TEXTURE_2D ... ect
-		GLuint resource = 0;
+		GLenum texTarget = GL_NONE;      ///< GL_TEXTURE_2D ... ect
+		GLuint resource = 0;             ///< The handle to the OpenGL resources.
 	};
 
   public:
@@ -80,7 +83,6 @@ struct GLContextStateCache {
 			v.buffer = 0;
 			v.isMapped = false;
 		}
-		m_viewport.first = false;
 	}
 
 	// https://www.opengl.org/sdk/docs/man/html/glMapBuffer.xhtml
@@ -90,12 +92,9 @@ struct GLContextStateCache {
 
 	void UnmapBuffer(const GLenum target);
 
-	// Just don't use this for now ...
-	// void* MapNamedBuffer(const GLuint buffer, const GLenum access);
-	// void UnmapNamedBuffer(const GLuint buffer);
-
-	//@bufferTarget - GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER, ect...
-	//@buffer - buffer to bind
+	/// A wrapper aound glBindBuffer.
+	/// @param bufferTarget - GL_ARRAY_BUFFER, GL_ELEMENT_ARRAY_BUFFER, ect...
+	/// @param buffer - buffer to be bound.
 	void BindBuffer(const GLenum bufferTarget, const GLuint buffer);
 
 	//
@@ -113,19 +112,27 @@ struct GLContextStateCache {
 	                              const GLuint stride,
 	                              const GLuint byteOffset);
 
-	// Bind the shading program
-	//@program - calls glUseProgram(program)
+	/// Binds the specified shading program. Basically calls glUseProgram.
+	/// @param program resource id to get bound.
 	void UseProgram(const GLuint program);
 
-	// Calls glBindBufferBase(GL_UNIFORM_BUFFER, index, buffer)
-	//@index - binding location
-	//@buffer - uniform buffer to be bound
+	/// Calls glBindBufferBase(GL_UNIFORM_BUFFER, index, buffer)
+	/// @param index - binding location
+	/// @param buffer - uniform buffer to be bound
 	void BindUniformBuffer(const GLuint index, const GLuint buffer);
 
-	// update the currently active texture
-	//@activeSlot - this should be activeSlot = GL_TEXTURE0 + N;
+	/// A wrapper around glActiveTexture, witch sets the current slot we are modifying (GL_TEXTURE0, GL_TEXTURE1 ...).
+	/// Prefer using @BindTextureEx.
 	void SetActiveTexture(const GLenum activeSlot);
+
+	/// A wrapper around glBindTexture.
+	/// Prefer using @BindTextureEx.
 	void BindTexture(const GLenum texTarget, const GLuint texture);
+
+	/// A shorcut for @SetActiveTexture + @BindTexture.
+	/// @param texTarget is the type of the texture: GL_TEXTURE_2D, GL_TEXTURE_3D and so on.
+	/// @param activeSlot is the slot where the textue is going th get bound: GL_TEXTURE0, GL_TEXTURE1 ...
+	/// @param texture is the resource id to be bound.
 	void BindTextureEx(const GLenum texTarget, const GLenum activeSlot, const GLuint texture);
 
 	void BindFBO(const GLuint fbo);
@@ -157,10 +164,7 @@ struct GLContextStateCache {
 	void GenFrameBuffers(const GLsizei n, GLuint* ids);
 	void DeleteFrameBuffers(const GLsizei n, GLuint* ids);
 
-	GLuint CreateProgram()
-	{
-		return glCreateProgram();
-	}
+	GLuint CreateProgram() { return glCreateProgram(); }
 	void DeleteProgram(GLuint program);
 
   private:
@@ -188,13 +192,10 @@ struct GLContextStateCache {
 
 	// Found buffer for every buffer target (array, element array, uniform...)
 	std::array<BoundBufferState, BUFFER_FREQUENCY::NUM_BUFFER_FREQUENCY> m_boundBuffers;
-
-	//[TODO]:HARDCODED SIZE
 	std::array<VertexAttribSlotDesc, 16> m_vertAttribPointers;
 
-	//[TODO]:HARDCODED SIZE
-	GLenum m_activeTexture = GL_TEXTURE0;
-	StaticArray<BoundTexture, 16> m_textures;
+	GLenum m_activeTextureSlot = GL_TEXTURE0;
+	std::array<BoundTexture, 32> m_textures;
 
 	GLuint m_program = 0;
 
@@ -204,8 +205,8 @@ struct GLContextStateCache {
 	// THe bound framebuffer;
 	GLuint m_frameBuffer = 0;
 
-	// The bound viewport. "first" holds if there is actually bound viewport.
-	Pair<bool, sge::GLViewport> m_viewport;
+	/// The bound viewport. If the optional is empty than no viewport has been bound so far.
+	Optional<sge::GLViewport> m_viewport;
 };
 
 } // namespace sge

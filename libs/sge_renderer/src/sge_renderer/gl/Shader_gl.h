@@ -47,12 +47,19 @@ struct ShaderGL : public Shader {
 	~ShaderGL() { destroy(); }
 
 	// Creates the shader using the native language for the API.
-	CreateShaderResult createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint);
+	CreateShaderResult createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint) override;
+
+	CreateShaderResult createFromNativeBytecode(const ShaderType::Enum UNUSED(type), std::vector<char> UNUSED(nativeBytecode)) override
+	{
+		return CreateShaderResult();
+	}
 
 	virtual void destroy() override;
 	virtual bool isValid() const override;
 
 	const ShaderType::Enum getShaderType() const final { return m_shaderType; }
+
+	virtual bool getCreationBytecode(std::vector<char>& UNUSED(outMemory)) const override { return false; }
 
 	GLuint GL_GetShader() { return m_glShader; }
 

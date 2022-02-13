@@ -2,7 +2,7 @@
 
 #include "sge_renderer/renderer/renderer.h"
 
-#include <sge_utils/utils/StringRegister.h>
+#include "sge_utils/text/StringRegister.h"
 
 #include "GLContextStateCache.h"
 
@@ -38,7 +38,9 @@ struct SGEDeviceImpl : public SGEDevice {
 
 	SGEDeviceImpl()
 	    : m_immContext(nullptr)
-	    , m_VSyncEnabled(false) {}
+	    , m_VSyncEnabled(false)
+	{
+	}
 
 	bool Create(const MainFrameTargetDesc& frameTargetDesc);
 
@@ -102,7 +104,9 @@ struct SGEDeviceImpl : public SGEDevice {
 //--------------------------------------------------------
 struct SGEContextGL : public SGEContext {
 	SGEContextGL()
-	    : m_device(nullptr) {}
+	    : m_device(nullptr)
+	{
+	}
 
 	SGEDevice* getDevice() final { return m_device; }
 	SGEDeviceImpl* getDeviceImpl() { return m_device; }
@@ -139,7 +143,7 @@ struct SGEContextImmediate : public SGEContextGL {
 	bool isQueryReady(Query* const query) final;
 	bool getQueryData(Query* const query, uint64& queryData) final;
 
-	void updateTextureData(Texture* texture,  const TextureData& td) override;
+	void updateTextureData(Texture* texture, const TextureData& td) override;
 };
 
 //---------------------------------------------------------------------

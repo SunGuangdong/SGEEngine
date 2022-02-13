@@ -6,6 +6,8 @@
 #include "sge_utils/text/Path.h"
 #include "sge_utils/text/format.h"
 
+#include "sge_renderer/renderer/renderer.h"
+
 namespace sge {
 
 bool ShadingProgramPermuatorCache::saveToFile(const char* cacheFilename) const
@@ -47,7 +49,7 @@ bool ShadingProgramPermuatorCache::saveToFile(const char* cacheFilename) const
 	return succeeded;
 }
 
-bool ShadingProgramPermuatorCache::loadFileFile(const char* cacheFilename)
+bool ShadingProgramPermuatorCache::loadCacheFile(const char* cacheFilename)
 {
 	try {
 		// Reset the structure to its default state.

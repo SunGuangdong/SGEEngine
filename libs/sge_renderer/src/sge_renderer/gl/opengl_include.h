@@ -17,7 +17,9 @@
 
 namespace sge {
 
-void DumpGLError(const GLenum opengl_error_code);
+/// Check the OpenGL context if it has any errors.
+/// On desktop this will happen only when SGE_USE_DEBUG is defined.
+/// For Emscripten it is forced disabled as it is too slow, you can enable it manually.
 void DumpAllGLErrors();
 
 inline GLenum GLUniformTypeToTextureType(const GLenum uniformType)

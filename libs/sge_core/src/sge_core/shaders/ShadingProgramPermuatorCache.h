@@ -18,9 +18,9 @@ struct ShadingProgramPermuatorCache {
 	bool saveToFile(const char* cacheFilename) const;
 
 	/// Loads the cache from the specified file.
-	bool loadFileFile(const char* cacheFilename);
+	bool loadCacheFile(const char* cacheFilename);
 
-	/// After loading a cache with @loadFileFile, we can use
+	/// After loading a cache with @loadCacheFile, we can use
 	/// this function to see if any the source files used by the shader
 	/// has been changed.
 	bool verifyThatCacheIsUpDoDate() const;

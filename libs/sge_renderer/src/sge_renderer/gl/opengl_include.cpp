@@ -32,9 +32,11 @@ void DumpGLError(const GLenum opengl_error_code) {
 }
 // clang-format on
 
-void DumpAllGLErrors() {
-	// Dumping errors for EMSCRIPTEN builds is disabled by default it is way to slow.
-#if !defined(__EMSCRIPTEN__)
+void DumpAllGLErrors()
+{
+#if !defined(SGE_USE_DEBUG)
+	// Dumping errors for EMSCRIPTEN builds is disabled by default it is way too slow, even in debug.
+	#if !defined(__EMSCRIPTEN__)
 	GLenum opengl_error_code = glGetError();
 	while (opengl_error_code != GL_NO_ERROR) {
 		// Dump the error message for the error.
@@ -43,6 +45,7 @@ void DumpAllGLErrors() {
 		// Advance to the next error
 		opengl_error_code = glGetError();
 	}
+	#endif
 #endif
 }
 

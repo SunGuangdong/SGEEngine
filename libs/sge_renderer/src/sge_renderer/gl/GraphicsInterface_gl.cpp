@@ -483,7 +483,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 					// Bind the texture.
 					TextureGL* const textureGL = ((TextureGL*)(binding.texture));
 					const GLint texture = textureGL ? ((TextureGL*)(binding.texture))->GL_GetResource() : GL_NONE;
-					glcon->BindTextureEx(textureTarget, GL_TEXTURE0 + binding.bindLocation.glTextureUnit, texture);
+					const GLenum texUnit = GL_TEXTURE0 + binding.bindLocation.glTextureUnit;
+					glcon->BindTextureEx(textureTarget, texUnit, texture);
 					DumpAllGLErrors();
 
 					glUniform1i(binding.bindLocation.bindLocation, binding.bindLocation.glTextureUnit);
@@ -493,11 +494,11 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 						// Bind the texture.
 						TextureGL* const boundTextureGL = static_cast<TextureGL*>(binding.textures[t]);
 						const GLint texture = boundTextureGL ? boundTextureGL->GL_GetResource() : GL_NONE;
-						const GLenum texSlotIdx = binding.bindLocation.bindLocation + t;
-						glcon->BindTextureEx(textureTarget, GL_TEXTURE0 + texSlotIdx, texture);
+						const GLenum texUnit = GL_TEXTURE0 + binding.bindLocation.glTextureUnit + t;
+						glcon->BindTextureEx(textureTarget, texUnit, texture);
 						DumpAllGLErrors();
 
-						glUniform1i(texSlotIdx, texSlotIdx);
+						glUniform1i(binding.bindLocation.bindLocation + t, binding.bindLocation.glTextureUnit + t);
 						DumpAllGLErrors();
 					}
 				}
