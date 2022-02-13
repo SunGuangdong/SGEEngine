@@ -7,7 +7,6 @@ I want to have good samples and documentation before releasing it. Stay tuned!__
 
 __SGEEngine__ is an open source __(MIT License)__, C++ centric game engine with an editor usable as a sandbox. Aimed at simple projects, SGEEngine is suitable for small games, game jams, learning, personal projects and can be used as a basis for your own game engine.
 
-
 I've build many demos and toy projects with it. Below you can try an endless runner game that I made in a few days
 with the engine. It is an endless runner game in a 2.5D world. The game works on desktop, web and web on phones.
 
@@ -16,10 +15,14 @@ with the engine. It is an endless runner game in a 2.5D world. The game works on
 I've also did a small test recording of me explaining the basics of the engine how one could make a small Ballance-like game with it:
 [![SGEEngine demo](docs/img/sgeEngineDemoVidThumbnail.jpg)](https://www.youtube.com/watch?v=aL8-DhXEnWo)
 
-<img src="./docs/img/editor_ss4.jpg" alt="alt text" width="100%">
-
 <img src="./docs/img/editor_ss0.png" alt="alt text" width="50%" height="50%"><img src="./docs/img/editor_ss1.png" alt="alt text" width="50%" height="50%">
 <img src="./docs/img/editor_ss2.png" alt="alt text" width="50%" height="50%"><img src="./docs/img/editor_ss3.png" alt="alt text" width="50%" height="50%">
+
+ __Roadmap to 1st release:__
+  - better in-game UI API (in progress)
+  - Sample demo scene and games (in progress)
+  - Documentation
+  - Kinematic Character controller (80% done)
 
 __The main features of the engine are:__
  - Cross platform working on Windows, GNU/Lunix and on the web via Emscripten.
@@ -35,13 +38,7 @@ __The main features of the engine are:__
  - Material System.
  - Hopefully being easy to setup and use.
 
-[](https://user-images.githubusercontent.com/6237727/114287179-95c8a700-9a6d-11eb-9fdd-54009834ef2f.mp4)
-
- __Roadmap to 1st release:__
-  - better in-game UI API (in progress)
-  - Sample demo scene and games (in progress)
-  - Documentation
-  - Kinematic Character controller (80% done)
+[](https://user-images.githubusercontent.com/6237727/114287179-95c8a700-9a6d-11eb-9fdd-54009834ef2f.mp4 =250x)
 
  __Roadmap:__
   - Responding to user feedback.
