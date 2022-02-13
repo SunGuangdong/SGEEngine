@@ -1,9 +1,11 @@
 #include "setImGuiContexCore.h"
 
-ImGuiContext* getImGuiContextCore() {
+ImGuiContext* getImGuiContextCore()
+{
 	return ImGui::GetCurrentContext();
 }
 
-void setImGuiContextCore(ImGuiContext* g) {
+void setImGuiContextCore(ImGuiContext* g)
+{
 	ImGui::SetCurrentContext(g);
 }

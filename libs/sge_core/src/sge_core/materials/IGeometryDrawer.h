@@ -16,7 +16,8 @@ struct IMaterialData;
 /// like disabling culling/lighting and so on.
 /// Currently it is not used for anything and hopefully it will get deleted.
 /// However, I feel that I'll need to reintroduce it once more this is why I've kept it.
-struct InstanceDrawMods {};
+struct InstanceDrawMods {
+};
 
 /// ShadingLightData describes a single light settings
 /// to be used by the @IGeometryDrawer when rendering a single geometry.
@@ -46,11 +47,12 @@ struct ObjectLighting {
 	/// lightsCount is the size of the array pointed by @ppLightData.
 	int lightsCount = 0;
 
-	/// An array of all lights that affect the object. 
+	/// An array of all lights that affect the object.
 	/// The size of the array is @lightsCount.
 	const ShadingLightData** ppLightData = nullptr;
 
-	static ObjectLighting makeAmbientLightOnly() {
+	static ObjectLighting makeAmbientLightOnly()
+	{
 		ObjectLighting result;
 		result.ambientLightColor = vec3f(1.f);
 		result.ambientFakeDetailBias = 1.f;

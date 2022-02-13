@@ -13,7 +13,8 @@ namespace sge {
 //------------------------------------------------------------------------
 // VertexMapperGL
 //------------------------------------------------------------------------
-bool VertexMapperGL::create(const ShadingProgram* shadingProgram, const VertexDeclIndex vertexDeclIndex) {
+bool VertexMapperGL::create(const ShadingProgram* shadingProgram, const VertexDeclIndex vertexDeclIndex)
+{
 	destroy();
 
 	m_vertexDeclIndex = vertexDeclIndex;
@@ -69,19 +70,22 @@ bool VertexMapperGL::create(const ShadingProgram* shadingProgram, const VertexDe
 	return true;
 }
 
-void VertexMapperGL::destroy() {
+void VertexMapperGL::destroy()
+{
 	m_vertexDeclIndex = VertexDeclIndex_Null;
 	m_glVertexLayout.clear();
 }
 
-bool VertexMapperGL::isValid() const {
+bool VertexMapperGL::isValid() const
+{
 	return m_vertexDeclIndex != VertexDeclIndex_Null && m_glVertexLayout.size() != 0;
 }
 
 //-----------------------------------------------------------------------
 // ShaderGL
 //-----------------------------------------------------------------------
-CreateShaderResult ShaderGL::createNative(const ShaderType::Enum type, const char* pCode, const char* const UNUSED(entryPoint)) {
+CreateShaderResult ShaderGL::createNative(const ShaderType::Enum type, const char* pCode, const char* const UNUSED(entryPoint))
+{
 	// Cleanup any previous state.
 	destroy();
 
@@ -127,7 +131,8 @@ CreateShaderResult ShaderGL::createNative(const ShaderType::Enum type, const cha
 	return CreateShaderResult(true, "");
 }
 
-void ShaderGL::destroy() {
+void ShaderGL::destroy()
+{
 	if (m_glShader != 0) {
 		glDeleteShader(m_glShader);
 		m_glShader = 0;
@@ -136,7 +141,8 @@ void ShaderGL::destroy() {
 	m_cachedCode = std::string();
 }
 
-bool ShaderGL::isValid() const {
+bool ShaderGL::isValid() const
+{
 	return m_glShader != 0;
 }
 

@@ -3,7 +3,8 @@
 #include <filesystem>
 
 namespace sge {
-void exportGame(const std::string& exportDir) {
+void exportGame(const std::string& exportDir)
+{
 	if (exportDir.empty()) {
 		return;
 	}
@@ -11,20 +12,21 @@ void exportGame(const std::string& exportDir) {
 #define SGE_TRY_CATCH(code) \
 	try {                   \
 		code;               \
-	} catch (...) {         \
+	}                       \
+	catch (...) {           \
 	};
 
 	const auto copyDirRecOverwrite = std::filesystem::copy_options::overwrite_existing | std::filesystem::copy_options::recursive;
 	const auto copyOverwrite = std::filesystem::copy_options::overwrite_existing;
 
 #ifdef WIN32
-#define SGE_EXE_SUFFIX ".exe"
-#define SGE_DLL_SUFFIX ".dll"
-#define SGE_DLL_PREFIX
+	#define SGE_EXE_SUFFIX ".exe"
+	#define SGE_DLL_SUFFIX ".dll"
+	#define SGE_DLL_PREFIX
 #else
-#define SGE_EXE_SUFFIX
-#define SGE_DLL_SUFFIX ".so"
-#define SGE_DLL_PREFIX "lib"
+	#define SGE_EXE_SUFFIX
+	#define SGE_DLL_SUFFIX ".so"
+	#define SGE_DLL_PREFIX "lib"
 #endif
 
 	SGE_TRY_CATCH(std::filesystem::copy("appdata", exportDir + "/appData", copyDirRecOverwrite));

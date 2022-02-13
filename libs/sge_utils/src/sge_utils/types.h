@@ -3,7 +3,7 @@
 #include <cstddef>
 
 namespace sge {
-	
+
 typedef unsigned char ubyte;
 typedef unsigned short uint16;
 typedef unsigned int uint32;
@@ -14,8 +14,8 @@ typedef signed short sint16;
 typedef signed int sint32;
 typedef signed long long sint64;
 typedef signed long long int64;
-typedef signed long long i64;	
-	
+typedef signed long long i64;
+
 /// Inheriting @NoCopyNoMove is an easy way to enforce a class to be non-copyable and non-movable.
 struct NoCopyNoMove {
   public:
@@ -28,7 +28,7 @@ struct NoCopyNoMove {
 struct NoCopy {
   public:
 	NoCopy() = default;
-	
+
 	NoCopy(const NoCopy&) = delete;
 	NoCopy& operator=(const NoCopy&) = delete;
 
@@ -44,5 +44,5 @@ struct Polymorphic {
 	Polymorphic() = default;
 	virtual ~Polymorphic() = default;
 };
-	
+
 } // namespace sge

@@ -26,13 +26,16 @@ class FileReadStream : public IReadStream {
 	    , buffer(nullptr)
 	    , bufferSize(0)
 	    , bufferFileOffset(0)
-	    , pointer(0) {}
+	    , pointer(0)
+	{
+	}
 
 	~FileReadStream() { close(); }
 
 	// Just an errorless shortcut to Open method
 	FileReadStream(const char* const filename, const size_t bufsz = 0)
-	    : FileReadStream() {
+	    : FileReadStream()
+	{
 		open(filename, bufsz);
 	}
 
@@ -78,7 +81,9 @@ class FileReadStream : public IReadStream {
 class FileWriteStream : public IWriteStream {
   public:
 	FileWriteStream()
-	    : m_file(nullptr) {}
+	    : m_file(nullptr)
+	{
+	}
 
 	~FileWriteStream() { close(); }
 

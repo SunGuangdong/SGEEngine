@@ -1,16 +1,17 @@
 #include "VSDebugger.h"
 
 #ifdef WIN32
-#include "sge_utils/text/format.h"
+	#include "sge_utils/text/format.h"
 
-#define NOMINMAX
-#include <Windows.h>
+	#define NOMINMAX
+	#include <Windows.h>
 #endif
 
 namespace sge {
 
 #ifdef WIN32
-bool startVisualStudioDebugging() {
+bool startVisualStudioDebugging()
+{
 	// Start Visual Studio JIT. It will open a dialogue to ask the user
 	// to select how he is going to debug the application.
 	STARTUPINFOA si;
@@ -39,16 +40,19 @@ bool startVisualStudioDebugging() {
 	return true;
 }
 
-bool isVSDebuggerPresent() {
+bool isVSDebuggerPresent()
+{
 	return IsDebuggerPresent() != FALSE;
 }
 #else // #ifdef WIN32
 
-bool startVisualStudioDebugging() {
+bool startVisualStudioDebugging()
+{
 	return false;
 }
 
-bool isVSDebuggerPresent() {
+bool isVSDebuggerPresent()
+{
 	return false;
 }
 

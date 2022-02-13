@@ -41,20 +41,24 @@ float4 psMain(VERTEX_OUT IN) : COLOR {
 //------------------------------------------------------------------------------------------
 // WiredCommandData
 //------------------------------------------------------------------------------------------
-void DebugDraw::WiredCommandData::line(const vec3f& a, const vec3f& b, const int rgba) {
+void DebugDraw::WiredCommandData::line(const vec3f& a, const vec3f& b, const int rgba)
+{
 	m_verts.push_back(GeomGen::PosColorVert(a, rgba));
 	m_verts.push_back(GeomGen::PosColorVert(b, rgba));
 }
 
-void DebugDraw::WiredCommandData::box(const mat4f& world, const int rgba) {
+void DebugDraw::WiredCommandData::box(const mat4f& world, const int rgba)
+{
 	GeomGen::wiredBox(m_verts, world, rgba);
 }
 
-void DebugDraw::WiredCommandData::box(const Box3f& aabb, const int rgba) {
+void DebugDraw::WiredCommandData::box(const Box3f& aabb, const int rgba)
+{
 	GeomGen::wiredBox(m_verts, aabb, rgba);
 }
 
-void DebugDraw::WiredCommandData::box(const mat4f& world, const Box3f& aabb, const int rgba) {
+void DebugDraw::WiredCommandData::box(const mat4f& world, const Box3f& aabb, const int rgba)
+{
 	const size_t newBoxStart = m_verts.size();
 
 	GeomGen::wiredBox(m_verts, aabb, rgba);
@@ -64,31 +68,37 @@ void DebugDraw::WiredCommandData::box(const mat4f& world, const Box3f& aabb, con
 	}
 }
 
-void DebugDraw::WiredCommandData::capsule(const mat4f& world, const int rgba, float height, float radius, int numSides) {
+void DebugDraw::WiredCommandData::capsule(const mat4f& world, const int rgba, float height, float radius, int numSides)
+{
 	GeomGen::wiredCapsule(m_verts, world, rgba, height, radius, numSides, GeomGen::center);
 }
 
-void DebugDraw::WiredCommandData::sphere(const mat4f& world, const int rgba, float radius, int numSides) {
+void DebugDraw::WiredCommandData::sphere(const mat4f& world, const int rgba, float radius, int numSides)
+{
 	GeomGen::wiredSphere(m_verts, world, rgba, radius, numSides);
 }
 
-void DebugDraw::WiredCommandData::cylinder(const mat4f& world, const int rgba, float height, float radius, int numSides) {
+void DebugDraw::WiredCommandData::cylinder(const mat4f& world, const int rgba, float height, float radius, int numSides)
+{
 	GeomGen::wiredCylinder(m_verts, world, rgba, height, radius, numSides, GeomGen::center);
 }
 
-void DebugDraw::WiredCommandData::basis(const mat4f& world) {
+void DebugDraw::WiredCommandData::basis(const mat4f& world)
+{
 	GeomGen::wiredBasis(m_verts, world);
 }
 
 void DebugDraw::WiredCommandData::grid(
-    const vec3f& origin, const vec3f& xAxis, const vec3f& zAxis, const int xLines, const int yLines, const int color) {
+    const vec3f& origin, const vec3f& xAxis, const vec3f& zAxis, const int xLines, const int yLines, const int color)
+{
 	GeomGen::wiredGrid(m_verts, origin, xAxis, zAxis, xLines, yLines, color);
 }
 
 //------------------------------------------------------------------------------------------
 // WiredCommandData
 //------------------------------------------------------------------------------------------
-void DebugDraw::initialze(SGEDevice* sgedev) {
+void DebugDraw::initialze(SGEDevice* sgedev)
+{
 	if (isInitialized)
 		return;
 	isInitialized = true;
@@ -115,13 +125,15 @@ void DebugDraw::initialze(SGEDevice* sgedev) {
 	m_vertexBuffer->create(bd, nullptr);
 }
 
-void DebugDraw::draw(const RenderDestination& rdest, const mat4f& projView) {
+void DebugDraw::draw(const RenderDestination& rdest, const mat4f& projView)
+{
 	for (auto& grpItr : m_groups) {
 		drawWieredCommand(rdest, projView, grpItr.second.getWiered());
 	}
 }
 
-void DebugDraw::drawWieredCommand(const RenderDestination& rdest, const mat4f& projView, const WiredCommandData& cmd) {
+void DebugDraw::drawWieredCommand(const RenderDestination& rdest, const mat4f& projView, const WiredCommandData& cmd)
+{
 	const std::vector<GeomGen::PosColorVert> verts = cmd.getVerts();
 
 	if (verts.size() == 0)
@@ -135,7 +147,8 @@ void DebugDraw::drawWieredCommand(const RenderDestination& rdest, const mat4f& p
 
 	// Set-up the draw call
 	BoundUniform uniforms[] = {
-	    BoundUniform(m_shaderSolidVertexColor->getReflection().numericUnforms.findUniform("projViewWorld", ShaderType::VertexShader), (void*)&projView),
+	    BoundUniform(m_shaderSolidVertexColor->getReflection().numericUnforms.findUniform("projViewWorld", ShaderType::VertexShader),
+	                 (void*)&projView),
 	};
 
 	m_stateGroup.setProgram(m_shaderSolidVertexColor);

@@ -37,12 +37,14 @@ ReflBlock() {
 //---------------------------------------------------------------------------
 // ALight
 //---------------------------------------------------------------------------
-void ALight::create() {
+void ALight::create()
+{
 	registerTrait(m_traitViewportIcon);
 	m_traitViewportIcon.setTexture("assets/editor/textures/icons/obj/ALight.png", true);
 }
 
-Box3f ALight::getBBoxOS() const {
+Box3f ALight::getBBoxOS() const
+{
 	switch (m_lightDesc.type) {
 		case light_directional: {
 			return Box3f();
@@ -68,7 +70,8 @@ Box3f ALight::getBBoxOS() const {
 	}
 }
 
-void ALight::update(const GameUpdateSets& UNUSED(updateSets)) {
+void ALight::update(const GameUpdateSets& UNUSED(updateSets))
+{
 }
 
 

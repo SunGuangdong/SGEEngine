@@ -14,7 +14,8 @@ ReflBlock() {
 }
 // clang-format on
 
-bool TraitPath3DForACRSpline::isEmpty() const {
+bool TraitPath3DForACRSpline::isEmpty() const
+{
 	const Actor* a = getActor();
 	if (a && a->getType() == sgeTypeId(ACRSpline)) {
 		const ACRSpline* const spline = static_cast<const ACRSpline*>(a);
@@ -25,7 +26,8 @@ bool TraitPath3DForACRSpline::isEmpty() const {
 	return true;
 }
 
-bool TraitPath3DForACRSpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float distance) {
+bool TraitPath3DForACRSpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float distance)
+{
 	Actor* a = getActor();
 	if (a && a->getType() == sgeTypeId(ACRSpline)) {
 		ACRSpline* const spline = (ACRSpline*)a;
@@ -35,7 +37,8 @@ bool TraitPath3DForACRSpline::evaluateAtDistance(vec3f* outPosition, vec3f* outT
 	return false;
 }
 
-float TraitPath3DForACRSpline::getTotalLength() {
+float TraitPath3DForACRSpline::getTotalLength()
+{
 	Actor* a = getActor();
 	if (a && a->getType() == sgeTypeId(ACRSpline)) {
 		ACRSpline* const spline = (ACRSpline*)a;
@@ -45,7 +48,8 @@ float TraitPath3DForACRSpline::getTotalLength() {
 	return 0.0f;
 }
 
-void ACRSpline::create() {
+void ACRSpline::create()
+{
 	registerTrait(traitPath);
 	registerTrait(m_traitViewportIcon);
 	m_traitViewportIcon.setTexture("assets/editor/textures/icons/obj/ACRSpline.png", true);
@@ -56,7 +60,8 @@ void ACRSpline::create() {
 	computeSegmentsLength();
 }
 
-Box3f ACRSpline::getBBoxOS() const {
+Box3f ACRSpline::getBBoxOS() const
+{
 	Box3f bbox;
 
 	for (const vec3f& pt : points)
@@ -68,12 +73,14 @@ Box3f ACRSpline::getBBoxOS() const {
 	return bbox;
 }
 
-void ACRSpline::onMemberChanged() {
+void ACRSpline::onMemberChanged()
+{
 	makeDirty();
 	computeSegmentsLength();
 }
 
-bool ACRSpline::evalute(vec3f* outPosition, vec3f* outTanget, float t) {
+bool ACRSpline::evalute(vec3f* outPosition, vec3f* outTanget, float t)
+{
 	int iSegment = clamp((int)t, 0, getNumPoints() - 2);
 	vec3f verts[4];
 	getPointsForSegment(verts, iSegment);
@@ -91,7 +98,8 @@ bool ACRSpline::evalute(vec3f* outPosition, vec3f* outTanget, float t) {
 	return true;
 }
 
-bool ACRSpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float distance) {
+bool ACRSpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float distance)
+{
 	if (getNumPoints() == 0)
 		return false;
 
@@ -115,7 +123,8 @@ bool ACRSpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float d
 	return this->evalute(outPosition, outTanget, t);
 }
 
-void ACRSpline::getPointsForSegment(vec3f result[4], const int iSegment) const {
+void ACRSpline::getPointsForSegment(vec3f result[4], const int iSegment) const
+{
 	const int i0 = iSegment - 1;
 	const int i1 = iSegment;
 	const int i2 = iSegment + 1;
@@ -133,7 +142,8 @@ void ACRSpline::getPointsForSegment(vec3f result[4], const int iSegment) const {
 	result[3] = (i3 >= n) ? result[2] : points[i3];
 }
 
-void ACRSpline::computeSegmentsLength() {
+void ACRSpline::computeSegmentsLength()
+{
 	totalLength = 0.f;
 	if (getNumPoints() <= 1) {
 		return;
@@ -157,7 +167,8 @@ void ACRSpline::computeSegmentsLength() {
 InspectorCmd* ACRSpline::generateDeleteItemCmd(GameInspector* inspector,
                                                const SelectedItem* items,
                                                int numItems,
-                                               bool ifActorModeShouldDeleteActorsUnder) {
+                                               bool ifActorModeShouldDeleteActorsUnder)
+{
 	if (numItems == 1 && items[0].editMode == editMode_actors) {
 		return Actor::generateDeleteItemCmd(inspector, items, numItems, ifActorModeShouldDeleteActorsUnder);
 	}
@@ -173,7 +184,8 @@ InspectorCmd* ACRSpline::generateDeleteItemCmd(GameInspector* inspector,
 }
 
 InspectorCmd* ACRSpline::generateItemSetTransformCmd(
-    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform) {
+    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform)
+{
 	if (mode == editMode_points) {
 		ACRSplineMovePointCmd* cmd = new ACRSplineMovePointCmd;
 		cmd->setup(getId(), itemIndex, initalTrasform.p, newTransform.p);
@@ -186,14 +198,16 @@ InspectorCmd* ACRSpline::generateItemSetTransformCmd(
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ACRSplineMovePointCmd::setup(ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition) {
+void ACRSplineMovePointCmd::setup(ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition)
+{
 	m_actorid = actorid;
 	m_pointIndex = pointIndex;
 	m_originalPosition = originalPosition;
 	m_newPosition = newPosition;
 }
 
-void ACRSplineMovePointCmd::apply(GameInspector* inspector) {
+void ACRSplineMovePointCmd::apply(GameInspector* inspector)
+{
 	Actor* const actor = inspector->m_world->getActorById(m_actorid);
 
 	if (actor && actor->getType() == sgeTypeId(ACRSpline)) {
@@ -201,28 +215,34 @@ void ACRSplineMovePointCmd::apply(GameInspector* inspector) {
 
 		if (m_pointIndex < spline->points.size()) {
 			spline->points[m_pointIndex] = m_newPosition;
-		} else {
+		}
+		else {
 			sgeAssert(false); // Should never happen.
 		}
-	} else {
+	}
+	else {
 		sgeAssert(false); // Should never happen.
 	}
 }
 
-void ACRSplineMovePointCmd::redo(GameInspector* inspector) {
+void ACRSplineMovePointCmd::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void ACRSplineMovePointCmd::undo(GameInspector* inspector) {
+void ACRSplineMovePointCmd::undo(GameInspector* inspector)
+{
 	ACRSpline* const spline = inspector->m_world->getActor<ACRSpline>(m_actorid);
 
 	if (spline) {
 		if (m_pointIndex < spline->points.size()) {
 			spline->points[m_pointIndex] = m_originalPosition;
-		} else {
+		}
+		else {
 			sgeAssert(false); // Should never happen.
 		}
-	} else {
+	}
+	else {
 		sgeAssert(false); // Should never happen.
 	}
 }
@@ -230,7 +250,8 @@ void ACRSplineMovePointCmd::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ACRSplineAddPoints::setup(ACRSpline* const spline, std::vector<int> pointsToTessalateBetween) {
+void ACRSplineAddPoints::setup(ACRSpline* const spline, std::vector<int> pointsToTessalateBetween)
+{
 	sgeAssert(spline);
 
 	m_actorid = spline->getId();
@@ -240,7 +261,8 @@ void ACRSplineAddPoints::setup(ACRSpline* const spline, std::vector<int> pointsT
 	std::sort(m_pointsToTessalateBetween.begin(), m_pointsToTessalateBetween.end());
 }
 
-void ACRSplineAddPoints::apply(GameInspector* inspector) {
+void ACRSplineAddPoints::apply(GameInspector* inspector)
+{
 	ACRSpline* const spline = inspector->m_world->getActor<ACRSpline>(m_actorid);
 
 	int offs = 0;
@@ -261,11 +283,13 @@ void ACRSplineAddPoints::apply(GameInspector* inspector) {
 	}
 }
 
-void ACRSplineAddPoints::redo(GameInspector* inspector) {
+void ACRSplineAddPoints::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void ACRSplineAddPoints::undo(GameInspector* inspector) {
+void ACRSplineAddPoints::undo(GameInspector* inspector)
+{
 	ACRSpline* const spline = inspector->m_world->getActor<ACRSpline>(m_actorid);
 	if (spline) {
 		spline->points = m_originalSplinePoints;
@@ -276,8 +300,10 @@ void ACRSplineAddPoints::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ACRSplineDeletePoints::setup(ACRSpline* const spline, std::vector<int> indicesToDelete) {
-	if_checked(spline) {
+void ACRSplineDeletePoints::setup(ACRSpline* const spline, std::vector<int> indicesToDelete)
+{
+	if_checked(spline)
+	{
 		m_indicesToDelete = std::move(indicesToDelete);
 		m_actorid = spline->getId();
 		std::sort(m_indicesToDelete.begin(), m_indicesToDelete.end(), [](int a, int b) { return a > b; });
@@ -285,9 +311,11 @@ void ACRSplineDeletePoints::setup(ACRSpline* const spline, std::vector<int> indi
 	}
 }
 
-void ACRSplineDeletePoints::apply(GameInspector* inspector) {
+void ACRSplineDeletePoints::apply(GameInspector* inspector)
+{
 	ACRSpline* const spline = inspector->m_world->getActor<ACRSpline>(m_actorid);
-	if_checked(spline) {
+	if_checked(spline)
+	{
 		// CAUTION: Assumes that indices are sorted big to small
 		for (int const idxToDel : m_indicesToDelete) {
 			if_checked(idxToDel < spline->points.size()) { spline->points.erase(spline->points.begin() + idxToDel); }
@@ -297,11 +325,13 @@ void ACRSplineDeletePoints::apply(GameInspector* inspector) {
 
 #define if_asserted(expr) if (const bool v = (expr), sgeAssert(v), v)
 
-void ACRSplineDeletePoints::redo(GameInspector* inspector) {
+void ACRSplineDeletePoints::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void ACRSplineDeletePoints::undo(GameInspector* inspector) {
+void ACRSplineDeletePoints::undo(GameInspector* inspector)
+{
 	ACRSpline* const spline = inspector->m_world->getActor<ACRSpline>(m_actorid);
 	if_checked(spline) { spline->points = m_originalSplinePoints; }
 }

@@ -24,7 +24,7 @@ struct ShaderD3D11 : public Shader {
 	/// Returns the bytecode used for creating this shader.
 	virtual bool getCreationBytecode(std::vector<char>& outMemory) const override;
 
-	
+
 
 	virtual void destroy() override;
 	virtual bool isValid() const override;

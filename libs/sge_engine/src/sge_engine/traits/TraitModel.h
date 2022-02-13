@@ -24,10 +24,7 @@ struct SGE_ENGINE_API ModelEntry {
 	}
 
 	/// Invalidates the asset property focing an update.
-	void invalidateCachedAssets()
-	{
-		m_assetProperty.clear();
-	}
+	void invalidateCachedAssets() { m_assetProperty.clear(); }
 
 	bool updateAssetProperty()
 	{
@@ -95,19 +92,13 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 
 	void addModel(const char* assetPath, bool setupCustomEvalState = false);
 	void addModel(AssetPtr& asset, bool setupCustomEvalState = false);
-	void clearModels()
-	{
-		m_models.clear();
-	}
+	void clearModels() { m_models.clear(); }
 
 	/// Not called automatically see the class comment above.
 	/// Updates the working models.
 	/// Returns true if a model has been changed (no matter if it is valid or not),
 	/// useful if other sytems might depend on it.
-	bool postUpdate()
-	{
-		return updateAssetProperties();
-	}
+	bool postUpdate() { return updateAssetProperties(); }
 
 	/// Returns the bounding box of all models.
 	Box3f getBBoxOS() const;

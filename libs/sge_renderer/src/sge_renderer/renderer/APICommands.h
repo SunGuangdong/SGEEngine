@@ -21,15 +21,9 @@ struct CBufferFiller {
 		size_t offsetBytes = 0;
 	};
 
-	void setFloat4(const unsigned nameStrIdx, const float v[4])
-	{
-		SetData(nameStrIdx, UniformType::Float4, v, sizeof(float) * 4);
-	}
+	void setFloat4(const unsigned nameStrIdx, const float v[4]) { SetData(nameStrIdx, UniformType::Float4, v, sizeof(float) * 4); }
 
-	void setFloat4x4(const unsigned nameStrIdx, const float v[16])
-	{
-		SetData(nameStrIdx, UniformType::Float4x4, v, sizeof(float) * 16);
-	}
+	void setFloat4x4(const unsigned nameStrIdx, const float v[16]) { SetData(nameStrIdx, UniformType::Float4x4, v, sizeof(float) * 16); }
 
 	ValueDesc& getValueDesc(const unsigned nameStrIdx, const UniformType::Enum type);
 	void DeleteValue(const int idx);
@@ -96,23 +90,11 @@ struct DrawExecDesc {
 		m_indexed.numInstances = instanceCount;
 	}
 
-	bool IsValid() const
-	{
-		return m_type != Type_Invalid;
-	}
-	Type GetType() const
-	{
-		return m_type;
-	}
+	bool IsValid() const { return m_type != Type_Invalid; }
+	Type GetType() const { return m_type; }
 
-	const Linear& LinearCall() const
-	{
-		return m_linear;
-	}
-	const Indexed& IndexedCall() const
-	{
-		return m_indexed;
-	}
+	const Linear& LinearCall() const { return m_linear; }
+	const Indexed& IndexedCall() const { return m_indexed; }
 
 	union {
 		Linear m_linear;
@@ -131,14 +113,8 @@ struct StateGroup {
 	void setPrimitiveTopology(const PrimitiveTopology::Enum pt);
 	void setIB(Buffer* pBuffer, const UniformType::Enum format, const uint32 byteOffset);
 
-	void setRasterizerState(RasterizerState* state)
-	{
-		m_rasterState = state;
-	}
-	void setDepthStencilState(DepthStencilState* state)
-	{
-		m_depthStencilState = state;
-	}
+	void setRasterizerState(RasterizerState* state) { m_rasterState = state; }
+	void setDepthStencilState(DepthStencilState* state) { m_depthStencilState = state; }
 
 	void setRenderState(RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState = nullptr);
 
@@ -210,10 +186,7 @@ struct DrawCall {
 		this->numUniforms = numUniformsNew;
 	}
 
-	void setStateGroup(StateGroup* const stateGroup)
-	{
-		m_pStateGroup = stateGroup;
-	}
+	void setStateGroup(StateGroup* const stateGroup) { m_pStateGroup = stateGroup; }
 
 	void draw(const uint32 numVerts, const uint32 startVert, const uint32 numInstances = 1);
 	void drawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances = 1);

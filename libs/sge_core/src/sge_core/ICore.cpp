@@ -23,60 +23,27 @@ struct Core : public ICore {
 
 	void setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice) final;
 
-	AssetLibrary* getAssetLib() final
-	{
-		return m_assetLibrary.get();
-	}
+	AssetLibrary* getAssetLib() final { return m_assetLibrary.get(); }
 
-	MaterialFamilyLibrary* getMaterialLib() final
-	{
-		return m_materialFamilyLib.get();
-	}
+	MaterialFamilyLibrary* getMaterialLib() final { return m_materialFamilyLib.get(); }
 
-	QuickDraw& getQuickDraw() final
-	{
-		return m_quickDraw;
-	}
+	QuickDraw& getQuickDraw() final { return m_quickDraw; }
 
-	DebugDraw& getDebugDraw() final
-	{
-		return m_debugDraw;
-	}
+	DebugDraw& getDebugDraw() final { return m_debugDraw; }
 
-	SGEDevice* getDevice() final
-	{
-		return m_sgedev;
-	}
+	SGEDevice* getDevice() final { return m_sgedev; }
 
-	AudioDevice* getAudioDevice() final
-	{
-		return m_audioDevice;
-	}
+	AudioDevice* getAudioDevice() final { return m_audioDevice; }
 
-	GraphicsResources& getGraphicsResources() final
-	{
-		return m_graphicsResources;
-	}
+	GraphicsResources& getGraphicsResources() final { return m_graphicsResources; }
 
-	void setInputState(const InputState& is) final
-	{
-		m_inputState = is;
-	}
+	void setInputState(const InputState& is) final { m_inputState = is; }
 
-	const InputState& getInputState() const final
-	{
-		return m_inputState;
-	}
+	const InputState& getInputState() const final { return m_inputState; }
 
-	const FrameStatistics& getLastFrameStatistics() const final
-	{
-		return lastFrameStatistics;
-	}
+	const FrameStatistics& getLastFrameStatistics() const final { return lastFrameStatistics; }
 
-	void setLastFrameStatistics(const FrameStatistics& stats) final
-	{
-		lastFrameStatistics = stats;
-	}
+	void setLastFrameStatistics(const FrameStatistics& stats) final { lastFrameStatistics = stats; }
 
   public:
 	SGEDevice* m_sgedev = nullptr; // The sge device attached to the main window.

@@ -6,7 +6,8 @@ namespace sge {
 //////////////////////////////////////////////////////////////////////////////
 // SamplerStateD3D11
 //////////////////////////////////////////////////////////////////////////////
-bool SamplerStateD3D11::create(const SamplerDesc& desc) {
+bool SamplerStateD3D11::create(const SamplerDesc& desc)
+{
 	destroy();
 
 	ID3D11Device* const d3ddev = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice();
@@ -22,11 +23,13 @@ bool SamplerStateD3D11::create(const SamplerDesc& desc) {
 	return true;
 }
 
-void SamplerStateD3D11::destroy() {
+void SamplerStateD3D11::destroy()
+{
 	m_samplerState.Release();
 }
 
-bool SamplerStateD3D11::isValid() const {
+bool SamplerStateD3D11::isValid() const
+{
 	return m_samplerState != nullptr;
 }
 

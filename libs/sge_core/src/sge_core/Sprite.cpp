@@ -1,12 +1,13 @@
 #include "Sprite.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_utils/io/FileStream.h"
-#include "sge_utils/text/Path.h"
 #include "sge_utils/json/json.h"
+#include "sge_utils/text/Path.h"
 
 namespace sge {
 
-bool SpriteAnimation::importSprite(SpriteAnimation& outSprite, const char* const filename) {
+bool SpriteAnimation::importSprite(SpriteAnimation& outSprite, const char* const filename)
+{
 	outSprite = SpriteAnimation();
 
 	FileReadStream frs;
@@ -47,7 +48,8 @@ bool SpriteAnimation::importSprite(SpriteAnimation& outSprite, const char* const
 	return true;
 }
 
-bool SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(SpriteAnimation& outSprite, const char* const filename) {
+bool SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(SpriteAnimation& outSprite, const char* const filename)
+{
 	try {
 		outSprite = SpriteAnimation();
 
@@ -112,14 +114,16 @@ bool SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(SpriteAnimation& out
 		}
 
 		outSprite.animationDuration = totalAnimationDuration;
-	} catch (...) {
+	}
+	catch (...) {
 		return false;
 	}
 
 	return true;
 }
 
-bool SpriteAnimation::saveSpriteToFile(const char* path) const {
+bool SpriteAnimation::saveSpriteToFile(const char* path) const
+{
 	JsonWriter jw;
 	JsonValueBuffer jvb;
 
@@ -148,7 +152,8 @@ bool SpriteAnimation::saveSpriteToFile(const char* path) const {
 	return succeeded;
 }
 
-const SpriteAnimation::Frame* SpriteAnimation::getFrameForTime(float time) const {
+const SpriteAnimation::Frame* SpriteAnimation::getFrameForTime(float time) const
+{
 	if (frames.size() == 0) {
 		return nullptr;
 	}
@@ -165,7 +170,8 @@ const SpriteAnimation::Frame* SpriteAnimation::getFrameForTime(float time) const
 }
 
 
-bool SpriteAnimationWithTextures::importSprite(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib) {
+bool SpriteAnimationWithTextures::importSprite(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib)
+{
 	if (SpriteAnimation::importSprite(outSprite.spriteAnimation, filename)) {
 		outSprite.textureAsset = assetLib.getAssetFromFile(outSprite.spriteAnimation.texturePath.c_str());
 		return isAssetLoaded(outSprite.textureAsset);
@@ -174,8 +180,9 @@ bool SpriteAnimationWithTextures::importSprite(SpriteAnimationWithTextures& outS
 }
 
 bool SpriteAnimationWithTextures::importFromAsepriteSpriteSheetJsonFile(SpriteAnimationWithTextures& outSprite,
-                                                                 const char* const filename,
-                                                                 AssetLibrary& assetLib) {
+                                                                        const char* const filename,
+                                                                        AssetLibrary& assetLib)
+{
 	if (SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(outSprite.spriteAnimation, filename)) {
 		outSprite.textureAsset = assetLib.getAssetFromFile(outSprite.spriteAnimation.texturePath.c_str());
 		return isAssetLoaded(outSprite.textureAsset);

@@ -3,15 +3,18 @@
 #include <stdarg.h>
 #include <string>
 
-inline bool sge_isspace(const char ch) {
+inline bool sge_isspace(const char ch)
+{
 	return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n';
 }
 
-inline bool sge_isdigit(const char ch) {
+inline bool sge_isdigit(const char ch)
+{
 	return ch >= '0' && ch <= '9';
 }
 
-inline bool sge_isalpha(const char ch) {
+inline bool sge_isalpha(const char ch)
+{
 	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z');
 }
 
@@ -20,7 +23,8 @@ int sge_snprintf(char* s, size_t n, const char* format, va_list args);
 int sge_snprintf(char* s, size_t n, const char* format, ...);
 
 template <size_t SZ>
-inline int sge_snprintf(char (&s)[SZ], const char* format, va_list args) {
+inline int sge_snprintf(char (&s)[SZ], const char* format, va_list args)
+{
 	const int result = sge_snprintf(s, SZ, format, args);
 	return result;
 }
@@ -36,7 +40,8 @@ inline int sge_snprintf(char (&s)[SZ], const char* format, va_list args) {
 //}
 
 template <size_t SZ>
-inline void sge_strcpy(char (&dest)[SZ], const char* source) {
+inline void sge_strcpy(char (&dest)[SZ], const char* source)
+{
 #ifdef _MSC_VER
 	strcpy_s(dest, source);
 #else

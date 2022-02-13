@@ -2,7 +2,8 @@
 
 namespace sge {
 
-char base64_index_of(const char c) {
+char base64_index_of(const char c)
+{
 	if (c >= 'A' && c <= 'Z')
 		return c - 'A';
 	else if (c >= 'a' && c <= 'z')
@@ -14,21 +15,25 @@ char base64_index_of(const char c) {
 	return c - '0' + 52;
 }
 
-char base64_is_base64_data_char(const char c) {
+char base64_is_base64_data_char(const char c)
+{
 	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == '+') || (c >= '/' && c <= '9');
 }
 
-size_t base64_get_encoded_strlen(const size_t dataSize) {
+size_t base64_get_encoded_strlen(const size_t dataSize)
+{
 	// for every 3 bytes we assing 4 characters
 	// if the number of bytes isn't multiple of 3 add 4 more characters
 	return ((dataSize / 3) + (dataSize % 3 ? 1 : 0)) * 4;
 }
 
-size_t base64_get_decoded_datasize_approx(const size_t numCharacters) {
+size_t base64_get_decoded_datasize_approx(const size_t numCharacters)
+{
 	return (numCharacters / 4) * 3;
 }
 
-size_t base64_get_decoded_datasize_exact(const char* const encodedString, size_t numCharacters) {
+size_t base64_get_decoded_datasize_exact(const char* const encodedString, size_t numCharacters)
+{
 	size_t retval = ((numCharacters - 4) / 4) * 3;
 
 	// process the last 4 character separatley, because they can contain '='
@@ -43,7 +48,8 @@ size_t base64_get_decoded_datasize_exact(const char* const encodedString, size_t
 	return retval;
 }
 
-bool base64_is_correctly_encoded(const char* const encodedString, size_t stringLength) {
+bool base64_is_correctly_encoded(const char* const encodedString, size_t stringLength)
+{
 	if (stringLength % 4 != 0) {
 		return false;
 	}
@@ -64,7 +70,8 @@ bool base64_is_correctly_encoded(const char* const encodedString, size_t stringL
 	if (base64_is_base64_data_char(encodedString[stringLength - 2])) {
 		// 1) and 2)
 		return (base64_is_base64_data_char(encodedString[stringLength - 1]) || encodedString[stringLength - 1] == '=');
-	} else if (encodedString[stringLength - 2] == '=') {
+	}
+	else if (encodedString[stringLength - 2] == '=') {
 		// 3)
 		return encodedString[stringLength - 1] == '=';
 	}
@@ -72,7 +79,8 @@ bool base64_is_correctly_encoded(const char* const encodedString, size_t stringL
 	return false;
 }
 
-void base64_encode(const void* vptrData, size_t datasize, char* encodedString) {
+void base64_encode(const void* vptrData, size_t datasize, char* encodedString)
+{
 	const char* data = (char*)(vptrData);
 
 	const char base64_characters[] =
@@ -120,7 +128,8 @@ void base64_encode(const void* vptrData, size_t datasize, char* encodedString) {
 	}
 }
 
-void base64_decode(const char* encodedString, size_t stringLength, void* vptrDecodedData) {
+void base64_decode(const char* encodedString, size_t stringLength, void* vptrDecodedData)
+{
 	char* decodedData = (char*)(vptrDecodedData);
 
 	// Last 4 elements will be processed separetrly because they can contain '='
@@ -159,7 +168,8 @@ void base64_decode(const char* encodedString, size_t stringLength, void* vptrDec
 }
 
 
-std::string base64Encode(const void* data, size_t datasize) {
+std::string base64Encode(const void* data, size_t datasize)
+{
 	size_t strLen = base64_get_encoded_strlen(datasize);
 
 	std::vector<char> encodedDataRaw;
@@ -171,7 +181,8 @@ std::string base64Encode(const void* data, size_t datasize) {
 	return std::string(encodedDataRaw.data());
 }
 
-bool base64Decode(const char* encodedString, size_t stringLength, std::vector<char>& outDecodedData) {
+bool base64Decode(const char* encodedString, size_t stringLength, std::vector<char>& outDecodedData)
+{
 	if (base64_is_correctly_encoded(encodedString, stringLength)) {
 		const size_t decodedDataSizeBytes = base64_get_decoded_datasize_exact(encodedString, stringLength);
 		outDecodedData.resize(decodedDataSizeBytes);

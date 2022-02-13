@@ -4,17 +4,18 @@
 #include "sge_Log/Log.h"
 #include "sge_core/ICore.h"
 #include "sge_core/dds/dds.h"
-#include "sge_utils/io/FileStream.h"
-#include "sge_utils/text/Path.h"
-#include "sge_utils/json/json.h"
 #include "sge_utils/containers/Optional.h"
+#include "sge_utils/io/FileStream.h"
+#include "sge_utils/json/json.h"
+#include "sge_utils/text/Path.h"
 
 #include "stb_image.h"
 #include <filesystem>
 
 namespace sge {
 
-inline JsonValue* samplerDesc_toJson(const SamplerDesc& desc, JsonValueBuffer& jvb) {
+inline JsonValue* samplerDesc_toJson(const SamplerDesc& desc, JsonValueBuffer& jvb)
+{
 	const auto addressModeToString = [](TextureAddressMode::Enum adressMode) -> const char* {
 		switch (adressMode) {
 			case TextureAddressMode::Repeat:
@@ -58,7 +59,8 @@ inline JsonValue* samplerDesc_toJson(const SamplerDesc& desc, JsonValueBuffer& j
 	return jRoot;
 }
 
-inline Optional<SamplerDesc> samplerDesc_fromJson(const JsonValue& jRoot) {
+inline Optional<SamplerDesc> samplerDesc_fromJson(const JsonValue& jRoot)
+{
 	auto addressModeFromStringOrThrow = [](const char* str) -> TextureAddressMode::Enum {
 		if (str == nullptr || str[0] == '\0') {
 			throw std::exception();
@@ -105,13 +107,15 @@ inline Optional<SamplerDesc> samplerDesc_fromJson(const JsonValue& jRoot) {
 		result.filter = filterFormStringOrThrow(filterStr);
 
 		return result;
-	} catch (...) {
+	}
+	catch (...) {
 		sgeAssert(false);
 		return NullOptional();
 	}
 }
 
-AssetTextureMeta loadAssetTextureMeta2(const std::string& baseAssetPath) {
+AssetTextureMeta loadAssetTextureMeta2(const std::string& baseAssetPath)
+{
 	// [TEXTURE_ASSET_INFO]
 	const std::string infoPath = baseAssetPath + ".info";
 
@@ -150,14 +154,16 @@ AssetTextureMeta loadAssetTextureMeta2(const std::string& baseAssetPath) {
 		}
 
 		return result;
-	} catch (...) {
+	}
+	catch (...) {
 	}
 
 	sgeAssert(false && "Parsing the texture info file, that contains additional settings for a texture asset cannot be parsed!");
 	return AssetTextureMeta();
 }
 
-AssetTexture2d::DDSLoadCode AssetTexture2d::loadDDS(const char* const rawPath) {
+AssetTexture2d::DDSLoadCode AssetTexture2d::loadDDS(const char* const rawPath)
+{
 	std::string const ddsPath = (extractFileExtension(rawPath) == "dds") ? rawPath : std::string(rawPath) + ".dds";
 
 	std::vector<char> ddsDataRaw;
@@ -188,7 +194,8 @@ AssetTexture2d::DDSLoadCode AssetTexture2d::loadDDS(const char* const rawPath) {
 	return ddsLoadCode_fine;
 }
 
-bool AssetTexture2d::loadAssetFromFile(const char* path) {
+bool AssetTexture2d::loadAssetFromFile(const char* path)
+{
 	m_status = AssetStatus_LoadFailed;
 
 #if !defined(__EMSCRIPTEN__)
@@ -196,7 +203,8 @@ bool AssetTexture2d::loadAssetFromFile(const char* path) {
 
 	if (ddsLoadStatus == ddsLoadCode_fine) {
 		return true;
-	} else if (ddsLoadStatus == ddsLoadCode_importOrCreationFailed) {
+	}
+	else if (ddsLoadStatus == ddsLoadCode_importOrCreationFailed) {
 		sgeLogWarn("Failed to load the DDS equivalent to '%s'!\n", path);
 		return false;
 	}
@@ -247,7 +255,8 @@ bool AssetTexture2d::loadAssetFromFile(const char* path) {
 	return m_status == AssetStatus_Loaded;
 }
 
-bool AssetTexture2d::saveTextureSettingsToInfoFile() const {
+bool AssetTexture2d::saveTextureSettingsToInfoFile() const
+{
 	// [TEXTURE_ASSET_INFO]
 	const std::string infoPath = getPath() + ".info";
 

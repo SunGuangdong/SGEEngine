@@ -23,7 +23,8 @@ std::string preprocessCode(const char* code,
                            const char* const* macros,
                            const int numMacros,
                            const std::string& includeDir,
-                           std::set<std::string>* outIncludedFiles) {
+                           std::set<std::string>* outIncludedFiles)
+{
 	if (isStringEmpty(code) || isStringEmpty(codeFilename)) {
 		return false;
 	}
@@ -81,7 +82,8 @@ std::string preprocessCode(const char* code,
 		std::vector<char>* pFileData = nullptr;
 		if (itrExisting != udata.includeFiles.end()) {
 			pFileData = &itrExisting->second;
-		} else {
+		}
+		else {
 			std::vector<char> data;
 			if (sge::FileReadStream::readFile(fileToLoad.c_str(), data) == false) {
 				return 0;
@@ -130,7 +132,8 @@ std::string preprocessCodeFromFile(const char* const codeFilename,
                                    const char* const* macros,
                                    const int numMacros,
                                    const std::string& includeDir,
-                                   std::set<std::string>* outIncludedFiles) {
+                                   std::set<std::string>* outIncludedFiles)
+{
 	std::string code;
 	FileReadStream::readTextFile(codeFilename, code);
 

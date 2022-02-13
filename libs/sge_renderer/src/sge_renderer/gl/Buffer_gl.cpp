@@ -7,7 +7,8 @@ namespace sge {
 //-----------------------------------------------------------------------------
 // Buffer
 //-----------------------------------------------------------------------------
-bool BufferGL::create(const BufferDesc& desc, const void* const pInitalData) {
+bool BufferGL::create(const BufferDesc& desc, const void* const pInitalData)
+{
 	destroy();
 
 	GLContextStateCache* glcon = getDevice<SGEDeviceImpl>()->GL_GetContextStateCache();
@@ -42,7 +43,8 @@ bool BufferGL::create(const BufferDesc& desc, const void* const pInitalData) {
 	return true;
 }
 
-void BufferGL::destroy() {
+void BufferGL::destroy()
+{
 	m_bufferDesc = BufferDesc();
 
 	if (m_glBuffer != 0) {
@@ -52,11 +54,13 @@ void BufferGL::destroy() {
 	}
 }
 
-bool BufferGL::isValid() const {
+bool BufferGL::isValid() const
+{
 	return m_glBuffer != 0;
 }
 
-GLenum BufferGL::GL_GetTargetBufferType() const {
+GLenum BufferGL::GL_GetTargetBufferType() const
+{
 	GLenum target = GL_NONE;
 
 	if (isConstantBuffer())
@@ -73,7 +77,8 @@ GLenum BufferGL::GL_GetTargetBufferType() const {
 	return target;
 }
 
-void* BufferGL::map([[maybe_unused]] const Map::Enum map, SGEContext* UNUSED(sgecon)) {
+void* BufferGL::map([[maybe_unused]] const Map::Enum map, SGEContext* UNUSED(sgecon))
+{
 #if defined(__EMSCRIPTEN__)
 	sgeAssert(m_emsc_mapBufferHelper.size() == m_bufferDesc.sizeBytes);
 	return (void*)m_emsc_mapBufferHelper.data();
@@ -87,7 +92,8 @@ void* BufferGL::map([[maybe_unused]] const Map::Enum map, SGEContext* UNUSED(sge
 #endif
 }
 
-void BufferGL::unMap(SGEContext* UNUSED(sgecon)) {
+void BufferGL::unMap(SGEContext* UNUSED(sgecon))
+{
 #if defined(__EMSCRIPTEN__)
 	GLContextStateCache* const glcon = getDevice<SGEDeviceImpl>()->GL_GetContextStateCache();
 

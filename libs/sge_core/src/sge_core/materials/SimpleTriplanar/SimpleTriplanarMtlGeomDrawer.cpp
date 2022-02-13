@@ -51,7 +51,8 @@ void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
                                                 const ObjectLighting& lighting,
                                                 const Geometry& geometry,
                                                 const IMaterialData* mtlDataBase,
-                                                const InstanceDrawMods& UNUSED(instDrawMods)) {
+                                                const InstanceDrawMods& UNUSED(instDrawMods))
+{
 	const SimpleTriplanarMtlData& mtlData = *dynamic_cast<const SimpleTriplanarMtlData*>(mtlDataBase);
 
 	SGEDevice* const sgedev = rdest.getDevice();
@@ -123,7 +124,8 @@ void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	stateGroup.setPrimitiveTopology(geometry.topology);
 	if (geometry.ibFmt != UniformType::Unknown) {
 		stateGroup.setIB(geometry.indexBuffer, geometry.ibFmt, geometry.ibByteOffset);
-	} else {
+	}
+	else {
 		stateGroup.setIB(nullptr, UniformType::Unknown, 0);
 	}
 
@@ -179,7 +181,8 @@ void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		ShaderLightData& shaderLight = paramsCb.lights[iLight];
 		const ShadingLightData* srcLight = lighting.ppLightData[iLight];
 
-		if_checked(srcLight && srcLight->pLightDesc) {
+		if_checked(srcLight && srcLight->pLightDesc)
+		{
 			// We assume that the light is enabled if it reached here.
 			// We don't want to make the code more complicated with redundadnt checks.
 			sgeAssert(srcLight->pLightDesc->isOn == true);
@@ -232,7 +235,8 @@ void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 
 	if (geometry.ibFmt != UniformType::Unknown) {
 		dc.drawIndexed(geometry.numElements, 0, 0);
-	} else {
+	}
+	else {
 		dc.draw(geometry.numElements, 0);
 	}
 

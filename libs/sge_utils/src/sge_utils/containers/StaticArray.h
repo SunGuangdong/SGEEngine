@@ -23,10 +23,7 @@ class StaticArray {
 	{
 	}
 
-	~StaticArray()
-	{
-		resize(0);
-	}
+	~StaticArray() { resize(0); }
 
 	StaticArray(const StaticArray& other)
 	    : usedElems(0)
@@ -44,14 +41,8 @@ class StaticArray {
 		return *this;
 	}
 
-	int size() const
-	{
-		return usedElems;
-	}
-	int static_size() const
-	{
-		return SIZE;
-	}
+	int size() const { return usedElems; }
+	int static_size() const { return SIZE; }
 
 	// Fills all alocated elements with a particlar value.
 	void fill(int newSize, const TType& val)
@@ -78,33 +69,15 @@ class StaticArray {
 		return true;
 	}
 
-	ElementType& operator[](int idx)
-	{
-		return elements[idx];
-	}
-	const ElementType& operator[](int idx) const
-	{
-		return elements[idx];
-	}
+	ElementType& operator[](int idx) { return elements[idx]; }
+	const ElementType& operator[](int idx) const { return elements[idx]; }
 
-	const ElementType* data() const
-	{
-		return elements;
-	}
-	ElementType* data()
-	{
-		return elements;
-	}
+	const ElementType* data() const { return elements; }
+	ElementType* data() { return elements; }
 
-	bool isFull()
-	{
-		return SIZE == usedElems;
-	}
+	bool isFull() { return SIZE == usedElems; }
 
-	void clear()
-	{
-		resize();
-	}
+	void clear() { resize(); }
 
 	void resize(const int newSize)
 	{
@@ -124,32 +97,14 @@ class StaticArray {
 		usedElems = newSize;
 	}
 
-	ElementType* begin()
-	{
-		return elements;
-	}
-	ElementType* end()
-	{
-		return elements + usedElems;
-	}
+	ElementType* begin() { return elements; }
+	ElementType* end() { return elements + usedElems; }
 
-	const ElementType* begin() const
-	{
-		return elements;
-	}
-	const ElementType* end() const
-	{
-		return elements + usedElems;
-	}
+	const ElementType* begin() const { return elements; }
+	const ElementType* end() const { return elements + usedElems; }
 
-	ElementType& back()
-	{
-		return *(elements + usedElems - 1);
-	}
-	const ElementType& back() const
-	{
-		return *(elements + usedElems - 1);
-	}
+	ElementType& back() { return *(elements + usedElems - 1); }
+	const ElementType& back() const { return *(elements + usedElems - 1); }
 
   protected:
 	int usedElems;

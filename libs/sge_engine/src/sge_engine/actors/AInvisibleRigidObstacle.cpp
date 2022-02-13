@@ -5,15 +5,18 @@
 namespace sge {
 
 ReflAddTypeId(AInvisibleRigidObstacle, 20'08'17'0001);
-ReflBlock() {
+ReflBlock()
+{
 	ReflAddActor(AInvisibleRigidObstacle);
 }
 
-Box3f AInvisibleRigidObstacle::getBBoxOS() const {
+Box3f AInvisibleRigidObstacle::getBBoxOS() const
+{
 	return kBBoxObjSpace;
 }
 
-void AInvisibleRigidObstacle::create() {
+void AInvisibleRigidObstacle::create()
+{
 	registerTrait(m_traitRB);
 	registerTrait(m_traitViewportIcon);
 

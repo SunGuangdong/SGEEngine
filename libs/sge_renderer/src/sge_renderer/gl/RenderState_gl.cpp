@@ -5,41 +5,48 @@ namespace sge {
 //--------------------------------------------------------------------------
 // RasterizerStateGL
 //--------------------------------------------------------------------------
-bool RasterizerStateGL::create(const RasterDesc& desc) {
+bool RasterizerStateGL::create(const RasterDesc& desc)
+{
 	m_bufferedDesc = desc;
 	m_isValid = true;
 	return true;
 }
 
-void RasterizerStateGL::destroy() {
+void RasterizerStateGL::destroy()
+{
 	m_isValid = false;
 }
 
-bool RasterizerStateGL::isValid() const {
+bool RasterizerStateGL::isValid() const
+{
 	return m_isValid;
 }
 
 //--------------------------------------------------------------------------
 // DepthStencilStateGL
 //--------------------------------------------------------------------------
-bool DepthStencilStateGL::create(const DepthStencilDesc& desc) {
+bool DepthStencilStateGL::create(const DepthStencilDesc& desc)
+{
 	m_bufferedDesc = desc;
 	m_isValid = true;
 	return true;
 }
 
-void DepthStencilStateGL::destroy() {
+void DepthStencilStateGL::destroy()
+{
 	m_isValid = false;
 }
 
-bool DepthStencilStateGL::isValid() const {
+bool DepthStencilStateGL::isValid() const
+{
 	return m_isValid;
 }
 
 //--------------------------------------------------------------------------
 // BlendStateGL
 //--------------------------------------------------------------------------
-bool BlendStateGL::create(const BlendStateDesc& desc) {
+bool BlendStateGL::create(const BlendStateDesc& desc)
+{
 	if (desc.independentBlend != false) {
 		sgeAssert(false && "TIndependent blend state is not supported on GL!\n");
 	}
@@ -49,11 +56,13 @@ bool BlendStateGL::create(const BlendStateDesc& desc) {
 	return true;
 }
 
-void BlendStateGL::destroy() {
+void BlendStateGL::destroy()
+{
 	m_isValid = false;
 }
 
-bool BlendStateGL::isValid() const {
+bool BlendStateGL::isValid() const
+{
 	return m_isValid;
 }
 

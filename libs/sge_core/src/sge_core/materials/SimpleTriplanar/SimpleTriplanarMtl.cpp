@@ -3,8 +3,8 @@
 #include "sge_core/AssetLibrary/AssetTexture2D.h"
 #include "sge_core/ICore.h"
 #include "sge_core/typelib/typeLib.h"
-#include "sge_utils/text/Path.h"
 #include "sge_utils/json/json.h"
+#include "sge_utils/text/Path.h"
 
 namespace sge {
 
@@ -25,11 +25,13 @@ ReflBlock() {
 }
 // clang-format on
 
-TypeId SimpleTriplanarMtl::getTypeId() const {
+TypeId SimpleTriplanarMtl::getTypeId() const
+{
 	return sgeTypeId(SimpleTriplanarMtl);
 }
 
-IMaterialData* SimpleTriplanarMtl::getMaterialDataLocalStorage() {
+IMaterialData* SimpleTriplanarMtl::getMaterialDataLocalStorage()
+{
 	mdlData = SimpleTriplanarMtlData();
 
 	mdlData.forceNoLighting = forceNoLighting;
@@ -70,7 +72,8 @@ IMaterialData* SimpleTriplanarMtl::getMaterialDataLocalStorage() {
 	return &mdlData;
 }
 
-JsonValue* SimpleTriplanarMtl::toJson(JsonValueBuffer& jvb, const char* localDir) {
+JsonValue* SimpleTriplanarMtl::toJson(JsonValueBuffer& jvb, const char* localDir)
+{
 	JsonValue* jMaterial = jvb(JID_MAP);
 
 	jMaterial->setMember("family", jvb("SimpleTriplanar"));
@@ -105,7 +108,8 @@ JsonValue* SimpleTriplanarMtl::toJson(JsonValueBuffer& jvb, const char* localDir
 	return jMaterial;
 }
 
-bool SimpleTriplanarMtl::fromJson(const JsonValue* jMaterial, const char* localDir) {
+bool SimpleTriplanarMtl::fromJson(const JsonValue* jMaterial, const char* localDir)
+{
 	if (jMaterial == nullptr) {
 		return false;
 	}

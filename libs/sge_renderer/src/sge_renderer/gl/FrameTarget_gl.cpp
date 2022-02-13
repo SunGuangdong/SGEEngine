@@ -9,7 +9,8 @@ namespace sge {
 //---------------------------------------------------------------
 // FrameTargetGL
 //---------------------------------------------------------------
-bool FrameTargetGL::create() {
+bool FrameTargetGL::create()
+{
 	return create(0, nullptr, nullptr, nullptr, TargetDesc());
 }
 
@@ -17,7 +18,8 @@ bool FrameTargetGL::create(int numRenderTargets,
                            Texture* renderTargets[],
                            TargetDesc renderTargetDescs[],
                            Texture* depthStencil,
-                           const TargetDesc& depthTargetDesc) {
+                           const TargetDesc& depthTargetDesc)
+{
 	destroy();
 
 	m_frameTargetWidth = -1;
@@ -54,7 +56,8 @@ bool FrameTargetGL::create(int numRenderTargets,
 	return true;
 }
 
-void FrameTargetGL::GL_CreateWindowFrameTarget(int width, int height) {
+void FrameTargetGL::GL_CreateWindowFrameTarget(int width, int height)
+{
 	destroy();
 
 	m_isWindowFrameBufferWrapper_gl = true;
@@ -62,7 +65,8 @@ void FrameTargetGL::GL_CreateWindowFrameTarget(int width, int height) {
 	m_frameTargetHeight = height;
 }
 
-void FrameTargetGL::setRenderTarget(const int slot, Texture* texture, const TargetDesc& targetDesc) {
+void FrameTargetGL::setRenderTarget(const int slot, Texture* texture, const TargetDesc& targetDesc)
+{
 	if (m_isWindowFrameBufferWrapper_gl) {
 		sgeAssert(false && "Invalid operation, modifying the window frame buffer is not possible!");
 		return;
@@ -92,13 +96,15 @@ void FrameTargetGL::setRenderTarget(const int slot, Texture* texture, const Targ
 		                       targetDesc.texture2D.mipLevel);
 
 		DumpAllGLErrors();
-	} else {
+	}
+	else {
 		// Unimplemented...
 		sgeAssert(false);
 	}
 }
 
-void FrameTargetGL::setDepthStencil(Texture* texture, const TargetDesc& targetDesc) {
+void FrameTargetGL::setDepthStencil(Texture* texture, const TargetDesc& targetDesc)
+{
 	if (m_isWindowFrameBufferWrapper_gl) {
 		sgeAssert(false && "Invalid operation, modifying the window frame buffer is not possible!");
 		return;
@@ -130,7 +136,8 @@ void FrameTargetGL::setDepthStencil(Texture* texture, const TargetDesc& targetDe
 		// glFramebufferTexture3D(
 		//	GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D_ARRAY,
 		//	texture->GL_GetResource().id, targetDesc.texture2D.mipLevel, targetDesc.texture2D.arrayIdx);
-	} else if (texToBindDesc.textureType == UniformType::TextureCube) {
+	}
+	else if (texToBindDesc.textureType == UniformType::TextureCube) {
 		updateAttachmentsInfo(texture);
 
 		// Binding a face from a cube texture as a depth-stencil.
@@ -140,12 +147,14 @@ void FrameTargetGL::setDepthStencil(Texture* texture, const TargetDesc& targetDe
 		                       targetDesc.textureCube.mipLevel);
 
 		DumpAllGLErrors();
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 }
 
-void FrameTargetGL::destroy() {
+void FrameTargetGL::destroy()
+{
 	if (m_frameBuffer_gl != 0) {
 		auto glcon = getDevice<SGEDeviceImpl>()->GL_GetContextStateCache();
 		glcon->DeleteFrameBuffers(1, &m_frameBuffer_gl);
@@ -164,7 +173,8 @@ void FrameTargetGL::destroy() {
 	m_depthBuffer.Release();
 }
 
-bool FrameTargetGL::isValid() const {
+bool FrameTargetGL::isValid() const
+{
 	if (m_isWindowFrameBufferWrapper_gl) {
 		return true;
 	}
@@ -182,7 +192,8 @@ bool FrameTargetGL::isValid() const {
 	return m_depthBuffer.IsResourceValid();
 }
 
-Texture* FrameTargetGL::getRenderTarget(const unsigned int index) const {
+Texture* FrameTargetGL::getRenderTarget(const unsigned int index) const
+{
 	if (m_isWindowFrameBufferWrapper_gl) {
 		sgeAssert(false && "Invalid operation, calling getRenderTarget on the window frame buffer is not possible!");
 		return NULL;
@@ -191,7 +202,8 @@ Texture* FrameTargetGL::getRenderTarget(const unsigned int index) const {
 	return m_renderTargets[index].GetPtr();
 }
 
-Texture* FrameTargetGL::getDepthStencil() const {
+Texture* FrameTargetGL::getDepthStencil() const
+{
 	if (m_isWindowFrameBufferWrapper_gl) {
 		sgeAssert(false && "Invalid operation, calling getDepthStencil on the window frame buffer is not possible!");
 		return NULL;
@@ -200,7 +212,8 @@ Texture* FrameTargetGL::getDepthStencil() const {
 	return m_depthBuffer.GetPtr();
 }
 
-bool FrameTargetGL::hasAttachment() const {
+bool FrameTargetGL::hasAttachment() const
+{
 	bool hasRenderTarget = false;
 
 	for (int t = 0; t < SGE_ARRSZ(m_renderTargets); ++t) {
@@ -210,7 +223,8 @@ bool FrameTargetGL::hasAttachment() const {
 	return hasRenderTarget || (m_depthBuffer.GetPtr() != NULL);
 }
 
-void FrameTargetGL::updateAttachmentsInfo(Texture* texture) {
+void FrameTargetGL::updateAttachmentsInfo(Texture* texture)
+{
 	if (hasAttachment() == false) {
 		m_frameTargetWidth = -1;
 		m_frameTargetHeight = -1;
@@ -223,24 +237,28 @@ void FrameTargetGL::updateAttachmentsInfo(Texture* texture) {
 				m_frameTargetWidth = texture->getDesc().texture2D.width;
 			if (m_frameTargetHeight == -1)
 				m_frameTargetHeight = texture->getDesc().texture2D.height;
-		} else if (texture->getDesc().textureType == UniformType::Texture3D) {
+		}
+		else if (texture->getDesc().textureType == UniformType::Texture3D) {
 			if (m_frameTargetWidth == -1)
 				m_frameTargetWidth = texture->getDesc().texture3D.width;
 			if (m_frameTargetHeight == -1)
 				m_frameTargetHeight = texture->getDesc().texture3D.height;
-		} else if (texture->getDesc().textureType == UniformType::TextureCube) {
+		}
+		else if (texture->getDesc().textureType == UniformType::TextureCube) {
 			if (m_frameTargetWidth == -1)
 				m_frameTargetWidth = texture->getDesc().textureCube.width;
 			if (m_frameTargetHeight == -1)
 				m_frameTargetHeight = texture->getDesc().textureCube.height;
-		} else {
+		}
+		else {
 			// Not implemented.
 			sgeAssert(false);
 		}
 	}
 }
 
-bool FrameTargetGL::create2D(int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt) {
+bool FrameTargetGL::create2D(int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt)
+{
 	// Render Target texture.
 	GpuHandle<Texture> renderTarget = getDevice()->requestResource<Texture>();
 	if (renderTargetFmt != TextureFormat::Unknown) {
@@ -256,7 +274,8 @@ bool FrameTargetGL::create2D(int width, int height, TextureFormat::Enum renderTa
 		depthStencilTexture = getDevice()->requestResource<Texture>();
 		const TextureDesc depthStencilDesc = TextureDesc::GetDefaultDepthStencil(width, height, depthTextureFmt);
 		const bool succeeded = depthStencilTexture->create(depthStencilDesc, nullptr);
-	} else {
+	}
+	else {
 		sgeAssert(depthTextureFmt == TextureFormat::Unknown);
 	}
 

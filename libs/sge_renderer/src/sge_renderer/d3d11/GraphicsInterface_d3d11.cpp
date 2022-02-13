@@ -1,6 +1,6 @@
 #include "GraphicsInterface_d3d11.h"
-#include "sge_utils/time/Timer.h"
 #include "sge_log/Log.h"
+#include "sge_utils/time/Timer.h"
 
 #include "Buffer_d3d11.h"
 #include "FrameTarget_d3d11.h"
@@ -19,7 +19,8 @@ static ID3D11DeviceContext* g_d3d11ImmDeviceContext = nullptr;
 //////////////////////////////////////////////////////////////////////////////////////////
 // Create/Destroy
 //////////////////////////////////////////////////////////////////////////////////////////
-bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc) {
+bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc)
+{
 #if defined(SGE_USE_DEBUG)
 	//#define SGE_USE_D3D_DEBUG
 #endif
@@ -87,7 +88,7 @@ bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc) {
 	m_immContext->SetSGEDevice(this);
 	setVsync(mainFrameDesc.vSync);
 
-	 sgeLogInfo("D3D11 Device Created with FeatureLevel = 0x%x\n", m_workingFeatureLevel);
+	sgeLogInfo("D3D11 Device Created with FeatureLevel = 0x%x\n", m_workingFeatureLevel);
 
 	// Create the swapchain to the target window and allocate the default FrameTargetD3D11
 	const bool succeedeCreatingSC = D3D11_CreateSwapChain(mainFrameDesc);
@@ -120,7 +121,8 @@ bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc) {
 }
 
 //--------------------------------------------------------------------------------------
-bool SGEDeviceD3D11::D3D11_CreateSwapChain(const MainFrameTargetDesc& desc) {
+bool SGEDeviceD3D11::D3D11_CreateSwapChain(const MainFrameTargetDesc& desc)
+{
 	TComPtr<IDXGIDevice> DXGIDevice;
 	const HRESULT hr = m_d3d11Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&DXGIDevice);
 
@@ -229,7 +231,8 @@ bool SGEDeviceD3D11::D3D11_CreateSwapChain(const MainFrameTargetDesc& desc) {
 	return true;
 }
 
-void SGEDeviceD3D11::resizeBackBuffer(int width, int height) {
+void SGEDeviceD3D11::resizeBackBuffer(int width, int height)
+{
 	if (m_windowFrameTargetDesc.width == width && m_windowFrameTargetDesc.height == height) {
 		return;
 	}
@@ -293,12 +296,14 @@ void SGEDeviceD3D11::resizeBackBuffer(int width, int height) {
 }
 
 //--------------------------------------------------------------------------------------
-void SGEDeviceD3D11::setVsync(const bool enabled) {
+void SGEDeviceD3D11::setVsync(const bool enabled)
+{
 	m_VSyncEnabled = enabled;
 }
 
 //--------------------------------------------------------------------------------------
-void SGEDeviceD3D11::Destroy() {
+void SGEDeviceD3D11::Destroy()
+{
 	m_d3d11Device.Release();
 	m_d3d11Context.Release();
 	m_d3d11SwapChain.Release();
@@ -307,7 +312,8 @@ void SGEDeviceD3D11::Destroy() {
 }
 
 //--------------------------------------------------------------------------------------
-std::string SGEDeviceD3D11::D3D11_GetWorkingShaderModel(const ShaderType::Enum shaderType) const {
+std::string SGEDeviceD3D11::D3D11_GetWorkingShaderModel(const ShaderType::Enum shaderType) const
+{
 	std::string shaderModel;
 
 	switch (shaderType) {
@@ -351,7 +357,8 @@ std::string SGEDeviceD3D11::D3D11_GetWorkingShaderModel(const ShaderType::Enum s
 	return shaderModel;
 }
 
-void SGEDeviceD3D11::present() {
+void SGEDeviceD3D11::present()
+{
 	m_d3d11SwapChain->Present(m_VSyncEnabled ? 1 : 0, 0);
 	m_frameStatistics.Reset();
 	float const now = Timer::now_seconds();
@@ -362,7 +369,8 @@ void SGEDeviceD3D11::present() {
 ///////////////////////////////////////////////////////////////////////////////////////////
 // SGEContextImmediateD3D11
 ///////////////////////////////////////////////////////////////////////////////////////////
-void SGEContextImmediateD3D11::clearColor(FrameTarget* target, int index, const float rgba[4]) {
+void SGEContextImmediateD3D11::clearColor(FrameTarget* target, int index, const float rgba[4])
+{
 	if (target == NULL) {
 		target = ((SGEDeviceD3D11*)getDevice())->D3D11_GetScreenTarget();
 	}
@@ -382,7 +390,8 @@ void SGEContextImmediateD3D11::clearColor(FrameTarget* target, int index, const 
 }
 
 //--------------------------------------------------------------------------
-void SGEContextImmediateD3D11::clearDepth(FrameTarget* target, float depth) {
+void SGEContextImmediateD3D11::clearDepth(FrameTarget* target, float depth)
+{
 	if (target == NULL) {
 		target = ((SGEDeviceD3D11*)getDevice())->D3D11_GetScreenTarget();
 	}
@@ -391,14 +400,17 @@ void SGEContextImmediateD3D11::clearDepth(FrameTarget* target, float depth) {
 		D3D11_GetImmContext()->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH, depth, 0);
 }
 
-void* SGEContextImmediateD3D11::map(Buffer* buffer, const Map::Enum map) {
+void* SGEContextImmediateD3D11::map(Buffer* buffer, const Map::Enum map)
+{
 	return ((BufferD3D11*)buffer)->map(map, this);
 }
-void SGEContextImmediateD3D11::unMap(Buffer* buffer) {
+void SGEContextImmediateD3D11::unMap(Buffer* buffer)
+{
 	((BufferD3D11*)buffer)->unMap(this);
 }
 
-void SGEContextImmediateD3D11::updateTextureData(Texture* texture, const TextureData& texData) {
+void SGEContextImmediateD3D11::updateTextureData(Texture* texture, const TextureData& texData)
+{
 	if (texture && texture->getDesc().textureType == UniformType::Texture2D && texData.data) {
 		TextureD3D11* texD3D = ((TextureD3D11*)texture);
 
@@ -420,18 +432,21 @@ void SGEContextImmediateD3D11::updateTextureData(Texture* texture, const Texture
 }
 
 //--------------------------------------------------------------------------
-void SGEContextImmediateD3D11::beginQuery(Query* const query) {
+void SGEContextImmediateD3D11::beginQuery(Query* const query)
+{
 	QueryD3D11* const queryImpl = (QueryD3D11*)query;
 
 	D3D11_GetImmContext()->Begin(queryImpl->D3D11_GetResource());
 }
 
-void SGEContextImmediateD3D11::endQuery(Query* const query) {
+void SGEContextImmediateD3D11::endQuery(Query* const query)
+{
 	QueryD3D11* const queryImpl = (QueryD3D11*)query;
 	D3D11_GetImmContext()->End(queryImpl->D3D11_GetResource());
 }
 
-bool SGEContextImmediateD3D11::isQueryReady(Query* const query) {
+bool SGEContextImmediateD3D11::isQueryReady(Query* const query)
+{
 	if (!query || !query->isValid()) {
 		sgeAssert(false);
 		return false;
@@ -442,7 +457,8 @@ bool SGEContextImmediateD3D11::isQueryReady(Query* const query) {
 	return hr == S_OK;
 }
 
-bool SGEContextImmediateD3D11::getQueryData(Query* const query, uint64& queryData) {
+bool SGEContextImmediateD3D11::getQueryData(Query* const query, uint64& queryData)
+{
 	if (!query || !query->isValid()) {
 		sgeAssert(false);
 		return false;
@@ -457,7 +473,8 @@ bool SGEContextImmediateD3D11::getQueryData(Query* const query, uint64& queryDat
 void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
                                                FrameTarget* frameTarget,
                                                const Rect2s* const pViewport,
-                                               const Rect2s* const pScissorsRect) {
+                                               const Rect2s* const pScissorsRect)
+{
 	if (drawCall.m_pStateGroup == nullptr) {
 		sgeAssert(false && "Aborting draw call! No state group is specified!\n");
 		return;
@@ -531,7 +548,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 					if (bindLocation.texArraySize_or_numericUniformSizeBytes == 1) {
 						TextureD3D11* texture = reinterpret_cast<TextureD3D11*>(uniform.texture);
 						srvs[bindLocation.shaderFreq][bindLocation.bindLocation] = texture ? texture->D3D11_GetSRV() : nullptr;
-					} else {
+					}
+					else {
 						for (int t = 0; t < bindLocation.texArraySize_or_numericUniformSizeBytes; ++t) {
 							TextureD3D11* const d3d11Tex = static_cast<TextureD3D11*>(uniform.textures[t]);
 							srvs[bindLocation.shaderFreq][bindLocation.bindLocation + t] = d3d11Tex ? d3d11Tex->D3D11_GetSRV() : nullptr;
@@ -546,7 +564,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 					if (bindLocation.texArraySize_or_numericUniformSizeBytes == 0) {
 						samplers[bindLocation.shaderFreq][bindLocation.bindLocation] =
 						    ((SamplerStateD3D11*)(uniform.sampler))->D3D11_GetResource();
-					} else {
+					}
+					else {
 						for (int t = 0; t < bindLocation.texArraySize_or_numericUniformSizeBytes; ++t) {
 							SamplerStateD3D11* const d3d11Samp = static_cast<SamplerStateD3D11*>(uniform.samplers[t]);
 							samplers[bindLocation.shaderFreq][bindLocation.bindLocation + t] =
@@ -562,11 +581,13 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 				default: {
 					if (UniformType::isNumeric((UniformType::Enum)bindLocation.uniformType)) {
 						char* const cBufferMem = (char*)globalCBufferMappedMem[bindLocation.shaderFreq];
-						if_checked(cBufferMem != nullptr) {
+						if_checked(cBufferMem != nullptr)
+						{
 							memcpy(cBufferMem + bindLocation.bindLocation, uniform.data,
 							       bindLocation.texArraySize_or_numericUniformSizeBytes);
 						}
-					} else {
+					}
+					else {
 						sgeAssert(false);
 					}
 
@@ -638,7 +659,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 	// Blending
 	if (stateGroup.m_blendState && stateGroup.m_blendState->isValid()) {
 		stateCache->SetBlendState(((BlendStateD3D11*)stateGroup.m_blendState)->D3D11_GetResource());
-	} else {
+	}
+	else {
 		stateCache->SetBlendState(((BlendStateD3D11*)(getDeviceD3D11()->m_default_blendState.GetPtr()))->D3D11_GetResource());
 	}
 
@@ -666,7 +688,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 
 			stateCache->SetScissors(&d3d11_rect, 1);
 		}
-	} else {
+	}
+	else {
 		// [TODO] Cache this.
 		stateCache->SetRasterizerState(
 		    ((RasterizerStateD3D11*)(getDeviceD3D11()->m_default_RasterizerState.GetPtr()))->D3D11_GetResource());
@@ -675,7 +698,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 	// Depth stencil state.
 	if (stateGroup.m_depthStencilState && stateGroup.m_depthStencilState->isValid()) {
 		stateCache->SetDepthStencilState(((DepthStencilStateD3D11*)stateGroup.m_depthStencilState)->D3D11_GetResource());
-	} else {
+	}
+	else {
 		stateCache->SetDepthStencilState(
 		    ((DepthStencilStateD3D11*)(getDeviceD3D11()->m_default_DepthStencilState.GetPtr()))->D3D11_GetResource());
 	}
@@ -699,17 +723,20 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 
 		if (call.numInstances == 1) {
 			stateCache->m_d3dcon->Draw(call.numVerts, call.startVert);
-		} else {
+		}
+		else {
 			stateCache->m_d3dcon->DrawInstanced(call.numVerts, call.numInstances, call.startVert, 0);
 		}
-	} else if (drawCall.m_drawExec.GetType() == DrawExecDesc::Type_Indexed) {
+	}
+	else if (drawCall.m_drawExec.GetType() == DrawExecDesc::Type_Indexed) {
 		const auto& call = drawCall.m_drawExec.IndexedCall();
 
 		numPrimitivesDrawn = PrimitiveTopology::GetNumPrimitivesByPoints(stateGroup.m_primTopology, call.numIndices) * call.numInstances;
 
 		if (call.numInstances == 1) {
 			stateCache->m_d3dcon->DrawIndexed(call.numIndices, call.startIndex, call.startVertex);
-		} else {
+		}
+		else {
 			stateCache->m_d3dcon->DrawIndexedInstanced(call.numIndices, call.numInstances, call.startIndex, call.startVertex, 0);
 		}
 	}
@@ -718,13 +745,15 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 	this->getDeviceD3D11()->m_frameStatistics.numPrimitiveDrawn += numPrimitivesDrawn;
 }
 
-SGEDevice* SGEDevice::create(const MainFrameTargetDesc& frameTargetDesc) {
+SGEDevice* SGEDevice::create(const MainFrameTargetDesc& frameTargetDesc)
+{
 	SGEDeviceD3D11* s = new SGEDeviceD3D11();
 	s->Create(frameTargetDesc);
 	return s;
 }
 
-RAIResource* SGEDeviceD3D11::requestResource(const ResourceType::Enum resourceType) {
+RAIResource* SGEDeviceD3D11::requestResource(const ResourceType::Enum resourceType)
+{
 	RAIResource* result = nullptr;
 
 	if (resourceType == ResourceType::Buffer)
@@ -759,7 +788,8 @@ RAIResource* SGEDeviceD3D11::requestResource(const ResourceType::Enum resourceTy
 }
 
 
-RasterizerState* SGEDeviceD3D11::requestRasterizerState(const RasterDesc& desc) {
+RasterizerState* SGEDeviceD3D11::requestRasterizerState(const RasterDesc& desc)
+{
 	// Search if the resource exists.
 	auto itr = std::find_if(rasterizerStateCache.begin(), rasterizerStateCache.end(),
 	                        [&desc](const RasterizerState* state) -> bool { return state->getDesc() == desc; });
@@ -781,7 +811,8 @@ RasterizerState* SGEDeviceD3D11::requestRasterizerState(const RasterDesc& desc) 
 	return state;
 }
 
-DepthStencilState* SGEDeviceD3D11::requestDepthStencilState(const DepthStencilDesc& desc) {
+DepthStencilState* SGEDeviceD3D11::requestDepthStencilState(const DepthStencilDesc& desc)
+{
 	// Search if the resource exists.
 	auto itr = std::find_if(depthStencilStateCache.begin(), depthStencilStateCache.end(),
 	                        [&desc](const DepthStencilState* state) -> bool { return state->getDesc() == desc; });
@@ -802,7 +833,8 @@ DepthStencilState* SGEDeviceD3D11::requestDepthStencilState(const DepthStencilDe
 	return state;
 }
 
-BlendState* SGEDeviceD3D11::requestBlendState(const BlendStateDesc& desc) {
+BlendState* SGEDeviceD3D11::requestBlendState(const BlendStateDesc& desc)
+{
 	// Search if the resource exists.
 	auto itr = std::find_if(blendStateCache.begin(), blendStateCache.end(),
 	                        [&desc](const BlendState* state) -> bool { return state->getDesc() == desc; });
@@ -823,7 +855,8 @@ BlendState* SGEDeviceD3D11::requestBlendState(const BlendStateDesc& desc) {
 	return state;
 }
 
-SamplerState* SGEDeviceD3D11::requestSamplerState(const SamplerDesc& desc) {
+SamplerState* SGEDeviceD3D11::requestSamplerState(const SamplerDesc& desc)
+{
 	// Search if the resource exists.
 	auto itr = std::find_if(samplerStateCache.begin(), samplerStateCache.end(),
 	                        [&desc](const SamplerState* state) -> bool { return state->getDesc() == desc; });
@@ -844,7 +877,8 @@ SamplerState* SGEDeviceD3D11::requestSamplerState(const SamplerDesc& desc) {
 	return state;
 }
 
-VertexDeclIndex SGEDeviceD3D11::getVertexDeclIndex(const VertexDecl* const declElems, const int declElemsCount) {
+VertexDeclIndex SGEDeviceD3D11::getVertexDeclIndex(const VertexDecl* const declElems, const int declElemsCount)
+{
 	const std::vector<VertexDecl> decl = VertexDecl::NormalizeDecl(declElems, declElemsCount);
 
 	VertexDeclIndex& idx = static_cast<VertexDeclIndex>(m_vertexDeclIndexMap[decl]);
@@ -856,7 +890,8 @@ VertexDeclIndex SGEDeviceD3D11::getVertexDeclIndex(const VertexDecl* const declE
 	return idx;
 }
 
-const std::vector<VertexDecl>& SGEDeviceD3D11::getVertexDeclFromIndex(const VertexDeclIndex index) const {
+const std::vector<VertexDecl>& SGEDeviceD3D11::getVertexDeclFromIndex(const VertexDeclIndex index) const
+{
 	for (const auto& e : m_vertexDeclIndexMap) {
 		if (e.second == index) {
 			return e.first;

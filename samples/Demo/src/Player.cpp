@@ -21,15 +21,14 @@ struct Player : public Actor {
 
 	float wobbleAmplitude = 1.f;
 	float wobbleForce = 0.f;
-	 
+
 	float jumpButtonHeldTime = 0.f;
 	static inline const float kMaxJumpHeldTime = 1.f;
 
-	Box3f getBBoxOS() const override {
-		return ttModel.getBBoxOS();
-	}
+	Box3f getBBoxOS() const override { return ttModel.getBBoxOS(); }
 
-	void create() override {
+	void create() override
+	{
 		registerTrait(ttRigidbody);
 		registerTrait(ttModel);
 
@@ -43,14 +42,16 @@ struct Player : public Actor {
 		ttRigidbody.getRigidBody()->setDamping(0.05f, 0.005f);
 	}
 
-	void onPlayStateChanged(bool const isStartingToPlay) {
+	void onPlayStateChanged(bool const isStartingToPlay)
+	{
 		Actor::onPlayStateChanged(isStartingToPlay);
 		if (isStartingToPlay) {
 			respawnPosition = this->getPosition();
 		}
 	}
 
-	void update(const GameUpdateSets& u) {
+	void update(const GameUpdateSets& u)
+	{
 		if (u.isSimulationPaused()) {
 			return;
 		}
@@ -133,7 +134,8 @@ struct Player : public Actor {
 };
 
 ReflAddTypeId(Player, 30'02'22'0001);
-ReflBlock() {
+ReflBlock()
+{
 	ReflAddActor(Player) ReflMember(Player, cameraObject) ReflMember(Player, cameraOffset);
 }
 

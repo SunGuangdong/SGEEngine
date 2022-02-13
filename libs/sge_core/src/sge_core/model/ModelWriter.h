@@ -17,7 +17,9 @@ class SGE_CORE_API ModelWriter {
 		DataChunk(int id, const void* data, size_t sizeBytes)
 		    : id(id)
 		    , data(data)
-		    , sizeBytes(sizeBytes) {}
+		    , sizeBytes(sizeBytes)
+		{
+		}
 
 		int id;
 		const void* data;
@@ -38,7 +40,8 @@ class SGE_CORE_API ModelWriter {
 
 	// This function assumes that the vector wont be resized(aka. the data pointer won't change).
 	template <typename T>
-	int newChunkFromStdVector(const std::vector<T>& data) {
+	int newChunkFromStdVector(const std::vector<T>& data)
+	{
 		return newDataChunkFromPtr(data.data(), data.size() * sizeof(T));
 	}
 

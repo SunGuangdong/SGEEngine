@@ -2,22 +2,22 @@
 
 #include "imgui/imgui.h"
 #include "sge_core/ICore.h"
-#include "sge_utils/sge_utils.h"
 #include "sge_utils/containers/StaticArray.h"
+#include "sge_utils/sge_utils.h"
 
 #ifdef SGE_RENDERER_GL
-#include "sge_renderer/gl/opengl_include.h"
-#include <algorithm>
+	#include "sge_renderer/gl/opengl_include.h"
+	#include <algorithm>
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include <SDL2/SDL.h>
-#include <emscripten.h>
-#include <emscripten/html5_webgl.h>
+	#include <SDL2/SDL.h>
+	#include <emscripten.h>
+	#include <emscripten/html5_webgl.h>
 //#include <GLES3/gl3.h> // WebGL2 + GLES 3 emulation.
 #else
-#include <SDL.h>
-#include <SDL_syswm.h>
+	#include <SDL.h>
+	#include <SDL_syswm.h>
 #endif
 
 #include "application.h"
@@ -29,7 +29,8 @@ struct WindowImplData {
 	bool isActive = 0;
 };
 
-Key SDL_key_to_SGEKey(const int sdlKey) {
+Key SDL_key_to_SGEKey(const int sdlKey)
+{
 	switch (sdlKey) {
 		// Letters
 		case SDLK_a:
@@ -184,7 +185,8 @@ Key SDL_key_to_SGEKey(const int sdlKey) {
 	return Key_NumElements;
 }
 
-WindowBase* ApplicationHandler::findWindowBySDLId(const uint32 id) {
+WindowBase* ApplicationHandler::findWindowBySDLId(const uint32 id)
+{
 	for (WindowBase* wnd : this->m_wnds) {
 		if (SDL_GetWindowID(wnd->m_implData->window) == id) {
 			return wnd;
@@ -194,7 +196,8 @@ WindowBase* ApplicationHandler::findWindowBySDLId(const uint32 id) {
 	return nullptr;
 }
 
-void ApplicationHandler::removeWindow(WindowBase* const wndToRemove) {
+void ApplicationHandler::removeWindow(WindowBase* const wndToRemove)
+{
 	for (int t = 0; t < m_wnds.size(); ++t) {
 		if (wndToRemove == m_wnds[t]) {
 			delete wndToRemove;
@@ -205,7 +208,8 @@ void ApplicationHandler::removeWindow(WindowBase* const wndToRemove) {
 }
 
 void ApplicationHandler::NewWindowInternal(
-    WindowBase* window, const char* windowName, int width, int height, bool isMaximized, bool noResize) {
+    WindowBase* window, const char* windowName, int width, int height, bool isMaximized, bool noResize)
+{
 	Uint32 wndFlags = SDL_WINDOW_SHOWN;
 	if (noResize == false)
 		wndFlags |= SDL_WINDOW_RESIZABLE;
@@ -227,9 +231,9 @@ void ApplicationHandler::NewWindowInternal(
 	DumpAllGLErrors();
 
 	// emscripten_webgl_get_current_context emscripten_webgl_enable_extension
-#if !defined(__EMSCRIPTEN__)
+	#if !defined(__EMSCRIPTEN__)
 	SDL_GL_SetSwapInterval(1);
-#endif
+	#endif
 #endif
 
 	// SDL_ShowWindow(window->m_implData->window);
@@ -238,11 +242,13 @@ void ApplicationHandler::NewWindowInternal(
 	m_wnds.push_back(window);
 }
 
-void ApplicationHandler::DeregisterWindowInternal(WindowBase* wnd) {
+void ApplicationHandler::DeregisterWindowInternal(WindowBase* wnd)
+{
 	m_wnds.erase(std::find(m_wnds.begin(), m_wnds.end(), wnd));
 }
 
-void ApplicationHandler::PollEvents() {
+void ApplicationHandler::PollEvents()
+{
 	m_inputState.Advance();
 
 	// Mark the connected gamepads as active, the input state advance makes this false.
@@ -311,18 +317,21 @@ void ApplicationHandler::PollEvents() {
 							wnd->HandleEvent(WE_Create, nullptr);
 							wnd->isWindowShownEventUsedAsCreate_HACK = true;
 						}
-					} else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+					}
+					else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 						WE_Resize_Data data(event.window.data1, event.window.data2);
 						wnd->HandleEvent(WE_Resize, &data);
 
 						// Caution the code above works for desktop but not for webgl builds with emscpriten.
 						// For the workaround see tag [SGE_EMSCRIPTEN_NO_SDL_RESIZE].
-					} else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+					}
+					else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 						// From https://wiki.libsdl.org/SDL_WindowEventID
 						// window size has changed, either as a result of an API call or through the system or user changing the window
 						// size; this event is followed by SDL_WINDOWEVENT_RESIZED if the size was changed by an external event, i.e. the
 						// user or the window manager
-					} else if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
+					}
+					else if (event.window.event == SDL_WINDOWEVENT_CLOSE) {
 						wnd->HandleEvent(WE_Destroying, nullptr);
 						SDL_DestroyWindow(wnd->m_implData->window);
 						removeWindow(wnd); // There might be some more messages here but there is no window destroyed event in SDL.
@@ -357,7 +366,8 @@ void ApplicationHandler::PollEvents() {
 				for (char ch : event.text.text) {
 					if (ch != '\0') {
 						m_inputState.addInputText(ch);
-					} else {
+					}
+					else {
 						break;
 					}
 				}
@@ -368,7 +378,8 @@ void ApplicationHandler::PollEvents() {
 
 				if (sge_key == Key_Enter) {
 					additionalTextInput.push_back('\n');
-				} else if (sge_key == Key_Tab) {
+				}
+				else if (sge_key == Key_Tab) {
 					additionalTextInput.push_back('\t');
 				}
 
@@ -415,7 +426,8 @@ void ApplicationHandler::PollEvents() {
 					SDL_Joystick* const gameContollerJoystick = SDL_GameControllerGetJoystick(gameController);
 					const int joystickInstanceId = SDL_JoystickInstanceID(gameContollerJoystick);
 
-					if_checked(gameController && sdlJoystickInstanceIdIdToIndex.count(joystickInstanceId) == 0) {
+					if_checked(gameController && sdlJoystickInstanceIdIdToIndex.count(joystickInstanceId) == 0)
+					{
 						const int deviceIndex = int(sdlJoystickInstanceIdIdToIndex.size());
 						sdlJoystickInstanceIdIdToIndex[joystickInstanceId] = deviceIndex;
 					}
@@ -424,7 +436,8 @@ void ApplicationHandler::PollEvents() {
 			} break;
 			case SDL_JOYDEVICEREMOVED: {
 				const int sdlGamepadInstanceId = event.cdevice.which;
-				if_checked(sdlJoystickInstanceIdIdToIndex.count(sdlGamepadInstanceId) > 0) {
+				if_checked(sdlJoystickInstanceIdIdToIndex.count(sdlGamepadInstanceId) > 0)
+				{
 					sdlJoystickInstanceIdIdToIndex.erase(sdlGamepadInstanceId);
 				}
 			} break;
@@ -436,31 +449,44 @@ void ApplicationHandler::PollEvents() {
 
 					if (event.cbutton.button == 0) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_a] |= 1;
-					} else if (event.cbutton.button == 1) {
+					}
+					else if (event.cbutton.button == 1) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_b] |= 1;
-					} else if (event.cbutton.button == 2) {
+					}
+					else if (event.cbutton.button == 2) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_x] |= 1;
-					} else if (event.cbutton.button == 3) {
+					}
+					else if (event.cbutton.button == 3) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_y] |= 1;
-					} else if (event.cbutton.button == 4) {
+					}
+					else if (event.cbutton.button == 4) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_shoulderL] |= 1;
-					} else if (event.cbutton.button == 5) {
+					}
+					else if (event.cbutton.button == 5) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_shoulderR] |= 1;
-					} else if (event.cbutton.button == 6) {
+					}
+					else if (event.cbutton.button == 6) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_back] |= 1;
-					} else if (event.cbutton.button == 7) {
+					}
+					else if (event.cbutton.button == 7) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_start] |= 1;
-					} else if (event.cbutton.button == 8) {
+					}
+					else if (event.cbutton.button == 8) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_thumbL] |= 1;
-					} else if (event.cbutton.button == 9) {
+					}
+					else if (event.cbutton.button == 9) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_thumbR] |= 1;
-					} else if (event.cbutton.button == 11) { // PS4 hat-up
+					}
+					else if (event.cbutton.button == 11) { // PS4 hat-up
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_up] |= 1;
-					} else if (event.cbutton.button == 12) { // PS4 hat-down
+					}
+					else if (event.cbutton.button == 12) { // PS4 hat-down
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_down] |= 1;
-					} else if (event.cbutton.button == 13) { // PS4 hat-left
+					}
+					else if (event.cbutton.button == 13) { // PS4 hat-left
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_left] |= 1;
-					} else if (event.cbutton.button == 14) { // PS4 hat-right
+					}
+					else if (event.cbutton.button == 14) { // PS4 hat-right
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_right] |= 1;
 					}
 				}
@@ -473,31 +499,44 @@ void ApplicationHandler::PollEvents() {
 
 					if (event.cbutton.button == 0) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_a] &= ~1;
-					} else if (event.cbutton.button == 1) {
+					}
+					else if (event.cbutton.button == 1) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_b] &= ~1;
-					} else if (event.cbutton.button == 2) {
+					}
+					else if (event.cbutton.button == 2) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_x] &= ~1;
-					} else if (event.cbutton.button == 3) {
+					}
+					else if (event.cbutton.button == 3) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_y] &= ~1;
-					} else if (event.cbutton.button == 4) {
+					}
+					else if (event.cbutton.button == 4) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_shoulderL] &= ~1;
-					} else if (event.cbutton.button == 5) {
+					}
+					else if (event.cbutton.button == 5) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_shoulderR] &= ~1;
-					} else if (event.cbutton.button == 6) {
+					}
+					else if (event.cbutton.button == 6) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_back] &= ~1;
-					} else if (event.cbutton.button == 7) {
+					}
+					else if (event.cbutton.button == 7) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_start] &= ~1;
-					} else if (event.cbutton.button == 8) {
+					}
+					else if (event.cbutton.button == 8) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_thumbL] &= ~1;
-					} else if (event.cbutton.button == 9) {
+					}
+					else if (event.cbutton.button == 9) {
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_thumbR] &= ~1;
-					} else if (event.cbutton.button == 11) { // PS4 hat-up
+					}
+					else if (event.cbutton.button == 11) { // PS4 hat-up
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_up] &= ~1;
-					} else if (event.cbutton.button == 12) { // PS4 hat-down
+					}
+					else if (event.cbutton.button == 12) { // PS4 hat-down
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_down] &= ~1;
-					} else if (event.cbutton.button == 13) { // PS4 hat-left
+					}
+					else if (event.cbutton.button == 13) { // PS4 hat-left
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_left] &= ~1;
-					} else if (event.cbutton.button == 14) { // PS4 hat-right
+					}
+					else if (event.cbutton.button == 14) { // PS4 hat-right
 						m_inputState.xinputDevicesState[gamepadIndex].btnState[GamepadState::btn_right] &= ~1;
 					}
 				}
@@ -520,23 +559,28 @@ void ApplicationHandler::PollEvents() {
 							float newValue = clampDeadZone(float(event.caxis.value) / 32768.f);
 							m_inputState.xinputDevicesState[gamepadIndex].axisL.x = newValue;
 							m_inputState.xinputDevicesState[gamepadIndex].hadInputThisPoll |= newValue > 0.f;
-						} else if (event.caxis.axis == 1) {
+						}
+						else if (event.caxis.axis == 1) {
 							float newValue = clampDeadZone(float(-event.caxis.value) / 32768.f);
 							m_inputState.xinputDevicesState[gamepadIndex].axisL.y = newValue;
 							m_inputState.xinputDevicesState[gamepadIndex].hadInputThisPoll |= newValue > 0.f;
-						} else if (event.caxis.axis == 3) {
+						}
+						else if (event.caxis.axis == 3) {
 							float newValue = clampDeadZone(float(event.caxis.value) / 32768.f);
 							m_inputState.xinputDevicesState[gamepadIndex].axisR.x = newValue;
 							m_inputState.xinputDevicesState[gamepadIndex].hadInputThisPoll |= newValue > 0.f;
-						} else if (event.caxis.axis == 4) {
+						}
+						else if (event.caxis.axis == 4) {
 							float newValue = clampDeadZone(float(-event.caxis.value) / 32768.f);
 							m_inputState.xinputDevicesState[gamepadIndex].axisR.y = newValue;
 							m_inputState.xinputDevicesState[gamepadIndex].hadInputThisPoll |= newValue > 0.f;
-						} else if (event.caxis.axis == 2) {
+						}
+						else if (event.caxis.axis == 2) {
 							float newValue = clampDeadZone(float(event.caxis.value) / 32768.f);
 							m_inputState.xinputDevicesState[gamepadIndex].triggerL = (newValue + 1.f) * 0.5f;
 							m_inputState.xinputDevicesState[gamepadIndex].hadInputThisPoll |= newValue > 0.f;
-						} else if (event.caxis.axis == 5) {
+						}
+						else if (event.caxis.axis == 5) {
 							float newValue = clampDeadZone(float(event.caxis.value) / 32768.f);
 							m_inputState.xinputDevicesState[gamepadIndex].triggerR = (newValue + 1.f) * 0.5f;
 							m_inputState.xinputDevicesState[gamepadIndex].hadInputThisPoll |= newValue > 0.f;
@@ -650,16 +694,19 @@ void ApplicationHandler::PollEvents() {
 #endif
 } // namespace sge
 
-WindowBase::WindowBase() {
+WindowBase::WindowBase()
+{
 	m_implData = new WindowImplData;
 }
 
-WindowBase::~WindowBase() {
+WindowBase::~WindowBase()
+{
 	delete m_implData;
 	m_implData = nullptr;
 }
 
-void* WindowBase::GetNativeHandle() const {
+void* WindowBase::GetNativeHandle() const
+{
 #ifdef _WIN32
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION(&wmInfo.version);
@@ -677,45 +724,53 @@ void* WindowBase::GetNativeHandle() const {
 #endif
 }
 
-bool WindowBase::IsActive() const {
+bool WindowBase::IsActive() const
+{
 	return bool(SDL_WINDOW_INPUT_FOCUS & SDL_GetWindowFlags(m_implData->window));
 }
 
 
-void WindowBase::resizeWindow(int width, int height) {
+void WindowBase::resizeWindow(int width, int height)
+{
 	SDL_SetWindowSize(m_implData->window, width, height);
 }
 
-int WindowBase::GetClientWidth() const {
+int WindowBase::GetClientWidth() const
+{
 	int w = 0;
 	int h = 0;
 	SDL_GetWindowSize(m_implData->window, &w, &h);
 	return w;
 }
 
-int WindowBase::GetClientHeight() const {
+int WindowBase::GetClientHeight() const
+{
 	int w = 0;
 	int h = 0;
 	SDL_GetWindowSize(m_implData->window, &w, &h);
 	return h;
 }
 
-bool WindowBase::isMaximized() const {
+bool WindowBase::isMaximized() const
+{
 	bool isMaximizied = SDL_GetWindowFlags(m_implData->window) & SDL_WINDOW_MAXIMIZED;
 	return isMaximizied;
 }
 
-void WindowBase::setWindowTitle(const char* title) {
+void WindowBase::setWindowTitle(const char* title)
+{
 	if (title) {
 		SDL_SetWindowTitle(m_implData->window, title);
 	}
 }
 
-void setMouseCursorRelative(bool isRelative) {
+void setMouseCursorRelative(bool isRelative)
+{
 	SDL_SetRelativeMouseMode(isRelative ? SDL_TRUE : SDL_FALSE);
 }
 
-bool getMouseCursorRelative() {
+bool getMouseCursorRelative()
+{
 	return SDL_GetRelativeMouseMode() == SDL_TRUE;
 }
 

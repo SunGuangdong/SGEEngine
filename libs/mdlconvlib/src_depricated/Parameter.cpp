@@ -9,7 +9,8 @@ namespace sge {
 //-------------------------------------------------------------------------
 //
 //-------------------------------------------------------------------------
-bool ParameterCurve::debug_VerifyData() const {
+bool ParameterCurve::debug_VerifyData() const
+{
 	if (type == ParameterType::String) {
 		return true;
 	}
@@ -22,7 +23,8 @@ bool ParameterCurve::debug_VerifyData() const {
 	return numKeys == numDatas;
 }
 
-bool ParameterCurve::Add(float key, const void* const value) {
+bool ParameterCurve::Add(float key, const void* const value)
+{
 	// String Parameters are not animateable(currently).
 	sgeAssert(type != ParameterType::String);
 
@@ -32,7 +34,8 @@ bool ParameterCurve::Add(float key, const void* const value) {
 		if (key < *itr) {
 			it = itr;
 			break;
-		} else if (key == *itr) {
+		}
+		else if (key == *itr) {
 			keyAsSameTimeExisted = true;
 			it = itr;
 			break;
@@ -45,7 +48,8 @@ bool ParameterCurve::Add(float key, const void* const value) {
 	if (keyAsSameTimeExisted) {
 		keys[idx] = key;
 		memcpy(&data.front() + +idx * dataSize, value, dataSize);
-	} else {
+	}
+	else {
 		keys.insert(it, key);
 		data.insert(data.begin() + idx * dataSize, (char*)value, (char*)value + dataSize);
 	}
@@ -55,7 +59,8 @@ bool ParameterCurve::Add(float key, const void* const value) {
 	return true;
 }
 
-bool ParameterCurve::Evaluate(float time, void* dest) const {
+bool ParameterCurve::Evaluate(float time, void* dest) const
+{
 	if (type == ParameterType::String) {
 		// String parameters are not animatable currently.
 		return false;
@@ -88,7 +93,8 @@ bool ParameterCurve::Evaluate(float time, void* dest) const {
 		// The requested evaluation time is before the 1st keyframe.
 		memcpy(dest, data.data(), dataSize);
 		return true;
-	} else if (keyIdx == keys.size()) {
+	}
+	else if (keyIdx == keys.size()) {
 		// The requested evaluation time is after the last keyframe.
 		memcpy(dest, &data.back() - dataSize + 1, dataSize);
 		return true;
@@ -112,11 +118,13 @@ bool ParameterCurve::Evaluate(float time, void* dest) const {
 			const float b = fData[(keyIdx)*arity + t];
 			fResult[t] = lerp<float>(a, b, interpolationCoeff);
 		}
-	} else if (type == ParameterType::Quaternion) {
+	}
+	else if (type == ParameterType::Quaternion) {
 		const quatf* const qData = (quatf*)data.data();
 		quatf& result = *(quatf*)(dest);
 		result = slerp(qData[keyIdx - 1], qData[keyIdx], interpolationCoeff);
-	} else {
+	}
+	else {
 		// Unimplemented type.
 		sgeAssert(false);
 	}
@@ -124,7 +132,8 @@ bool ParameterCurve::Evaluate(float time, void* dest) const {
 	return true;
 }
 
-void Parameter::Create(ParameterType::Enum const paramType, const void* staticValue) {
+void Parameter::Create(ParameterType::Enum const paramType, const void* staticValue)
+{
 	Destroy();
 
 	this->type = paramType;
@@ -159,7 +168,8 @@ void Parameter::Create(ParameterType::Enum const paramType, const void* staticVa
 				return;
 			}
 		}
-	} else {
+	}
+	else {
 		switch (type) {
 			case ParameterType::Float:
 				staticValue_float = 0.f;
@@ -193,12 +203,14 @@ void Parameter::Create(ParameterType::Enum const paramType, const void* staticVa
 //-------------------------------------------------------------------------
 //
 //-------------------------------------------------------------------------
-void Parameter::Destroy() {
+void Parameter::Destroy()
+{
 	staticValue_string = std::string();
 	curves = vector_map<std::string, ParameterCurve>();
 }
 
-void Parameter::SetStaticValue(const void* const staticValue) {
+void Parameter::SetStaticValue(const void* const staticValue)
+{
 	switch (type) {
 		case ParameterType::Float:
 			staticValue_float = *(const float*)staticValue;
@@ -228,27 +240,31 @@ void Parameter::SetStaticValue(const void* const staticValue) {
 	return;
 }
 
-ParameterCurve* Parameter::GetCurve(const char* name) {
+ParameterCurve* Parameter::GetCurve(const char* name)
+{
 	int const index = GetCurveIndex(name);
 	if (index < 0)
 		return NULL;
 	return GetCurve(index);
 }
 
-const ParameterCurve* Parameter::GetCurve(const char* name) const {
+const ParameterCurve* Parameter::GetCurve(const char* name) const
+{
 	int const index = GetCurveIndex(name);
 	if (index < 0)
 		return NULL;
 	return GetCurve(index);
 }
 
-const void* Parameter::GetStaticValue() const {
+const void* Parameter::GetStaticValue() const
+{
 	if (type != ParameterType::String)
 		return &staticValue_float;
 	return staticValue_string.c_str();
 }
 
-bool Parameter::CreateCurve(const char* const name) {
+bool Parameter::CreateCurve(const char* const name)
+{
 	if (GetCurveIndex(name) != -1) {
 		sgeAssert(false); // Trying to create a curve that already exists for this parameter.
 		return false;
@@ -259,7 +275,8 @@ bool Parameter::CreateCurve(const char* const name) {
 	return true;
 }
 
-int Parameter::GetCurveIndex(const char* const name) const {
+int Parameter::GetCurveIndex(const char* const name) const
+{
 	if (name == nullptr) {
 		return -1;
 	}
@@ -273,7 +290,8 @@ int Parameter::GetCurveIndex(const char* const name) const {
 	return -1;
 }
 
-void Parameter::Evalute(void* const resultData, const char* const curveName, const float sampleTime) const {
+void Parameter::Evalute(void* const resultData, const char* const curveName, const float sampleTime) const
+{
 	sgeAssert(resultData);
 
 	int const curveIndex = GetCurveIndex(curveName);
@@ -285,7 +303,8 @@ void Parameter::Evalute(void* const resultData, const char* const curveName, con
 		if (type == ParameterType::String) {
 			std::string& resultString = *(std::string*)resultData;
 			resultString = staticValue_string;
-		} else {
+		}
+		else {
 			const size_t elemByteSize = ParameterType::info(type).sizeBytes;
 			sgeAssert(elemByteSize > 0);
 			memcpy(resultData, &staticValue_float, elemByteSize);
@@ -298,13 +317,15 @@ void Parameter::Evalute(void* const resultData, const char* const curveName, con
 //-------------------------------------------------------------------------
 // ParameterBlock
 //-------------------------------------------------------------------------
-Parameter* ParameterBlock::FindParameter(const char* const name, const ParameterType::Enum typeIfMissing, const void* staticValue) {
+Parameter* ParameterBlock::FindParameter(const char* const name, const ParameterType::Enum typeIfMissing, const void* staticValue)
+{
 	// Search if the parameter already exists, if not create a new one depending on the input type.
 	auto itr = m_parameters.find(name);
 
 	if (itr != m_parameters.end()) {
 		return &itr->second;
-	} else if (typeIfMissing != ParameterType::DontCreate) {
+	}
+	else if (typeIfMissing != ParameterType::DontCreate) {
 		Parameter& prm = m_parameters[name];
 		prm.Create(typeIfMissing, staticValue);
 		return &prm;
@@ -313,7 +334,8 @@ Parameter* ParameterBlock::FindParameter(const char* const name, const Parameter
 	return nullptr;
 }
 
-const Parameter* ParameterBlock::FindParameter(const char* const name) const {
+const Parameter* ParameterBlock::FindParameter(const char* const name) const
+{
 	auto itr = m_parameters.find(name);
 	if (itr == m_parameters.end()) {
 		return nullptr;
@@ -322,7 +344,8 @@ const Parameter* ParameterBlock::FindParameter(const char* const name) const {
 	return &itr->second;
 }
 
-void ParameterBlock::AddParameter(const char* const name, const Parameter& param) {
+void ParameterBlock::AddParameter(const char* const name, const Parameter& param)
+{
 	if (FindParameter(name))
 		return;
 	m_parameters[name] = std::move(param);

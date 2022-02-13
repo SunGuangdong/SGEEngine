@@ -5,7 +5,8 @@
 
 namespace sge {
 
-Ray ICamera::perspectivePickWs(const vec2f& cursorUv) const {
+Ray ICamera::perspectivePickWs(const vec2f& cursorUv) const
+{
 	Ray resultWs = rayFromProjectionMatrix(getProj(), inverse(getProj()), inverse(getView()), cursorUv);
 	return resultWs;
 }
@@ -13,7 +14,8 @@ Ray ICamera::perspectivePickWs(const vec2f& cursorUv) const {
 RawCamera::RawCamera(const vec3f& camPos, const mat4f& view, const mat4f& proj)
     : m_camPos(camPos)
     , m_view(view)
-    , m_proj(proj) {
+    , m_proj(proj)
+{
 	m_projView = proj * view;
 	m_frustum = Frustum::extractClippingPlanes(m_projView, kIsTexcoordStyleD3D);
 }

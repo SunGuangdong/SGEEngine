@@ -5,7 +5,8 @@
 
 namespace sge {
 
-Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& lightWs, const Frustum& mainCameraFrustumWs) const {
+Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& lightWs, const Frustum& mainCameraFrustumWs) const
+{
 	// Check if the light could have shadows, if not just return an empty structure.
 	if (isOn == false || hasShadows == false) {
 		return NullOptional();
@@ -71,7 +72,8 @@ Optional<ShadowMapBuildInfo> LightDesc::buildShadowMapInfo(const transf3d& light
 			// bottom up.
 			if (kIsTexcoordStyleD3D) {
 				// So far no changes needed here.
-			} else {
+			}
+			else {
 				// 1. A myterious x-axis flip, the same one is done for Direct3D.
 				// 2. A Y-axis flip as texture space (0,0) for OpenGL is bottom left,
 				// while we use it as top-left.

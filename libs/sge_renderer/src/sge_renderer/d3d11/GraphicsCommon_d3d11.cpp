@@ -2,7 +2,8 @@
 
 namespace sge {
 
-D3D11_VIEWPORT Viewport_D3D11_Native(const Rect2s& viewport) {
+D3D11_VIEWPORT Viewport_D3D11_Native(const Rect2s& viewport)
+{
 	D3D11_VIEWPORT result;
 
 	result.Width = (float)viewport.width;
@@ -15,7 +16,8 @@ D3D11_VIEWPORT Viewport_D3D11_Native(const Rect2s& viewport) {
 	return result;
 }
 
-UINT ResourceBindFlags_D3D11_Native(const unsigned bindFlags) {
+UINT ResourceBindFlags_D3D11_Native(const unsigned bindFlags)
+{
 	UINT retval = 0;
 	retval |= (bindFlags & ResourceBindFlags::VertexBuffer) ? D3D11_BIND_VERTEX_BUFFER : 0;
 	retval |= (bindFlags & ResourceBindFlags::IndexBuffer) ? D3D11_BIND_INDEX_BUFFER : 0;
@@ -26,7 +28,8 @@ UINT ResourceBindFlags_D3D11_Native(const unsigned bindFlags) {
 	return retval;
 }
 
-void ResourceUsage_D3D11_Native(ResourceUsage::Enum type, D3D11_USAGE& usage, UINT& cpuAcessFlags) {
+void ResourceUsage_D3D11_Native(ResourceUsage::Enum type, D3D11_USAGE& usage, UINT& cpuAcessFlags)
+{
 	switch (type) {
 		case ResourceUsage::Immutable:
 			usage = D3D11_USAGE_IMMUTABLE;
@@ -47,7 +50,8 @@ void ResourceUsage_D3D11_Native(ResourceUsage::Enum type, D3D11_USAGE& usage, UI
 	sgeAssert(false); // Unimplemented type.
 }
 
-D3D11_MAP Map_D3D11_Native(const Map::Enum map) {
+D3D11_MAP Map_D3D11_Native(const Map::Enum map)
+{
 	switch (map) {
 		case Map::Read:
 			return D3D11_MAP_READ;
@@ -64,7 +68,8 @@ D3D11_MAP Map_D3D11_Native(const Map::Enum map) {
 	return D3D11_MAP_READ;
 }
 
-void TextureFormat_D3D11_Native(const TextureFormat::Enum format, DXGI_FORMAT& srv, DXGI_FORMAT& dsv, DXGI_FORMAT& typeless) {
+void TextureFormat_D3D11_Native(const TextureFormat::Enum format, DXGI_FORMAT& srv, DXGI_FORMAT& dsv, DXGI_FORMAT& typeless)
+{
 	switch (format) {
 		case TextureFormat::Unknown:
 			dsv = DXGI_FORMAT_UNKNOWN;
@@ -351,7 +356,8 @@ void TextureFormat_D3D11_Native(const TextureFormat::Enum format, DXGI_FORMAT& s
 	sgeAssert(false);
 }
 
-D3D11_SUBRESOURCE_DATA TextureData_D3D11_Native(const TextureData& texData) {
+D3D11_SUBRESOURCE_DATA TextureData_D3D11_Native(const TextureData& texData)
+{
 	D3D11_SUBRESOURCE_DATA result;
 
 	result.pSysMem = texData.data;
@@ -361,7 +367,8 @@ D3D11_SUBRESOURCE_DATA TextureData_D3D11_Native(const TextureData& texData) {
 	return result;
 }
 
-D3D11_TEXTURE_ADDRESS_MODE TextureAddressMode_D3D11_Native(const TextureAddressMode::Enum& mode) {
+D3D11_TEXTURE_ADDRESS_MODE TextureAddressMode_D3D11_Native(const TextureAddressMode::Enum& mode)
+{
 	if (mode == TextureAddressMode::Repeat)
 		return D3D11_TEXTURE_ADDRESS_WRAP;
 	if (mode == TextureAddressMode::ClampEdge)
@@ -373,7 +380,8 @@ D3D11_TEXTURE_ADDRESS_MODE TextureAddressMode_D3D11_Native(const TextureAddressM
 	return D3D11_TEXTURE_ADDRESS_WRAP;
 }
 
-D3D11_FILTER TextureFilter_D3D11_Native(const TextureFilter::Enum& filter) {
+D3D11_FILTER TextureFilter_D3D11_Native(const TextureFilter::Enum& filter)
+{
 	if (filter == TextureFilter::Min_Mag_Mip_Point)
 		return D3D11_FILTER_MIN_MAG_MIP_POINT;
 	if (filter == TextureFilter::Min_Mag_Mip_Linear)
@@ -385,7 +393,8 @@ D3D11_FILTER TextureFilter_D3D11_Native(const TextureFilter::Enum& filter) {
 	return D3D11_FILTER_MIN_MAG_MIP_POINT;
 }
 
-D3D11_SAMPLER_DESC SamplerDesc_D3D11_Native(SamplerDesc const& desc) {
+D3D11_SAMPLER_DESC SamplerDesc_D3D11_Native(SamplerDesc const& desc)
+{
 	D3D11_SAMPLER_DESC retval;
 
 	retval.Filter = TextureFilter_D3D11_Native(desc.filter);
@@ -405,7 +414,8 @@ D3D11_SAMPLER_DESC SamplerDesc_D3D11_Native(SamplerDesc const& desc) {
 	return retval;
 }
 
-DXGI_FORMAT UniformType_GetDX_DXGI_FORMAT(const UniformType::Enum uniformType) {
+DXGI_FORMAT UniformType_GetDX_DXGI_FORMAT(const UniformType::Enum uniformType)
+{
 	switch (uniformType) {
 		case UniformType::Unknown:
 			return DXGI_FORMAT_UNKNOWN;
@@ -460,7 +470,8 @@ DXGI_FORMAT UniformType_GetDX_DXGI_FORMAT(const UniformType::Enum uniformType) {
 	return DXGI_FORMAT_UNKNOWN;
 }
 
-D3D11_BUFFER_DESC BufferDesc_D3D11_Native(const BufferDesc& desc) {
+D3D11_BUFFER_DESC BufferDesc_D3D11_Native(const BufferDesc& desc)
+{
 	D3D11_BUFFER_DESC retval = {0};
 
 	ResourceUsage_D3D11_Native(desc.usage, retval.Usage, retval.CPUAccessFlags);
@@ -472,7 +483,8 @@ D3D11_BUFFER_DESC BufferDesc_D3D11_Native(const BufferDesc& desc) {
 	return retval;
 }
 
-D3D11_FILL_MODE FillMode_D3D11_Native(const FillMode::Enum& fillMode) {
+D3D11_FILL_MODE FillMode_D3D11_Native(const FillMode::Enum& fillMode)
+{
 	if (fillMode == FillMode::Solid)
 		return D3D11_FILL_SOLID;
 	else if (fillMode == FillMode::Wireframe)
@@ -483,7 +495,8 @@ D3D11_FILL_MODE FillMode_D3D11_Native(const FillMode::Enum& fillMode) {
 	return D3D11_FILL_WIREFRAME;
 }
 
-D3D11_CULL_MODE CullMode_D3D11_Native(const CullMode::Enum& cullMode) {
+D3D11_CULL_MODE CullMode_D3D11_Native(const CullMode::Enum& cullMode)
+{
 	switch (cullMode) {
 		case CullMode::Back:
 			return D3D11_CULL_BACK;
@@ -497,7 +510,8 @@ D3D11_CULL_MODE CullMode_D3D11_Native(const CullMode::Enum& cullMode) {
 	return D3D11_CULL_NONE;
 }
 
-D3D11_COMPARISON_FUNC DepthComparisonFunc_D3D11_Native(const DepthComparisonFunc::Enum& comaprisonFunc) {
+D3D11_COMPARISON_FUNC DepthComparisonFunc_D3D11_Native(const DepthComparisonFunc::Enum& comaprisonFunc)
+{
 	switch (comaprisonFunc) {
 		case DepthComparisonFunc::Never:
 			return D3D11_COMPARISON_NEVER;
@@ -521,7 +535,8 @@ D3D11_COMPARISON_FUNC DepthComparisonFunc_D3D11_Native(const DepthComparisonFunc
 	return D3D11_COMPARISON_ALWAYS;
 }
 
-D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology_D3D11_Native(const PrimitiveTopology::Enum& topology) {
+D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology_D3D11_Native(const PrimitiveTopology::Enum& topology)
+{
 	switch (topology) {
 		case PrimitiveTopology::TriangleList:
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -543,7 +558,8 @@ D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology_D3D11_Native(const PrimitiveTopology::E
 	return D3D_PRIMITIVE_TOPOLOGY_UNDEFINED;
 }
 
-D3D11_RASTERIZER_DESC RasterDesc_GetD3D11Nativce(const RasterDesc& desc) {
+D3D11_RASTERIZER_DESC RasterDesc_GetD3D11Nativce(const RasterDesc& desc)
+{
 	D3D11_RASTERIZER_DESC result;
 
 	result.FillMode = FillMode_D3D11_Native(desc.fillMode);
@@ -560,7 +576,8 @@ D3D11_RASTERIZER_DESC RasterDesc_GetD3D11Nativce(const RasterDesc& desc) {
 	return result;
 }
 
-D3D11_DEPTH_STENCIL_DESC DepthStencilDesc_D3D11_Native(const DepthStencilDesc& desc) {
+D3D11_DEPTH_STENCIL_DESC DepthStencilDesc_D3D11_Native(const DepthStencilDesc& desc)
+{
 	const D3D11_DEPTH_STENCILOP_DESC defaultDepthStencilOp = {D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP,
 	                                                          D3D11_COMPARISON_ALWAYS};
 
@@ -578,7 +595,8 @@ D3D11_DEPTH_STENCIL_DESC DepthStencilDesc_D3D11_Native(const DepthStencilDesc& d
 	return result;
 }
 
-D3D11_BLEND Blend_D3D11_Native(Blend::Enum blend) {
+D3D11_BLEND Blend_D3D11_Native(Blend::Enum blend)
+{
 	if (blend == Blend::Zero)
 		return D3D11_BLEND_ZERO;
 	else if (blend == Blend::One)
@@ -609,7 +627,8 @@ D3D11_BLEND Blend_D3D11_Native(Blend::Enum blend) {
 	return D3D11_BLEND_ONE;
 }
 
-D3D11_BLEND_OP BlendOp_D3D11_Native(BlendOp::Enum blendOp) {
+D3D11_BLEND_OP BlendOp_D3D11_Native(BlendOp::Enum blendOp)
+{
 	if (blendOp == BlendOp::Add)
 		return D3D11_BLEND_OP_ADD;
 	if (blendOp == BlendOp::Sub)
@@ -626,7 +645,8 @@ D3D11_BLEND_OP BlendOp_D3D11_Native(BlendOp::Enum blendOp) {
 	return D3D11_BLEND_OP_ADD;
 }
 
-D3D11_RENDER_TARGET_BLEND_DESC BlendDesc_D3D11_Native(const BlendDesc& desc) {
+D3D11_RENDER_TARGET_BLEND_DESC BlendDesc_D3D11_Native(const BlendDesc& desc)
+{
 	D3D11_RENDER_TARGET_BLEND_DESC blendDesc;
 
 	blendDesc.BlendEnable = desc.enabled;
@@ -641,7 +661,8 @@ D3D11_RENDER_TARGET_BLEND_DESC BlendDesc_D3D11_Native(const BlendDesc& desc) {
 	return blendDesc;
 }
 
-D3D11_BLEND_DESC BlendStateDesc_D3D11_Native(const BlendStateDesc& desc) {
+D3D11_BLEND_DESC BlendStateDesc_D3D11_Native(const BlendStateDesc& desc)
+{
 	sgeAssert(SGE_ARRSZ(D3D11_BLEND_DESC::RenderTarget) == desc.blendDesc.size());
 
 	D3D11_BLEND_DESC result;
@@ -657,7 +678,8 @@ D3D11_BLEND_DESC BlendStateDesc_D3D11_Native(const BlendStateDesc& desc) {
 	return result;
 }
 
-D3D11_QUERY QueryType_D3D11_Native(QueryType::Enum const queryType) {
+D3D11_QUERY QueryType_D3D11_Native(QueryType::Enum const queryType)
+{
 	switch (queryType) {
 		case QueryType::NumSamplesPassedDepthStencilTest:
 			return D3D11_QUERY_OCCLUSION;
@@ -670,7 +692,8 @@ D3D11_QUERY QueryType_D3D11_Native(QueryType::Enum const queryType) {
 	return (D3D11_QUERY)(D3D11_QUERY_SO_OVERFLOW_PREDICATE_STREAM3 + 1); // Try to return something invalid.
 }
 
-D3D11_TEXTURECUBE_FACE signedAxis_toTexCubeFaceIdx_D3D11(const SignedAxis sa) {
+D3D11_TEXTURECUBE_FACE signedAxis_toTexCubeFaceIdx_D3D11(const SignedAxis sa)
+{
 	switch (sa) {
 		case axis_x_pos:
 			return D3D11_TEXTURECUBE_FACE_POSITIVE_X;

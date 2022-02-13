@@ -14,7 +14,8 @@ struct ShadingProgramGL : public ShadingProgram {
 
 	bool create(Shader* vertShdr, Shader* pixelShdr) final;
 	CreateShaderResult createFromNativeCode(const char* const pVSCode, const char* const pPSCode) final;
-	//bool createFromNativeCode(const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles = nullptr) final;
+	// bool createFromNativeCode(const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles = nullptr)
+	// final;
 
 	void destroy() override;
 	bool isValid() const override;

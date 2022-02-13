@@ -30,7 +30,8 @@ struct MaterialFamilyLibrary {
 		std::unique_ptr<IGeometryDrawer> geometryDrawer = nullptr;
 	};
 
-	void registerFamily(const MaterialFamilyDesc& desc) {
+	void registerFamily(const MaterialFamilyDesc& desc)
+	{
 		auto findItr = m_mtlFamilies.find(desc.familyUniqueNumber);
 		if (findItr == m_mtlFamilies.end()) {
 			MaterialFamilyData& familyData = m_mtlFamilies[desc.familyUniqueNumber];
@@ -41,14 +42,15 @@ struct MaterialFamilyLibrary {
 				sgeLogError("Failed to allocated IGeometryDrawer for family %s.\n", desc.displayName.c_str());
 				sgeAssert(false);
 			}
-
-		} else {
+		}
+		else {
 			sgeLogError("A Material Family with id %ull is already registered.\n", desc.familyUniqueNumber);
 			sgeAssert(false);
 		}
 	}
 
-	const MaterialFamilyData* findFamilyById(uint32 familyUniqueNumber) const {
+	const MaterialFamilyData* findFamilyById(uint32 familyUniqueNumber) const
+	{
 		auto findItr = m_mtlFamilies.find(familyUniqueNumber);
 		if (findItr != m_mtlFamilies.end()) {
 			return &findItr->second;
@@ -57,7 +59,8 @@ struct MaterialFamilyLibrary {
 		return nullptr;
 	}
 
-	const MaterialFamilyData* findFamilyByName(const char* familyName) const {
+	const MaterialFamilyData* findFamilyByName(const char* familyName) const
+	{
 		for (const auto& pair : m_mtlFamilies) {
 			if (pair.second.familyDesc.displayName == familyName) {
 				return &pair.second;
@@ -68,9 +71,7 @@ struct MaterialFamilyLibrary {
 	}
 
 
-	const std::unordered_map<uint32, MaterialFamilyData>& getAllFamilies() const {
-		return m_mtlFamilies;
-	}
+	const std::unordered_map<uint32, MaterialFamilyData>& getAllFamilies() const { return m_mtlFamilies; }
 
 	std::unique_ptr<IMaterial> loadMaterialFromJson(const JsonValue* jRoot, const char* materialDirectory) const;
 

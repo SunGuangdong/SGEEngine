@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sge_engine/Actor.h"
-#include "sge_engine/physics/RigidBody.h"
 #include "sge_engine/physics/CollisionShape.h"
+#include "sge_engine/physics/RigidBody.h"
 
 namespace sge {
 struct transf3d;
@@ -19,19 +19,10 @@ struct SGE_ENGINE_API TraitRigidBody : public Trait {
 
 	~TraitRigidBody();
 
-	RigidBody* getRigidBody()
-	{
-		return &m_rigidBody;
-	}
-	const RigidBody* getRigidBody() const
-	{
-		return &m_rigidBody;
-	}
+	RigidBody* getRigidBody() { return &m_rigidBody; }
+	const RigidBody* getRigidBody() const { return &m_rigidBody; }
 
-	bool isValid() const
-	{
-		return m_rigidBody.isValid();
-	}
+	bool isValid() const { return m_rigidBody.isValid(); }
 
 	/// Returns true if the attached rigid body is currently in the game world.
 	bool isInWorld() const;

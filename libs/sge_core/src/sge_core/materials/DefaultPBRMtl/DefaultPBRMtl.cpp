@@ -3,8 +3,8 @@
 #include "sge_core/AssetLibrary/AssetTexture2D.h"
 #include "sge_core/ICore.h"
 #include "sge_core/typelib/typeLib.h"
-#include "sge_utils/text/Path.h"
 #include "sge_utils/json/json.h"
+#include "sge_utils/text/Path.h"
 
 namespace sge {
 
@@ -32,11 +32,13 @@ ReflBlock() {
 }
 // clang-format on
 
-TypeId DefaultPBRMtl::getTypeId() const {
+TypeId DefaultPBRMtl::getTypeId() const
+{
 	return sgeTypeId(DefaultPBRMtl);
 }
 
-IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
+IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage()
+{
 	mdlData = DefaultPBRMtlData();
 
 	mdlData.disableCulling = disableCulling;
@@ -68,7 +70,8 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	// TODO: this needs to be an option in the material.
 	if (mdlData.diffuseTexture != nullptr) {
 		mdlData.diffuseColorSrc = DefaultPBRMtlData::diffuseColorSource_diffuseMap;
-	} else {
+	}
+	else {
 		mdlData.diffuseColorSrc = DefaultPBRMtlData::diffuseColorSource_vertexColor;
 	}
 
@@ -87,7 +90,8 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage() {
 	return &mdlData;
 }
 
-JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb, const char* localDir) {
+JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb, const char* localDir)
+{
 	JsonValue* jMaterial = jvb(JID_MAP);
 
 	jMaterial->setMember("family", jvb("DefaultPBR"));
@@ -124,7 +128,8 @@ JsonValue* DefaultPBRMtl::toJson(JsonValueBuffer& jvb, const char* localDir) {
 	return jMaterial;
 }
 
-bool DefaultPBRMtl::fromJson(const JsonValue* jMaterial, const char* localDir) {
+bool DefaultPBRMtl::fromJson(const JsonValue* jMaterial, const char* localDir)
+{
 	if (jMaterial == nullptr) {
 		return false;
 	}

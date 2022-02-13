@@ -14,7 +14,9 @@ struct SGEDeviceD3D11 : public SGEDevice {
 
 	SGEDeviceD3D11()
 	    : m_immContext(nullptr)
-	    , m_VSyncEnabled(false) {}
+	    , m_VSyncEnabled(false)
+	{
+	}
 
 	bool Create(const MainFrameTargetDesc& frameTargetDesc);
 
@@ -60,7 +62,8 @@ struct SGEDeviceD3D11 : public SGEDevice {
 
 	D3D11ContextStateCache* D3D11_GetContextStateCache() { return &m_d3d11_contextStateCache; }
 
-	Buffer* D3D11_GetGlobalUniformsBuffer(ShaderType::Enum shaderType) {
+	Buffer* D3D11_GetGlobalUniformsBuffer(ShaderType::Enum shaderType)
+	{
 		if (shaderType == ShaderType::VertexShader)
 			return m_globalUniformsVS;
 		else if (shaderType == ShaderType::PixelShader)
@@ -115,7 +118,9 @@ struct SGEContextImmediateD3D11 : public SGEContext {
 	friend SGEDeviceD3D11;
 
 	SGEContextImmediateD3D11()
-	    : m_device(nullptr) {}
+	    : m_device(nullptr)
+	{
+	}
 
 	SGEDevice* getDevice() final { return m_device; }
 	SGEDeviceD3D11* getDeviceD3D11() { return m_device; }
@@ -124,7 +129,7 @@ struct SGEContextImmediateD3D11 : public SGEContext {
 	void* map(Buffer* buffer, const Map::Enum map) final;
 	void unMap(Buffer* buffer) final;
 
-	void updateTextureData(Texture* texture,  const TextureData& td) override;
+	void updateTextureData(Texture* texture, const TextureData& td) override;
 
 	void clearColor(FrameTarget* target, int index, const float rgba[4]) final;
 	void clearDepth(FrameTarget* target, float depth) final;

@@ -5,9 +5,9 @@
 #include "InspectorTool.h"
 #include "sge_engine/GameObject.h"
 #include "sge_renderer/renderer/renderer.h"
+#include "sge_utils/containers/vector_set.h"
 #include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/containers/vector_set.h"
 
 namespace sge {
 

@@ -24,7 +24,9 @@ struct SGE_LOG_API Log : public NoCopy {
 	struct Message {
 		Message(MessageType type, std::string msg)
 		    : type(type)
-		    , message(std::move(msg)) {}
+		    , message(std::move(msg))
+		{
+		}
 
 		MessageType type;
 		std::string message;
@@ -43,24 +45,36 @@ struct SGE_LOG_API Log : public NoCopy {
 };
 
 #if defined(SGE_USE_DEBUG)
-// https://stackoverflow.com/questions/5588855/standard-alternative-to-gccs-va-args-trick
-#define sgeLogInfo(_str_msg_, ...) \
-	{ sge::getLog()->write((_str_msg_), ##__VA_ARGS__); }
-#define sgeLogCheck(_str_msg_, ...) \
-	{ sge::getLog()->writeCheck((_str_msg_), ##__VA_ARGS__); }
-#define sgeLogError(_str_msg_, ...) \
-	{ sge::getLog()->writeError((_str_msg_), ##__VA_ARGS__); }
-#define sgeLogWarn(_str_msg_, ...) \
-	{ sge::getLog()->writeWarning((_str_msg_), ##__VA_ARGS__); }
+    // https://stackoverflow.com/questions/5588855/standard-alternative-to-gccs-va-args-trick
+	#define sgeLogInfo(_str_msg_, ...)                        \
+		{                                                     \
+			sge::getLog()->write((_str_msg_), ##__VA_ARGS__); \
+		}
+	#define sgeLogCheck(_str_msg_, ...)                            \
+		{                                                          \
+			sge::getLog()->writeCheck((_str_msg_), ##__VA_ARGS__); \
+		}
+	#define sgeLogError(_str_msg_, ...)                            \
+		{                                                          \
+			sge::getLog()->writeError((_str_msg_), ##__VA_ARGS__); \
+		}
+	#define sgeLogWarn(_str_msg_, ...)                               \
+		{                                                            \
+			sge::getLog()->writeWarning((_str_msg_), ##__VA_ARGS__); \
+		}
 #else
-#define sgeLogInfo(_str_msg_, ...) \
-	{}
-#define sgeLogCheck(_str_msg_, ...) \
-	{}
-#define sgeLogError(_str_msg_, ...) \
-	{}
-#define sgeLogWarn(_str_msg_, ...) \
-	{}
+	#define sgeLogInfo(_str_msg_, ...) \
+		{                              \
+		}
+	#define sgeLogCheck(_str_msg_, ...) \
+		{                               \
+		}
+	#define sgeLogError(_str_msg_, ...) \
+		{                               \
+		}
+	#define sgeLogWarn(_str_msg_, ...) \
+		{                              \
+		}
 #endif
 
 /// The global of the current module(dll, exe, ect.). However we could "borrow" another modules "ICore" and use theirs.

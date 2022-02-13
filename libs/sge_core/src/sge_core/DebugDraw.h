@@ -8,7 +8,8 @@ namespace sge {
 
 struct SGE_CORE_API DebugDraw {
 	struct SGE_CORE_API WiredCommandData {
-		void clear(bool deallocMem) {
+		void clear(bool deallocMem)
+		{
 			m_verts.clear();
 			if (deallocMem)
 				m_verts = decltype(m_verts)();

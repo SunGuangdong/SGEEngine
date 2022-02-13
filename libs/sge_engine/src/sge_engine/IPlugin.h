@@ -30,7 +30,8 @@ struct SgeGlobalSingletons {
 	Log* log = nullptr;
 
 	/// Captures global state of SGE in the current DLL (that calls this constructor).
-	SgeGlobalSingletons() {
+	SgeGlobalSingletons()
+	{
 		imguiCtx = ImGui::GetCurrentContext();
 		global = getCore();
 		log = getLog();
@@ -38,7 +39,8 @@ struct SgeGlobalSingletons {
 
 	/// Applies the global state of SGE captured in some DLL (usually the sge_editor or sge_player)
 	/// and applies is in the current one (usually the game).
-	void applyGlobalState() const {
+	void applyGlobalState() const
+	{
 		sgeAssert(imguiCtx);
 		ImGui::SetCurrentContext(imguiCtx);
 

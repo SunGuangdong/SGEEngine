@@ -14,7 +14,8 @@ T* SGEDevice::requestResource()
 
 #define SGE_Impl_request_resource(T, RT)             \
 	template <>                                      \
-	T* SGEDevice::requestResource<T>() {             \
+	T* SGEDevice::requestResource<T>()               \
+	{                                                \
 		return static_cast<T*>(requestResource(RT)); \
 	}
 
@@ -30,7 +31,8 @@ SGE_Impl_request_resource(SamplerState, ResourceType::Sampler);
 SGE_Impl_request_resource(Query, ResourceType::Query);
 
 CreateShaderResult
-    ShadingProgram::createFromCustomHLSL(const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles) {
+    ShadingProgram::createFromCustomHLSL(const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles)
+{
 	std::string compilationErrors;
 
 	std::string vsTranslated;

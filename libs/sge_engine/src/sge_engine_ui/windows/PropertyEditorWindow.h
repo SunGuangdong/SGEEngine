@@ -18,7 +18,7 @@ namespace ProperyEditorUIGen {
 	/// Does the user interface specified game object.
 	SGE_ENGINE_API void doGameObjectUI(GameInspector& inspector, GameObject* const gameObject);
 
-	enum DoMemberUIFlags : int { 
+	enum DoMemberUIFlags : int {
 		DoMemberUIFlags_none = 0,
 		DoMemberUIFlags_structInNoHeader = 1 << 0,
 
@@ -50,21 +50,15 @@ namespace ProperyEditorUIGen {
 /// These edits generate undo/redo commands (command history).
 struct SGE_ENGINE_API PropertyEditorWindow : public IImGuiWindow {
 	PropertyEditorWindow(std::string windowName)
-	    : m_windowName(std::move(windowName)) {
-	}
-
-	void close() override
+	    : m_windowName(std::move(windowName))
 	{
-		m_isOpened = false;
 	}
 
-	bool isClosed() override {
-		return !m_isOpened;
-	}
+	void close() override { m_isOpened = false; }
 
-	const char* getWindowName() const override {
-		return m_windowName.c_str();
-	}
+	bool isClosed() override { return !m_isOpened; }
+
+	const char* getWindowName() const override { return m_windowName.c_str(); }
 
 	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 

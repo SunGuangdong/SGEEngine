@@ -64,10 +64,7 @@ struct JsonValue {
 		members.clear();
 	}
 
-	JsonValue()
-	{
-		clear();
-	}
+	JsonValue() { clear(); }
 
 	//[TODO] HALF
 	union {
@@ -84,10 +81,7 @@ struct JsonValue {
 	};
 
 	// general setters
-	void setBool(const bool v)
-	{
-		jid = v ? JID_TRUE : JID_FALSE;
-	}
+	void setBool(const bool v) { jid = v ? JID_TRUE : JID_FALSE; }
 	void setFloat(const float v);
 	void setInt32(const sint32 v);
 	void setUInt32(const uint32 v);
@@ -104,23 +98,11 @@ struct JsonValue {
 
 	// Array operators
 	JsonValue* arrPush(JsonValue* value); // returns value
-	size_t arrSize() const
-	{
-		return arrayValues.size();
-	}
-	const JsonValue* arrAt(const size_t index) const
-	{
-		return arrayValues[index];
-	}
-	const std::vector<JsonValue*>& arr() const
-	{
-		return arrayValues;
-	}
+	size_t arrSize() const { return arrayValues.size(); }
+	const JsonValue* arrAt(const size_t index) const { return arrayValues[index]; }
+	const std::vector<JsonValue*>& arr() const { return arrayValues; }
 
-	const char* GetString() const
-	{
-		return (char*)uniformData.data();
-	}
+	const char* GetString() const { return (char*)uniformData.data(); }
 	const char* GetStringOrThrow() const
 	{
 		if (jid != JID_STRING) {
@@ -243,18 +225,9 @@ struct JsonValue {
 		return true;
 	}
 
-	bool isArray() const
-	{
-		return jid == JID_ARRAY_BEGIN;
-	}
-	bool isMap() const
-	{
-		return jid == JID_MAP_BEGIN;
-	}
-	bool isString() const
-	{
-		return jid == JID_STRING;
-	}
+	bool isArray() const { return jid == JID_ARRAY_BEGIN; }
+	bool isMap() const { return jid == JID_MAP_BEGIN; }
+	bool isString() const { return jid == JID_STRING; }
 
 	JID jid;                                // The ID of the variable type.
 	std::vector<unsigned char> uniformData; // Just a data buffer, currently used for strings.
@@ -276,10 +249,7 @@ struct JsonValueBuffer {
 	{
 	}
 
-	~JsonValueBuffer()
-	{
-		clearAllValues();
-	}
+	~JsonValueBuffer() { clearAllValues(); }
 
 	// allocates a new value
 	JsonValue* GetNewValue();
@@ -313,29 +283,15 @@ struct JsonValueBuffer {
 /////////////////////////////////////////////////////////////////////////
 class JsonParser : protected JsonValueBuffer {
   public:
-	JsonParser()
-	{
-	}
+	JsonParser() {}
 	void Clear();
 
-	bool parse(IReadStream& instream)
-	{
-		parse(&instream);
-	}
+	bool parse(IReadStream& instream) { parse(&instream); }
 	bool parse(IReadStream* instream);
 
-	JsonValue* getRoot()
-	{
-		return root;
-	}
-	const JsonValue* getRoot() const
-	{
-		return root;
-	}
-	const char* getErrorMsg() const
-	{
-		return parsingErrorMsg;
-	}
+	JsonValue* getRoot() { return root; }
+	const JsonValue* getRoot() const { return root; }
+	const char* getErrorMsg() const { return parsingErrorMsg; }
 
   private:
 	JID getNextJID();                        // returns the JID of the next element

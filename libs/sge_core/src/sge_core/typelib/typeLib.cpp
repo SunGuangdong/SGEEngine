@@ -8,17 +8,20 @@ template class std::map<sge::TypeId, sge::TypeDesc*>;
 
 namespace sge {
 
-TypeLib& typeLib() {
+TypeLib& typeLib()
+{
 	static TypeLib s;
 	return s;
 }
 
-int addFunctionThatDefinesTypesToTypeLibrary(void (*fnPtr)()) {
+int addFunctionThatDefinesTypesToTypeLibrary(void (*fnPtr)())
+{
 	typeLib().functionsToBeCalledThatWillRegisterTypes.push_back(fnPtr);
 	return 0;
 }
 
-std::string TypeDesc::computePrettyName(const char* const name) {
+std::string TypeDesc::computePrettyName(const char* const name)
+{
 	const int nameStrLen = int(strlen(name));
 	if (nameStrLen <= 2) {
 		return name;
@@ -33,7 +36,8 @@ std::string TypeDesc::computePrettyName(const char* const name) {
 	for (; i < nameStrLen; ++i) {
 		if (isFirstIter && std::isalpha(name[i])) {
 			prettyName.push_back(char(std::toupper(name[i])));
-		} else {
+		}
+		else {
 			if (std::isupper(name[i])) {
 				prettyName.push_back(' ');
 			}
@@ -47,7 +51,8 @@ std::string TypeDesc::computePrettyName(const char* const name) {
 	return prettyName;
 }
 
-TypeDesc& TypeDesc::uiRange(float vmin, float vmax, float sliderSpeed) {
+TypeDesc& TypeDesc::uiRange(float vmin, float vmax, float sliderSpeed)
+{
 	members.back().min_float = vmin;
 	members.back().max_float = vmax;
 	members.back().sliderSpeed_float = sliderSpeed;
@@ -55,7 +60,8 @@ TypeDesc& TypeDesc::uiRange(float vmin, float vmax, float sliderSpeed) {
 	return *this;
 }
 
-TypeDesc& TypeDesc::uiRange(int vmin, int vmax, float sliderSpeed) {
+TypeDesc& TypeDesc::uiRange(int vmin, int vmax, float sliderSpeed)
+{
 	members.back().min_int = vmin;
 	members.back().max_int = vmax;
 	members.back().sliderSpeed_float = sliderSpeed;
@@ -66,13 +72,15 @@ TypeDesc& TypeDesc::uiRange(int vmin, int vmax, float sliderSpeed) {
 //----------------------------------------------------------------------------------------
 // TypeDesc
 //----------------------------------------------------------------------------------------
-TypeDesc& TypeDesc::addEnumMember(int member, const char* name) {
+TypeDesc& TypeDesc::addEnumMember(int member, const char* name)
+{
 	sgeAssert(enumUnderlayingType.isNull() == false);
 	enumValueToNameLUT[member] = name;
 	return *this;
 }
 
-const MemberDesc* TypeDesc::findMemberByName(const char* const memberName) const {
+const MemberDesc* TypeDesc::findMemberByName(const char* const memberName) const
+{
 	for (int t = 0; t < members.size(); ++t) {
 		if (strcmp(members[t].name, memberName) == 0) {
 			return &members[t];
@@ -84,11 +92,13 @@ const MemberDesc* TypeDesc::findMemberByName(const char* const memberName) const
 	return NULL;
 }
 
-bool TypeDesc::doesInherits(const TypeId parentClass) const {
+bool TypeDesc::doesInherits(const TypeId parentClass) const
+{
 	for (const SuperClassData superClass : superclasses) {
 		if (superClass.id == parentClass) {
 			return true;
-		} else {
+		}
+		else {
 			// If the current superClass is not a the pearent we are seeking, seach it's parents.
 			const TypeDesc* const superClassTypeDesc = typeLib().find(superClass.id);
 			if (superClassTypeDesc == nullptr) {
@@ -105,7 +115,8 @@ bool TypeDesc::doesInherits(const TypeId parentClass) const {
 	return false;
 }
 
-void TypeLib::performRegistration() {
+void TypeLib::performRegistration()
+{
 	for (auto& fn : functionsToBeCalledThatWillRegisterTypes) {
 		fn();
 	}

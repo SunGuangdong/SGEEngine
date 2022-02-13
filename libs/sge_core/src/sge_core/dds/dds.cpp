@@ -6,20 +6,23 @@ namespace sge {
 namespace {
 
 	template <typename T>
-	T dds_min(T a, T b) {
+	T dds_min(T a, T b)
+	{
 		if (a < b)
 			return a;
 		return b;
 	}
 
 	template <typename T>
-	T dds_max(T a, T b) {
+	T dds_max(T a, T b)
+	{
 		if (a > b)
 			return a;
 		return b;
 	}
 
-	TextureFormat::Enum DDS_DXGI_FORMAT_to_TextureFormat(const DDS_DXGI_FORMAT& format) {
+	TextureFormat::Enum DDS_DXGI_FORMAT_to_TextureFormat(const DDS_DXGI_FORMAT& format)
+	{
 		switch (format) {
 			case DDS_DXGI_FORMAT_UNKNOWN:
 				return TextureFormat::Unknown;
@@ -294,7 +297,8 @@ namespace {
 #define DDS_MAKEFOURCC(c0, c1, c2, c3) (((c3) << 24) | ((c2) << 16) | ((c1) << 8) | (c0))
 #define ISBITMASK(r, g, b, a) (ddpf.dwRBitMask == r && ddpf.dwGBitMask == g && ddpf.dwBBitMask == b && ddpf.dwABitMask == a)
 
-	TextureFormat::Enum GetTextureFormat(const DDS_PIXELFORMAT& ddpf) {
+	TextureFormat::Enum GetTextureFormat(const DDS_PIXELFORMAT& ddpf)
+	{
 		if (ddpf.dwFlags & DDPF_RGB) {
 			// Note that sRGB formats are written using the "DX10" extended header
 
@@ -368,7 +372,8 @@ namespace {
 					// No 3:3:2, 3:3:2:8, or paletted DXGI formats aka D3DFMT_A8R3G3B2, D3DFMT_R3G3B2, D3DFMT_P8, D3DFMT_A8P8, etc.
 					break;
 			}
-		} else if (ddpf.dwFlags & DDPF_LUMINANCE) {
+		}
+		else if (ddpf.dwFlags & DDPF_LUMINANCE) {
 			if (8 == ddpf.dwRGBBitCount) {
 				if (ISBITMASK(0x000000ff, 0x00000000, 0x00000000, 0x00000000)) {
 					return TextureFormat::R8_UNORM; // D3DX10/11 writes this out as DX10 extension
@@ -385,11 +390,13 @@ namespace {
 					return TextureFormat::R8G8_UNORM; // D3DX10/11 writes this out as DX10 extension
 				}
 			}
-		} else if (ddpf.dwFlags & DDPF_ALPHA) {
+		}
+		else if (ddpf.dwFlags & DDPF_ALPHA) {
 			if (8 == ddpf.dwRGBBitCount) {
 				return TextureFormat::A8_UNORM;
 			}
-		} else if (ddpf.dwFlags & DDPF_BUMPDUDV) {
+		}
+		else if (ddpf.dwFlags & DDPF_BUMPDUDV) {
 			if (16 == ddpf.dwRGBBitCount) {
 				if (ISBITMASK(0x00ff, 0xff00, 0x0000, 0x0000)) {
 					return TextureFormat::R8G8_SNORM; // D3DX10/11 writes this out as DX10 extension
@@ -406,7 +413,8 @@ namespace {
 
 				// No DXGI format maps to ISBITMASK(0x3ff00000, 0x000ffc00, 0x000003ff, 0xc0000000) aka D3DFMT_A2W10V10U10
 			}
-		} else if (ddpf.dwFlags & DDPF_FOURCC) {
+		}
+		else if (ddpf.dwFlags & DDPF_FOURCC) {
 			if (DDS_MAKEFOURCC('D', 'X', 'T', '1') == ddpf.dwFourCC) {
 				return TextureFormat::BC1_UNORM;
 			}
@@ -502,7 +510,8 @@ namespace {
 //---------------------------------------------------------------
 // DDS loader implementation.
 //---------------------------------------------------------------
-bool DDSLoader::load(const char* inputData, const size_t inputDataSizeBytes, TextureDesc& desc, std::vector<TextureData>& initalData) {
+bool DDSLoader::load(const char* inputData, const size_t inputDataSizeBytes, TextureDesc& desc, std::vector<TextureData>& initalData)
+{
 	m_ddsData = inputData;
 	m_ddsDataSizeBytes = inputDataSizeBytes;
 	m_ddsDataPointer = 0;
@@ -655,26 +664,30 @@ bool DDSLoader::load(const char* inputData, const size_t inputDataSizeBytes, Tex
 		desc.format = textureFormat;
 		desc.textureType = UniformType::Texture1D;
 		desc.texture1D = Texture1DDesc(width, mipCount, arraySize);
-	} else if (textureDimensionIdx == 2) {
+	}
+	else if (textureDimensionIdx == 2) {
 		desc = TextureDesc();
 		desc.format = textureFormat;
 
 		if (isCubeTexture == false) {
 			desc.textureType = UniformType::Texture2D;
 			desc.texture2D = Texture2DDesc(width, height, mipCount, arraySize);
-		} else {
+		}
+		else {
 			// Since cube textures are just 6 2D textures we assume this.
 			sgeAssert(arraySize % 6 == 0);
 
 			desc.textureType = UniformType::TextureCube;
 			desc.textureCube = TextureCubeDesc(width, height, mipCount, arraySize / 6);
 		}
-	} else if (textureDimensionIdx == 3) {
+	}
+	else if (textureDimensionIdx == 3) {
 		desc = TextureDesc();
 		desc.format = textureFormat;
 		desc.textureType = UniformType::Texture3D;
 		desc.texture3D = Texture3DDesc(width, height, depth, mipCount);
-	} else {
+	}
+	else {
 		// Should never happen.
 		sgeAssert(false);
 		return false;
@@ -683,7 +696,8 @@ bool DDSLoader::load(const char* inputData, const size_t inputDataSizeBytes, Tex
 	return true;
 }
 
-DDSLoader::SurfaceInfo DDSLoader::getSurfaceInfo(const int width, const int height, const TextureFormat::Enum textureFormat) {
+DDSLoader::SurfaceInfo DDSLoader::getSurfaceInfo(const int width, const int height, const TextureFormat::Enum textureFormat)
+{
 	const size_t bpp = TextureFormat::GetSizeBits(textureFormat);
 	const bool isBC = TextureFormat::IsBC(textureFormat);
 

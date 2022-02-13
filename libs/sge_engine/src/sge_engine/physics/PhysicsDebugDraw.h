@@ -30,15 +30,9 @@ struct SGE_ENGINE_API BulletPhysicsDebugDraw : public btIDebugDraw {
 	void preDebugDraw(const mat4f& projView, QuickDraw* const debugDraw, const RenderDestination& rdest);
 	void postDebugDraw();
 
-	void setDebugMode(int debugMode) final
-	{
-		m_debugMode = debugMode;
-	}
+	void setDebugMode(int debugMode) final { m_debugMode = debugMode; }
 
-	int getDebugMode() const final
-	{
-		return m_debugMode;
-	}
+	int getDebugMode() const final { return m_debugMode; }
 
 	void reportErrorWarning(const char* warningString) final;
 
@@ -52,9 +46,7 @@ struct SGE_ENGINE_API BulletPhysicsDebugDraw : public btIDebugDraw {
 	{
 	}
 
-	void draw3dText(const btVector3& UNUSED(location), const char* UNUSED(textString)) final
-	{
-	}
+	void draw3dText(const btVector3& UNUSED(location), const char* UNUSED(textString)) final {}
 };
 
 } // namespace sge

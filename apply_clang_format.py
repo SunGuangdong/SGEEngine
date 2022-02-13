@@ -1,6 +1,7 @@
-# This files applies the .clang-format to the code, exculding 3rd parties.
+# This file applies the .clang-format to the code, exculding 3rd parties.
 # It is assumed that there is already installed and acessible (for all users) LLVM 10 or newer.
 # This script is tested with Python 3.
+
 from glob import glob
 from pathlib import Path
 import os, sys, subprocess
@@ -22,12 +23,9 @@ for dir in directoriesToFormat:
 		if path.suffix in extension:
 			filesToFormat.append(str(path))
 
-print (filesToFormat)
-
 # Apply the formatting.
 for file in filesToFormat:
 	print(file)
-	cmd = "clang-format -i -style=file \"" + file + "\""
 	output = subprocess.run(["clang-format", "-i", "-style=file",  file])
 
 	# if clang-format returns something assume that it is an error!

@@ -14,11 +14,13 @@ struct PluginGame final : public IPlugin {
 
 extern "C" {
 #ifdef WIN32
-__declspec(dllexport) sge::IPlugin* getInterop() {
+__declspec(dllexport) sge::IPlugin* getInterop()
+{
 	return new sge::PluginGame();
 }
 #else
-__attribute__((visibility("default"))) sge::IPlugin* getInterop() {
+__attribute__((visibility("default"))) sge::IPlugin* getInterop()
+{
 	return new sge::PluginGame();
 }
 #endif

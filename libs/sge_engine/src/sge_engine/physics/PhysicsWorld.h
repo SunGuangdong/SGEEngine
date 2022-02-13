@@ -24,10 +24,7 @@ struct PhysicsAction;
 /// CAUTION: Do not forget to update the destroy() method!!!
 struct SGE_ENGINE_API PhysicsWorld {
 	PhysicsWorld() = default;
-	~PhysicsWorld()
-	{
-		destroy();
-	}
+	~PhysicsWorld() { destroy(); }
 
 	void create();
 	void destroy();

@@ -8,15 +8,18 @@ struct Tester {
 	Tester() = delete;
 	Tester(int& constr, int& destr)
 	    : constr(&constr)
-	    , destr(&destr) {
+	    , destr(&destr)
+	{
 		if (this->constr)
 			(*this->constr)++;
 	}
-	~Tester() {
+	~Tester()
+	{
 		if (this->destr)
 			(*this->destr)++;
 	}
-	Tester(const Tester& ref) {
+	Tester(const Tester& ref)
+	{
 		constr = ref.constr;
 		destr = ref.destr;
 		if (constr)
@@ -26,7 +29,8 @@ struct Tester {
 
 	Tester(Tester&& ref)
 	    : constr(ref.constr)
-	    , destr(ref.destr) {
+	    , destr(ref.destr)
+	{
 		this->isMoveConstructed = true;
 
 		if (constr)
@@ -36,7 +40,8 @@ struct Tester {
 		ref.isStolenWithMoveCtor = true;
 	}
 
-	Tester& operator=(Tester&& ref) {
+	Tester& operator=(Tester&& ref)
+	{
 		constr = ref.constr;
 		destr = ref.destr;
 		ref.constr = nullptr;
@@ -45,7 +50,8 @@ struct Tester {
 		return *this;
 	}
 
-	Tester& operator=(const Tester& ref) {
+	Tester& operator=(const Tester& ref)
+	{
 		constr = ref.constr;
 		destr = ref.destr;
 		return *this;
@@ -61,7 +67,8 @@ struct Tester {
 	bool isStolenWithMoveAssign = false;
 };
 
-TEST_CASE("Optional Equal and not Equal") {
+TEST_CASE("Optional Equal and not Equal")
+{
 	const char* const kTestCStr = "Was it a wonder to describe it!";
 
 	Optional<std::string> x;
@@ -83,7 +90,8 @@ TEST_CASE("Optional Equal and not Equal") {
 	CHECK_FALSE(y.isValid());
 }
 
-TEST_CASE("Optional Copy Constructor from T") {
+TEST_CASE("Optional Copy Constructor from T")
+{
 	int c = 0;
 	int d = 0;
 
@@ -114,7 +122,8 @@ TEST_CASE("Optional Copy Constructor from T") {
 	CHECK(d == 2);
 }
 
-TEST_CASE("Optional Copy Constructor from Optional") {
+TEST_CASE("Optional Copy Constructor from Optional")
+{
 	int c = 0;
 	int d = 0;
 
@@ -138,7 +147,8 @@ TEST_CASE("Optional Copy Constructor from Optional") {
 	CHECK(d == 2);
 }
 
-TEST_CASE("Optional Assign from T") {
+TEST_CASE("Optional Assign from T")
+{
 	int c = 0;
 	int d = 0;
 
@@ -156,7 +166,8 @@ TEST_CASE("Optional Assign from T") {
 	CHECK(d == 2);
 }
 
-TEST_CASE("Optional Assign from Optional") {
+TEST_CASE("Optional Assign from Optional")
+{
 	int c = 0;
 	int d = 0;
 
@@ -178,7 +189,8 @@ TEST_CASE("Optional Assign from Optional") {
 	CHECK(d == 2);
 }
 
-TEST_CASE("Optional Move Construct from T") {
+TEST_CASE("Optional Move Construct from T")
+{
 	int c = 0;
 	int d = 0;
 
@@ -208,7 +220,8 @@ TEST_CASE("Optional Move Construct from T") {
 	CHECK(d == 1);
 }
 
-TEST_CASE("Optional Move Construct from Optional") {
+TEST_CASE("Optional Move Construct from Optional")
+{
 	int c = 0;
 	int d = 0;
 
@@ -239,7 +252,8 @@ TEST_CASE("Optional Move Construct from Optional") {
 	CHECK(d == 1);
 }
 
-TEST_CASE("Optional Move Assign from T") {
+TEST_CASE("Optional Move Assign from T")
+{
 	int c = 0;
 	int d = 0;
 
@@ -272,7 +286,8 @@ TEST_CASE("Optional Move Assign from T") {
 	CHECK(d == 1);
 }
 
-TEST_CASE("Optional Move Assign from Optional") {
+TEST_CASE("Optional Move Assign from Optional")
+{
 	int c = 0;
 	int d = 0;
 
@@ -305,7 +320,8 @@ TEST_CASE("Optional Move Assign from Optional") {
 	CHECK(d == 1);
 }
 
-TEST_CASE("Optional T&") {
+TEST_CASE("Optional T&")
+{
 	int x;
 	Optional<const int> v = x;
 }

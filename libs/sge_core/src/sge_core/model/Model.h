@@ -5,11 +5,11 @@
 
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
+#include "sge_utils/containers/ChunkContainer.h"
 #include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/math/transform.h"
-#include "sge_utils/containers/ChunkContainer.h"
 
 #include "CollisionMesh.h"
 
@@ -24,7 +24,8 @@ struct Model_CollisionShapeBox {
 	Model_CollisionShapeBox(std::string name, transf3d transform, vec3f halfDiagonal)
 	    : name(std::move(name))
 	    , transform(transform)
-	    , halfDiagonal(halfDiagonal) {
+	    , halfDiagonal(halfDiagonal)
+	{
 	}
 
 	std::string name;
@@ -40,7 +41,8 @@ struct Model_CollisionShapeCapsule {
 	    : name(std::move(name))
 	    , transform(transform)
 	    , halfHeight(halfHeight)
-	    , radius(radius) {
+	    , radius(radius)
+	{
 	}
 
 	std::string name;
@@ -54,7 +56,8 @@ struct Model_CollisionShapeCylinder {
 	Model_CollisionShapeCylinder(std::string name, transf3d transform, vec3f halfDiagonal)
 	    : name(std::move(name))
 	    , transform(transform)
-	    , halfDiagonal(halfDiagonal) {
+	    , halfDiagonal(halfDiagonal)
+	{
 	}
 
 	std::string name;
@@ -67,7 +70,8 @@ struct Model_CollisionShapeSphere {
 	Model_CollisionShapeSphere(std::string name, transf3d transform, float radius)
 	    : name(std::move(name))
 	    , transform(transform)
-	    , radius(radius) {
+	    , radius(radius)
+	{
 	}
 
 	std::string name;
@@ -112,7 +116,8 @@ struct ModelMeshBone {
 	ModelMeshBone() = default;
 	ModelMeshBone(const mat4f& offsetMatrix, int nodeIdx)
 	    : offsetMatrix(offsetMatrix)
-	    , nodeIdx(nodeIdx) {
+	    , nodeIdx(nodeIdx)
+	{
 	}
 
 	mat4f offsetMatrix = mat4f::getIdentity(); ///< The transformation matrix used for binding a bone to a mesh.
@@ -161,7 +166,8 @@ struct MeshAttachment {
 
 	MeshAttachment(int attachedMeshIndex, int attachedMaterialIndex)
 	    : attachedMeshIndex(attachedMeshIndex)
-	    , attachedMaterialIndex(attachedMaterialIndex) {
+	    , attachedMaterialIndex(attachedMaterialIndex)
+	{
 	}
 
 	int attachedMeshIndex = -1;
@@ -173,9 +179,7 @@ struct KeyFrames {
 	std::map<float, quatf> rotationKeyFrames;
 	std::map<float, vec3f> scalingKeyFrames;
 
-	bool hasAnyKeyFrames() const {
-		return !positionKeyFrames.empty() || !rotationKeyFrames.empty() || !scalingKeyFrames.empty();
-	}
+	bool hasAnyKeyFrames() const { return !positionKeyFrames.empty() || !rotationKeyFrames.empty() || !scalingKeyFrames.empty(); }
 
 	void evaluate(transf3d& result, const float t) const;
 };
@@ -186,7 +190,8 @@ struct ModelAnimation {
 	ModelAnimation(std::string animationName, float durationSec, std::map<int, KeyFrames> perNodeKeyFrames)
 	    : animationName(std::move(animationName))
 	    , durationSec(durationSec)
-	    , perNodeKeyFrames(std::move(perNodeKeyFrames)) {
+	    , perNodeKeyFrames(std::move(perNodeKeyFrames))
+	{
 	}
 
 	/// Modifies the specified transform and amends the keyframed data. Non-keyframed data is not changed.
@@ -196,7 +201,8 @@ struct ModelAnimation {
 	/// @param [in] the keyframes for the targeted node.
 	/// @param [in] time is the time in the animation used to interpolate between keyframes.
 	/// @return true if there were keyframes for the node.
-	bool modifyTransformWithKeyFrames(transf3d& outTransform, const int nodeIndex, const float time) const {
+	bool modifyTransformWithKeyFrames(transf3d& outTransform, const int nodeIndex, const float time) const
+	{
 		auto itr = perNodeKeyFrames.find(nodeIndex);
 		if (itr != perNodeKeyFrames.end()) {
 			itr->second.evaluate(outTransform, time);
@@ -244,33 +250,19 @@ struct SGE_CORE_API Model {
 	int makeNewAnim();
 	void setRootNodeIndex(const int newRootNodeIndex);
 
-	int getRootNodeIndex() const {
-		return m_rootNodeIndex;
-	}
+	int getRootNodeIndex() const { return m_rootNodeIndex; }
 
-	ModelNode* getRootNode() {
-		return nodeAt(getRootNodeIndex());
-	}
+	ModelNode* getRootNode() { return nodeAt(getRootNodeIndex()); }
 
-	const ModelNode* getRootNode() const {
-		return nodeAt(getRootNodeIndex());
-	}
+	const ModelNode* getRootNode() const { return nodeAt(getRootNodeIndex()); }
 
-	int numNodes() const {
-		return int(m_nodes.size());
-	}
+	int numNodes() const { return int(m_nodes.size()); }
 
-	int numMaterials() const {
-		return int(m_materials.size());
-	}
+	int numMaterials() const { return int(m_materials.size()); }
 
-	int numMeshes() const {
-		return int(m_meshes.size());
-	}
+	int numMeshes() const { return int(m_meshes.size()); }
 
-	int numAnimations() const {
-		return int(m_animations.size());
-	}
+	int numAnimations() const { return int(m_animations.size()); }
 
 	ModelNode* nodeAt(int nodeIndex);
 	const ModelNode* nodeAt(int nodeIndex) const;
@@ -287,25 +279,15 @@ struct SGE_CORE_API Model {
 	int getAnimationIndexByName(const std::string& name) const;
 
 
-	const std::vector<ModelNode*>& getNodes() {
-		return m_nodes;
-	}
+	const std::vector<ModelNode*>& getNodes() { return m_nodes; }
 
-	const std::vector<ModelMesh*>& getMeshes() {
-		return m_meshes;
-	}
+	const std::vector<ModelMesh*>& getMeshes() { return m_meshes; }
 
-	const std::vector<ModelMaterial*>& getMatrials() {
-		return m_materials;
-	}
+	const std::vector<ModelMaterial*>& getMatrials() { return m_materials; }
 
-	void setModelLoadSettings(const ModelLoadSettings& loadSets) {
-		m_loadSets = loadSets;
-	}
+	void setModelLoadSettings(const ModelLoadSettings& loadSets) { m_loadSets = loadSets; }
 
-	const ModelLoadSettings& getModelLoadSetting() const {
-		return m_loadSets;
-	}
+	const ModelLoadSettings& getModelLoadSetting() const { return m_loadSets; }
 
   private:
 	void loadMaterials(AssetLibrary& assetLib);

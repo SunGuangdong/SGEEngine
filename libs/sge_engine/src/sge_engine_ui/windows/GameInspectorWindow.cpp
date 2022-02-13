@@ -9,7 +9,8 @@
 #include "sge_utils/text/format.h"
 
 namespace sge {
-void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is)) {
+void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is))
+{
 	if (isClosed()) {
 		return;
 	}
@@ -48,7 +49,8 @@ void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), GameInspector
 
 				if (go) {
 					currentObjectName = go->getDisplayName();
-				} else {
+				}
+				else {
 					currentObjectName = "<not-assigned-object>";
 				}
 

@@ -7,7 +7,8 @@
 
 namespace sge {
 
-int MultiCurve2D::findBezierH0(const int iBezierKey) const {
+int MultiCurve2D::findBezierH0(const int iBezierKey) const
+{
 	if (isIndexValid(iBezierKey) == false) {
 		return -1;
 	}
@@ -22,7 +23,8 @@ int MultiCurve2D::findBezierH0(const int iBezierKey) const {
 			if (m_pointsWs[t].type == pointType_bezierHandle0) {
 				return t;
 			}
-		} else {
+		}
+		else {
 			// Do not assert here as this is used in isCurveValid()
 			// sgeAssert(false && "This point cannot be anything different but a bezier handle!");
 			return -1;
@@ -32,7 +34,8 @@ int MultiCurve2D::findBezierH0(const int iBezierKey) const {
 	return -1;
 }
 
-int MultiCurve2D::findBezierH1(const int iBezierKey) const {
+int MultiCurve2D::findBezierH1(const int iBezierKey) const
+{
 	if (isIndexValid(iBezierKey) == false) {
 		return -1;
 	}
@@ -47,7 +50,8 @@ int MultiCurve2D::findBezierH1(const int iBezierKey) const {
 			if (m_pointsWs[t].type == pointType_bezierHandle1) {
 				return t;
 			}
-		} else {
+		}
+		else {
 			// Do not assert here as this is used in isCurveValid()
 			// sgeAssert(false && "This point cannot be anything different but a bezier handle!");
 			return -1;
@@ -57,7 +61,8 @@ int MultiCurve2D::findBezierH1(const int iBezierKey) const {
 	return -1;
 }
 
-int MultiCurve2D::findHandleKeyPoint(const int iHandle) const {
+int MultiCurve2D::findHandleKeyPoint(const int iHandle) const
+{
 	if (isIndexValid(iHandle) == false) {
 		return -1;
 	}
@@ -75,7 +80,8 @@ int MultiCurve2D::findHandleKeyPoint(const int iHandle) const {
 	return -1;
 }
 
-int MultiCurve2D::findHandleAttachmentPoint(const int iHandle) const {
+int MultiCurve2D::findHandleAttachmentPoint(const int iHandle) const
+{
 	if (isIndexValid(iHandle) == false) {
 		return -1;
 	}
@@ -95,7 +101,8 @@ int MultiCurve2D::findHandleAttachmentPoint(const int iHandle) const {
 	return -1;
 }
 
-int MultiCurve2D::findNextKeyPoint(const int iStart) const {
+int MultiCurve2D::findNextKeyPoint(const int iStart) const
+{
 	if (isIndexValid(iStart) == false) {
 		return -1;
 	}
@@ -109,7 +116,8 @@ int MultiCurve2D::findNextKeyPoint(const int iStart) const {
 	return -1;
 }
 
-int MultiCurve2D::findPrevKeyPoint(const int iStart) const {
+int MultiCurve2D::findPrevKeyPoint(const int iStart) const
+{
 	if (isIndexValid(iStart) == false) {
 		return -1;
 	}
@@ -124,7 +132,8 @@ int MultiCurve2D::findPrevKeyPoint(const int iStart) const {
 }
 
 
-bool MultiCurve2D::isCurveValid() const {
+bool MultiCurve2D::isCurveValid() const
+{
 	float prevPointX = -FLT_MAX;
 	for (int t = 0; t < m_pointsWs.size(); ++t) {
 		const Point pt = m_pointsWs[t];
@@ -148,7 +157,8 @@ bool MultiCurve2D::isCurveValid() const {
 			if (!isH0PossibleIdx || !isH1PossibleIdx || h0 == h1) {
 				return false;
 			}
-		} else if (pointType_isBezierHandle(pt.type)) {
+		}
+		else if (pointType_isBezierHandle(pt.type)) {
 			const int key = findHandleKeyPoint(t);
 			if (key < 0 || ((t - key) > 2)) {
 				return false;
@@ -161,7 +171,8 @@ bool MultiCurve2D::isCurveValid() const {
 	return true;
 }
 
-void MultiCurve2D::sortPointsByX() {
+void MultiCurve2D::sortPointsByX()
+{
 	for (int i = 0; i < m_pointsWs.size(); ++i) {
 		for (int j = i + 1; j < m_pointsWs.size(); ++j) {
 			if (m_pointsWs[j].x < m_pointsWs[i].x) {
@@ -171,7 +182,8 @@ void MultiCurve2D::sortPointsByX() {
 	}
 }
 
-bool MultiCurve2D::sortPointsByX(std::vector<int>& outIndexRemap) {
+bool MultiCurve2D::sortPointsByX(std::vector<int>& outIndexRemap)
+{
 	std::vector<int> indicesLut;
 	for (int i = 0; i < m_pointsWs.size(); ++i) {
 		indicesLut.emplace_back(i);
@@ -197,7 +209,8 @@ bool MultiCurve2D::sortPointsByX(std::vector<int>& outIndexRemap) {
 	return hasOrderChanged;
 }
 
-bool MultiCurve2D::addSmoothPointSafe(const float x, const float y) {
+bool MultiCurve2D::addSmoothPointSafe(const float x, const float y)
+{
 	sgeAssert(isCurveValid());
 
 	if (m_pointsWs.empty()) {
@@ -223,10 +236,12 @@ bool MultiCurve2D::addSmoothPointSafe(const float x, const float y) {
 	// Place the point.
 	if (placeIndex >= 0 && placeIndex < m_pointsWs.size()) {
 		m_pointsWs.insert(m_pointsWs.begin() + placeIndex, Point(pointType_smooth, x, y));
-	} else if (placeIndex == -1) {
+	}
+	else if (placeIndex == -1) {
 		// push the point to the front.
 		m_pointsWs.insert(m_pointsWs.begin(), Point(pointType_smooth, x, y));
-	} else if (placeIndex == m_pointsWs.size()) {
+	}
+	else if (placeIndex == m_pointsWs.size()) {
 		// If the old last point is a bezier key, add its handles.
 		if (pointType_isBezierKey(m_pointsWs.back().type)) {
 			const float oldLastX = m_pointsWs.back().x;
@@ -241,7 +256,8 @@ bool MultiCurve2D::addSmoothPointSafe(const float x, const float y) {
 
 		m_pointsWs.emplace_back(Point(pointType_smooth, x, y));
 		return true;
-	} else {
+	}
+	else {
 		sgeAssert(false && "Should never happen, above situations should handle everything!");
 		return false;
 	}
@@ -255,7 +271,8 @@ bool MultiCurve2D::addSmoothPointSafe(const float x, const float y) {
 	return false;
 }
 
-bool MultiCurve2D::removePointSafe(const int idx, std::vector<int>& outIndexRemap) {
+bool MultiCurve2D::removePointSafe(const int idx, std::vector<int>& outIndexRemap)
+{
 	if (isIndexValid(idx) == false) {
 		return false;
 	}
@@ -273,7 +290,8 @@ bool MultiCurve2D::removePointSafe(const int idx, std::vector<int>& outIndexRema
 	if (pointType_isBezierHandle(m_pointsWs[idx].type)) {
 		// Bezier handle points cannot be deleted. Delete the keypoint itself.
 		return false;
-	} else if (pointType_isBezierKey(m_pointsWs[idx].type)) {
+	}
+	else if (pointType_isBezierKey(m_pointsWs[idx].type)) {
 		const int h0 = findBezierH0(idx);
 		const int h1 = findBezierH1(idx);
 
@@ -295,11 +313,13 @@ bool MultiCurve2D::removePointSafe(const int idx, std::vector<int>& outIndexRema
 			outIndexRemap[hFar] = -1;
 			outIndexRemap[hNear] = -1;
 			outIndexRemap[idx] = -1;
-		} else {
+		}
+		else {
 			sgeAssert(false);
 			return false;
 		}
-	} else {
+	}
+	else {
 		// Key point without handles.
 		removePointUnsafe(idx);
 		outIndexRemap[idx] = -1;
@@ -318,7 +338,8 @@ bool MultiCurve2D::removePointSafe(const int idx, std::vector<int>& outIndexRema
 	return true;
 }
 
-bool MultiCurve2D::chnagePointType(const int idx, const PointType newType) {
+bool MultiCurve2D::chnagePointType(const int idx, const PointType newType)
+{
 	if (isIndexValid(idx) == false) {
 		return false;
 	}
@@ -340,12 +361,14 @@ bool MultiCurve2D::chnagePointType(const int idx, const PointType newType) {
 		if (pointType_isBezierKey(m_pointsWs[idx].type)) {
 			// Bezier Key -> Bezier Key
 			sgeAssert(false && "Shouldn't happen!");
-		} else {
+		}
+		else {
 			// Regular -> Bezier Key
 			if (m_pointsWs.size() == idx + 1) {
 				// Making the last point bezier, doesn't need handles.
 				m_pointsWs[idx].type = newType;
-			} else {
+			}
+			else {
 				const float x0 = m_pointsWs[idx].x;
 				const float x1 = m_pointsWs[idx + 1].x;
 
@@ -362,11 +385,13 @@ bool MultiCurve2D::chnagePointType(const int idx, const PointType newType) {
 				m_pointsWs.insert(m_pointsWs.begin() + idx + 2, Point(pointType_bezierHandle1, h1x, y1));
 			}
 		}
-	} else {
+	}
+	else {
 		if (pointType_isBezierKey(m_pointsWs[idx].type)) {
 			// Regular -> Regular
 			m_pointsWs[idx].type = newType;
-		} else {
+		}
+		else {
 			// Bezier -> Regular
 			const int h0 = findBezierH0(idx);
 			const int h1 = findBezierH1(idx);
@@ -387,11 +412,13 @@ bool MultiCurve2D::chnagePointType(const int idx, const PointType newType) {
 	return false;
 }
 
-void MultiCurve2D::addPointUnsafe(const Point& pt) {
+void MultiCurve2D::addPointUnsafe(const Point& pt)
+{
 	m_pointsWs.emplace_back(pt);
 }
 
-bool MultiCurve2D::removePointUnsafe(int idx) {
+bool MultiCurve2D::removePointUnsafe(int idx)
+{
 	if (isIndexValid(idx) == false) {
 		return false;
 	}
@@ -400,7 +427,8 @@ bool MultiCurve2D::removePointUnsafe(int idx) {
 	return true;
 }
 
-float MultiCurve2D::sample(const float x) const {
+float MultiCurve2D::sample(const float x) const
+{
 	if (m_pointsWs.empty()) {
 		return 0.f;
 	}
@@ -428,13 +456,15 @@ float MultiCurve2D::sample(const float x) const {
 
 	if (m_pointsWs[iBasePt].type == pointType_constant) {
 		return m_pointsWs[iBasePt].y;
-	} else if (m_pointsWs[iBasePt].type == pointType_linear) {
+	}
+	else if (m_pointsWs[iBasePt].type == pointType_linear) {
 		const Point pt0 = m_pointsWs[iBasePt];
 		const Point pt1 = m_pointsWs[iBasePt + 1];
 		const float t = (x - pt0.x) / (pt1.x - pt0.x);
 		const float res = (1.f - t) * pt0.y + t * pt1.y;
 		return res;
-	} else if (m_pointsWs[iBasePt].type == pointType_smooth) {
+	}
+	else if (m_pointsWs[iBasePt].type == pointType_smooth) {
 		float points[4];
 
 		const int i0 = iBasePt - 1;
@@ -455,7 +485,8 @@ float MultiCurve2D::sample(const float x) const {
 
 		const float t = (x - m_pointsWs[i1].x) / (m_pointsWs[i2].x - m_pointsWs[i1].x);
 		return hermiteEval(t, points);
-	} else if (m_pointsWs[iBasePt].type == pointType_bezierKey) {
+	}
+	else if (m_pointsWs[iBasePt].type == pointType_bezierKey) {
 		const Point h0 = m_pointsWs[findBezierH0(iBasePt)];
 		const Point h1 = m_pointsWs[findBezierH1(iBasePt)];
 		const Point cp0 = m_pointsWs[iBasePt];

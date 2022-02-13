@@ -11,7 +11,8 @@
 #include "sge_utils/text/format.h"
 
 namespace sge {
-void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is)) {
+void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+{
 	if (isClosed()) {
 		return;
 	}

@@ -22,7 +22,8 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
                                            const mat4f& world,
                                            const Geometry& geometry,
                                            const vec4f& shadingColor,
-                                           bool forceNoCulling) {
+                                           bool forceNoCulling)
+{
 	enum : int { OPT_HasVertexSkinning, kNumOptions };
 
 	enum : int {
@@ -99,7 +100,8 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 	stateGroup.setPrimitiveTopology(geometry.topology);
 	if (geometry.ibFmt != UniformType::Unknown) {
 		stateGroup.setIB(geometry.indexBuffer, geometry.ibFmt, geometry.ibByteOffset);
-	} else {
+	}
+	else {
 		stateGroup.setIB(nullptr, UniformType::Unknown, 0);
 	}
 
@@ -130,7 +132,8 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 
 	if (geometry.ibFmt != UniformType::Unknown) {
 		dc.drawIndexed(geometry.numElements, 0, 0);
-	} else {
+	}
+	else {
 		dc.draw(geometry.numElements, 0);
 	}
 
@@ -142,7 +145,8 @@ void ConstantColorWireShader::draw(const RenderDestination& rdest,
                                    const mat4f& preRoot,
                                    const EvaluatedModel& evalModel,
                                    const vec4f& shadingColor,
-                                   bool forceNoCulling) {
+                                   bool forceNoCulling)
+{
 	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
 		const ModelNode* rawNode = evalModel.m_model->nodeAt(iNode);

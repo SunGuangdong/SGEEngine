@@ -17,7 +17,8 @@ struct MainMenuScript final : public IWorldScript {
 	std::shared_ptr<gamegui::InvisibleWidget> mainMenuButtonsWidget;
 	std::vector<EventSubscription> eventSubs;
 
-	void create() override {
+	void create() override
+	{
 		uiContext.create(getWorld()->userProjectionSettings.canvasSize);
 
 		font.Create(getCore()->getDevice(), "assets/editor/fonts/UbuntuMono-Regular.ttf", 36.f);
@@ -46,11 +47,10 @@ struct MainMenuScript final : public IWorldScript {
 		uiContext.addRootWidget(rootMenuWidget);
 	}
 
-	void onPostUpdate(const GameUpdateSets& u) override {
-		uiContext.update(u.is, getWorld()->userProjectionSettings.canvasSize, u.dt);
-	}
+	void onPostUpdate(const GameUpdateSets& u) override { uiContext.update(u.is, getWorld()->userProjectionSettings.canvasSize, u.dt); }
 
-	void onPostDraw(const GameDrawSets& drawSets) override {
+	void onPostDraw(const GameDrawSets& drawSets) override
+	{
 		UIDrawSets uiDrawSets;
 		uiDrawSets.setup(drawSets.rdest, drawSets.quickDraw);
 		uiContext.draw(uiDrawSets);
@@ -58,7 +58,8 @@ struct MainMenuScript final : public IWorldScript {
 };
 
 ReflAddTypeId(MainMenuScript, 21'03'13'0001);
-ReflBlock() {
+ReflBlock()
+{
 	ReflAddScript(MainMenuScript);
 }
 

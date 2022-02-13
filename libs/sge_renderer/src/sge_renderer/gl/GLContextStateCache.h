@@ -12,8 +12,8 @@
 #include "opengl_include.h"
 
 #include "sge_renderer/renderer/GraphicsCommon.h"
-#include "sge_utils/containers/Pair.h"
 #include "sge_utils/containers/Optional.h"
+#include "sge_utils/containers/Pair.h"
 #include "sge_utils/containers/StaticArray.h"
 
 namespace sge {
@@ -23,9 +23,9 @@ namespace sge {
 /// of all bound resources and and rendering states. This way we can reduce the needless API calls
 /// to OpenGL if we are apply the same state that is already bound.
 /// In addition this will automatically unbind all delete resources.
-/// 
+///
 /// Known problems :
-/// - Deleteing a frame buffer, that also deletes it's attachements, 
+/// - Deleteing a frame buffer, that also deletes it's attachements,
 ///   WILL NOT unbind its attachements form if any of them is bound.
 struct GLContextStateCache {
 	struct ScissorRect {
@@ -67,8 +67,8 @@ struct GLContextStateCache {
 
 	// Bond textures description.
 	struct BoundTexture {
-		GLenum texTarget = GL_NONE;      ///< GL_TEXTURE_2D ... ect
-		GLuint resource = 0;             ///< The handle to the OpenGL resources.
+		GLenum texTarget = GL_NONE; ///< GL_TEXTURE_2D ... ect
+		GLuint resource = 0;        ///< The handle to the OpenGL resources.
 	};
 
   public:

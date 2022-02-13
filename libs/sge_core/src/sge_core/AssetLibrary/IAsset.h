@@ -21,17 +21,14 @@ struct SGE_CORE_API Asset {
 
 	Asset(std::string assetPath, AssetLibrary& ownerAssetLib)
 	    : m_assetPath(std::move(assetPath))
-	    , m_ownerAssetLib(ownerAssetLib) {
+	    , m_ownerAssetLib(ownerAssetLib)
+	{
 	}
 	virtual ~Asset() = default;
 
-	AssetStatus getStatus() const {
-		return m_status;
-	}
+	AssetStatus getStatus() const { return m_status; }
 
-	const std::string& getPath() const {
-		return m_assetPath;
-	}
+	const std::string& getPath() const { return m_assetPath; }
 
 	virtual bool loadAssetFromFile(const char* filePath) = 0;
 
@@ -53,10 +50,11 @@ using AssetWeak = std::weak_ptr<Asset>;
 
 /// If the specified asset is loaded, the function
 /// retrieves the specified asset interface if available.
-/// If you just want to cast this to the interface type without caring 
+/// If you just want to cast this to the interface type without caring
 /// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-TAssetInterface* getLoadedAssetIface(AssetPtr& asset) {
+TAssetInterface* getLoadedAssetIface(AssetPtr& asset)
+{
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<TAssetInterface*>(asset.get());
 	}
@@ -69,7 +67,8 @@ TAssetInterface* getLoadedAssetIface(AssetPtr& asset) {
 /// If you just want to cast this to the interface type without caring
 /// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-const TAssetInterface* getLoadedAssetIface(const AssetPtr& asset) {
+const TAssetInterface* getLoadedAssetIface(const AssetPtr& asset)
+{
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<const TAssetInterface*>(asset.get());
 	}
@@ -82,7 +81,8 @@ const TAssetInterface* getLoadedAssetIface(const AssetPtr& asset) {
 /// If you just want to cast this to the interface type without caring
 /// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-TAssetInterface* getLoadedAssetIface(Asset& asset) {
+TAssetInterface* getLoadedAssetIface(Asset& asset)
+{
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<TAssetInterface*>(&asset);
 	}
@@ -95,7 +95,8 @@ TAssetInterface* getLoadedAssetIface(Asset& asset) {
 /// If you just want to cast this to the interface type without caring
 /// if the asset is loaded or not use std::dynamic_pointer_cast.
 template <typename TAssetInterface>
-const TAssetInterface* getLoadedAssetIface(const Asset& asset) {
+const TAssetInterface* getLoadedAssetIface(const Asset& asset)
+{
 	if (isAssetLoaded(asset)) {
 		return dynamic_cast<const TAssetInterface*>(&asset);
 	}
@@ -103,13 +104,15 @@ const TAssetInterface* getLoadedAssetIface(const Asset& asset) {
 	return nullptr;
 }
 /// Returns true if the specified asset is loaded.
-inline bool isAssetLoaded(const Asset& asset) {
+inline bool isAssetLoaded(const Asset& asset)
+{
 	bool loaded = asset.getStatus() == AssetStatus_Loaded;
 	return loaded;
 }
 
 /// Returns true if the specified asset is loaded.
-inline bool isAssetLoaded(const AssetPtr& asset) {
+inline bool isAssetLoaded(const AssetPtr& asset)
+{
 	bool loaded = asset && isAssetLoaded(*asset);
 	return loaded;
 }

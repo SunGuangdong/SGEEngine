@@ -549,7 +549,7 @@ bool GLContextStateCache::IsBufferTargetSupported(const GLenum bufferTarget)
 	return false;
 }
 //
-//struct BoundBufferState {
+// struct BoundBufferState {
 //	bool isMapped = false;
 //	GLuint buffer = 0;
 //};

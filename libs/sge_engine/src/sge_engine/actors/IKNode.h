@@ -23,7 +23,8 @@ struct SGE_ENGINE_API AIKNode : public Actor, public IActorCustomAttributeEditor
 
   private:
 	void bind(ObjectId start, ObjectId end);
-	void unbind() {
+	void unbind()
+	{
 		ikChainActorIds.clear();
 		linksLengthWs.clear();
 		chainLengthWs = 0.f;

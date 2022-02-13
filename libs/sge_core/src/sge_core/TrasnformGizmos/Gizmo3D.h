@@ -1,10 +1,10 @@
 #pragma once
 
+#include "sge_core/sgecore_api.h"
 #include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/primitives.h"
 #include "sge_utils/math/transform.h"
 #include "sge_utils/sge_utils.h"
-#include "sge_core/sgecore_api.h"
 
 namespace sge {
 
@@ -16,9 +16,12 @@ struct SGE_CORE_API GizmoSnapSets {
 	GizmoSnapSets(const vec3f& translationSnapping, float const rotationSnapping, const vec3f& scaleSnapping)
 	    : translationSnapping(translationSnapping)
 	    , rotationSnapping(rotationSnapping)
-	    , scaleSnapping(scaleSnapping) {}
+	    , scaleSnapping(scaleSnapping)
+	{
+	}
 
-	float applySnappingTranslation(const float v, int iAxis) const {
+	float applySnappingTranslation(const float v, int iAxis) const
+	{
 		iAxis = iAxis % 3; // Assuming the input is in SignedAxis enum convention, which has negatives as well.
 		sgeAssert(iAxis >= 0 && iAxis < 3);
 		if (translationSnapping[iAxis] == 0.f) {
@@ -30,7 +33,8 @@ struct SGE_CORE_API GizmoSnapSets {
 		return res;
 	}
 
-	vec3f applySnappingTranslation(vec3f v) const {
+	vec3f applySnappingTranslation(vec3f v) const
+	{
 		return vec3f(applySnappingTranslation(v.x, 0), applySnappingTranslation(v.y, 1), applySnappingTranslation(v.z, 2));
 	}
 
@@ -50,7 +54,9 @@ struct SGE_CORE_API GizmoInteractArgs {
 	    : is(is)
 	    , rayWS(rayWS)
 	    , snapSets(snapSets)
-	    , customScale(customScale) {}
+	    , customScale(customScale)
+	{
+	}
 
 	const InputState* is = nullptr;
 	const GizmoSnapSets* snapSets = nullptr;
@@ -62,7 +68,9 @@ struct SGE_CORE_API GizmoInteractArgs {
 struct SGE_CORE_API GizmoInteractResult {
 	GizmoInteractResult(bool isDone = false, bool userClickedAway = false)
 	    : isDone(isDone)
-	    , userClickedAway(userClickedAway) {}
+	    , userClickedAway(userClickedAway)
+	{
+	}
 
 	bool isDone;
 	bool userClickedAway;
@@ -84,7 +92,9 @@ struct SGE_CORE_API GizmoActionMask {
 	};
 
 	GizmoActionMask()
-	    : mask(0) {}
+	    : mask(0)
+	{
+	}
 
 	bool only_x() const { return mask == 1; }
 	bool only_y() const { return mask == 2; }
@@ -103,7 +113,8 @@ struct SGE_CORE_API GizmoActionMask {
 	bool has(SignedAxis axis) const { return mask & (1 << int(axis)); }
 	bool hasOnly(SignedAxis axis) const { return mask == (1 << int(axis)); }
 
-	SignedAxis getSingleInteractionAxis() const {
+	SignedAxis getSingleInteractionAxis() const
+	{
 		for (int iAxis = 0; iAxis < signedAxis_numElements; ++iAxis) {
 			if (hasOnly(SignedAxis(iAxis))) {
 				return SignedAxis(iAxis);
@@ -135,7 +146,8 @@ struct SGE_CORE_API Gizmo3DCommon {
 	bool isInteracting() const { return m_interaction.mask != 0; }
 
   protected:
-	void resetCommon() {
+	void resetCommon()
+	{
 		m_interaction.mask = 0;
 		m_hover.mask = 0;
 		m_displayScale = m_sizeMultiplier; // TODO: Not sure if this is necessary.
@@ -287,7 +299,9 @@ struct SGE_CORE_API Gizmo3D {
 
 	Gizmo3D()
 	    : m_mode(Mode_Translation)
-	    , m_initalTransform(transf3d::getIdentity()) {}
+	    , m_initalTransform(transf3d::getIdentity())
+	{
+	}
 
 	void setSizeMultipler(const float scalingCoefficient);
 

@@ -3,7 +3,8 @@
 
 namespace sge {
 
-bool FrameTargetD3D11::create() {
+bool FrameTargetD3D11::create()
+{
 	// for the sake of having Create!
 	destroy();
 	return true;
@@ -14,7 +15,8 @@ bool FrameTargetD3D11::create(int numRenderTargets,
                               Texture* renderTargets[],
                               TargetDesc renderTargetDescs[],
                               Texture* depthStencil,
-                              const TargetDesc& depthTargetDesc) {
+                              const TargetDesc& depthTargetDesc)
+{
 	destroy();
 
 	if (numRenderTargets > 0) {
@@ -32,7 +34,8 @@ bool FrameTargetD3D11::create(int numRenderTargets,
 }
 
 //--------------------------------------------------------------
-void FrameTargetD3D11::setRenderTarget(const int slot, Texture* texture, const TargetDesc& targetDesc) {
+void FrameTargetD3D11::setRenderTarget(const int slot, Texture* texture, const TargetDesc& targetDesc)
+{
 	m_renderTargets[slot] = texture;
 	m_dx11RTVs[slot] = texture ? ((TextureD3D11*)texture)->D3D11_GetRTV(targetDesc) : NULL;
 
@@ -40,7 +43,8 @@ void FrameTargetD3D11::setRenderTarget(const int slot, Texture* texture, const T
 }
 
 //--------------------------------------------------------------
-void FrameTargetD3D11::setDepthStencil(Texture* texture, const TargetDesc& targetDesc) {
+void FrameTargetD3D11::setDepthStencil(Texture* texture, const TargetDesc& targetDesc)
+{
 	m_depthBuffer = texture;
 	m_dx11DSV = ((TextureD3D11*)texture)->D3D11_GetDSV(targetDesc);
 
@@ -48,7 +52,8 @@ void FrameTargetD3D11::setDepthStencil(Texture* texture, const TargetDesc& targe
 }
 
 //--------------------------------------------------------------
-void FrameTargetD3D11::destroy() {
+void FrameTargetD3D11::destroy()
+{
 	m_frameTargetWidth = -1;
 	m_frameTargetHeight = -1;
 
@@ -64,7 +69,8 @@ void FrameTargetD3D11::destroy() {
 }
 
 //--------------------------------------------------------------
-bool FrameTargetD3D11::isValid() const {
+bool FrameTargetD3D11::isValid() const
+{
 	for (unsigned int t = 0; t < SGE_ARRSZ(m_renderTargets); ++t) {
 		if (m_renderTargets[t].IsResourceValid())
 			return true;
@@ -73,15 +79,18 @@ bool FrameTargetD3D11::isValid() const {
 	return m_depthBuffer.IsResourceValid();
 }
 
-Texture* FrameTargetD3D11::getRenderTarget(const unsigned int index) const {
+Texture* FrameTargetD3D11::getRenderTarget(const unsigned int index) const
+{
 	return m_renderTargets[index].GetPtr();
 }
 
-Texture* FrameTargetD3D11::getDepthStencil() const {
+Texture* FrameTargetD3D11::getDepthStencil() const
+{
 	return m_depthBuffer.GetPtr();
 }
 
-bool FrameTargetD3D11::hasAttachment() const {
+bool FrameTargetD3D11::hasAttachment() const
+{
 	bool hasRenderTarget = false;
 
 	for (int t = 0; t < SGE_ARRSZ(m_renderTargets); ++t) {
@@ -91,7 +100,8 @@ bool FrameTargetD3D11::hasAttachment() const {
 	return hasRenderTarget || (m_depthBuffer.GetPtr() != NULL);
 }
 
-void FrameTargetD3D11::updateAttachmentsInfo(Texture* texture) {
+void FrameTargetD3D11::updateAttachmentsInfo(Texture* texture)
+{
 	if (hasAttachment() == false) {
 		m_frameTargetWidth = -1;
 		m_frameTargetHeight = -1;
@@ -104,24 +114,28 @@ void FrameTargetD3D11::updateAttachmentsInfo(Texture* texture) {
 				m_frameTargetWidth = texture->getDesc().texture2D.width;
 			if (m_frameTargetHeight == -1)
 				m_frameTargetHeight = texture->getDesc().texture2D.height;
-		} else if (texture->getDesc().textureType == UniformType::Texture3D) {
+		}
+		else if (texture->getDesc().textureType == UniformType::Texture3D) {
 			if (m_frameTargetWidth == -1)
 				m_frameTargetWidth = texture->getDesc().texture3D.width;
 			if (m_frameTargetHeight == -1)
 				m_frameTargetHeight = texture->getDesc().texture3D.height;
-		} else if (texture->getDesc().textureType == UniformType::TextureCube) {
+		}
+		else if (texture->getDesc().textureType == UniformType::TextureCube) {
 			if (m_frameTargetWidth == -1)
 				m_frameTargetWidth = texture->getDesc().textureCube.width;
 			if (m_frameTargetHeight == -1)
 				m_frameTargetHeight = texture->getDesc().textureCube.height;
-		} else {
+		}
+		else {
 			// Not implemented.
 			sgeAssert(false);
 		}
 	}
 }
 
-bool FrameTargetD3D11::create2D(int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt) {
+bool FrameTargetD3D11::create2D(int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt)
+{
 	// Render Target texture.
 	GpuHandle<Texture> renderTarget = getDevice()->requestResource<Texture>();
 	if (renderTargetFmt != TextureFormat::Unknown) {
@@ -137,7 +151,8 @@ bool FrameTargetD3D11::create2D(int width, int height, TextureFormat::Enum rende
 		depthStencilTexture = getDevice()->requestResource<Texture>();
 		const TextureDesc depthStencilDesc = TextureDesc::GetDefaultDepthStencil(width, height, depthTextureFmt);
 		[[maybe_unused]] const bool succeeded = depthStencilTexture->create(depthStencilDesc, NULL);
-	} else {
+	}
+	else {
 		sgeAssert(depthTextureFmt == TextureFormat::Unknown);
 	}
 

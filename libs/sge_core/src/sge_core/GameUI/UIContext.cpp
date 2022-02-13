@@ -10,7 +10,8 @@
 
 namespace sge::gamegui {
 
-void UIContext::update(const InputState& is, const vec2i& canvasSize, const float dt) {
+void UIContext::update(const InputState& is, const vec2i& canvasSize, const float dt)
+{
 	const float kGamepadDirInputCooldownDuration = 0.25f;
 	m_gamepadDirInputCooldown -= dt;
 	m_canvasSize = canvasSize;
@@ -37,7 +38,8 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 			if (m_isUsingGamepad) {
 				w->m_wasHoveredPrevFrame = false;
 				w->onHoverLeave();
-			} else {
+			}
+			else {
 				if (!bboxss.isInside(is.GetCursorPos())) {
 					w->m_wasHoveredPrevFrame = false;
 					w->onHoverLeave();
@@ -120,7 +122,8 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 								newTarget = w;
 							}
 						}
-					} else {
+					}
+					else {
 						for (const std::shared_ptr<IWidget>& child : w->getChildren()) {
 							findAllGamepadTargets(child);
 						}
@@ -143,8 +146,8 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 				}
 			}
 		}
-
-	} else {
+	}
+	else {
 		std::vector<std::weak_ptr<IWidget>> hoveredWidgetsChain;
 		std::function<void(const std::shared_ptr<IWidget>&)> handleCursor = [&](const std::shared_ptr<IWidget>& w) {
 			if (w->isSuspended()) {
@@ -214,7 +217,8 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 	}
 }
 
-void UIContext::draw(const UIDrawSets& drawSets) {
+void UIContext::draw(const UIDrawSets& drawSets)
+{
 	std::function<void(const std::shared_ptr<IWidget>&)> drawWidget = [&](const std::shared_ptr<IWidget>& w) {
 		if (w->isSuspended()) {
 			return;

@@ -14,7 +14,8 @@ namespace sge {
 //---------------------------------------------------------------
 // TransformTool
 //---------------------------------------------------------------
-void TransformTool::onSetActive(GameInspector* const inspector) {
+void TransformTool::onSetActive(GameInspector* const inspector)
+{
 	GameWorld* const world = inspector->m_world;
 
 	clear();
@@ -61,17 +62,20 @@ void TransformTool::onSetActive(GameInspector* const inspector) {
 		if (inspector->getSelection().size() > 1) {
 			gizmoTransform = transf3d::getIdentity();
 			gizmoBBoxScaleVolume = allBBoxesWs;
-		} else {
+		}
+		else {
 			Actor* const actor = inspector->m_world->getActorById(inspector->getPrimarySelection());
 			if (actor) {
 				gizmoTransform = actor->getTransform();
 				gizmoBBoxScaleVolume = actor->getBBoxOS();
 			}
 		}
-	} else {
+	}
+	else {
 		if (perItemData.size() == 1) {
 			gizmoTransform = perItemData[0].initialTasform;
-		} else if (perItemData.size() > 1) {
+		}
+		else if (perItemData.size() > 1) {
 			vec3f averagePosition(0.f);
 			for (const PerControlledItemData& i : perItemData) {
 				averagePosition += i.initialTasform.p;
@@ -87,7 +91,8 @@ void TransformTool::onSetActive(GameInspector* const inspector) {
 
 			if (m_origin == transformToolOrigin_firstSelected) {
 				gizmoTransform.p = perItemData.front().initialTasform.p;
-			} else if (m_origin == transformToolOrigin_averagePosition) {
+			}
+			else if (m_origin == transformToolOrigin_averagePosition) {
 				gizmoTransform.p = averagePosition;
 			}
 		}
@@ -102,10 +107,9 @@ void TransformTool::onSetActive(GameInspector* const inspector) {
 	// m_gizmo.interact(InputState(), Ray(vec3f(0.f), vec3f(1.f, 0.f, 0.f)), nullptr, nullptr);
 }
 
-InspectorToolResult TransformTool::updateTool(GameInspector* const inspector,
-                                              bool isAllowedToTakeInput,
-                                              const InputState& is,
-                                              const GameDrawSets& drawSets) {
+InspectorToolResult
+    TransformTool::updateTool(GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
+{
 	InspectorToolResult result;
 
 	if (workingSelectionDirtyIndex != inspector->m_selectionChangeIdx) {
@@ -146,7 +150,8 @@ InspectorToolResult TransformTool::updateTool(GameInspector* const inspector,
 		cameraEyePos = mat_mul_pos(viewInvMtx, vec3f(pickDirVS.x, pickDirVS.y, 0.f));
 		pickDirWS = -viewInvMtx.data[2].xyz();
 		customScale = 2.f * 1.f / proj.data[1][1];
-	} else {
+	}
+	else {
 		cameraEyePos = viewInvMtx.data[3].xyz();
 		pickDirWS = (viewInvMtx * pickDirVS).xyz();
 		customScale = 0.f;
@@ -197,12 +202,14 @@ InspectorToolResult TransformTool::updateTool(GameInspector* const inspector,
 	return result;
 }
 
-void TransformTool::onCancel(GameInspector* UNUSED(inspector)) {
+void TransformTool::onCancel(GameInspector* UNUSED(inspector))
+{
 	workingSelectionDirtyIndex = 0;
 	clear();
 }
 
-void TransformTool::onUI(GameInspector* inspector) {
+void TransformTool::onUI(GameInspector* inspector)
+{
 	int origin_int = m_origin;
 	if (ImGui::Combo("Gizmo Location", &origin_int, "Last Selected\0First Selected\0Average\0")) {
 		m_origin = (TransformToolOrigin)origin_int;
@@ -221,16 +228,19 @@ void TransformTool::onUI(GameInspector* inspector) {
 	ImGui::Checkbox("Local Space Rotation", &m_localSpaceRotation);
 }
 
-void TransformTool::drawOverlay(const GameDrawSets& drawSets) {
+void TransformTool::drawOverlay(const GameDrawSets& drawSets)
+{
 	drawGizmo(drawSets.rdest, m_gizmo, drawSets.drawCamera->getProjView());
 }
 
 
-void TransformTool::prepareForEditing() {
+void TransformTool::prepareForEditing()
+{
 }
 
 bool TransformTool::interact(
-    const InputState& is, const vec3f& rayOrigin, const vec3f rayDir, const float customScale, bool* hasClickedAway) {
+    const InputState& is, const vec3f& rayOrigin, const vec3f rayDir, const float customScale, bool* hasClickedAway)
+{
 	// Interact with the gizmo.
 
 	if (is.IsKeyPressed(Key::Key_LCtrl) || is.IsKeyReleased(Key::Key_LCtrl)) {
@@ -248,7 +258,8 @@ bool TransformTool::interact(
 	if (perItemData.size() == 1) {
 		const transf3d transform = m_gizmo.getEditedTransform();
 		perItemData[0].editedTransform = transform;
-	} else {
+	}
+	else {
 		const vec3f gizmoInitPos = m_gizmo.getInitalTransform().p;
 		const transf3d gizmoTransform = m_gizmo.getTransformDiff();
 
@@ -258,7 +269,8 @@ bool TransformTool::interact(
 
 			if (m_gizmo.getMode() == Gizmo3D::Mode_Translation) {
 				objectTrasform.p += gizmoTransform.p;
-			} else if (m_gizmo.getMode() == Gizmo3D::Mode_Rotation) {
+			}
+			else if (m_gizmo.getMode() == Gizmo3D::Mode_Rotation) {
 				if (!m_localSpaceRotation) {
 					// Rotate the position around the gizmo.
 					const vec3f posOffset = objectTrasform.p - gizmoInitPos;
@@ -270,12 +282,13 @@ bool TransformTool::interact(
 				}
 
 				objectTrasform.r = gizmoTransform.r * objectTrasform.r;
-
-			} else if (m_gizmo.getMode() == Gizmo3D::Mode_Scaling) {
+			}
+			else if (m_gizmo.getMode() == Gizmo3D::Mode_Scaling) {
 				const vec3f posOffset = objectTrasform.p - gizmoInitPos;
 				objectTrasform.s = gizmoTransform.s * objectTrasform.s;
 				objectTrasform.p = gizmoInitPos + gizmoTransform.s * (objectTrasform.p - gizmoInitPos);
-			} else if (m_gizmo.getMode() == Gizmo3D::Mode_ScaleVolume) {
+			}
+			else if (m_gizmo.getMode() == Gizmo3D::Mode_ScaleVolume) {
 				const vec3f posOffset = objectTrasform.p - gizmoInitPos;
 				objectTrasform.s = gizmoTransform.s * objectTrasform.s;
 				objectTrasform.p = gizmoTransform.p + gizmoTransform.s * (objectTrasform.p - gizmoInitPos);

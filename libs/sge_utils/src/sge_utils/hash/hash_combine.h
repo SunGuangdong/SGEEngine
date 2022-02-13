@@ -2,7 +2,8 @@
 
 namespace sge {
 
-inline unsigned int hashCString_djb2(const char* str) {
+inline unsigned int hashCString_djb2(const char* str)
+{
 	if (!str) {
 		return 0;
 	}
@@ -18,7 +19,8 @@ inline unsigned int hashCString_djb2(const char* str) {
 	return hash;
 }
 
-inline unsigned int hash_djb2(const char* const mem, const size_t numBytes) {
+inline unsigned int hash_djb2(const char* const mem, const size_t numBytes)
+{
 	if (!mem) {
 		return 0;
 	}
@@ -33,7 +35,8 @@ inline unsigned int hash_djb2(const char* const mem, const size_t numBytes) {
 }
 
 template <typename T>
-inline T hash_combine(T seed, T value) {
+inline T hash_combine(T seed, T value)
+{
 	return seed ^ (value + 0x9e3779b9 + (seed << 6) + (seed >> 2));
 }
 

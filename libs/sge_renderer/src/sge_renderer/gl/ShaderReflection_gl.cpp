@@ -8,15 +8,18 @@
 
 namespace sge {
 
-BindLocation NumericUniformRefl::computeBindLocation() const {
+BindLocation NumericUniformRefl::computeBindLocation() const
+{
 	return BindLocation((short)bindLocation, (short)uniformType, (short)arraySize, 0);
 }
 
-BindLocation CBufferRefl::computeBindLocation() const {
+BindLocation CBufferRefl::computeBindLocation() const
+{
 	return BindLocation((short)gl_bindLocation, (short)UniformType::ConstantBuffer, 1, 0);
 }
 
-BindLocation TextureRefl::computeBindLocation() const {
+BindLocation TextureRefl::computeBindLocation() const
+{
 #if !defined(__EMSCRIPTEN__)
 	if (gl_textureTarget == GL_TEXTURE_1D) {
 		return BindLocation((short)gl_bindLocation, (short)UniformType::Texture1D, short(arraySize), short(gl_bindUnit));
@@ -39,7 +42,8 @@ BindLocation TextureRefl::computeBindLocation() const {
 	return BindLocation();
 }
 
-BindLocation SamplerRefl::computeBindLocation() const {
+BindLocation SamplerRefl::computeBindLocation() const
+{
 	// There are no sampler in OpenGL.
 	sgeAssert(false);
 	return BindLocation();
@@ -48,7 +52,8 @@ BindLocation SamplerRefl::computeBindLocation() const {
 //---------------------------------------------------------------
 // ShaderRefl
 //---------------------------------------------------------------
-bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
+bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
+{
 	if (!shadingProgram || !shadingProgram->isValid()) {
 		return false;
 	}
@@ -132,7 +137,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 			texture.arraySize = size;
 
 			textures.add(texture);
-		} else {
+		}
+		else {
 			// unknown uniform type
 			sgeAssert(false);
 		}

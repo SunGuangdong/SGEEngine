@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sge_core/sgecore_api.h"
 #include "sge_core/Camera.h"
+#include "sge_core/sgecore_api.h"
 
 namespace sge {
 
@@ -14,7 +14,9 @@ struct SGE_CORE_API ShadowMapBuildInfo {
 	ShadowMapBuildInfo() = default;
 
 	ShadowMapBuildInfo(RawCamera shadowMapCamera)
-	    : shadowMapCamera(shadowMapCamera) {}
+	    : shadowMapCamera(shadowMapCamera)
+	{
+	}
 
 	bool isPointLight = false;
 	RawCamera shadowMapCamera;

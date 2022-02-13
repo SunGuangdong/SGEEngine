@@ -9,9 +9,12 @@ namespace sge {
 struct ScopeGuard : public NoCopyNoMove {
 	ScopeGuard() = default;
 	ScopeGuard(std::function<void()> scopeExitProc)
-	    : scopeExitProc(std::move(scopeExitProc)) {}
+	    : scopeExitProc(std::move(scopeExitProc))
+	{
+	}
 
-	~ScopeGuard() {
+	~ScopeGuard()
+	{
 		if (scopeExitProc) {
 			scopeExitProc();
 		}

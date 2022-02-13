@@ -162,7 +162,6 @@ vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end)
 	vec3f result;
 	if (dtStatusSucceed(m_detourNavMeshQuery->moveAlongSurface(nearestPolyRef, start.data, end.data, &queryPolyFilter, result.data, visited,
 	                                                           &actualVisited, SGE_ARRSZ(visited)))) {
-
 		/// The result so far if correct in xz plane but, it is not projected on the navmesh.
 		float height = 0.f;
 		m_detourNavMeshQuery->getPolyHeight(visited[actualVisited - 1], result.data, &height);

@@ -17,7 +17,6 @@ struct RigidBody;
 /// add add forces to its rigid body for the rigid body should behave as a character
 /// it is expected that the the angular velocity of the rigid body is already set to 0 (to avoid tippling of the rigid body).
 struct SGE_ENGINE_API CharacterCtrlDynamic {
-
 	/// @brief Call this function to make the rigid body of the actor ot appear as a character.
 	/// Use the return value to change the facing direction of the character).
 	CharaterCtrlOutcome update(const GameUpdateSets& updateSets, const CharacterCtrlInput& input);

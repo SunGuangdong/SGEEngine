@@ -6,6 +6,7 @@
 namespace sge {
 
 ReflAddTypeIdExists(Script);
-struct SGE_ENGINE_API Script : public GameObject {};
+struct SGE_ENGINE_API Script : public GameObject {
+};
 
 } // namespace sge

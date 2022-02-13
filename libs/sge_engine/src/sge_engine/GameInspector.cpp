@@ -1,23 +1,26 @@
 #include "GameInspector.h"
 #include "sge_engine/EngineGlobal.h"
+#include "sge_engine/InspectorCmds.h"
 #include "sge_engine/traits/TraitCamera.h"
 #include "sge_utils/text/format.h"
-#include "sge_engine/InspectorCmds.h"
 
 namespace sge {
 
 //--------------------------------------------------------------------
 // GameInspector
 //--------------------------------------------------------------------
-GameInspector::GameInspector() {
+GameInspector::GameInspector()
+{
 	clear();
 }
 
-bool GameInspector::isSteppingAllowed() const {
+bool GameInspector::isSteppingAllowed() const
+{
 	return !m_disableAutoStepping || m_stepOnce;
 }
 
-void GameInspector::redoCommand() {
+void GameInspector::redoCommand()
+{
 	if ((m_lastExecutedCommandIdx + 1 < m_commandHistory.size()) && (m_commandHistory.size() != 0)) {
 		std::string cmdText;
 		m_commandHistory[m_lastExecutedCommandIdx + 1]->getText(cmdText);
@@ -28,7 +31,8 @@ void GameInspector::redoCommand() {
 	}
 }
 
-void GameInspector::undoCommand() {
+void GameInspector::undoCommand()
+{
 	if (m_lastExecutedCommandIdx < m_commandHistory.size() && m_lastExecutedCommandIdx >= 0) {
 		std::string cmdText;
 		m_commandHistory[m_lastExecutedCommandIdx]->getText(cmdText);
@@ -40,7 +44,8 @@ void GameInspector::undoCommand() {
 }
 
 
-void GameInspector::appendCommand(InspectorCmd* const cmd, bool shouldApply) {
+void GameInspector::appendCommand(InspectorCmd* const cmd, bool shouldApply)
+{
 	if (cmd) {
 		m_commandHistory.resize(m_lastExecutedCommandIdx + 1);
 		m_commandHistory.emplace_back(cmd);
@@ -56,7 +61,8 @@ void GameInspector::appendCommand(InspectorCmd* const cmd, bool shouldApply) {
 	}
 }
 
-bool GameInspector::isSelected(ObjectId const id, bool* const outIsPrimary) const {
+bool GameInspector::isSelected(ObjectId const id, bool* const outIsPrimary) const
+{
 	if (outIsPrimary) {
 		*outIsPrimary = false;
 	}
@@ -74,7 +80,8 @@ bool GameInspector::isSelected(ObjectId const id, bool* const outIsPrimary) cons
 	return false;
 }
 
-bool GameInspector::isPrimarySelected(ObjectId const id) const {
+bool GameInspector::isPrimarySelected(ObjectId const id) const
+{
 	if (m_selection.empty() == false) {
 		if (m_selection[0].editMode == editMode_actors && m_selection[0].objectId == id) {
 			return true;
@@ -84,14 +91,16 @@ bool GameInspector::isPrimarySelected(ObjectId const id) const {
 	return false;
 }
 
-ObjectId GameInspector::getPrimarySelection() const {
+ObjectId GameInspector::getPrimarySelection() const
+{
 	if (m_selection.empty())
 		return ObjectId();
 
 	return m_selection[0].objectId;
 }
 
-ObjectId GameInspector::getSecondarySelection() const {
+ObjectId GameInspector::getSecondarySelection() const
+{
 	if (m_selection.size() < 2) {
 		return ObjectId();
 	}
@@ -99,7 +108,8 @@ ObjectId GameInspector::getSecondarySelection() const {
 	return m_selection[1].objectId;
 }
 
-ObjectId GameInspector::getSecondarySelectedActor() const {
+ObjectId GameInspector::getSecondarySelectedActor() const
+{
 	if (m_selection.size() < 2) {
 		return ObjectId();
 	}
@@ -111,7 +121,8 @@ ObjectId GameInspector::getSecondarySelectedActor() const {
 	return m_selection[1].objectId;
 }
 
-void GameInspector::getAllSelectedObjects(vector_set<ObjectId>& allActors) {
+void GameInspector::getAllSelectedObjects(vector_set<ObjectId>& allActors)
+{
 	for (size_t t = 0; t < m_selection.size(); ++t) {
 		if (m_selection[t].editMode == editMode_actors) {
 			allActors.insert(m_selection[t].objectId);
@@ -119,7 +130,8 @@ void GameInspector::getAllSelectedObjects(vector_set<ObjectId>& allActors) {
 	}
 }
 
-void GameInspector::select(ObjectId const id, bool const selectAsPrimary) {
+void GameInspector::select(ObjectId const id, bool const selectAsPrimary)
+{
 	if (selectAsPrimary) {
 		if (isSelected(id)) {
 			deselect(id);
@@ -131,7 +143,8 @@ void GameInspector::select(ObjectId const id, bool const selectAsPrimary) {
 			m_selection.emplace(m_selection.begin(), SelectedItem(id));
 
 		m_selectionChangeIdx++;
-	} else {
+	}
+	else {
 		if (!isSelected(id)) {
 			m_selection.push_back(SelectedItem(id));
 			m_selectionChangeIdx++;
@@ -139,7 +152,8 @@ void GameInspector::select(ObjectId const id, bool const selectAsPrimary) {
 	}
 }
 
-void GameInspector::deselect(ObjectId const id) {
+void GameInspector::deselect(ObjectId const id)
+{
 	for (int t = 0; t < m_selection.size(); ++t) {
 		if (m_selection[t].editMode == editMode_actors && id == m_selection[t].objectId) {
 			m_selection.erase(m_selection.begin() + t);
@@ -149,7 +163,8 @@ void GameInspector::deselect(ObjectId const id) {
 	}
 }
 
-void GameInspector::toggleSelected(ObjectId const id) {
+void GameInspector::toggleSelected(ObjectId const id)
+{
 	for (int t = 0; t < m_selection.size(); ++t) {
 		if (m_selection[t].editMode == editMode_actors && id == m_selection[t].objectId) {
 			m_selection.erase(m_selection.begin() + t);
@@ -162,12 +177,14 @@ void GameInspector::toggleSelected(ObjectId const id) {
 	m_selectionChangeIdx++;
 }
 
-void GameInspector::deselectAll() {
+void GameInspector::deselectAll()
+{
 	m_selection.clear();
 	m_selectionChangeIdx++;
 }
 
-void GameInspector::duplicateSelection(vector_set<ObjectId>* outNewObjects) {
+void GameInspector::duplicateSelection(vector_set<ObjectId>* outNewObjects)
+{
 	if (m_selection.size() == 0) {
 		return;
 	}
@@ -195,7 +212,8 @@ void GameInspector::duplicateSelection(vector_set<ObjectId>* outNewObjects) {
 	}
 }
 
-void GameInspector::deleteSelection(bool const deleteHierarchyUnderSelectedObjects) {
+void GameInspector::deleteSelection(bool const deleteHierarchyUnderSelectedObjects)
+{
 	CmdCompound* const compoundCmd = new CmdCompound();
 
 	std::map<GameObject*, vector_set<SelectedItem>> perObjectSelection;
@@ -217,7 +235,7 @@ void GameInspector::deleteSelection(bool const deleteHierarchyUnderSelectedObjec
 	if (editMode == editMode_actors) {
 		vector_set<ObjectId> actorsToDelete;
 		for (auto& pair : perObjectSelection) {
-			if(deleteHierarchyUnderSelectedObjects) {
+			if (deleteHierarchyUnderSelectedObjects) {
 				getWorld()->getAllChildren(actorsToDelete, pair.first->getId());
 			}
 			actorsToDelete.insert(pair.first->getId());
@@ -226,13 +244,15 @@ void GameInspector::deleteSelection(bool const deleteHierarchyUnderSelectedObjec
 		CmdObjectDeletion* cmd = new CmdObjectDeletion;
 		cmd->setupDeletion(*getWorld(), actorsToDelete);
 		appendCommand(cmd, true);
-	} else {
+	}
+	else {
 		for (auto& itr : perObjectSelection) {
 			Actor* actor = dynamic_cast<Actor*>(itr.first);
 			InspectorCmd* cmd = nullptr;
 			if (actor) {
 				cmd = actor->generateDeleteItemCmd(this, itr.second.data(), itr.second.size(), deleteHierarchyUnderSelectedObjects);
-			} else {
+			}
+			else {
 				CmdObjectDeletion* cmdDel = new CmdObjectDeletion;
 				vector_set<ObjectId> objToDel;
 				objToDel.insert(itr.first->getId());
@@ -248,7 +268,8 @@ void GameInspector::deleteSelection(bool const deleteHierarchyUnderSelectedObjec
 	}
 }
 
-void GameInspector::focusOnSelection() {
+void GameInspector::focusOnSelection()
+{
 	if (m_selection.size() == 0) {
 		getWorld()->m_editorCamera.m_orbitCamera.orbitPoint = vec3f(0.f);
 		getWorld()->m_editorCamera.m_orbitCamera.radius = 27.0f;
@@ -269,7 +290,8 @@ void GameInspector::focusOnSelection() {
 				combinedBoundingBox.expand(box);
 			else
 				combinedBoundingBox.expand(actor->getTransform().p);
-		} else {
+		}
+		else {
 			transf3d tr;
 			actor->getItemTransform(tr, m_selection[t].editMode, m_selection[t].index);
 			combinedBoundingBox.expand(tr.p);

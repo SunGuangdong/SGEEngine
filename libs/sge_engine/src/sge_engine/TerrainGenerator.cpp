@@ -61,7 +61,8 @@ bool TerrainGenerator::generateStairs(std::vector<Vertex>& vertices,
                                       const StairsDesc& desc,
                                       int* pNumVertsAdded,
                                       int* pNumIndicesAdded,
-                                      int* pNumBoxesAdded) {
+                                      int* pNumBoxesAdded)
+{
 	if (!desc.isValid()) {
 		return false;
 	}
@@ -227,7 +228,8 @@ bool TerrainGenerator::generateSlope(std::vector<Vertex>& vertices,
                                      ModelCollisionMesh& outCollisionMesh,
                                      const SlopeDesc& desc,
                                      int* pNumVertsAdded,
-                                     int* pNumIndicesAdded) {
+                                     int* pNumIndicesAdded)
+{
 	outCollisionMesh.freeMemory();
 
 	if (desc.isValid() == false) {
@@ -354,7 +356,8 @@ bool TerrainGenerator::generateSlantedBlock(std::vector<Vertex>& vertices,
                                             ModelCollisionMesh& outCollisionMesh,
                                             const SlantedBlockDesc& desc,
                                             int* pNumVertsAdded,
-                                            int* pNumIndicesAdded) {
+                                            int* pNumIndicesAdded)
+{
 	if (!desc.isValid()) {
 		return false;
 	}

@@ -3,7 +3,8 @@
 
 namespace sge {
 
-void OptionPermuataor::build(const std::vector<OptionDesc>& options) {
+void OptionPermuataor::build(const std::vector<OptionDesc>& options)
+{
 	*this = OptionPermuataor();
 
 	allOptions = options;
@@ -28,7 +29,8 @@ void OptionPermuataor::build(const std::vector<OptionDesc>& options) {
 	}
 }
 
-int OptionPermuataor::computePermutationIndex(const OptionChoice* const optionChoices, const int numOptions) const {
+int OptionPermuataor::computePermutationIndex(const OptionChoice* const optionChoices, const int numOptions) const
+{
 	if (numAllPermutations == 0 || numOptions != allOptions.size()) {
 		sgeAssert(false && "All options must be specified! Maybe creating the shaders failed?");
 		return -1;

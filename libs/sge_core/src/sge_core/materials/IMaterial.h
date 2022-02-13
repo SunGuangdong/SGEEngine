@@ -22,7 +22,8 @@ struct TypeId;
 /// redundand and slow work (however I did not measure it).
 struct SGE_CORE_API IMaterialData {
 	IMaterialData(uint32 materialFamilyId)
-	    : materialFamilyId(materialFamilyId) {
+	    : materialFamilyId(materialFamilyId)
+	{
 	}
 	virtual ~IMaterialData() = default;
 

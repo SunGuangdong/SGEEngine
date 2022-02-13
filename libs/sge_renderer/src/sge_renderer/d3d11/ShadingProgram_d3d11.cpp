@@ -9,7 +9,8 @@
 
 namespace sge {
 
-CreateShaderResult ShadingProgramD3D11::createFromNativeCode(const char* const pVSCode, const char* const pPSCode) {
+CreateShaderResult ShadingProgramD3D11::createFromNativeCode(const char* const pVSCode, const char* const pPSCode)
+{
 	// Create the Vertex Shader...
 	GpuHandle<Shader> vs = getDevice()->requestResource(ResourceType::Shader);
 	CreateShaderResult createVertexShaderRes = vs->createNative(ShaderType::VertexShader, pVSCode, "vsMain");
@@ -28,12 +29,14 @@ CreateShaderResult ShadingProgramD3D11::createFromNativeCode(const char* const p
 
 	if (create(vs, ps)) {
 		return CreateShaderResult(true, "");
-	} else {
+	}
+	else {
 		return CreateShaderResult(false, "ShadingProgramD3D11::createFromNativeCode failed.");
 	}
 }
 
-bool ShadingProgramD3D11::create(Shader* vertShdr, Shader* pixelShdr) {
+bool ShadingProgramD3D11::create(Shader* vertShdr, Shader* pixelShdr)
+{
 	// Clean up the current state
 	destroy();
 
@@ -66,22 +69,26 @@ bool ShadingProgramD3D11::create(Shader* vertShdr, Shader* pixelShdr) {
 	return true;
 }
 
-void ShadingProgramD3D11::destroy() {
+void ShadingProgramD3D11::destroy()
+{
 	// drop shader usage
 	m_vertShdr.Release();
 	m_pixShadr.Release();
 }
 
-bool ShadingProgramD3D11::isValid() const {
+bool ShadingProgramD3D11::isValid() const
+{
 	return m_vertShdr.IsResourceValid() || m_pixShadr.IsResourceValid();
 }
 
-ID3D11VertexShader* ShadingProgramD3D11::D3D11_GetVertexShader() const {
+ID3D11VertexShader* ShadingProgramD3D11::D3D11_GetVertexShader() const
+{
 	sgeAssert(m_vertShdr.IsResourceValid());
 	return (ID3D11VertexShader*)m_vertShdr.as<ShaderD3D11>()->D3D11_GetShader();
 }
 
-ID3D11PixelShader* ShadingProgramD3D11::D3D11_GetPixelShader() const {
+ID3D11PixelShader* ShadingProgramD3D11::D3D11_GetPixelShader() const
+{
 	sgeAssert(m_pixShadr.IsResourceValid());
 	return (ID3D11PixelShader*)m_pixShadr.as<ShaderD3D11>()->D3D11_GetShader();
 }

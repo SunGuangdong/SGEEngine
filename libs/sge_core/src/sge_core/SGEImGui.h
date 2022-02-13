@@ -105,7 +105,8 @@ struct SGE_CORE_API UIState {
 	void* storage = nullptr;
 	void (*deleter)(void*) = nullptr;
 
-	~UIState() {
+	~UIState()
+	{
 		sgeAssert((storage != nullptr) == (deleter != nullptr) && "These are expected to both be present or not!");
 		if (deleter && storage) {
 			deleter(storage);
@@ -117,7 +118,8 @@ struct SGE_CORE_API UIState {
 UIState* getUIStateInternal(const ImGuiID id, void* (*newer)(), void (*deleter)(void*));
 
 template <typename T>
-T& getUIState() {
+T& getUIState()
+{
 	const ImGuiID id = ImGui::GetCurrentWindow()->IDStack.back();
 	UIState* res = getUIStateInternal(
 	    id, []() -> void* { return new T; }, [](void* p) { delete p; });
@@ -127,19 +129,23 @@ T& getUIState() {
 	return *resObj;
 }
 
-inline ImVec2 toImGui(const vec2f& v) {
+inline ImVec2 toImGui(const vec2f& v)
+{
 	return ImVec2(v.x, v.y);
 }
 
-inline vec2f fromImGui(const ImVec2& v) {
+inline vec2f fromImGui(const ImVec2& v)
+{
 	return vec2f(v.x, v.y);
 }
 
-inline ImVec4 toImGui(const vec4f& v) {
+inline ImVec4 toImGui(const vec4f& v)
+{
 	return ImVec4(v.x, v.y, v.z, v.w);
 }
 
-inline vec4f fromImGui(const ImVec4& v) {
+inline vec4f fromImGui(const ImVec4& v)
+{
 	return vec4f(v.x, v.y, v.z, v.w);
 }
 
@@ -148,19 +154,11 @@ inline vec4f fromImGui(const ImVec4& v) {
 namespace ImGuiEx {
 
 struct IDGuard {
-	[[nodiscard]] explicit IDGuard(ImGuiID id) {
-		ImGui::PushID(id);
-	}
-	[[nodiscard]] explicit IDGuard(const void* ptr) {
-		ImGui::PushID(ptr);
-	}
-	[[nodiscard]] explicit IDGuard(const char* const cString) {
-		ImGui::PushID(cString);
-	}
+	[[nodiscard]] explicit IDGuard(ImGuiID id) { ImGui::PushID(id); }
+	[[nodiscard]] explicit IDGuard(const void* ptr) { ImGui::PushID(ptr); }
+	[[nodiscard]] explicit IDGuard(const char* const cString) { ImGui::PushID(cString); }
 
-	~IDGuard() {
-		ImGui::PopID();
-	}
+	~IDGuard() { ImGui::PopID(); }
 
 	// Disable copy:
 	IDGuard(const IDGuard&) = delete;
@@ -172,13 +170,9 @@ struct IDGuard {
 };
 
 struct IndentGuard {
-	IndentGuard() {
-		ImGui::Indent();
-	}
+	IndentGuard() { ImGui::Indent(); }
 
-	~IndentGuard() {
-		ImGui::Unindent();
-	}
+	~IndentGuard() { ImGui::Unindent(); }
 };
 
 SGE_CORE_API void BeginGroupPanel(const char* name, const ImVec2 size = ImVec2(-1.f, -1.f));

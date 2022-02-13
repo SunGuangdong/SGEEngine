@@ -8,13 +8,15 @@ namespace sge {
 
 struct FileWatcher {
 	FileWatcher() = default;
-	FileWatcher(const char* const filenameToWatch) {
+	FileWatcher(const char* const filenameToWatch)
+	{
 		*this = FileWatcher();
 		initilize(filenameToWatch);
 	}
 
 	// Returns true if the file exists.
-	bool initilize(const char* const filenameToWatch) {
+	bool initilize(const char* const filenameToWatch)
+	{
 		*this = FileWatcher(); // reset to defaults.
 		if (filenameToWatch) {
 			this->filename = filenameToWatch;
@@ -25,7 +27,8 @@ struct FileWatcher {
 	}
 
 	/// Returns true if the file was updated.
-	bool update() {
+	bool update()
+	{
 		lastUpdateModtime = modtime;
 		modtime = FileReadStream::getFileModTime(filename.c_str());
 		isFileExisting = modtime != 0;
@@ -34,7 +37,8 @@ struct FileWatcher {
 
 	bool doesFileExists() const { return isFileExisting; }
 
-	bool hasChangedSinceLastUpdate() {
+	bool hasChangedSinceLastUpdate()
+	{
 		if (isFileExisting == false) {
 			return false;
 		}
@@ -53,7 +57,8 @@ struct FileWatcher {
 };
 
 struct FilesWatcher {
-	void initialize(const std::set<std::string>& filesToWatch, float delayedCheckIntervalsSeconds = 0) {
+	void initialize(const std::set<std::string>& filesToWatch, float delayedCheckIntervalsSeconds = 0)
+	{
 		timeIntervalBetweenActualChecks = delayedCheckIntervalsSeconds;
 		for (const std::string& filePath : filesToWatch) {
 			watchers.emplace_back(FileWatcher(filePath.c_str()));
@@ -61,7 +66,8 @@ struct FilesWatcher {
 	}
 
 	/// Returns true if any file was updated.
-	bool update() {
+	bool update()
+	{
 		if (timeIntervalBetweenActualChecks != 0) {
 			const float now = Timer::now_seconds();
 			if (now - lastCheckTime < timeIntervalBetweenActualChecks) {

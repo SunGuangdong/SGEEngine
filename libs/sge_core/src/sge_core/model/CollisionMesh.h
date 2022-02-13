@@ -13,9 +13,12 @@ struct SGE_CORE_API ModelCollisionMesh {
 	ModelCollisionMesh() = default;
 	ModelCollisionMesh(std::vector<vec3f> vertices, std::vector<int> indices)
 	    : vertices(std::move(vertices))
-	    , indices(std::move(indices)) {}
+	    , indices(std::move(indices))
+	{
+	}
 
-	void freeMemory() {
+	void freeMemory()
+	{
 		vertices = std::vector<vec3f>();
 		indices = std::vector<int>();
 	}

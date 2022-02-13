@@ -4,7 +4,8 @@
 
 namespace sge {
 
-void SceneInstance::newScene() {
+void SceneInstance::newScene()
+{
 	m_world.clear();
 	m_inspector.clear();
 
@@ -13,7 +14,8 @@ void SceneInstance::newScene() {
 	m_world.create();
 }
 
-void SceneInstance::loadWorldFromJson(const char* const json, bool disableAutoSepping) {
+void SceneInstance::loadWorldFromJson(const char* const json, bool disableAutoSepping)
+{
 	newScene();
 	[[maybe_unused]] bool success = loadGameWorldFromString(&m_world, json);
 	sgeAssert(success);
@@ -21,7 +23,8 @@ void SceneInstance::loadWorldFromJson(const char* const json, bool disableAutoSe
 	getInspector().m_disableAutoStepping = disableAutoSepping;
 }
 
-void SceneInstance::loadWorldFromFile(const char* const filename, bool disableAutoSepping) {
+void SceneInstance::loadWorldFromFile(const char* const filename, bool disableAutoSepping)
+{
 	std::vector<char> fileContents;
 	if (FileReadStream::readFile(filename, fileContents)) {
 		fileContents.push_back('\0');
@@ -32,14 +35,16 @@ void SceneInstance::loadWorldFromFile(const char* const filename, bool disableAu
 	sgeAssert(false);
 }
 
-bool SceneInstance::saveWorldToFile(const char* const filename) {
+bool SceneInstance::saveWorldToFile(const char* const filename)
+{
 	if (!filename) {
 		return false;
 	}
 
 	JsonValueBuffer jvb;
 	JsonValue* const jWorld = serializeGameWorld(&m_world, jvb);
-	if_checked(jWorld) {
+	if_checked(jWorld)
+	{
 		JsonWriter jw;
 		bool succeeded = jw.WriteInFile(filename, jWorld, true);
 		return succeeded;
@@ -48,7 +53,8 @@ bool SceneInstance::saveWorldToFile(const char* const filename) {
 	return false;
 }
 
-void SceneInstance::update(float dt, const InputState& is) {
+void SceneInstance::update(float dt, const InputState& is)
+{
 	dt = clamp(minOf(dt, 1.f), 0.f, 1.f / 15.f);
 	const GameUpdateSets updateSets(dt, !m_inspector.isSteppingAllowed(), is);
 	m_world.update(updateSets);

@@ -34,24 +34,17 @@ struct SGE_CORE_API AssetIface_Texture2D : public IAssetInterface {
 
 struct SGE_CORE_API AssetTexture2d : public Asset, public AssetIface_Texture2D {
 	AssetTexture2d(std::string assetPath, AssetLibrary& ownerAssetLib)
-	    : Asset(assetPath, ownerAssetLib) {
+	    : Asset(assetPath, ownerAssetLib)
+	{
 	}
 
-	Texture* getTexture() override {
-		return m_texture.GetPtr();
-	}
+	Texture* getTexture() override { return m_texture.GetPtr(); }
 
-	Texture* getTexture() const override {
-		return m_texture.GetPtr();
-	}
+	Texture* getTexture() const override { return m_texture.GetPtr(); }
 
-	const AssetTextureMeta& getTextureMeta() const override {
-		return m_textureMeta;
-	}
+	const AssetTextureMeta& getTextureMeta() const override { return m_textureMeta; }
 
-	void setTextureMeta(const AssetTextureMeta& newMeta) override {
-		m_textureMeta = newMeta;
-	}
+	void setTextureMeta(const AssetTextureMeta& newMeta) override { m_textureMeta = newMeta; }
 
 	/// Loads the specified asset form the specified path.
 	bool loadAssetFromFile(const char* const path) override;

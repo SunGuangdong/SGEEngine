@@ -4,9 +4,9 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
 #include "sge_log/Log.h"
-#include "sge_utils/math/transform.h"
 #include "sge_utils/io/FileStream.h"
 #include "sge_utils/json/json.h"
+#include "sge_utils/math/transform.h"
 #include "sge_utils/text/format.h"
 
 namespace sge {
@@ -19,13 +19,15 @@ enum SceneVersion {
 };
 
 template <typename T>
-JsonValue* serializeVariableT(const T& value, JsonValueBuffer& jvb) {
+JsonValue* serializeVariableT(const T& value, JsonValueBuffer& jvb)
+{
 	return serializeVariable(typeLib().find(sgeTypeId(T)), (char*)&value, jvb);
 }
 
 /// @T needs to be somethings that inherits IAssetInterface.
 template <typename TAssetIface>
-JsonValue* serializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, JsonValueBuffer& jvb) {
+JsonValue* serializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, JsonValueBuffer& jvb)
+{
 	AssetPtr asset = std::dynamic_pointer_cast<Asset>(assetIface);
 	if (isAssetLoaded(asset)) {
 		return jvb(asset->getPath());
@@ -36,7 +38,8 @@ JsonValue* serializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, Jso
 
 /// @T needs to be somethings that inherits IAssetInterface.
 template <typename TAssetIface>
-void deserializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, const JsonValue* jValue) {
+void deserializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, const JsonValue* jValue)
+{
 	if (jValue->isString()) {
 		const char* const assetPath = jValue->GetString();
 		if (!isStringEmpty(assetPath)) {
@@ -46,7 +49,8 @@ void deserializeAssetInterface(std::shared_ptr<TAssetIface>& assetIface, const J
 	}
 }
 
-JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const data, JsonValueBuffer& jvb) {
+JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const data, JsonValueBuffer& jvb)
+{
 	if (typeDesc == NULL) {
 		sgeLogError("[SERIALIZATION] No TypeDesc was specified to %s\n", __func__);
 		sgeAssert(false);
@@ -62,17 +66,23 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 	// Check if this is a primitive type.
 	if (typeDesc->typeId == sgeTypeId(unsigned)) {
 		return jvb(*(unsigned*)data);
-	} else if (typeDesc->typeId == sgeTypeId(int)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(int)) {
 		return jvb(*(int*)data);
-	} else if (typeDesc->typeId == sgeTypeId(float)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(float)) {
 		return jvb(*(float*)data);
-	} else if (typeDesc->typeId == sgeTypeId(char)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(char)) {
 		return jvb(*(char*)data);
-	} else if (typeDesc->typeId == sgeTypeId(bool)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(bool)) {
 		return jvb(*(bool*)data);
-	} else if (typeDesc->typeId == sgeTypeId(std::string)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::string)) {
 		return jvb(*(std::string*)data);
-	} else if (typeDesc->typeId == sgeTypeId(transf3d)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(transf3d)) {
 		// Caution:
 		// [TRANSF3D_GAME_SERIALIZATION]
 		// As a lot of comoments in a trasform are usually default (particularly rotation or scaling),
@@ -91,27 +101,34 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 		}
 
 		return jTransform;
-	} else if (typeDesc->typeId == sgeTypeId(AssetPtr)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(AssetPtr)) {
 		AssetPtr& asset = *(AssetPtr*)data;
 		if (asset) {
 			return jvb(asset->getPath());
-		} else {
+		}
+		else {
 			return jvb("");
 		}
-	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Material>)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Material>)) {
 		std::shared_ptr<AssetIface_Material>* pAssetIface = (std::shared_ptr<AssetIface_Material>*)data;
 		return serializeAssetInterface<AssetIface_Material>(*pAssetIface, jvb);
-	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Model3D>)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Model3D>)) {
 		std::shared_ptr<AssetIface_Model3D>* pAssetIface = (std::shared_ptr<AssetIface_Model3D>*)data;
 		return serializeAssetInterface<AssetIface_Model3D>(*pAssetIface, jvb);
-	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
 		std::shared_ptr<AssetIface_Texture2D>* pAssetIface = (std::shared_ptr<AssetIface_Texture2D>*)data;
 		return serializeAssetInterface<AssetIface_Texture2D>(*pAssetIface, jvb);
-	} else if (typeDesc->enumUnderlayingType.isValid()) {
+	}
+	else if (typeDesc->enumUnderlayingType.isValid()) {
 		// This is an enum. Pass this to be serailized as its underlying type.
 		// TODO: Concider adding the text in some way.
 		return serializeVariable(typeLib().find(typeDesc->enumUnderlayingType), data, jvb);
-	} else if (typeDesc->stdVectorUnderlayingType.isValid()) {
+	}
+	else if (typeDesc->stdVectorUnderlayingType.isValid()) {
 		// The type is std::vector
 		JsonValue* result = jvb(JID_ARRAY);
 
@@ -122,7 +139,8 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 		}
 
 		return result;
-	} else if (typeDesc->stdMapKeyType.isValid() && typeDesc->stdMapKeyType.isValid()) {
+	}
+	else if (typeDesc->stdMapKeyType.isValid() && typeDesc->stdMapKeyType.isValid()) {
 		const TypeDesc* keyTd = typeLib().find(typeDesc->stdMapKeyType);
 		const TypeDesc* ValueTd = typeLib().find(typeDesc->stdMapValueType);
 
@@ -186,11 +204,13 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 
 					if (serializedMember) {
 						jResult->setMember(mfd.name, serializedMember);
-					} else {
+					}
+					else {
 						sgeLogError("[SERIALIZATION] Failed to serialize member %s::%s\n", typeDesc->name, mfd.name);
 						sgeAssert(false);
 					}
-				} else if (mfd.getDataFn != nullptr) {
+				}
+				else if (mfd.getDataFn != nullptr) {
 					char* const memberData = (char*)alloca(mfd.sizeBytes);
 					memberTypeDesc->constructorFn(memberData);
 					mfd.getDataFn((void*)data, memberData);
@@ -199,13 +219,14 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 
 					if (serializedMember) {
 						jResult->setMember(mfd.name, serializedMember);
-					} else {
+					}
+					else {
 						sgeLogError("[SERIALIZATION] Failed to serialize member %s::%s\n", typeDesc->name, mfd.name);
 						sgeAssert(false);
 					}
 				}
-
-			} else {
+			}
+			else {
 				sgeLogError("[SERIALIZATION] Found a member without TypeDesc in type %s\n", typeDesc->name);
 				sgeAssert(false);
 			}
@@ -215,7 +236,8 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 	return jResult;
 }
 
-bool deserializeVariable(char* const valueData, const JsonValue* jValue, const TypeDesc* const typeDesc) {
+bool deserializeVariable(char* const valueData, const JsonValue* jValue, const TypeDesc* const typeDesc)
+{
 	if (typeDesc == nullptr || jValue == nullptr || valueData == nullptr) {
 		return false;
 	}
@@ -223,22 +245,28 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 	if (typeDesc->typeId == sgeTypeId(unsigned)) {
 		*(unsigned*)(valueData) = jValue->getNumberAs<unsigned>();
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(int)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(int)) {
 		*(int*)(valueData) = jValue->getNumberAs<int>();
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(float)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(float)) {
 		*(float*)(valueData) = jValue->getNumberAs<float>();
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(char)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(char)) {
 		*(char*)(valueData) = jValue->getNumberAs<char>();
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(bool)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(bool)) {
 		*(bool*)(valueData) = jValue->getNumberAs<bool>();
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(std::string)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::string)) {
 		*(std::string*)(valueData) = jValue->GetString();
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(transf3d)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(transf3d)) {
 		// Caution:
 		// [TRANSF3D_GAME_SERIALIZATION]
 		// As a lot of comoments in a trasform are usually default (particularly rotation or scaling),
@@ -261,30 +289,36 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		}
 
 		return succeeded;
-	} else if (typeDesc->typeId == sgeTypeId(AssetPtr)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(AssetPtr)) {
 		AssetPtr& asset = *reinterpret_cast<AssetPtr*>(valueData);
 
 		if (jValue->isString()) {
 			asset = getCore()->getAssetLib()->getAssetFromFile(jValue->GetString());
 		}
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Material>)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Material>)) {
 		std::shared_ptr<AssetIface_Material>& assetIface = *reinterpret_cast<std::shared_ptr<AssetIface_Material>*>(valueData);
 		deserializeAssetInterface<AssetIface_Material>(assetIface, jValue);
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Model3D>)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Model3D>)) {
 		std::shared_ptr<AssetIface_Model3D>& assetIface = *reinterpret_cast<std::shared_ptr<AssetIface_Model3D>*>(valueData);
 		deserializeAssetInterface<AssetIface_Model3D>(assetIface, jValue);
 		return true;
-	} else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
+	}
+	else if (typeDesc->typeId == sgeTypeId(std::shared_ptr<AssetIface_Texture2D>)) {
 		std::shared_ptr<AssetIface_Texture2D>& assetIface = *reinterpret_cast<std::shared_ptr<AssetIface_Texture2D>*>(valueData);
 		deserializeAssetInterface<AssetIface_Texture2D>(assetIface, jValue);
 		return true;
-	} else if (typeDesc->enumUnderlayingType.isValid()) {
+	}
+	else if (typeDesc->enumUnderlayingType.isValid()) {
 		// This is an enum. Pass this to be deserialized as its underlying type.
 		// TODO: Concider adding the text in some way.
 		return deserializeVariable(valueData, jValue, typeLib().find(typeDesc->enumUnderlayingType));
-	} else if (typeDesc->stdVectorUnderlayingType.isValid()) {
+	}
+	else if (typeDesc->stdVectorUnderlayingType.isValid()) {
 		// this is a std::vector<T>
 		int const numElements = int(jValue->arrSize());
 		typeDesc->stdVectorResize(valueData, numElements);
@@ -298,7 +332,8 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		}
 
 		return true;
-	} else if (typeDesc->stdMapKeyType.isValid() && typeDesc->stdMapKeyType.isValid()) {
+	}
+	else if (typeDesc->stdMapKeyType.isValid() && typeDesc->stdMapKeyType.isValid()) {
 		// The type is std::map
 		int const numMapPairs = int(jValue->arrSize());
 
@@ -332,7 +367,8 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 			ValueTd->deleteFn(tempValue);
 			tempValue = nullptr;
 			return true;
-		} else {
+		}
+		else {
 			sgeAssert(false && "std::map types not defined");
 		}
 	}
@@ -355,11 +391,13 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 		if (jMember == nullptr) {
 			sgeLogWarn("[DESERIALIZATION] Missing %s::%s, deserialization will be skipped.\n", typeDesc->name, mfd.name);
 			continue;
-		} else {
+		}
+		else {
 			bool succeeded = false;
 			if (mfd.byteOffset >= 0) {
 				succeeded = deserializeVariable(valueData + mfd.byteOffset, jMember, typeLib().find(mfd.typeId));
-			} else if (mfd.setDataFn != nullptr) {
+			}
+			else if (mfd.setDataFn != nullptr) {
 				const TypeDesc* const memberTypeDesc = typeLib().find(mfd.typeId);
 
 				if (memberTypeDesc) {
@@ -381,7 +419,8 @@ bool deserializeVariable(char* const valueData, const JsonValue* jValue, const T
 	return true;
 }
 
-JsonValue* serializeObject(const GameObject* object, JsonValueBuffer& jvb) {
+JsonValue* serializeObject(const GameObject* object, JsonValueBuffer& jvb)
+{
 	const TypeDesc* const typeDesc = typeLib().find(object->getType());
 
 	if (!typeDesc) {
@@ -409,7 +448,8 @@ JsonValue* serializeObject(const GameObject* object, JsonValueBuffer& jvb) {
 
 			if (jMember) {
 				jMembers->setMember(mfd.name, jMember);
-			} else {
+			}
+			else {
 				sgeAssert(false);
 			}
 		}
@@ -417,7 +457,8 @@ JsonValue* serializeObject(const GameObject* object, JsonValueBuffer& jvb) {
 
 	return jObject;
 }
-std::string serializeObject(const GameObject* object) {
+std::string serializeObject(const GameObject* object)
+{
 	JsonValueBuffer jvb;
 	JsonValue* jActor = serializeObject(object, jvb);
 
@@ -435,7 +476,8 @@ std::string serializeObject(const GameObject* object) {
 }
 
 GameObject*
-    deserializeObject(GameWorld* const world, const JsonValue* const jObject, const bool shouldGenerateNewId, ObjectId* outOriginalId) {
+    deserializeObject(GameWorld* const world, const JsonValue* const jObject, const bool shouldGenerateNewId, ObjectId* outOriginalId)
+{
 	// Get the id of the object.
 	ObjectId id;
 
@@ -497,13 +539,13 @@ GameObject*
 				transf3d logicTransform;
 				succeeded = deserializeVariable((char*)&logicTransform, jMember, typeLib().find(mfd.typeId));
 				Actor* actor = object->getActor();
-				if_checked(actor) {
-					actor->setTransform(logicTransform);
-				}
-			} else if (mfd.byteOffset >= 0) {
+				if_checked(actor) { actor->setTransform(logicTransform); }
+			}
+			else if (mfd.byteOffset >= 0) {
 				char* const memberData = (char*)(object) + mfd.byteOffset;
 				succeeded = deserializeVariable(memberData, jMember, typeLib().find(mfd.typeId));
-			} else if (mfd.setDataFn != nullptr) {
+			}
+			else if (mfd.setDataFn != nullptr) {
 				const TypeDesc* const memberTypeDesc = typeLib().find(mfd.typeId);
 
 				if (memberTypeDesc) {
@@ -519,7 +561,8 @@ GameObject*
 				sgeAssert(false);
 				return nullptr;
 			}
-		} else {
+		}
+		else {
 			sgeLogError("[SERIALIZATION] Member not found %s::%s. The member is skipped.\n", actorTypeDesc->name, mfd.name);
 		}
 	}
@@ -531,7 +574,8 @@ GameObject*
 }
 
 GameObject*
-    deserializeObjectFromJson(GameWorld* const world, const std::string& json, const bool shouldGenerateNewId, ObjectId* outOriginalId) {
+    deserializeObjectFromJson(GameWorld* const world, const std::string& json, const bool shouldGenerateNewId, ObjectId* outOriginalId)
+{
 	JsonParser parser;
 	ReadCStringStream crs(json.c_str());
 	if (!parser.parse(&crs)) {
@@ -541,7 +585,8 @@ GameObject*
 	return deserializeObject(world, parser.getRoot(), shouldGenerateNewId, outOriginalId);
 }
 
-JsonValue* serializeGameWorld(const GameWorld* world, JsonValueBuffer& jvb) {
+JsonValue* serializeGameWorld(const GameWorld* world, JsonValueBuffer& jvb)
+{
 	JsonValue* const jWorld = jvb(JID_MAP);
 
 	// Serialize the version of the scheme format.
@@ -598,7 +643,8 @@ JsonValue* serializeGameWorld(const GameWorld* world, JsonValueBuffer& jvb) {
 	return jWorld;
 }
 
-std::string serializeGameWorld(const GameWorld* world) {
+std::string serializeGameWorld(const GameWorld* world)
+{
 	JsonValueBuffer jvb;
 	const JsonValue* const jWorld = serializeGameWorld(world, jvb);
 	JsonWriter jw;
@@ -608,7 +654,8 @@ std::string serializeGameWorld(const GameWorld* world) {
 	return std::move(ss.serializedString);
 }
 
-bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream) {
+bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream)
+{
 	if (!world || !stream) {
 		return false;
 	}
@@ -720,12 +767,14 @@ bool loadGameWorldFromStream(GameWorld* world, IReadStream* stream) {
 	return true;
 }
 
-bool loadGameWorldFromString(GameWorld* world, const char* const levelJson) {
+bool loadGameWorldFromString(GameWorld* world, const char* const levelJson)
+{
 	ReadCStringStream rs(levelJson);
 	return loadGameWorldFromStream(world, &rs);
 }
 
-bool loadGameWorldFromFile(GameWorld* world, const char* const filename) {
+bool loadGameWorldFromFile(GameWorld* world, const char* const filename)
+{
 	if (!filename || filename[0] == '\0') {
 		return false;
 	}

@@ -22,7 +22,8 @@ bool assetPicker(const char* label,
                  std::string& assetPath,
                  AssetLibrary* const assetLibrary,
                  const AssetIfaceType assetTypes[],
-                 const int numAssetIfaceTypes) {
+                 const int numAssetIfaceTypes)
+{
 	ImGuiEx::IDGuard idGuard(label);
 	ImGuiEx::Label(label);
 
@@ -52,7 +53,7 @@ bool assetPicker(const char* label,
 
 		ImGui::EndPopup();
 	}
-	
+
 
 	// Handle accepting drops from drag and drop.
 	if (ImGui::BeginDragDropTarget()) {
@@ -71,7 +72,8 @@ bool assetPicker(const char* label,
 				if (isOfAcceptedInterfaces) {
 					assetPath = *droppedAssetPath;
 					wasAssetPicked = true;
-				} else {
+				}
+				else {
 					sgeLogWarn("The asset '%s' is not of accepted types!", droppedAssetPath->c_str());
 				}
 			}
@@ -111,7 +113,8 @@ bool assetPicker(const char* label,
 							if (ImGui::Button(itr.first.c_str(), ImVec2(48, 48))) {
 								getCore()->getAssetLib()->getAssetFromFile(asset->getPath().c_str());
 							}
-						} else if (isAssetLoaded(asset, assetIface_texture2d)) {
+						}
+						else if (isAssetLoaded(asset, assetIface_texture2d)) {
 							Texture* texture = getLoadedAssetIface<AssetIface_Texture2D>(asset)->getTexture();
 							if (texture && ImGui::ImageButton(texture, ImVec2(48, 48))) {
 								assetPath = itr.first;
@@ -132,10 +135,12 @@ bool assetPicker(const char* label,
 						else
 							ImGui::SameLine();
 					}
-				} else if (assetType == assetIface_model3d) {
+				}
+				else if (assetType == assetIface_model3d) {
 					if (isAssetLoaded(asset)) {
 						ImGui::Text(ICON_FK_CHECK);
-					} else {
+					}
+					else {
 						ImGui::Text(ICON_FK_RECYCLE);
 					}
 
@@ -145,7 +150,8 @@ bool assetPicker(const char* label,
 					if (ImGui::Selectable(itr.first.c_str(), &selected, ImGuiSelectableFlags_DontClosePopups)) {
 						if (!isAssetLoaded(asset)) {
 							getCore()->getAssetLib()->getAssetFromFile(asset->getPath().c_str());
-						} else {
+						}
+						else {
 							assetPath = itr.first;
 							wasAssetPicked = true;
 						}
@@ -185,12 +191,13 @@ bool assetPicker(const char* label,
 						ImGui::Image(frameTarget->getRenderTarget(0), ImVec2(textureSize, textureSize));
 						ImGui::EndTooltip();
 					}
-
-				} else {
+				}
+				else {
 					// Generic for all asset types.
 					if (itr.first == assetPath) {
 						ImGui::TextUnformatted(itr.first.c_str());
-					} else {
+					}
+					else {
 						bool selected = false;
 						if (ImGui::Selectable(itr.first.c_str(), &selected)) {
 							assetPath = itr.first;
@@ -203,7 +210,8 @@ bool assetPicker(const char* label,
 
 		if (numAssetIfaceTypes == 1) {
 			doAssetIfaceTypeMenu(assetTypes[0]);
-		} else {
+		}
+		else {
 			for (int iType = 0; iType < numAssetIfaceTypes; ++iType) {
 				const AssetIfaceType assetType = assetTypes[iType];
 
@@ -220,7 +228,8 @@ bool assetPicker(const char* label,
 }
 
 SGE_ENGINE_API bool assetPicker(
-    const char* label, AssetPtr& asset, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes) {
+    const char* label, AssetPtr& asset, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes)
+{
 	std::string tempPath = isAssetLoaded(asset) ? asset->getPath() : "";
 
 	if (assetPicker(label, tempPath, assetLibrary, assetTypes, numAssetIfaceTypes)) {
@@ -232,7 +241,8 @@ SGE_ENGINE_API bool assetPicker(
 }
 
 bool actorPicker(
-    const char* label, GameWorld& world, ObjectId& ioValue, std::function<bool(const GameObject&)> filter, bool pickPrimarySelection) {
+    const char* label, GameWorld& world, ObjectId& ioValue, std::function<bool(const GameObject&)> filter, bool pickPrimarySelection)
+{
 	GameInspector* inspector = world.getInspector();
 
 	if (!inspector) {
@@ -243,7 +253,8 @@ bool actorPicker(
 		ObjectId newPick;
 		if (pickPrimarySelection) {
 			newPick = inspector->getPrimarySelection();
-		} else {
+		}
+		else {
 			newPick = inspector->getSecondarySelection();
 		}
 
@@ -253,20 +264,24 @@ bool actorPicker(
 				if (obj) {
 					if (filter(*obj)) {
 						ioValue = newPick;
-					} else {
+					}
+					else {
 						getEngineGlobal()->showNotification("This object cannot be picked!");
 					}
 				}
-			} else {
+			}
+			else {
 				ioValue = newPick;
 			}
 
 
 			return true;
-		} else {
+		}
+		else {
 			if (pickPrimarySelection) {
 				getEngineGlobal()->showNotification("Select an object to be picked!");
-			} else {
+			}
+			else {
 				getEngineGlobal()->showNotification("Select a secondary object to be picked!");
 			}
 		}
@@ -274,7 +289,8 @@ bool actorPicker(
 
 	if (pickPrimarySelection) {
 		ImGuiEx::TextTooltip("Select an object and click this button to pick it!");
-	} else {
+	}
+	else {
 		ImGuiEx::TextTooltip("Select a secondary object and click this button to pick it!");
 	}
 	ImGui::SameLine();
@@ -289,7 +305,8 @@ bool actorPicker(
 		const GameObject* const newlyAssignedObject = world.getObjectByName(currentActorName);
 		if (newlyAssignedObject) {
 			ioValue = newlyAssignedObject->getId();
-		} else {
+		}
+		else {
 			ioValue = ObjectId();
 		}
 		return true;
@@ -311,7 +328,8 @@ bool actorPicker(
 	return false;
 }
 
-SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, const TypeId needsToInherit) {
+SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, const TypeId needsToInherit)
+{
 	ImGuiEx::IDGuard idGuard(label);
 	ImGuiEx::Label(label);
 
@@ -335,7 +353,8 @@ SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, con
 		if (pickedType != nullptr) {
 			ioValue = pickedType->typeId;
 			wasAssetPicked = true;
-		} else {
+		}
+		else {
 			sgeLogError("The speicifed type cannot be found!");
 		}
 	}
@@ -363,8 +382,8 @@ SGE_ENGINE_API bool gameObjectTypePicker(const char* label, TypeId& ioValue, con
 					continue;
 				}
 
-				const AssetIface_Texture2D* texIface =
-				    getLoadedAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
+				const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(
+				    getEngineGlobal()->getEngineAssets().getIconForObjectType(potentialType->typeId));
 
 				Texture* const iconTexture = texIface ? texIface->getTexture() : nullptr;
 

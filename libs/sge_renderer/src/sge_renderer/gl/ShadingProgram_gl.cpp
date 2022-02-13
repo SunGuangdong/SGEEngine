@@ -8,7 +8,8 @@
 
 namespace sge {
 
-bool ShadingProgramGL::create(Shader* vertShdr, Shader* pixelShdr) {
+bool ShadingProgramGL::create(Shader* vertShdr, Shader* pixelShdr)
+{
 	if (!vertShdr || !pixelShdr) {
 		return false;
 	}
@@ -54,7 +55,8 @@ bool ShadingProgramGL::create(Shader* vertShdr, Shader* pixelShdr) {
 	return reflectonSucceeded;
 }
 
-CreateShaderResult ShadingProgramGL::createFromNativeCode(const char* const pVSCode, const char* const pPSCode) {
+CreateShaderResult ShadingProgramGL::createFromNativeCode(const char* const pVSCode, const char* const pPSCode)
+{
 	GpuHandle<ShaderGL> vs = getDevice()->requestResource<Shader>();
 	CreateShaderResult createVertexShdrRes = vs->createNative(ShaderType::VertexShader, pVSCode, nullptr);
 	if (createVertexShdrRes.succeeded == false) {
@@ -74,7 +76,8 @@ CreateShaderResult ShadingProgramGL::createFromNativeCode(const char* const pVSC
 	return CreateShaderResult();
 }
 
-void ShadingProgramGL::destroy() {
+void ShadingProgramGL::destroy()
+{
 	// drop shader usage
 	m_vertShdr.Release();
 	m_pixShadr.Release();
@@ -86,11 +89,13 @@ void ShadingProgramGL::destroy() {
 	}
 }
 
-bool ShadingProgramGL::isValid() const {
+bool ShadingProgramGL::isValid() const
+{
 	return m_glProgram != 0;
 }
 
-VertexMapperGL* ShadingProgramGL::GetVertexMapper(const VertexDeclIndex vertexDeclIndex) {
+VertexMapperGL* ShadingProgramGL::GetVertexMapper(const VertexDeclIndex vertexDeclIndex)
+{
 	// if the requester mapper already exists return it!
 	for (size_t t = 0; t < m_vertMappers.size(); ++t) {
 		const bool isMatching = vertexDeclIndex == m_vertMappers[t]->getVertexDeclIndex();

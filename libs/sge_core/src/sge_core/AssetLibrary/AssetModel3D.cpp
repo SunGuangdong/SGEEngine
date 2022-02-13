@@ -6,7 +6,8 @@
 #include "sge_utils/text/Path.h"
 
 namespace sge {
-bool AssetModel3D::loadAssetFromFile(const char* const path) {
+bool AssetModel3D::loadAssetFromFile(const char* const path)
+{
 	m_status = AssetStatus_LoadFailed;
 
 	FileReadStream frs(path);
@@ -29,7 +30,7 @@ bool AssetModel3D::loadAssetFromFile(const char* const path) {
 		sgeLogError("Unable to load model asset: '%s'!\n", path);
 		return false;
 	}
-	
+
 	m_modelOpt->prepareForRendering(*getCore()->getDevice(), m_ownerAssetLib);
 
 	m_staticEval.initialize(m_modelOpt.getPtr());

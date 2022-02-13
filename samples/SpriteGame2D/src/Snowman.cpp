@@ -7,7 +7,8 @@
 
 namespace sge {
 
-vec2f getIntersectionDepth(const AABox2f& rectA, const AABox2f& rectB) {
+vec2f getIntersectionDepth(const AABox2f& rectA, const AABox2f& rectB)
+{
 	vec2f centerA = rectA.center();
 	vec2f centerB = rectB.center();
 
@@ -31,7 +32,8 @@ struct TraitCollisionRect2d : public Trait {
 
 	vec2f rectSize;
 
-	AABox2f getRect() const {
+	AABox2f getRect() const
+	{
 		vec2f pos = getActor()->getPosition().xy();
 		AABox2f rect = AABox2f(pos, pos + rectSize);
 		return rect;
@@ -49,7 +51,8 @@ struct Snowman : public Actor {
 
 	virtual AABox3f getBBoxOS() const { return ttModel.getBBoxOS(); }
 
-	void create() {
+	void create()
+	{
 		registerTrait(ttModel);
 		registerTrait(collider);
 
@@ -59,7 +62,8 @@ struct Snowman : public Actor {
 		ttModel.imageSettings.m_anchor = anchor_topLeft;
 	}
 
-	void update(const GameUpdateSets& u) {
+	void update(const GameUpdateSets& u)
+	{
 		if (u.isSimulationPaused()) {
 			return;
 		}
@@ -76,7 +80,8 @@ struct Snowman : public Actor {
 		// Apply the gravity.
 		if (vel.y < 0) {
 			vel.y -= gravity * u.dt;
-		} else {
+		}
+		else {
 			vel.y -= fallingGravity * u.dt;
 		}
 
@@ -97,7 +102,8 @@ struct Snowman : public Actor {
 					    if (intersection != vec2f(0.f)) {
 						    if (fabsf(intersection.x) < fabsf(intersection.y)) {
 							    setPosition(getPosition() + vec3f(intersection.x, 0.f, 0.f));
-						    } else {
+						    }
+						    else {
 							    setPosition(getPosition() + vec3f(0.f, intersection.y, 0.f));
 
 							    isGrounded |= intersection.y > 0.f;
@@ -123,7 +129,8 @@ struct Snowman : public Actor {
 			if (vel.y < 0) {
 				vel.y = 0.f;
 			}
-		} else {
+		}
+		else {
 			timeSpentInAir += u.dt;
 		}
 
@@ -189,7 +196,8 @@ struct Snowman : public Actor {
 
 ReflAddTypeId(Snowman, 21'04'17'0001);
 
-ReflBlock() {
+ReflBlock()
+{
 	ReflAddActor(Snowman);
 }
 
@@ -199,7 +207,8 @@ struct IceBlock : public Actor {
 
 	virtual AABox3f getBBoxOS() const { return ttModel.getBBoxOS(); }
 
-	void create() {
+	void create()
+	{
 		registerTrait(ttModel);
 		registerTrait(collider);
 
@@ -211,7 +220,8 @@ struct IceBlock : public Actor {
 
 ReflAddTypeId(IceBlock, 21'04'17'0002);
 
-ReflBlock() {
+ReflBlock()
+{
 	ReflAddActor(IceBlock);
 }
 

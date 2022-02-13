@@ -9,11 +9,11 @@
 /// code surronded by the macros below. Useful when we want to include 3rd party code
 /// that wasn't compiled with the same warnings as errors.
 #ifdef WIN32
-#define SGE_NO_WARN_BEGIN __pragma(warning(push, 0))
-#define SGE_NO_WARN_END __pragma(warning(pop))
+	#define SGE_NO_WARN_BEGIN __pragma(warning(push, 0))
+	#define SGE_NO_WARN_END __pragma(warning(pop))
 #else
-#define SGE_NO_WARN_BEGIN
-#define SGE_NO_WARN_END
+	#define SGE_NO_WARN_BEGIN
+	#define SGE_NO_WARN_END
 #endif
 
 namespace sge {

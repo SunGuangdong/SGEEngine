@@ -2,8 +2,8 @@
 
 #include "IconsForkAwesome/IconsForkAwesome.h"
 #include "application/application.h"
-#include "sge_utils/math/transform.h"
 #include "sge_utils/containers/StaticArray.h"
+#include "sge_utils/math/transform.h"
 
 #include "SGEImGui.h"
 
@@ -12,7 +12,8 @@
 
 namespace sge {
 
-inline void MayaStyle(ImGuiStyle& style) {
+inline void MayaStyle(ImGuiStyle& style)
+{
 	ImVec4* colors = style.Colors;
 
 	/// 0 = FLAT APPEARENCE
@@ -102,7 +103,8 @@ inline void MayaStyle(ImGuiStyle& style) {
 }
 
 
-inline void Style() {
+inline void Style()
+{
 	[[maybe_unused]] ImGuiStyle& style = ImGui::GetStyle();
 
 	// ImGui::StyleColorsLight(&style);
@@ -189,7 +191,8 @@ GpuHandle<sge::ShadingProgram> SGEImGui::shadingProgram;
 //--------------------------------------------------------------------
 // struct SGEImGui
 //--------------------------------------------------------------------
-void SGEImGui::initialize(SGEContext* sgecon_arg, FrameTarget* frameTarget, const Rect2s& viewport_arg) {
+void SGEImGui::initialize(SGEContext* sgecon_arg, FrameTarget* frameTarget, const Rect2s& viewport_arg)
+{
 	// Create the texture.
 	ImGuiContext* imContext = ImGui::CreateContext();
 	ImGui::SetCurrentContext(imContext);
@@ -198,7 +201,9 @@ void SGEImGui::initialize(SGEContext* sgecon_arg, FrameTarget* frameTarget, cons
 
 	// io.Fonts->AddFontDefault();
 
-	{ io.Fonts->AddFontFromFileTTF("assets/editor/fonts/UbuntuMono-Regular.ttf", 16.f); }
+	{
+		io.Fonts->AddFontFromFileTTF("assets/editor/fonts/UbuntuMono-Regular.ttf", 16.f);
+	}
 
 	// merge in icons from Font Awesome
 	{
@@ -275,7 +280,8 @@ void SGEImGui::initialize(SGEContext* sgecon_arg, FrameTarget* frameTarget, cons
 	Style();
 }
 
-void SGEImGui::destroy() {
+void SGEImGui::destroy()
+{
 	vertBuffer.Release();
 	idxBuffer.Release();
 	rasterizerState.Release();
@@ -285,12 +291,14 @@ void SGEImGui::destroy() {
 	frame_target.Release();
 }
 
-void SGEImGui::setViewport(const Rect2s& viewport_arg) {
+void SGEImGui::setViewport(const Rect2s& viewport_arg)
+{
 	viewport = viewport_arg;
 	ImGui::GetIO().DisplaySize = ImVec2(viewport.width, viewport.height);
 }
 
-void SGEImGui::newFrame(const InputState& inputState) {
+void SGEImGui::newFrame(const InputState& inputState)
+{
 	timer.tick();
 
 	ImGui::GetIO().DeltaTime = timer.diff_seconds();
@@ -340,7 +348,9 @@ void SGEImGui::newFrame(const InputState& inputState) {
 		while (*inputText != '\0') {
 			// Skip tabs, as they are handled by the ImGuiKey_Tab in ImGui.
 			// if(*inputText != '\t')
-			{ ImGui::GetIO().AddInputCharacter((ImWchar)*inputText); }
+			{
+				ImGui::GetIO().AddInputCharacter((ImWchar)*inputText);
+			}
 			inputText++;
 		}
 	}
@@ -348,7 +358,8 @@ void SGEImGui::newFrame(const InputState& inputState) {
 	ImGui::NewFrame();
 }
 
-void SGEImGui::render() {
+void SGEImGui::render()
+{
 	ImGui::Render();
 
 	ImDrawData* const data = ImGui::GetDrawData();
@@ -357,7 +368,8 @@ void SGEImGui::render() {
 	}
 }
 
-void SGEImGui::renderDrawLists(ImDrawData* imDrawData) {
+void SGEImGui::renderDrawLists(ImDrawData* imDrawData)
+{
 	const int vbNeededBytes = sizeof(SGEImGuiVertex) * imDrawData->TotalVtxCount;
 
 	if (vbNeededBytes == 0) {
@@ -430,7 +442,8 @@ void SGEImGui::renderDrawLists(ImDrawData* imDrawData) {
 
 			if (pcmd->UserCallback != NULL) {
 				pcmd->UserCallback(cmd_list, pcmd);
-			} else {
+			}
+			else {
 				Rect2s scissorsRect;
 
 				scissorsRect.x = (short)pcmd->ClipRect.x;
@@ -471,7 +484,8 @@ void SGEImGui::renderDrawLists(ImDrawData* imDrawData) {
 	}
 }
 
-bool SGEImGui::IsItemActiveLastFrame() {
+bool SGEImGui::IsItemActiveLastFrame()
+{
 	ImGuiContext& g = *GImGui;
 
 	if (g.ActiveIdPreviousFrame)
@@ -479,11 +493,13 @@ bool SGEImGui::IsItemActiveLastFrame() {
 	return false;
 }
 
-bool SGEImGui::IsItemJustReleased() {
+bool SGEImGui::IsItemJustReleased()
+{
 	return IsItemActiveLastFrame() && !ImGui::IsItemActive();
 }
 
-bool SGEImGui::IsItemJustActivated() {
+bool SGEImGui::IsItemJustActivated()
+{
 	return !IsItemActiveLastFrame() && ImGui::IsItemActive();
 }
 
@@ -497,7 +513,8 @@ bool SGEImGui::DragFloats(const char* label,
                           float v_min,
                           float v_max,
                           const char* display_format,
-                          float power) {
+                          float power)
+{
 	ImGuiWindow* const window = ImGui::GetCurrentWindow();
 	if (window->SkipItems) {
 		return false;
@@ -552,7 +569,8 @@ bool SGEImGui::DragInts(const char* label,
                         float v_speed,
                         int v_min,
                         int v_max,
-                        const char* display_format) {
+                        const char* display_format)
+{
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	if (window->SkipItems)
 		return false;
@@ -588,15 +606,9 @@ bool SGEImGui::DragInts(const char* label,
 // Note: only access 3 floats if ImGuiColorEditFlags_NoAlpha flag is set.
 // FIXME: we adjust the big color square height based on item width, which may cause a flickering feedback loop (if automatic height makes a
 // vertical scrollbar appears, affecting automatic width..)
-bool SGEImGui::ColorPicker4(const char* label,
-                            float col[4],
-                            bool* const pJustReleased,
-                            bool* const pJustActivated,
-                            ImGuiColorEditFlags flags,
-                            const float* ref_col) {
-
-
-
+bool SGEImGui::ColorPicker4(
+    const char* label, float col[4], bool* const pJustReleased, bool* const pJustActivated, ImGuiColorEditFlags flags, const float* ref_col)
+{
 	const auto RenderArrowsForVerticalBar = [](ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, float bar_w) -> void {
 		const auto RenderArrow = [](ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, ImGuiDir direction, ImU32 col) -> void {
 			switch (direction) {
@@ -858,7 +870,8 @@ bool SGEImGui::ColorPicker4(const char* label,
 }
 
 bool SGEImGui::ColorPicker3(
-    const char* label, float col[3], bool* const pJustPressed, bool* const pJustReleased, ImGuiColorEditFlags flags, const float* ref_col) {
+    const char* label, float col[3], bool* const pJustPressed, bool* const pJustReleased, ImGuiColorEditFlags flags, const float* ref_col)
+{
 	using namespace ImGui;
 
 	float col4[4] = {col[0], col[1], col[2], 1.0f};
@@ -876,7 +889,8 @@ bool SGEImGui::ColorPicker3(
 //--------------------------------------------------------------
 std::unordered_map<ImGuiID, UIState> g_sgeUIState;
 
-UIState* getUIStateInternal(const ImGuiID id, void* (*newer)(), void (*deleter)(void*)) {
+UIState* getUIStateInternal(const ImGuiID id, void* (*newer)(), void (*deleter)(void*))
+{
 	UIState& res = g_sgeUIState[id];
 
 	if (res.storage == nullptr && deleter != nullptr && newer != nullptr) {
@@ -893,7 +907,8 @@ namespace ImGuiEx {
 
 static ImVector<ImRect> s_GroupPanelLabelStack;
 
-void BeginGroupPanel(const char* name, const ImVec2 size) {
+void BeginGroupPanel(const char* name, const ImVec2 size)
+{
 	ImGui::BeginGroup();
 
 	auto cursorPos = ImGui::GetCursorScreenPos();
@@ -942,7 +957,8 @@ void BeginGroupPanel(const char* name, const ImVec2 size) {
 	s_GroupPanelLabelStack.push_back(ImRect(labelMin, labelMax));
 }
 
-void EndGroupPanel() {
+void EndGroupPanel()
+{
 	ImGui::PopItemWidth();
 
 	auto itemSpacing = ImGui::GetStyle().ItemSpacing;
@@ -1016,7 +1032,8 @@ void EndGroupPanel() {
 	ImGui::EndGroup();
 }
 
-void Label(const char* label, bool shouldSetNextItemWidth, float labelWidthProportion) {
+void Label(const char* label, bool shouldSetNextItemWidth, float labelWidthProportion)
+{
 	if (label == nullptr) {
 		sgeAssert(false);
 		return;
@@ -1071,7 +1088,8 @@ bool InputText(const char* label,
                ImGuiInputTextFlags flags,
                ImGuiInputTextCallback callback,
                void* user_data,
-               bool acceptOnlyIdentifierStyleText) {
+               bool acceptOnlyIdentifierStyleText)
+{
 	struct InputTextCallback_UserData {
 		std::string* Str;
 		ImGuiInputTextCallback ChainCallback;
@@ -1087,7 +1105,8 @@ bool InputText(const char* label,
 			IM_ASSERT(data->Buf == str->c_str());
 			str->resize(data->BufTextLen);
 			data->Buf = (char*)str->c_str();
-		} else if (user_data->ChainCallback) {
+		}
+		else if (user_data->ChainCallback) {
 			// Forward to user callback, if any
 			data->UserData = user_data->ChainCallbackUserData;
 			return user_data->ChainCallback(data);
@@ -1103,14 +1122,16 @@ bool InputText(const char* label,
 			}
 
 			return 1;
-		} else if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
+		}
+		else if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
 			// Resize string callback
 			// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
 			std::string* str = user_data->Str;
 			IM_ASSERT(data->Buf == str->c_str());
 			str->resize(data->BufTextLen);
 			data->Buf = (char*)str->c_str();
-		} else if (user_data->ChainCallback) {
+		}
+		else if (user_data->ChainCallback) {
 			// Forward to user callback, if any
 			data->UserData = user_data->ChainCallbackUserData;
 			return user_data->ChainCallback(data);
@@ -1133,12 +1154,14 @@ bool InputText(const char* label,
 
 	if (acceptOnlyIdentifierStyleText) {
 		return ImGui::InputText(label, (char*)str.c_str(), str.capacity() + 1, flags, InputTextCallbackIdentifierFilter, &cb_user_data);
-	} else {
+	}
+	else {
 		return ImGui::InputText(label, (char*)str.c_str(), str.capacity() + 1, flags, InputTextCallback, &cb_user_data);
 	}
 }
 
-SGE_CORE_API void TextTooltip(const char* const text) {
+SGE_CORE_API void TextTooltip(const char* const text)
+{
 	if (text != nullptr && ImGui::IsItemHovered()) {
 		ImGui::BeginTooltip();
 		ImGui::Text(text);
@@ -1146,7 +1169,8 @@ SGE_CORE_API void TextTooltip(const char* const text) {
 	}
 }
 
-SGE_CORE_API void TextTooltipDelayed(const char* const text, float delay) {
+SGE_CORE_API void TextTooltipDelayed(const char* const text, float delay)
+{
 	if (text != nullptr && ImGui::IsItemHovered() && (GImGui->HoveredIdTimer >= delay)) {
 		ImGui::BeginTooltip();
 		ImGui::Text(text);

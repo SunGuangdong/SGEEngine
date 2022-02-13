@@ -38,16 +38,21 @@ class ReadCStringStream : public IReadStream {
 	ReadCStringStream()
 	    : string(nullptr)
 	    , lenght(0)
-	    , pointer(0) {}
+	    , pointer(0)
+	{
+	}
 
 	ReadCStringStream(const char* const string)
 	    : string(string)
 	    , lenght(strlen(string))
-	    , pointer(0) {}
+	    , pointer(0)
+	{
+	}
 
 	// Attempts to read data equal in size to numBytes
 	// @retval: the amount of data actually read
-	inline size_t read(void* destination, size_t numBytes) override {
+	inline size_t read(void* destination, size_t numBytes) override
+	{
 		sgeAssert(destination);
 		char* chdest = (char*)destination;
 
@@ -63,7 +68,8 @@ class ReadCStringStream : public IReadStream {
 
 	inline size_t pointerOffset() { return pointer; }
 
-	inline void seek(SeekOrigin origin, size_t bytes) {
+	inline void seek(SeekOrigin origin, size_t bytes)
+	{
 		switch (origin) {
 			case SeekOrigin::Begining:
 				pointer = bytes;
@@ -94,7 +100,8 @@ class WriteStdStringStream : public IWriteStream {
 
 	// Attempts to write data equal in size to numBytes
 	// @retval: the amount of data actually written
-	size_t write(const char* src, size_t numBytes) final {
+	size_t write(const char* src, size_t numBytes) final
+	{
 		serializedString.reserve(serializedString.size() + numBytes);
 
 		const char* srcChar = (char*)src;
@@ -116,7 +123,8 @@ class WriteByteStream : public IWriteStream {
 
 	// Attempts to write data equal in size to numBytes
 	// @retval: the amount of data actually written
-	size_t write(const char* src, size_t numBytes) final {
+	size_t write(const char* src, size_t numBytes) final
+	{
 		serializedData.reserve(serializedData.size() + numBytes);
 
 		const char* srcChar = (char*)src;
@@ -141,16 +149,21 @@ class ReadByteStream : public IReadStream {
 	ReadByteStream(const std::vector<char>& vector)
 	    : data(vector.data())
 	    , dataSizeBytes(vector.size())
-	    , pointer(0) {}
+	    , pointer(0)
+	{
+	}
 
 	ReadByteStream(const char* const data, size_t numBytes)
 	    : data(data)
 	    , dataSizeBytes(numBytes)
-	    , pointer(0) {}
+	    , pointer(0)
+	{
+	}
 
 	// Attempts to read data equal in size to numBytes
 	// @retval: the amount of data actually read
-	inline size_t read(void* destination, size_t numBytes) override {
+	inline size_t read(void* destination, size_t numBytes) override
+	{
 		sgeAssert(destination);
 		char* chdest = (char*)destination;
 
@@ -166,7 +179,8 @@ class ReadByteStream : public IReadStream {
 
 	inline size_t pointerOffset() { return pointer; }
 
-	inline void seek(SeekOrigin origin, size_t bytes) {
+	inline void seek(SeekOrigin origin, size_t bytes)
+	{
 		switch (origin) {
 			case SeekOrigin::Begining:
 				pointer = bytes;

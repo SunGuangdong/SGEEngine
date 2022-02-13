@@ -3,7 +3,8 @@
 
 namespace sge {
 
-bool QueryD3D11::create(QueryType::Enum const queryType) {
+bool QueryD3D11::create(QueryType::Enum const queryType)
+{
 	ID3D11Device* const d3ddev = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice();
 
 	m_queryType = queryType;
@@ -21,11 +22,13 @@ bool QueryD3D11::create(QueryType::Enum const queryType) {
 	return true;
 }
 
-void QueryD3D11::destroy() {
+void QueryD3D11::destroy()
+{
 	m_d3d11_query.Release();
 }
 
-bool QueryD3D11::isValid() const {
+bool QueryD3D11::isValid() const
+{
 	return m_d3d11_query != nullptr;
 }
 

@@ -11,22 +11,12 @@ namespace sge {
 struct InputState;
 
 struct SGE_ENGINE_API SceneInstance {
-	SceneInstance() {
-		newScene();
-	}
+	SceneInstance() { newScene(); }
 
-	GameWorld& getWorld() {
-		return m_world;
-	}
-	const GameWorld& getWorld() const {
-		return m_world;
-	}
-	GameInspector& getInspector() {
-		return m_inspector;
-	}
-	const GameInspector& getInspector() const {
-		return m_inspector;
-	}
+	GameWorld& getWorld() { return m_world; }
+	const GameWorld& getWorld() const { return m_world; }
+	GameInspector& getInspector() { return m_inspector; }
+	const GameInspector& getInspector() const { return m_inspector; }
 
 	void newScene();
 	void loadWorldFromJson(const char* const json, bool disableAutoSepping);

@@ -14,7 +14,8 @@ namespace sge {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void CmdMemberChange::setActorLogicTransform(CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src) {
+void CmdMemberChange::setActorLogicTransform(CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src)
+{
 	Actor* const actor = inspector->m_world->getActorById(cmd->m_objectId);
 
 	sgeAssert(actor);
@@ -23,7 +24,8 @@ void CmdMemberChange::setActorLogicTransform(CmdMemberChange* cmd, GameInspector
 	}
 }
 
-void CmdMemberChange::setActorLocalTransform(CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src) {
+void CmdMemberChange::setActorLocalTransform(CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src)
+{
 	Actor* const actor = inspector->m_world->getActorById(cmd->m_objectId);
 
 	sgeAssert(actor);
@@ -32,14 +34,16 @@ void CmdMemberChange::setActorLocalTransform(CmdMemberChange* cmd, GameInspector
 	}
 }
 
-void CmdMemberChange::setAssetPropertyChange(CmdMemberChange* UNUSED(cmd), GameInspector* UNUSED(inspector), void* dest, void* src) {
+void CmdMemberChange::setAssetPropertyChange(CmdMemberChange* UNUSED(cmd), GameInspector* UNUSED(inspector), void* dest, void* src)
+{
 	AssetProperty* destAsset = reinterpret_cast<AssetProperty*>(dest);
 	AssetProperty* srcAsset = reinterpret_cast<AssetProperty*>(src);
 
 	destAsset->setAsset(srcAsset->getAsset());
 }
 
-CmdMemberChange::~CmdMemberChange() {
+CmdMemberChange::~CmdMemberChange()
+{
 	const TypeDesc* const typeDesc = m_chainToDynamicProp.getType();
 
 	if (typeDesc) {
@@ -60,7 +64,8 @@ void CmdMemberChange::setup(ObjectId const objId,
                             const MemberChain& chain,
                             const void* originalValue,
                             const void* newValue,
-                            void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src)) {
+                            void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src))
+{
 	sgeAssert(!objId.isNull() && originalValue && newValue);
 
 	m_objectId = objId;
@@ -80,7 +85,8 @@ void CmdMemberChange::setup(ObjectId const objId,
 	typeDesc->copyFn(m_newData.get(), newValue);
 }
 
-void CmdMemberChange::apply(GameInspector* inspector) {
+void CmdMemberChange::apply(GameInspector* inspector)
+{
 	GameObject* const actor = inspector->m_world->getObjectById(m_objectId);
 
 	if (!actor) {
@@ -106,7 +112,8 @@ void CmdMemberChange::apply(GameInspector* inspector) {
 	inspector->m_selectionChangeIdx++;
 }
 
-void CmdMemberChange::undo(GameInspector* inspector) {
+void CmdMemberChange::undo(GameInspector* inspector)
+{
 	GameObject* const actor = inspector->m_world->getObjectById(m_objectId);
 
 	if (!actor) {
@@ -132,14 +139,16 @@ void CmdMemberChange::undo(GameInspector* inspector) {
 	inspector->m_selectionChangeIdx++;
 }
 
-void CmdMemberChange::getText(std::string& text) {
+void CmdMemberChange::getText(std::string& text)
+{
 	text = "GameWorldCommandChangeMember";
 }
 
 //--------------------------------------------------------------------
 // CmdDynamicProperyChanged
 //--------------------------------------------------------------------
-CmdDynamicProperyChanged::~CmdDynamicProperyChanged() {
+CmdDynamicProperyChanged::~CmdDynamicProperyChanged()
+{
 	const TypeDesc* const typeDesc = typeLib().find(m_propertyTypeId);
 	if (typeDesc) {
 		if (m_orginaldata) {
@@ -156,7 +165,8 @@ CmdDynamicProperyChanged::~CmdDynamicProperyChanged() {
 }
 
 void CmdDynamicProperyChanged::setup(
-    GameObject* obj, const MemberChain& chain, std::string dynamicPropName, const void* originalValue, const void* newValue) {
+    GameObject* obj, const MemberChain& chain, std::string dynamicPropName, const void* originalValue, const void* newValue)
+{
 	sgeAssert(obj != nullptr && originalValue && newValue);
 
 	m_objectId = obj->getId();
@@ -190,7 +200,8 @@ void CmdDynamicProperyChanged::setup(
 	typeDesc->copyFn(m_newData.get(), newValue);
 }
 
-void CmdDynamicProperyChanged::apply(GameInspector* inspector) {
+void CmdDynamicProperyChanged::apply(GameInspector* inspector)
+{
 	if (m_propertyTypeId.isNull()) {
 		sgeAssert(false);
 		return;
@@ -231,7 +242,8 @@ void CmdDynamicProperyChanged::apply(GameInspector* inspector) {
 	inspector->m_selectionChangeIdx++;
 }
 
-void CmdDynamicProperyChanged::undo(GameInspector* inspector) {
+void CmdDynamicProperyChanged::undo(GameInspector* inspector)
+{
 	if (m_propertyTypeId.isNull()) {
 		sgeAssert(false);
 		return;
@@ -272,7 +284,8 @@ void CmdDynamicProperyChanged::undo(GameInspector* inspector) {
 	inspector->m_selectionChangeIdx++;
 }
 
-void CmdDynamicProperyChanged::getText(std::string& text) {
+void CmdDynamicProperyChanged::getText(std::string& text)
+{
 	text = "CmdDynamicProperyChanged";
 }
 
@@ -286,7 +299,8 @@ void CmdDynamicProperyChanged::getText(std::string& text) {
 // To complate the process of duplication the caller must call
 // onDuplocationComplete() on the reated object!
 //--------------------------------------------------------------------
-GameObject* duplicateGameObjectIncompleate(const GameObject* const srcObject) {
+GameObject* duplicateGameObjectIncompleate(const GameObject* const srcObject)
+{
 	if (!srcObject) {
 		sgeAssert(false);
 		return nullptr;
@@ -320,7 +334,8 @@ GameObject* duplicateGameObjectIncompleate(const GameObject* const srcObject) {
 
 			if (world->getObjectByName(displayName.c_str()) != nullptr) {
 				displayName.clear();
-			} else {
+			}
+			else {
 				break;
 			}
 		}
@@ -356,12 +371,15 @@ GameObject* duplicateGameObjectIncompleate(const GameObject* const srcObject) {
 				if (destActor) {
 					destActor->setTransform(*(transf3d*)(srcMemberBytes));
 				}
-			} else if (isDisplayName) {
+			}
+			else if (isDisplayName) {
 				// Do nothing here...
-			} else if (memberTypeDesc && memberTypeDesc->copyFn) {
+			}
+			else if (memberTypeDesc && memberTypeDesc->copyFn) {
 				// Usual member.
 				memberTypeDesc->copyFn(destMemberBytes, srcMemberBytes);
-			} else {
+			}
+			else {
 				sgeLogError("Cannot duplicate game object! Field %s::%s is not copyable!\n", objTypeDesc->name, mfd.name);
 				sgeAssert(false);
 			}
@@ -374,41 +392,40 @@ GameObject* duplicateGameObjectIncompleate(const GameObject* const srcObject) {
 //--------------------------------------------------------------------
 // CmdCompound
 //--------------------------------------------------------------------
-void CmdCompound::addCommand(InspectorCmd* const cmd) {
+void CmdCompound::addCommand(InspectorCmd* const cmd)
+{
 	sgeAssert(cmd);
 	if (cmd) {
 		cmds.emplace_back(cmd);
 	}
 }
 
-void CmdCompound::apply(GameInspector* inspector) {
+void CmdCompound::apply(GameInspector* inspector)
+{
 	for (int t = 0; t < cmds.size(); ++t) {
-		if_checked(cmds[t]) {
-			cmds[t]->apply(inspector);
-		}
+		if_checked(cmds[t]) { cmds[t]->apply(inspector); }
 	}
 }
 
-void CmdCompound::redo(GameInspector* inspector) {
+void CmdCompound::redo(GameInspector* inspector)
+{
 	for (int t = 0; t < cmds.size(); ++t) {
-		if_checked(cmds[t]) {
-			cmds[t]->redo(inspector);
-		}
+		if_checked(cmds[t]) { cmds[t]->redo(inspector); }
 	}
 }
 
-void CmdCompound::undo(GameInspector* inspector) {
+void CmdCompound::undo(GameInspector* inspector)
+{
 	for (int t = int(cmds.size()) - 1; t >= 0; --t) {
-		if_checked(cmds[t]) {
-			cmds[t]->undo(inspector);
-		}
+		if_checked(cmds[t]) { cmds[t]->undo(inspector); }
 	}
 }
 
 //--------------------------------------------------------------------
 // CmdActorGrouping
 //--------------------------------------------------------------------
-void CmdActorGrouping::setup(GameWorld& world, ObjectId parent, std::set<ObjectId> objectsToParentUnder) {
+void CmdActorGrouping::setup(GameWorld& world, ObjectId parent, std::set<ObjectId> objectsToParentUnder)
+{
 	m_parentActorId = parent;
 
 	// Gather the list of all objects that are going to be parented.
@@ -420,13 +437,15 @@ void CmdActorGrouping::setup(GameWorld& world, ObjectId parent, std::set<ObjectI
 			if (objectsToParentUnder.count(previousParent) == 0) {
 				m_newChildrenAndTheirOldParents[potentialNewChildId] = previousParent;
 			}
-		} else {
+		}
+		else {
 			sgeAssert(false && "Found an unexisting object while grouping!");
 		}
 	}
 }
 
-void CmdActorGrouping::apply(GameInspector* inspector) {
+void CmdActorGrouping::apply(GameInspector* inspector)
+{
 	GameWorld& world = *inspector->getWorld();
 
 	for (auto pair : m_newChildrenAndTheirOldParents) {
@@ -437,11 +456,13 @@ void CmdActorGrouping::apply(GameInspector* inspector) {
 	}
 }
 
-void CmdActorGrouping::redo(GameInspector* inspector) {
+void CmdActorGrouping::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void CmdActorGrouping::undo(GameInspector* inspector) {
+void CmdActorGrouping::undo(GameInspector* inspector)
+{
 	GameWorld& world = *inspector->getWorld();
 
 	for (auto pair : m_newChildrenAndTheirOldParents) {
@@ -455,7 +476,8 @@ void CmdActorGrouping::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void CmdObjectDeletion::setupDeletion(GameWorld& world, vector_set<ObjectId> objectIdsToBeDeleted) {
+void CmdObjectDeletion::setupDeletion(GameWorld& world, vector_set<ObjectId> objectIdsToBeDeleted)
+{
 	m_deletedObjectIds = std::move(objectIdsToBeDeleted);
 
 	// Store the original hierarchy, we will need it for undo
@@ -470,7 +492,8 @@ void CmdObjectDeletion::setupDeletion(GameWorld& world, vector_set<ObjectId> obj
 	m_prefabWorldJson = serializeGameWorld(&deletedObjectsInAPrefab);
 }
 
-void CmdObjectDeletion::apply(GameInspector* inspector) {
+void CmdObjectDeletion::apply(GameInspector* inspector)
+{
 	GameWorld* world = inspector->getWorld();
 
 	for (ObjectId id : m_deletedObjectIds) {
@@ -478,11 +501,13 @@ void CmdObjectDeletion::apply(GameInspector* inspector) {
 	}
 }
 
-void CmdObjectDeletion::redo(GameInspector* inspector) {
+void CmdObjectDeletion::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void CmdObjectDeletion::undo(GameInspector* inspector) {
+void CmdObjectDeletion::undo(GameInspector* inspector)
+{
 	GameWorld* world = inspector->getWorld();
 	world->instantiatePrefabFromJsonString(m_prefabWorldJson.c_str(), false, false, NullOptional());
 
@@ -500,7 +525,8 @@ void CmdObjectDeletion::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 // CmdExistingObjectCreation
 //--------------------------------------------------------------------
-void CmdExistingObjectCreation::setup(GameWorld& world, vector_set<ObjectId> targetObjects) {
+void CmdExistingObjectCreation::setup(GameWorld& world, vector_set<ObjectId> targetObjects)
+{
 	m_targetObjectIds = std::move(targetObjects);
 
 	// Store the original hierarchy, we will need it for undo
@@ -515,11 +541,13 @@ void CmdExistingObjectCreation::setup(GameWorld& world, vector_set<ObjectId> tar
 	m_prefabWorldJson = serializeGameWorld(&prefabWorld);
 }
 
-void CmdExistingObjectCreation::apply(GameInspector* UNUSED(inspector)) {
+void CmdExistingObjectCreation::apply(GameInspector* UNUSED(inspector))
+{
 	sgeAssert(false && "CmdExistingObjectCreation::apply should never get called, the objects are expected to be already created!");
 }
 
-void CmdExistingObjectCreation::redo(GameInspector* inspector) {
+void CmdExistingObjectCreation::redo(GameInspector* inspector)
+{
 	GameWorld* world = inspector->getWorld();
 	world->instantiatePrefabFromJsonString(m_prefabWorldJson.c_str(), false, false, NullOptional());
 
@@ -534,7 +562,8 @@ void CmdExistingObjectCreation::redo(GameInspector* inspector) {
 	}
 }
 
-void CmdExistingObjectCreation::undo(GameInspector* inspector) {
+void CmdExistingObjectCreation::undo(GameInspector* inspector)
+{
 	GameWorld* world = inspector->getWorld();
 
 	for (ObjectId id : m_targetObjectIds) {
@@ -545,25 +574,30 @@ void CmdExistingObjectCreation::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 // CmdObjectCreation
 //--------------------------------------------------------------------
-void CmdObjectCreation::setup(TypeId objectType) {
+void CmdObjectCreation::setup(TypeId objectType)
+{
 	m_objectType = objectType;
 	m_createdObjectId = ObjectId();
 }
 
-void CmdObjectCreation::apply(GameInspector* inspector) {
+void CmdObjectCreation::apply(GameInspector* inspector)
+{
 	GameObject* const go = inspector->getWorld()->allocObject(m_objectType, m_createdObjectId);
 	if (go != nullptr) {
 		m_createdObjectId = go->getId();
-	} else {
+	}
+	else {
 		sgeAssert(go != nullptr && "CmdObjectCreation failed");
 	}
 }
 
-void CmdObjectCreation::redo(GameInspector* inspector) {
+void CmdObjectCreation::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void CmdObjectCreation::undo(GameInspector* inspector) {
+void CmdObjectCreation::undo(GameInspector* inspector)
+{
 	sgeAssert(m_createdObjectId.isNull() == false);
 	inspector->getWorld()->objectDelete(m_createdObjectId);
 }
@@ -571,7 +605,8 @@ void CmdObjectCreation::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 // CmdDuplicateSpecial
 //--------------------------------------------------------------------
-void CmdDuplicateSpecial::apply(GameInspector* inspector) {
+void CmdDuplicateSpecial::apply(GameInspector* inspector)
+{
 	GameWorld* const world = inspector->getWorld();
 
 	// Duplicate the objects and build the ObjectId relationship remapping.
@@ -592,7 +627,8 @@ void CmdDuplicateSpecial::apply(GameInspector* inspector) {
 		// Caution:
 		// We must call onDuplocationComplete() for the created actor!
 		GameObject* const destGameObject = duplicateGameObjectIncompleate(srcActor);
-		if_checked(destGameObject) {
+		if_checked(destGameObject)
+		{
 			createdGameObjects.push_back(destGameObject);
 			m_createdGameObjectsIds.insert(destGameObject->getId());
 			destOf[srcActor->getId()] = destGameObject->getId();
@@ -691,15 +727,18 @@ void CmdDuplicateSpecial::apply(GameInspector* inspector) {
 	m_cmdExistingCreationHelper.setup(*world, createdActorsIds);
 }
 
-void CmdDuplicateSpecial::redo(GameInspector* inspector) {
+void CmdDuplicateSpecial::redo(GameInspector* inspector)
+{
 	m_cmdExistingCreationHelper.redo(inspector);
 }
 
-void CmdDuplicateSpecial::undo(GameInspector* inspector) {
+void CmdDuplicateSpecial::undo(GameInspector* inspector)
+{
 	m_cmdExistingCreationHelper.undo(inspector);
 }
 
-void CmdDuplicateSpecial::getText(std::string& text) {
+void CmdDuplicateSpecial::getText(std::string& text)
+{
 	text = "CmdDuplicateSmart";
 }
 

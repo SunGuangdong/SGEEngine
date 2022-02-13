@@ -22,12 +22,8 @@ struct SGE_ENGINE_API GameInspector {
 	GameInspector(const GameInspector&) = delete;
 	GameInspector& operator=(const GameInspector&) = delete;
 
-	GameWorld* getWorld() {
-		return m_world;
-	}
-	const GameWorld* getWorld() const {
-		return m_world;
-	}
+	GameWorld* getWorld() { return m_world; }
+	const GameWorld* getWorld() const { return m_world; }
 
 	bool isSteppingAllowed() const;
 
@@ -37,14 +33,10 @@ struct SGE_ENGINE_API GameInspector {
 	void appendCommand(InspectorCmd* const cmd, bool shouldApply);
 
 	// Selection.
-	bool hasSelection() const {
-		return m_selection.size() != 0;
-	}
+	bool hasSelection() const { return m_selection.size() != 0; }
 	bool isSelected(ObjectId const id, bool* const outIsPrimary = nullptr) const;
 	bool isPrimarySelected(ObjectId const id) const;
-	const std::vector<SelectedItem>& getSelection() const {
-		return m_selection;
-	}
+	const std::vector<SelectedItem>& getSelection() const { return m_selection; }
 	ObjectId getPrimarySelection() const;
 	ObjectId getSecondarySelection() const;
 	ObjectId getSecondarySelectedActor() const;
@@ -63,7 +55,8 @@ struct SGE_ENGINE_API GameInspector {
 	ICamera* getRenderCamera();
 
 	// Tools
-	void setTool(IInspectorTool* const tool) {
+	void setTool(IInspectorTool* const tool)
+	{
 		if (m_toolInAction) {
 			m_toolInAction->onCancel(this);
 		}
@@ -76,7 +69,8 @@ struct SGE_ENGINE_API GameInspector {
 	};
 
   public: // TODO: Make this private
-	void clear() {
+	void clear()
+	{
 		m_world = nullptr;
 		editMode = editMode_actors;
 		m_selection.clear();

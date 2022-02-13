@@ -6,7 +6,8 @@ namespace sge {
 //--------------------------------------------------------
 // TextureFormat
 //--------------------------------------------------------
-size_t TextureFormat::GetSizeBits(const TextureFormat::Enum format) {
+size_t TextureFormat::GetSizeBits(const TextureFormat::Enum format)
+{
 	switch (format) {
 		case R32G32B32A32_FLOAT:
 		case R32G32B32A32_UINT:
@@ -102,14 +103,16 @@ size_t TextureFormat::GetSizeBits(const TextureFormat::Enum format) {
 	return 0;
 }
 
-size_t TextureFormat::GetSizeBytes(const TextureFormat::Enum format) {
+size_t TextureFormat::GetSizeBytes(const TextureFormat::Enum format)
+{
 	return (TextureFormat::GetSizeBits(format) + 7) / 8;
 }
 
 //------------------------------------------------------------------------------
 // TextureDesc
 //------------------------------------------------------------------------------
-TextureDesc TextureDesc::GetDefaultRenderTarget(int width, int height, TextureFormat::Enum format) {
+TextureDesc TextureDesc::GetDefaultRenderTarget(int width, int height, TextureFormat::Enum format)
+{
 	TextureDesc retval;
 
 	retval.usage = TextureUsage::RenderTargetResource;
@@ -126,7 +129,8 @@ TextureDesc TextureDesc::GetDefaultRenderTarget(int width, int height, TextureFo
 	return retval;
 }
 
-TextureDesc TextureDesc::GetDefaultDepthStencil(int width, int height, TextureFormat::Enum format) {
+TextureDesc TextureDesc::GetDefaultDepthStencil(int width, int height, TextureFormat::Enum format)
+{
 	TextureDesc retval;
 
 	retval.usage = TextureUsage::DepthStencilResource;
@@ -146,13 +150,16 @@ TextureDesc TextureDesc::GetDefaultDepthStencil(int width, int height, TextureFo
 //------------------------------------------------------------------------------
 // UniformType
 //------------------------------------------------------------------------------
-UniformType::Enum UniformType::PickType(UniformType::Enum type, const int lanes, const int registers) {
+UniformType::Enum UniformType::PickType(UniformType::Enum type, const int lanes, const int registers)
+{
 	if (registers == 1) {
 		// [TODO] EXPAND THIS DON'T be a HACKER.
 		return (UniformType::Enum)((int)(type) + (lanes - 1));
-	} else if (registers == 4 && lanes == 4 && type == Float) {
+	}
+	else if (registers == 4 && lanes == 4 && type == Float) {
 		return Float4x4;
-	} else if (registers == 3 && lanes == 3 && type == Float) {
+	}
+	else if (registers == 3 && lanes == 3 && type == Float) {
 		return Float3x3;
 	}
 
@@ -160,7 +167,8 @@ UniformType::Enum UniformType::PickType(UniformType::Enum type, const int lanes,
 	return UniformType::Unknown;
 }
 
-int UniformType::GetSizeBytes(const UniformType::Enum uniformType) {
+int UniformType::GetSizeBytes(const UniformType::Enum uniformType)
+{
 	switch (uniformType) {
 		case Unknown:
 			return 0;
@@ -220,7 +228,8 @@ int UniformType::GetSizeBytes(const UniformType::Enum uniformType) {
 //-------------------------------------------------------------------------------
 // Buffers
 //-------------------------------------------------------------------------------
-BufferDesc BufferDesc::GetDefaultVertexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage) {
+BufferDesc BufferDesc::GetDefaultVertexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage)
+{
 	BufferDesc result;
 
 	result.sizeBytes = sizeBytes;
@@ -231,7 +240,8 @@ BufferDesc BufferDesc::GetDefaultVertexBuffer(const size_t sizeBytes, const Reso
 	return result;
 }
 
-BufferDesc BufferDesc::GetDefaultIndexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage) {
+BufferDesc BufferDesc::GetDefaultIndexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage)
+{
 	BufferDesc result;
 
 	result.bindFlags = ResourceBindFlags::IndexBuffer;
@@ -242,7 +252,8 @@ BufferDesc BufferDesc::GetDefaultIndexBuffer(const size_t sizeBytes, const Resou
 	return result;
 }
 
-BufferDesc BufferDesc::GetDefaultConstantBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage) {
+BufferDesc BufferDesc::GetDefaultConstantBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage)
+{
 	BufferDesc result;
 
 	result.sizeBytes = sizeBytes;
@@ -256,7 +267,8 @@ BufferDesc BufferDesc::GetDefaultConstantBuffer(const size_t sizeBytes, const Re
 //-------------------------------------------------------------------
 // PrimitiveTopology
 //-------------------------------------------------------------------
-int PrimitiveTopology::GetNumPrimitivesByPoints(const PrimitiveTopology::Enum topology, const int numPoints) {
+int PrimitiveTopology::GetNumPrimitivesByPoints(const PrimitiveTopology::Enum topology, const int numPoints)
+{
 	switch (topology) {
 		case Unknown:
 			sgeAssert(false);
@@ -278,7 +290,8 @@ int PrimitiveTopology::GetNumPrimitivesByPoints(const PrimitiveTopology::Enum to
 	return 0;
 }
 
-int PrimitiveTopology::GetNumPointsByPrimitives(const PrimitiveTopology::Enum topology, const int numPrimitives) {
+int PrimitiveTopology::GetNumPointsByPrimitives(const PrimitiveTopology::Enum topology, const int numPrimitives)
+{
 	if (numPrimitives == 0)
 		return 0;
 
@@ -306,7 +319,8 @@ int PrimitiveTopology::GetNumPointsByPrimitives(const PrimitiveTopology::Enum to
 //-------------------------------------------------------------------
 // VertexDecl
 //-------------------------------------------------------------------
-std::vector<VertexDecl> VertexDecl::NormalizeDecl(const VertexDecl* pDecl, const int numDeclElems) {
+std::vector<VertexDecl> VertexDecl::NormalizeDecl(const VertexDecl* pDecl, const int numDeclElems)
+{
 	sgeAssert(numDeclElems > 0);
 	if (numDeclElems <= 0)
 		return std::vector<VertexDecl>();
@@ -346,16 +360,19 @@ std::vector<VertexDecl> VertexDecl::NormalizeDecl(const VertexDecl* pDecl, const
 //-------------------------------------------------------------------
 // Blending
 //-------------------------------------------------------------------
-bool BlendDesc::operator==(const BlendDesc& other) const {
+bool BlendDesc::operator==(const BlendDesc& other) const
+{
 	return enabled == other.enabled && srcBlend == other.srcBlend && destBlend == other.destBlend && blendOp == other.blendOp &&
 	       alphaSrcBlend == other.alphaSrcBlend && alphaDestBlend == other.alphaDestBlend && alphaBlendOp == other.alphaBlendOp;
 }
 
-bool BlendDesc::operator!=(const BlendDesc& other) const {
+bool BlendDesc::operator!=(const BlendDesc& other) const
+{
 	return !(*this == other);
 }
 
-BlendDesc BlendDesc::GetDefaultBackToFrontAlpha() {
+BlendDesc BlendDesc::GetDefaultBackToFrontAlpha()
+{
 	BlendDesc blendDesc;
 
 	blendDesc.enabled = true;
@@ -369,7 +386,8 @@ BlendDesc BlendDesc::GetDefaultBackToFrontAlpha() {
 	return blendDesc;
 }
 
-BlendDesc BlendDesc::getColorAdditiveBlending() {
+BlendDesc BlendDesc::getColorAdditiveBlending()
+{
 	BlendDesc blendDesc;
 
 	blendDesc.enabled = true;
@@ -383,7 +401,8 @@ BlendDesc BlendDesc::getColorAdditiveBlending() {
 	return blendDesc;
 }
 
-BlendStateDesc BlendStateDesc::GetDefaultBackToFrontAlpha() {
+BlendStateDesc BlendStateDesc::GetDefaultBackToFrontAlpha()
+{
 	BlendStateDesc retval;
 
 	retval.independentBlend = false;
@@ -392,7 +411,8 @@ BlendStateDesc BlendStateDesc::GetDefaultBackToFrontAlpha() {
 	return retval;
 }
 
-BlendStateDesc BlendStateDesc::getColorAdditiveBlending() {
+BlendStateDesc BlendStateDesc::getColorAdditiveBlending()
+{
 	BlendStateDesc retval;
 
 	retval.independentBlend = false;
@@ -401,7 +421,8 @@ BlendStateDesc BlendStateDesc::getColorAdditiveBlending() {
 	return retval;
 }
 
-bool BlendStateDesc::operator==(const BlendStateDesc& other) const {
+bool BlendStateDesc::operator==(const BlendStateDesc& other) const
+{
 	if (independentBlend == false) {
 		return blendDesc[0] == other.blendDesc[0];
 	}
@@ -415,7 +436,8 @@ bool BlendStateDesc::operator==(const BlendStateDesc& other) const {
 	return true;
 }
 
-bool BlendStateDesc::operator!=(const BlendStateDesc& other) const {
+bool BlendStateDesc::operator!=(const BlendStateDesc& other) const
+{
 	return !(*this == other);
 }
 } // namespace sge

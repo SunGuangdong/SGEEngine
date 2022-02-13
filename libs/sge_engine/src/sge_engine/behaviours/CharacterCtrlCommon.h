@@ -8,7 +8,6 @@ namespace sge {
 
 /// @brief CharacterCtrlCfg describes how the character control should move, its speed, jump height and other parameters.
 struct SGE_ENGINE_API CharacterCtrlCfg {
-
 	vec3f defaultFacingDir = vec3f(0.f, 0.f, -1.f);
 
 	/// Everything below this height in actor space is concidered feet.
@@ -22,7 +21,7 @@ struct SGE_ENGINE_API CharacterCtrlCfg {
 	float minClimbableIncline = cosf(deg2rad(60.f));
 
 	float jumpHeight = 5.f;               ///< The regular jump height of the cracter.
-	float jumpTimeApex = 0.75f;             ///< The time (in seconds) that we wish the character to rach @jumpHeight.
+	float jumpTimeApex = 0.75f;           ///< The time (in seconds) that we wish the character to rach @jumpHeight.
 	float minJumpHeight = 2.f;            ///< The minium jump hight that we want if the player released the jump button.
 	float fallingGravityMultiplier = 2.f; ///< How much stronger we want the gravity to be if the character is falling. In mario games it is
 	                                      ///< used to make the jump feel better.

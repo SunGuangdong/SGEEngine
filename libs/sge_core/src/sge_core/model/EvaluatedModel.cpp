@@ -2,8 +2,8 @@
 
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
-#include "sge_utils/math/transform.h"
 #include "sge_utils/containers/Range.h"
+#include "sge_utils/math/transform.h"
 
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 
@@ -12,7 +12,8 @@
 
 namespace sge {
 
-void EvaluatedModel::initialize(Model* model) {
+void EvaluatedModel::initialize(Model* model)
+{
 	*this = EvaluatedModel();
 
 	sgeAssert(model != nullptr);
@@ -22,7 +23,8 @@ void EvaluatedModel::initialize(Model* model) {
 	}
 }
 
-void EvaluatedModel::evaluateStatic() {
+void EvaluatedModel::evaluateStatic()
+{
 	std::vector<mat4f> globalMatrices(m_model->numNodes());
 	std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode, const mat4f& parentGlobalTform) -> void {
 		ModelNode* rawNode = m_model->nodeAt(iNode);
@@ -42,7 +44,8 @@ void EvaluatedModel::evaluateStatic() {
 }
 
 
-bool EvaluatedModel::evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount) {
+bool EvaluatedModel::evaluate(const mat4f* nodesGlobalTransform, const int nodesGlobalTransformCount)
+{
 	ArrayView<const mat4f> nodesTrasfSpan = ArrayView<const mat4f>(nodesGlobalTransform, nodesGlobalTransformCount);
 	evaluate_ApplyNodeGlobalTransforms(nodesTrasfSpan);
 	evaluate_Skinning();
@@ -50,7 +53,8 @@ bool EvaluatedModel::evaluate(const mat4f* nodesGlobalTransform, const int nodes
 	return true;
 }
 
-bool EvaluatedModel::evaluate_ApplyNodeGlobalTransforms(const ArrayView<const mat4f>& boneGlobalTrasnformOverrides) {
+bool EvaluatedModel::evaluate_ApplyNodeGlobalTransforms(const ArrayView<const mat4f>& boneGlobalTrasnformOverrides)
+{
 	aabox.setEmpty();
 	m_evaluatedNodes.resize(m_model->numNodes());
 
@@ -67,7 +71,8 @@ bool EvaluatedModel::evaluate_ApplyNodeGlobalTransforms(const ArrayView<const ma
 	return true;
 }
 
-bool EvaluatedModel::evaluate_Skinning() {
+bool EvaluatedModel::evaluate_Skinning()
+{
 	m_evaluatedMeshes.resize(m_model->numMeshes());
 	m_perMeshSkinningBonesTransformOFfsetInTex.resize(m_model->numMeshes(), -1);
 
@@ -123,7 +128,8 @@ bool EvaluatedModel::evaluate_Skinning() {
 			m_skinningBoneTransfsTex = context->getDevice()->requestResource<Texture>();
 			m_skinningBoneTransfsTex->create(td, &data, sd);
 			m_skinningBoneTransfsTex->setDebugName("Skinning bones texture for a model.");
-		} else {
+		}
+		else {
 			context->updateTextureData(m_skinningBoneTransfsTex.GetPtr(), data);
 		}
 
@@ -160,7 +166,8 @@ bool EvaluatedModel::evaluate_Skinning() {
 	return true;
 }
 
-bool EvaluatedModel::evaluate_getAllGeometries() {
+bool EvaluatedModel::evaluate_getAllGeometries()
+{
 	m_evalAllMeshInstances.clear();
 
 	for (int iNode = 0; iNode < getNumEvalNodes(); ++iNode) {

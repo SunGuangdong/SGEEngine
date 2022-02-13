@@ -55,20 +55,12 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	void onGamePluginPreUnload();
 	void onGamePluginChanged();
 
-	void close() override
-	{
-	}
+	void close() override {}
 
-	bool isClosed() override
-	{
-		return false;
-	}
+	bool isClosed() override { return false; }
 
 	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
-	const char* getWindowName() const override
-	{
-		return m_windowName.c_str();
-	}
+	const char* getWindowName() const override { return m_windowName.c_str(); }
 
 	void newScene(bool forceKeepSameInspector = false);
 	void loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename, bool loadInNewInstance);
@@ -83,10 +75,7 @@ struct SGE_ENGINE_API EditorWindow : public IImGuiWindow {
 	void saveEditorSettings();
 	void addReasecentScene(const char* const filename);
 
-	void closeWelcomeWindow()
-	{
-		m_isWelcomeWindowOpened = false;
-	}
+	void closeWelcomeWindow() { m_isWelcomeWindowOpened = false; }
 
 	int newEmptyInstance();
 	void switchToInstance(int iInstance);

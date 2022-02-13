@@ -79,7 +79,9 @@ struct ShadingLanguage {
 struct SampleDesc {
 	SampleDesc(const int _count = 1, const int _quality = 0)
 	    : Count(_count)
-	    , Quality(_quality) {}
+	    , Quality(_quality)
+	{
+	}
 
 	int Count;   // default is 1
 	int Quality; // default is 0
@@ -94,13 +96,17 @@ struct Rect2s {
 	    : width(width)
 	    , height(height)
 	    , x(0)
-	    , y(0) {}
+	    , y(0)
+	{
+	}
 
 	Rect2s(const short width, const short height, const short x, const short y)
 	    : width(width)
 	    , height(height)
 	    , x(x)
-	    , y(y) {}
+	    , y(y)
+	{
+	}
 
 	bool isEmpty() const { return width != 0 && height != 0; }
 	float ratioWbyH() const { return (float)width / (float)height; }
@@ -280,12 +286,14 @@ struct TextureFormat {
 	static bool IsDepth(const TextureFormat::Enum format) { return (format > MARKER_DEPTH_BEGIN) && (format < MARKER_DEPTH_END); }
 
 	// Check if the texture format is a BC format.
-	static bool IsBC(const TextureFormat::Enum format) {
+	static bool IsBC(const TextureFormat::Enum format)
+	{
 		return (format > MARKER_BC_COMPRESSION_BEGIN) && (format < MARKER_BC_COMPRESSION_END);
 	}
 
 	// Checks if the texture format has both depth and stencil
-	static bool IsDepthWithStencil(const TextureFormat::Enum format) {
+	static bool IsDepthWithStencil(const TextureFormat::Enum format)
+	{
 		return (format > MARKER_DEPTH_HAS_STENCIL_BEGIN) && (format < MARKER_DEPTH_HAS_STENCIL_END);
 	}
 
@@ -362,7 +370,9 @@ struct TextureData {
 	TextureData(const void* data = nullptr, size_t rowByteSize = 0, size_t sliceByteSize = 0)
 	    : data(data)
 	    , rowByteSize(rowByteSize)
-	    , sliceByteSize(sliceByteSize) {}
+	    , sliceByteSize(sliceByteSize)
+	{
+	}
 
 	const void* data;
 	size_t rowByteSize;
@@ -375,7 +385,9 @@ struct Texture1DDesc {
 	Texture1DDesc(int width, const int numMips, int arraySize)
 	    : width(width)
 	    , numMips(numMips)
-	    , arraySize(arraySize) {}
+	    , arraySize(arraySize)
+	{
+	}
 
 	int width;
 	int numMips;
@@ -391,15 +403,13 @@ struct Texture2DDesc {
 	    , numMips(numMips)
 	    , arraySize(arraySize)
 	    , numSamples(numSamples)
-	    , sampleQuality(sampleQuality) {}
-
-	float widthByHeight() const {
-		return float(width) / float(height);
+	    , sampleQuality(sampleQuality)
+	{
 	}
 
-	float heightByWidth() const {
-		return float(height) / float(width);
-	}
+	float widthByHeight() const { return float(width) / float(height); }
+
+	float heightByWidth() const { return float(height) / float(width); }
 
 	int width;
 	int height;
@@ -417,7 +427,9 @@ struct TextureCubeDesc {
 	    , numMips(numMips)
 	    , arraySize(arraySize)
 	    , numSamples(numSamples)
-	    , sampleQuality(sampleQuality) {}
+	    , sampleQuality(sampleQuality)
+	{
+	}
 
 	int width;
 	int height;
@@ -433,7 +445,9 @@ struct Texture3DDesc {
 	    : width(width)
 	    , height(height)
 	    , depth(depth)
-	    , numMips(numMips) {}
+	    , numMips(numMips)
+	{
+	}
 
 	int width;
 	int height;
@@ -451,7 +465,8 @@ struct TextureUsage {
 		DepthStencilOnly, // cannot be used as shader resource
 	};
 
-	static bool CanBeShaderResource(const TextureUsage::Enum e) {
+	static bool CanBeShaderResource(const TextureUsage::Enum e)
+	{
 		return e == ImmutableResource || e == DynamicResource || e == RenderTargetResource || e == DepthStencilResource;
 	}
 
@@ -475,8 +490,8 @@ struct TextureDesc {
 		Texture3DDesc texture3D;
 	};
 
-	bool hasMipMaps() const {
-
+	bool hasMipMaps() const
+	{
 		if (generateMips) {
 			return true;
 		}
@@ -526,26 +541,30 @@ struct TargetDesc {
 	} textureCube;
 
 
-	bool operator==(const TargetDesc& other) const {
+	bool operator==(const TargetDesc& other) const
+	{
 		if (baseTextureType == UniformType::Texture1D) {
 			if (texture1D.arrayIdx != other.texture1D.arrayIdx)
 				return false;
 			if (texture1D.mipLevel != other.texture1D.mipLevel)
 				return false;
 			return true;
-		} else if (baseTextureType == UniformType::Texture2D) {
+		}
+		else if (baseTextureType == UniformType::Texture2D) {
 			if (texture2D.arrayIdx != other.texture2D.arrayIdx)
 				return false;
 			if (texture2D.mipLevel != other.texture2D.mipLevel)
 				return false;
 			return true;
-		} else if (baseTextureType == UniformType::TextureCube) {
+		}
+		else if (baseTextureType == UniformType::TextureCube) {
 			if (textureCube.face != other.textureCube.face)
 				return false;
 			if (textureCube.mipLevel != other.textureCube.mipLevel)
 				return false;
 			return true;
-		} else {
+		}
+		else {
 			// Not Implemented Yet.
 			sgeAssert(false);
 		}
@@ -555,7 +574,8 @@ struct TargetDesc {
 
 	bool operator!=(const TargetDesc& other) const { return !(*this == other); }
 
-	static TargetDesc FromTex2D(int arrayIdx = 0, int mipLevel = 0) {
+	static TargetDesc FromTex2D(int arrayIdx = 0, int mipLevel = 0)
+	{
 		TargetDesc result;
 		result.baseTextureType = UniformType::Texture2D;
 		result.texture2D.arrayIdx = arrayIdx;
@@ -563,7 +583,8 @@ struct TargetDesc {
 		return result;
 	}
 
-	static TargetDesc fromTexCubeFace(const SignedAxis face, int mipLevel = 0) {
+	static TargetDesc fromTexCubeFace(const SignedAxis face, int mipLevel = 0)
+	{
 		TargetDesc result;
 		result.baseTextureType = UniformType::TextureCube;
 		result.textureCube.face = face;
@@ -603,7 +624,8 @@ struct TextureFilter {
 // https://www.opengl.org/wiki/GLAPI/glTexParameter
 //-------------------------------------------------------------------
 struct SamplerDesc {
-	SamplerDesc() {
+	SamplerDesc()
+	{
 		filter = TextureFilter::Min_Mag_Mip_Linear;
 		for (auto& v : addressModes) {
 			v = TextureAddressMode::Repeat;
@@ -624,7 +646,8 @@ struct SamplerDesc {
 	float maxLOD;
 	uint32 maxAnisotropy; // 1- 16
 
-	bool operator==(const SamplerDesc& other) const {
+	bool operator==(const SamplerDesc& other) const
+	{
 		// clang-format off
 		return 
 			   filter == other.filter 
@@ -713,16 +736,20 @@ struct VertexDecl {
 	    : bufferSlot(bufferSlot)
 	    , semantic(semantic ? semantic : "")
 	    , format(format)
-	    , byteOffset(byteOffset) {}
+	    , byteOffset(byteOffset)
+	{
+	}
 
-	bool operator==(const VertexDecl& other) const {
+	bool operator==(const VertexDecl& other) const
+	{
 		return (bufferSlot == other.bufferSlot) && (semantic == other.semantic) && (byteOffset == other.byteOffset) &&
 		       (format == other.format);
 	}
 
 	bool operator!=(const VertexDecl& other) const { return !operator==(other); }
 
-	bool operator<(const VertexDecl& ref) const {
+	bool operator<(const VertexDecl& ref) const
+	{
 		return ref.bufferSlot > bufferSlot || ref.format > format || ref.byteOffset > byteOffset ||
 		       strcmp(ref.semantic.c_str(), semantic.c_str()) < 0;
 	}
@@ -790,9 +817,12 @@ struct RasterDesc {
 	    : backFaceCCW(backFaceCW)
 	    , cullMode(cullMode)
 	    , fillMode(fillMode)
-	    , useScissor(useScissor) {}
+	    , useScissor(useScissor)
+	{
+	}
 
-	bool operator==(const RasterDesc& other) const {
+	bool operator==(const RasterDesc& other) const
+	{
 		return backFaceCCW == other.backFaceCCW && cullMode == other.cullMode && fillMode == other.fillMode &&
 		       useScissor == other.useScissor && depthBiasAdd == other.depthBiasAdd && depthBiasSlope == other.depthBiasSlope;
 	}
@@ -808,13 +838,15 @@ struct DepthStencilDesc {
 	bool depthWriteEnabled;
 	DepthComparisonFunc::Enum comparisonFunc;
 
-	DepthStencilDesc() {
+	DepthStencilDesc()
+	{
 		depthTestEnabled = true;
 		depthWriteEnabled = true;
 		comparisonFunc = DepthComparisonFunc::Less;
 	}
 
-	bool operator==(const DepthStencilDesc& other) const {
+	bool operator==(const DepthStencilDesc& other) const
+	{
 		return depthTestEnabled == other.depthTestEnabled && depthWriteEnabled == other.depthWriteEnabled &&
 		       comparisonFunc == other.comparisonFunc;
 	}
@@ -887,7 +919,8 @@ struct BlendDesc {
 };
 
 struct BlendStateDesc {
-	BlendStateDesc(const BlendDesc& blend) {
+	BlendStateDesc(const BlendDesc& blend)
+	{
 		independentBlend = false;
 		blendDesc[0] = blend;
 	}
@@ -937,7 +970,8 @@ struct MainFrameTargetDesc {
 struct FrameStatistics {
 	FrameStatistics() = default;
 
-	void Reset() { 
+	void Reset()
+	{
 		// Basically reset all to defaults but keep the times.
 		numDrawCalls = 0;
 		numPrimitiveDrawn = 0;

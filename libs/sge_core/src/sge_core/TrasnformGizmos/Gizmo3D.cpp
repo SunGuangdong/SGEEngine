@@ -14,7 +14,8 @@ const float Gizmo3DTranslation::kQuadOffset = 0.44f;
 // The size of the planar translation quad.
 const float Gizmo3DTranslation::kQuatLength = 0.22f;
 
-void Gizmo3DTranslation::reset(const vec3f& initalTranslation, const quatf& initialOrientation) {
+void Gizmo3DTranslation::reset(const vec3f& initalTranslation, const quatf& initialOrientation)
+{
 	resetCommon();
 	m_initialTranslation = initalTranslation;
 
@@ -27,7 +28,8 @@ void Gizmo3DTranslation::reset(const vec3f& initalTranslation, const quatf& init
 	m_editedTranslation = initalTranslation;
 }
 
-GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args) {
+GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args)
+{
 	// Recompute the interaction mask only if we are not currently interacting with the gizmo.
 	if (m_interaction.mask == 0) {
 		float const distance2camera = distance(m_initialTranslation, args.rayWS.pos);
@@ -119,9 +121,11 @@ GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args) 
 			plane.setNormal(m_axes[1]);
 		else if (m_interaction.only_x()) {
 			plane.setNormal(fabsf(dot(m_axes[1], args.rayWS.dir)) > fabsf(dot(m_axes[2], args.rayWS.dir)) ? m_axes[1] : m_axes[2]);
-		} else if (m_interaction.only_y()) {
+		}
+		else if (m_interaction.only_y()) {
 			plane.setNormal(fabsf(dot(m_axes[0], args.rayWS.dir)) > fabsf(dot(m_axes[2], args.rayWS.dir)) ? m_axes[0] : m_axes[2]);
-		} else if (m_interaction.only_z()) {
+		}
+		else if (m_interaction.only_z()) {
 			plane.setNormal(fabsf(dot(m_axes[0], args.rayWS.dir)) > fabsf(dot(m_axes[1], args.rayWS.dir)) ? m_axes[0] : m_axes[1]);
 		}
 
@@ -180,14 +184,16 @@ GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args) 
 //-------------------------------------------------------------------------------
 //
 //-------------------------------------------------------------------------------
-void Gizmo3DRotation::reset(const vec3f& postion, const quatf& rotation) {
+void Gizmo3DRotation::reset(const vec3f& postion, const quatf& rotation)
+{
 	resetCommon();
 	m_initialTranslation = postion;
 	m_initalRotation = rotation;
 	m_editedRotation = rotation;
 }
 
-GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args) {
+GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args)
+{
 	m_lastInteractionEyePosition = args.rayWS.pos;
 
 	// Recompute the interaction mask only if we are not currently m_interaction with the gizmo.
@@ -232,7 +238,8 @@ GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args) {
 
 		if (dx > infl && dy > infl && dz > infl) {
 			m_hover.mask = 0;
-		} else {
+		}
+		else {
 			if (dx < dy && dx < dz)
 				m_hover.x = 1;
 			else if (dy < dz)
@@ -321,7 +328,8 @@ GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args) {
 const float Gizmo3DScale::kTrapezoidStart = 0.33f;
 const float Gizmo3DScale::kTrapezoidEnd = 0.44f;
 
-void Gizmo3DScale::reset(const vec3f& position, const quatf& rotation, const vec3f& scale) {
+void Gizmo3DScale::reset(const vec3f& position, const quatf& rotation, const vec3f& scale)
+{
 	resetCommon();
 	m_initialTranslation = position;
 	m_initalRotation = rotation;
@@ -329,7 +337,8 @@ void Gizmo3DScale::reset(const vec3f& position, const quatf& rotation, const vec
 	m_editedScaling = scale;
 }
 
-GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args) {
+GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args)
+{
 	// Recompute the interaction mask only if we are not currently m_interaction with the gizmo.
 	// If we do for example the translation wont feel natural.
 	if (m_interaction.mask == 0) {
@@ -409,10 +418,12 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args) {
 			m_interactionPlane.setNormal(vec3f::getAxis(1));
 		else if (m_interaction.x) {
 			m_interactionPlane.setNormal(vec3f::getAxis(1));
-		} else if (m_interaction.y) {
+		}
+		else if (m_interaction.y) {
 			// Pick the most "perpendicular" axis for better projection.
 			m_interactionPlane.setNormal(vec3f::getAxis((ray.dir.z < ray.dir.x) ? 2 : 0));
-		} else if (m_interaction.z) {
+		}
+		else if (m_interaction.z) {
 			m_interactionPlane.setNormal(vec3f::getAxis(1));
 		}
 
@@ -425,7 +436,8 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args) {
 
 		m_interactionStartHitWS = ptIntersect;
 		m_interactionStartHitPS = args.is->GetCursorPos();
-	} else if (args.is->IsKeyDown(Key_MouseLeft) && args.is->wasActiveWhilePolling()) {
+	}
+	else if (args.is->IsKeyDown(Key_MouseLeft) && args.is->wasActiveWhilePolling()) {
 		int numInteractingAxes = 0;
 
 		if (m_interaction.x)
@@ -457,7 +469,8 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args) {
 			if (m_interaction.z) {
 				m_editedScaling.z = kDiff * m_initialScaling.z;
 			}
-		} else if (numInteractingAxes == 2) {
+		}
+		else if (numInteractingAxes == 2) {
 			const vec3f currDir = ptIntersect - m_initialTranslation;
 			const vec3f initDir = m_interactionStartHitWS - m_initialTranslation;
 			const vec3f prjDir = normalized(initDir);
@@ -473,8 +486,8 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args) {
 				m_editedScaling.y = m_initialScaling.y + scaling * m_initialScaling.y;
 			if (m_interaction.z)
 				m_editedScaling.z = m_initialScaling.z + scaling * m_initialScaling.z;
-
-		} else if (numInteractingAxes == 3) {
+		}
+		else if (numInteractingAxes == 3) {
 			const vec2f diff = args.is->GetCursorPos() - m_interactionStartHitPS;
 			const float overallScaling = (-diff.y) / 100.f;
 
@@ -511,14 +524,16 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args) {
 //-------------------------------------------------------------------------------
 // Gizmo3DScaleVolume
 //-------------------------------------------------------------------------------
-void Gizmo3DScaleVolume::reset(const transf3d& transform, const Box3f& bboxOs) {
+void Gizmo3DScaleVolume::reset(const transf3d& transform, const Box3f& bboxOs)
+{
 	resetCommon();
 	m_initalTransform = transform;
 	m_editedTransform = transform;
 	m_initalBboxOs = bboxOs;
 }
 
-GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args) {
+GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args)
+{
 	handleRadiusWs = getInitialBBoxOS().getTransformed(getEditedTrasform().getSelfNoRotation().toMatrix()).size().componentMinAbs() * 0.2f;
 
 	// The display scale is not used for this gizmo as it is tied to the size of the bounding box.
@@ -562,7 +577,8 @@ GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args) 
 		}
 
 		m_interaction = m_hover;
-	} else if (args.is->IsKeyDown(Key_MouseLeft) && args.is->wasActiveWhilePolling()) {
+	}
+	else if (args.is->IsKeyDown(Key_MouseLeft) && args.is->wasActiveWhilePolling()) {
 		vec3f bboxFacesNormalsOs[signedAxis_numElements];
 		m_initalBboxOs.getFacesNormals(bboxFacesNormalsOs);
 		const vec3f faceNormalOS = bboxFacesNormalsOs[m_interaction.getSingleInteractionAxis()];
@@ -625,13 +641,15 @@ GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args) 
 //-------------------------------------------------------------------------------
 // Gizmo3D
 //-------------------------------------------------------------------------------
-void Gizmo3D::setSizeMultipler(const float scalingCoefficient) {
+void Gizmo3D::setSizeMultipler(const float scalingCoefficient)
+{
 	m_gizmoTranslation.setSizeMultiplier(scalingCoefficient);
 	m_gizmoRotation.setSizeMultiplier(scalingCoefficient);
 	m_gizmoScaling.setSizeMultiplier(scalingCoefficient);
 }
 
-void Gizmo3D::reset(const Mode newMode, const transf3d& tr, const Box3f& bbox) {
+void Gizmo3D::reset(const Mode newMode, const transf3d& tr, const Box3f& bbox)
+{
 	m_initalTransform = tr;
 
 	m_mode = newMode;
@@ -641,7 +659,8 @@ void Gizmo3D::reset(const Mode newMode, const transf3d& tr, const Box3f& bbox) {
 	m_gizmoScaleVolume.reset(tr, bbox);
 }
 
-GizmoInteractResult Gizmo3D::interact(const GizmoInteractArgs& args) {
+GizmoInteractResult Gizmo3D::interact(const GizmoInteractArgs& args)
+{
 	switch (m_mode) {
 		case Mode_Translation: {
 			return m_gizmoTranslation.interact(args);
@@ -662,7 +681,8 @@ GizmoInteractResult Gizmo3D::interact(const GizmoInteractArgs& args) {
 	return true;
 }
 
-transf3d Gizmo3D::getEditedTransform() const {
+transf3d Gizmo3D::getEditedTransform() const
+{
 	transf3d result = m_initalTransform;
 
 	switch (m_mode) {
@@ -685,7 +705,8 @@ transf3d Gizmo3D::getEditedTransform() const {
 	return result;
 }
 
-transf3d Gizmo3D::getTransformDiff() const {
+transf3d Gizmo3D::getTransformDiff() const
+{
 	transf3d diff = transf3d::getIdentity();
 
 	switch (m_mode) {
@@ -709,7 +730,8 @@ transf3d Gizmo3D::getTransformDiff() const {
 	return diff;
 }
 
-bool Gizmo3D::isInteracting() const {
+bool Gizmo3D::isInteracting() const
+{
 	switch (m_mode) {
 		case Mode_Translation: {
 			return m_gizmoTranslation.isInteracting();

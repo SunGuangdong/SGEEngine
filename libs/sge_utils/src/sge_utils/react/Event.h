@@ -42,10 +42,7 @@ struct EventSubscription : public NoCopy {
 	{
 	}
 
-	~EventSubscription()
-	{
-		unsubscribe();
-	}
+	~EventSubscription() { unsubscribe(); }
 
 	/// Unregisters the callback for the owning EventEmitter.
 	void unsubscribe()
@@ -58,10 +55,7 @@ struct EventSubscription : public NoCopy {
 
 	/// If called the lifetime of the callback will no longer be maintained
 	/// and it will get called until the owning EventEmitter exists.
-	void abandon()
-	{
-		unsubscribeFn = nullptr;
-	}
+	void abandon() { unsubscribeFn = nullptr; }
 
 	EventSubscription(EventSubscription&& other) noexcept
 	{
@@ -138,10 +132,7 @@ struct EventEmitter : public NoCopy {
 		    [id, weakData]() -> void {
 			    if (std::shared_ptr<Internal> strongData = weakData.lock()) {
 				    auto itr = strongData->callbacks.find(id);
-				    if_checked(itr != strongData->callbacks.end())
-				    {
-					    strongData->callbacks.erase(itr);
-				    }
+				    if_checked(itr != strongData->callbacks.end()) { strongData->callbacks.erase(itr); }
 			    }
 		    });
 	}
@@ -152,10 +143,7 @@ struct EventEmitter : public NoCopy {
 		const std::lock_guard<std::mutex> g(data->dataLock);
 
 		for (auto& callback : data->callbacks) {
-			if_checked(callback.second)
-			{
-				callback.second(args...);
-			}
+			if_checked(callback.second) { callback.second(args...); }
 		}
 	}
 

@@ -5,7 +5,8 @@ namespace sge {
 //----------------------------------------------------------------------------------------
 // MemberChain
 //----------------------------------------------------------------------------------------
-bool MemberChain::add(const MemberFieldChainKnot& knot) {
+bool MemberChain::add(const MemberFieldChainKnot& knot)
+{
 	if (!knot.mfd) {
 		sgeAssert(false);
 		return false;
@@ -14,9 +15,11 @@ bool MemberChain::add(const MemberFieldChainKnot& knot) {
 	if (knots.size() == 0 && knot.arrayIdx == -1) {
 		knots.emplace_back(knot);
 		return true;
-	} else {
+	}
+	else {
 		TypeId ownerTypeId = knots.back().mfd->owner->typeId;
-		if_checked(ownerTypeId != knot.mfd->typeId) {
+		if_checked(ownerTypeId != knot.mfd->typeId)
+		{
 			knots.emplace_back(knot);
 			return true;
 		}
@@ -25,15 +28,18 @@ bool MemberChain::add(const MemberFieldChainKnot& knot) {
 	}
 }
 
-void MemberChain::pop() {
+void MemberChain::pop()
+{
 	knots.pop_back();
 }
 
-void MemberChain::clear() {
+void MemberChain::clear()
+{
 	knots.clear();
 }
 
-void* MemberChain::follow(void* root) const {
+void* MemberChain::follow(void* root) const
+{
 	char* dest = (char*)root;
 	for (const auto& knot : knots) {
 		if (knot.mfd->byteOffset < 0) {
@@ -51,12 +57,14 @@ void* MemberChain::follow(void* root) const {
 			if (knot.arrayIdx == -1) {
 				// In that case we mean the std::vector itself.
 				dest += knot.mfd->byteOffset;
-			} else {
+			}
+			else {
 				// In that case we are indexing the std::vector.
 				char* pStdVector = dest + knot.mfd->byteOffset;
 				dest = (char*)type->stdVectorGetElement(pStdVector, knot.arrayIdx);
 			}
-		} else {
+		}
+		else {
 			dest += knot.mfd->byteOffset;
 		}
 	}
@@ -64,7 +72,8 @@ void* MemberChain::follow(void* root) const {
 	return dest;
 }
 
-void MemberChain::forEachMember(void* root, std::function<void(void* root, const MemberChain&)>& lambda) {
+void MemberChain::forEachMember(void* root, std::function<void(void* root, const MemberChain&)>& lambda)
+{
 	if (root == nullptr || lambda == nullptr) {
 		sgeAssert(false);
 		return;
@@ -73,7 +82,8 @@ void MemberChain::forEachMember(void* root, std::function<void(void* root, const
 	forEachMemberInternal(root, *this, lambda);
 }
 
-void MemberChain::forEachMemberInternal(void* root, MemberChain chain, std::function<void(void* root, const MemberChain&)>& lambda) {
+void MemberChain::forEachMemberInternal(void* root, MemberChain chain, std::function<void(void* root, const MemberChain&)>& lambda)
+{
 	if (root == nullptr || lambda == nullptr) {
 		sgeAssert(false);
 		return;

@@ -4,7 +4,8 @@
 
 namespace sge {
 
-std::string RelativeAssetRelocationPolicy::whatWillBeTheAssetNameOf(const std::string& askerDir, const char* path) {
+std::string RelativeAssetRelocationPolicy::whatWillBeTheAssetNameOf(const std::string& askerDir, const char* path)
+{
 	std::string assetName = canonizePathRespectOS(askerDir + path);
 	return assetName;
 }

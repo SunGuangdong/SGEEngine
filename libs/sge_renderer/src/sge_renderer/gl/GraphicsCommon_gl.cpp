@@ -5,7 +5,8 @@ namespace sge {
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GLenum ResourceUsage_GetGLNative(const ResourceUsage::Enum type) {
+GLenum ResourceUsage_GetGLNative(const ResourceUsage::Enum type)
+{
 	switch (type) {
 		case ResourceUsage::Immutable:
 			return GL_DYNAMIC_DRAW;
@@ -24,7 +25,8 @@ GLenum ResourceUsage_GetGLNative(const ResourceUsage::Enum type) {
 // GL_READ_ONLY, GL_WRITE_ONLY, or GL_READ_WRITE
 //------------------------------------------------------------------------------
 #if !defined(__EMSCRIPTEN__)
-GLenum Map_GetGLNative(const Map::Enum map) {
+GLenum Map_GetGLNative(const Map::Enum map)
+{
 	switch (map) {
 		case Map::Read:
 			return GL_READ_ONLY;
@@ -44,7 +46,8 @@ GLenum Map_GetGLNative(const Map::Enum map) {
 //------------------------------------------------------------------------------
 // TextureFormat
 //------------------------------------------------------------------------------
-void TextureFormat_GetGLNative(const TextureFormat::Enum format, GLint& glInternalFormat, GLenum& glFormat, GLenum& glType) {
+void TextureFormat_GetGLNative(const TextureFormat::Enum format, GLint& glInternalFormat, GLenum& glFormat, GLenum& glType)
+{
 	glInternalFormat = glFormat = glType = GL_NONE;
 
 	switch (format) {
@@ -324,22 +327,27 @@ void TextureFormat_GetGLNative(const TextureFormat::Enum format, GLint& glIntern
 //------------------------------------------------------------------------------
 // TextureDesc
 //------------------------------------------------------------------------------
-GLenum TextureDesc_GetGLNativeTextureTartget(const TextureDesc& desc) {
+GLenum TextureDesc_GetGLNativeTextureTartget(const TextureDesc& desc)
+{
 	if (desc.textureType == UniformType::Texture1D) {
 #if !defined(__EMSCRIPTEN__)
 		return desc.texture1D.arraySize == 1 ? GL_TEXTURE_1D : GL_TEXTURE_1D_ARRAY;
 #endif
-	} else if (desc.textureType == UniformType::Texture2D) {
+	}
+	else if (desc.textureType == UniformType::Texture2D) {
 		if (desc.texture2D.numSamples == 1) {
 			return desc.texture2D.arraySize == 1 ? GL_TEXTURE_2D : GL_TEXTURE_2D_ARRAY;
-		} else {
+		}
+		else {
 #if !defined(__EMSCRIPTEN__)
 			return desc.texture2D.arraySize == 1 ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D_MULTISAMPLE_ARRAY;
 #endif
 		}
-	} else if (desc.textureType == UniformType::Texture3D) {
+	}
+	else if (desc.textureType == UniformType::Texture3D) {
 		return GL_TEXTURE_3D;
-	} else if (desc.textureType == UniformType::TextureCube) {
+	}
+	else if (desc.textureType == UniformType::TextureCube) {
 #if !defined(__EMSCRIPTEN__)
 		return (desc.textureCube.arraySize == 1) ? GL_TEXTURE_CUBE_MAP : GL_TEXTURE_CUBE_MAP_ARRAY;
 #else
@@ -359,7 +367,8 @@ GLenum TextureDesc_GetGLNativeTextureTartget(const TextureDesc& desc) {
 //------------------------------------------------------------------------------
 
 // [TODO] http://www.opengl.org/sdk/docs/man/html/glGetActiveUniform.xhtml
-UniformType::Enum UniformType_FromGLNumericUniformType(const GLenum uniformType) {
+UniformType::Enum UniformType_FromGLNumericUniformType(const GLenum uniformType)
+{
 	switch (uniformType) {
 		case GL_FLOAT:
 			return UniformType::Float;
@@ -411,7 +420,8 @@ UniformType::Enum UniformType_FromGLNumericUniformType(const GLenum uniformType)
 
 // Resturns a suitable data for glVertexAttribPointer.
 // Example: for arg (Float3), the resuilt is (GL_FLOAT, 3, GL_FALSE).
-void UniformType_ToGLUniformType(const UniformType::Enum type, GLenum& glType, GLint& elemCnt, GLboolean& normalized) {
+void UniformType_ToGLUniformType(const UniformType::Enum type, GLenum& glType, GLint& elemCnt, GLboolean& normalized)
+{
 	// Set this here to save space as it is usually false
 	normalized = GL_FALSE;
 
@@ -521,16 +531,17 @@ void UniformType_ToGLUniformType(const UniformType::Enum type, GLenum& glType, G
 //------------------------------------------------------------------------------
 // ShaderType
 //------------------------------------------------------------------------------
-GLenum ShaderType_GetGLNative(const ShaderType::Enum type) {
+GLenum ShaderType_GetGLNative(const ShaderType::Enum type)
+{
 	switch (type) {
 		case ShaderType::VertexShader:
 			return GL_VERTEX_SHADER;
 		case ShaderType::PixelShader:
 			return GL_FRAGMENT_SHADER;
-//#ifdef GL_COMPUTE_SHADER
-//		case ShaderType::ComputeShader:
-//			return GL_COMPUTE_SHADER;
-//#endif
+			//#ifdef GL_COMPUTE_SHADER
+			//		case ShaderType::ComputeShader:
+			//			return GL_COMPUTE_SHADER;
+			//#endif
 	}
 
 	sgeAssert(false);
@@ -541,7 +552,8 @@ GLenum ShaderType_GetGLNative(const ShaderType::Enum type) {
 //
 //------------------------------------------------------------------------------
 #if !defined(__EMSCRIPTEN__)
-GLenum FillMode_GetGLNative(const FillMode::Enum& fillMode) {
+GLenum FillMode_GetGLNative(const FillMode::Enum& fillMode)
+{
 	if (fillMode == FillMode::Solid)
 		return GL_FILL;
 	return GL_LINE;
@@ -551,7 +563,8 @@ GLenum FillMode_GetGLNative(const FillMode::Enum& fillMode) {
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GLenum CullMode_GetGLNative(const CullMode::Enum& cullMode) {
+GLenum CullMode_GetGLNative(const CullMode::Enum& cullMode)
+{
 	switch (cullMode) {
 		case CullMode::Back:
 			return GL_BACK;
@@ -568,7 +581,8 @@ GLenum CullMode_GetGLNative(const CullMode::Enum& cullMode) {
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GLenum DepthComparisonFunc_GetGLNative(const DepthComparisonFunc::Enum& comaprisonFunc) {
+GLenum DepthComparisonFunc_GetGLNative(const DepthComparisonFunc::Enum& comaprisonFunc)
+{
 	switch (comaprisonFunc) {
 		case DepthComparisonFunc::Never:
 			return GL_NEVER;
@@ -595,7 +609,8 @@ GLenum DepthComparisonFunc_GetGLNative(const DepthComparisonFunc::Enum& comapris
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GLenum PrimitiveTopology_GetGLNative(const PrimitiveTopology::Enum& topology) {
+GLenum PrimitiveTopology_GetGLNative(const PrimitiveTopology::Enum& topology)
+{
 	switch (topology) {
 		case PrimitiveTopology::Unknown:
 			return GL_NONE;
@@ -619,7 +634,8 @@ GLenum PrimitiveTopology_GetGLNative(const PrimitiveTopology::Enum& topology) {
 //------------------------------------------------------------------------------
 //
 //------------------------------------------------------------------------------
-GLenum Blend_GetGLNative(Blend::Enum blend) {
+GLenum Blend_GetGLNative(Blend::Enum blend)
+{
 	if (blend == Blend::Zero)
 		return GL_ZERO;
 	else if (blend == Blend::One)
@@ -650,7 +666,8 @@ GLenum Blend_GetGLNative(Blend::Enum blend) {
 	return GL_ONE;
 }
 
-GLenum BlendOp_GetGLNative(BlendOp::Enum blendOp) {
+GLenum BlendOp_GetGLNative(BlendOp::Enum blendOp)
+{
 	if (blendOp == BlendOp::Add)
 		return GL_FUNC_ADD;
 	if (blendOp == BlendOp::Sub)
@@ -667,7 +684,8 @@ GLenum BlendOp_GetGLNative(BlendOp::Enum blendOp) {
 	return GL_FUNC_ADD;
 }
 
-GLenum QueryType_GetGLnative(QueryType::Enum const queryType) {
+GLenum QueryType_GetGLnative(QueryType::Enum const queryType)
+{
 	switch (queryType) {
 		case QueryType::NumSamplesPassedDepthStencilTest:
 #if !defined(__EMSCRIPTEN__)
@@ -684,7 +702,8 @@ GLenum QueryType_GetGLnative(QueryType::Enum const queryType) {
 	return SGE_GL_UNKNOWN;
 }
 
-GLenum signedAxis_toTexCubeFaceIdx_OpenGL(const SignedAxis signedAxis) {
+GLenum signedAxis_toTexCubeFaceIdx_OpenGL(const SignedAxis signedAxis)
+{
 	switch (signedAxis) {
 		case axis_x_pos:
 			return GL_TEXTURE_CUBE_MAP_POSITIVE_X;

@@ -14,27 +14,32 @@ namespace sge {
 //-------------------------------------------------------------------------------
 //
 //-------------------------------------------------------------------------------
-BindLocation NumericUniformRefl::computeBindLocation() const {
+BindLocation NumericUniformRefl::computeBindLocation() const
+{
 	return BindLocation(d3d11_shaderType, short(byteOffset_d3d11), short(uniformType), (short)sizeBytes_d3d11);
 }
 
-BindLocation CBufferRefl::computeBindLocation() const {
+BindLocation CBufferRefl::computeBindLocation() const
+{
 	return BindLocation(d3d11_shaderType, short(d3d11_bindingSlot), short(UniformType::ConstantBuffer));
 }
 
-BindLocation TextureRefl::computeBindLocation() const {
+BindLocation TextureRefl::computeBindLocation() const
+{
 	return BindLocation(d3d11_shaderType, short(d3d11_bindingSlot), short(textureType), short(arraySize));
 }
 
 
-BindLocation SamplerRefl::computeBindLocation() const {
+BindLocation SamplerRefl::computeBindLocation() const
+{
 	return BindLocation(d3d11_shaderType, short(d3d11_bindingSlot), short(UniformType::SamplerState), short(arraySize));
 }
 
 //-------------------------------------------------------------------------------
 // ShaderRefl
 //-------------------------------------------------------------------------------
-bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
+bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
+{
 	ShaderD3D11* shaders[] = {
 	    (ShaderD3D11*)shadingProgram->getVertexShader(),
 	    (ShaderD3D11*)shadingProgram->getPixelShader(),
@@ -51,7 +56,7 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 		TComPtr<ID3D11ShaderReflection> pD3DReflection;
 		[[maybe_unused]] const HRESULT reflResult =
 		    D3DReflect(shader->D3D11_GetByteCode()->GetBufferPointer(), shader->D3D11_GetByteCode()->GetBufferSize(),
-		                                      IID_ID3D11ShaderReflection, (void**)&pD3DReflection);
+		               IID_ID3D11ShaderReflection, (void**)&pD3DReflection);
 
 		sgeAssert(SUCCEEDED(reflResult));
 
@@ -143,7 +148,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram) {
 				}
 
 				cbuffers.add(cbRefl);
-			} else if (d3dResourceDesc.Type == D3D_SIT_TEXTURE) {
+			}
+			else if (d3dResourceDesc.Type == D3D_SIT_TEXTURE) {
 				// This is a texture.
 				TextureRefl textureRefl;
 				textureRefl.name = d3dResourceDesc.Name;

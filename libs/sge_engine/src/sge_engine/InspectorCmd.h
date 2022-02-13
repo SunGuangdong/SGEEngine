@@ -14,9 +14,7 @@ struct SGE_ENGINE_API InspectorCmd {
 	virtual void redo(GameInspector* inspector) = 0;
 	virtual void undo(GameInspector* inspector) = 0;
 
-	virtual void getText(std::string& text) {
-		text = "<command>";
-	}
+	virtual void getText(std::string& text) { text = "<command>"; }
 };
 
 } // namespace sge

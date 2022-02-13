@@ -28,7 +28,8 @@ struct ATimeline : public Actor, public IActorCustomAttributeEditorTrait {
 	// IActorCustomAttributeEditorTrait
 	void doAttributeEditor(GameInspector* inspector) override;
 
-	float getRawAnimationLength() const {
+	float getRawAnimationLength() const
+	{
 		const float res = keyFrames.size() == 0 ? 0.f : keyFrames.getAllKeys().back();
 		return res;
 	}

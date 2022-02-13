@@ -14,14 +14,13 @@ struct IGameDrawer;
 struct SGE_ENGINE_API SceneWindow : public IImGuiWindow {
 	SceneWindow(std::string windowName, IGameDrawer* gameDrawer)
 	    : m_windowName(std::move(windowName))
-	    , m_gameDrawer(gameDrawer) {}
+	    , m_gameDrawer(gameDrawer)
+	{
+	}
 
 	void setGameDrawer(IGameDrawer* gd) { m_gameDrawer = gd; }
 
-	void close() override
-	{
-		
-	}
+	void close() override {}
 
 	bool isClosed() override { return false; }
 	void update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& is) override;

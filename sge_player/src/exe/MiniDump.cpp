@@ -2,7 +2,7 @@
 
 #if WIN32
 
-    // clang-format off
+// clang-format off
 // The include order here matters.
 #include <Windows.h>
 #include <DbgHelp.h>

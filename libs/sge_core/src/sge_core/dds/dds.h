@@ -240,7 +240,9 @@ struct SGE_CORE_API DDSLoader {
 	DDSLoader()
 	    : m_ddsData(nullptr)
 	    , m_ddsDataSizeBytes(0)
-	    , m_ddsDataPointer(0) {}
+	    , m_ddsDataPointer(0)
+	{
+	}
 
 	bool load(const char* inputData, const size_t inputDataSizeBytes, TextureDesc& desc, std::vector<TextureData>& initalData);
 
@@ -256,13 +258,15 @@ struct SGE_CORE_API DDSLoader {
 	const char* getDataPointer() const { return m_ddsData + m_ddsDataPointer; }
 
 	// Returns the data size that hasn't been read so far.
-	size_t getRemainingBytesCount() const {
+	size_t getRemainingBytesCount() const
+	{
 		sgeAssert(m_ddsDataPointer <= m_ddsDataSizeBytes);
 		return m_ddsDataSizeBytes - m_ddsDataPointer;
 	}
 
 	template <typename T>
-	T readNextAs() {
+	T readNextAs()
+	{
 		sgeAssert(m_ddsDataPointer <= m_ddsDataSizeBytes);
 		T res;
 		memcpy(&res, getDataPointer(), sizeof(res));

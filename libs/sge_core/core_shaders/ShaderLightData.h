@@ -2,14 +2,14 @@
 #define SHADERLIGHTDATA_H
 
 #ifdef __cplusplus
-#include "sge_utils/math/mat4f.h"
+	#include "sge_utils/math/mat4f.h"
 #endif
 
 #ifdef __cplusplus
-#define float2 sge::vec2f
-#define float3 sge::vec3f
-#define float4 sge::vec4f
-#define float4x4 sge::mat4f
+	#define float2 sge::vec2f
+	#define float3 sge::vec3f
+	#define float4 sge::vec4f
+	#define float4x4 sge::mat4f
 #endif
 
 #define kLightFlg_HasShadowMap 1
@@ -21,9 +21,9 @@
 #define LightType_spot 2
 
 #ifdef __cplusplus
-__declspec(align(4)) 
+__declspec(align(4))
 #endif
-struct ShaderLightData {
+    struct ShaderLightData {
 	float3 lightPosition; // Used for spot and point lights.
 	int lightType;        // TODO: embed this into the flags.
 
@@ -46,10 +46,10 @@ static_assert(sizeof(ShaderLightData) % sizeof(sge::vec4f) == 0, "Keep the size 
 #endif
 
 #ifdef __cplusplus
-#undef float2
-#undef float3
-#undef float4
-#undef float4x4
+	#undef float2
+	#undef float3
+	#undef float4
+	#undef float4x4
 #endif
 
 #endif // SHADERLIGHTDATA_H

@@ -5,7 +5,8 @@
 
 namespace sge {
 
-void Log::write(const char* format, ...) {
+void Log::write(const char* format, ...)
+{
 	va_list args;
 	va_start(args, format);
 	std::string buffer;
@@ -15,7 +16,8 @@ void Log::write(const char* format, ...) {
 	m_messages.emplace_back(Message(messageType_log, buffer));
 }
 
-void Log::writeCheck(const char* format, ...) {
+void Log::writeCheck(const char* format, ...)
+{
 	va_list args;
 	va_start(args, format);
 	std::string buffer;
@@ -25,7 +27,8 @@ void Log::writeCheck(const char* format, ...) {
 	m_messages.emplace_back(Message(messageType_check, buffer));
 }
 
-void Log::writeError(const char* format, ...) {
+void Log::writeError(const char* format, ...)
+{
 	va_list args;
 	va_start(args, format);
 	std::string buffer;
@@ -35,7 +38,8 @@ void Log::writeError(const char* format, ...) {
 	m_messages.emplace_back(Message(messageType_error, buffer));
 }
 
-void Log::writeWarning(const char* format, ...) {
+void Log::writeWarning(const char* format, ...)
+{
 	va_list args;
 	va_start(args, format);
 	std::string buffer;
@@ -48,11 +52,13 @@ void Log::writeWarning(const char* format, ...) {
 Log g_moduleLocalLog;
 Log* g_pWorkingLog = &g_moduleLocalLog;
 
-Log* getLog() {
+Log* getLog()
+{
 	return g_pWorkingLog;
 }
 
-void setLog(Log* newLog) {
+void setLog(Log* newLog)
+{
 	sgeAssert(newLog);
 	g_pWorkingLog = newLog;
 }

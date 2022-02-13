@@ -11,27 +11,34 @@ struct Range {
 		T i;
 
 		const_iterator(T i)
-		    : i(i) {}
+		    : i(i)
+		{
+		}
 
 		bool operator!=(const const_iterator& ref) const { return i != ref.i; }
 		T operator*() const { return i; }
-		const_iterator operator++() {
+		const_iterator operator++()
+		{
 			++i;
 			return *this;
 		}
 	};
-public :
+
+  public:
 	Range() = delete;
 
 	/// the 1st value is assumed 0. the interval is [0, _end)
 	Range(const T m_end)
 	    : m_begin(0)
-	    , m_end(m_end) {}
+	    , m_end(m_end)
+	{
+	}
 
 	// [_begin, _end)
 	Range(const T _begin, const T _end)
 	    : m_begin(_begin)
-	    , m_end(_end) {
+	    , m_end(_end)
+	{
 		sgeAssert(m_begin <= m_end);
 	}
 

@@ -10,7 +10,9 @@ struct EditorGUINotification {
 	EditorGUINotification() = default;
 
 	EditorGUINotification(std::string text)
-	    : text(std::move(text)) {}
+	    : text(std::move(text))
+	{
+	}
 
 	// The message of this notification.
 	std::string text;
@@ -22,7 +24,8 @@ struct EditorGUINotification {
 //--------------------------------------------------------------------------
 // EngineGlobalAssets
 //--------------------------------------------------------------------------
-void EngineGlobalAssets::initialize() {
+void EngineGlobalAssets::initialize()
+{
 	AssetLibrary* const assetLib = getCore()->getAssetLib();
 
 	unknownObjectIcon = assetLib->getAssetFromFile("assets/editor/textures/icons/obj/UnknownObject.png");
@@ -42,7 +45,8 @@ void EngineGlobalAssets::initialize() {
 	}
 }
 
-AssetPtr EngineGlobalAssets::getIconForObjectType(const TypeId type) {
+AssetPtr EngineGlobalAssets::getIconForObjectType(const TypeId type)
+{
 	auto itr = perObjectTypeIcon.find(type);
 
 	if (itr != perObjectTypeIcon.end()) {
@@ -114,19 +118,23 @@ struct EngineGlobal final : public IEngineGlobal {
 	bool m_doesAnythingNeedsRelativeCursorThisFrame = false;
 };
 
-void EngineGlobal::addPropertyEditorIUGeneratorForType(TypeId type, PropertyEditorGeneratorForTypeFn function) {
+void EngineGlobal::addPropertyEditorIUGeneratorForType(TypeId type, PropertyEditorGeneratorForTypeFn function)
+{
 	m_propertyEditorUIGenFuncs[type] = function;
 }
 
-PropertyEditorGeneratorForTypeFn EngineGlobal::getPropertyEditorIUGeneratorForType(TypeId type) {
+PropertyEditorGeneratorForTypeFn EngineGlobal::getPropertyEditorIUGeneratorForType(TypeId type)
+{
 	return m_propertyEditorUIGenFuncs[type];
 }
 
-void EngineGlobal::initialize() {
+void EngineGlobal::initialize()
+{
 	m_globalAssets.initialize();
 }
 
-void EngineGlobal::update(float dt) {
+void EngineGlobal::update(float dt)
+{
 	// Delete expiered notification messages.
 	for (int t = 0; t < int(m_notifications.size()); ++t) {
 		m_notifications[t].timeDisplayed += dt;
@@ -140,7 +148,8 @@ void EngineGlobal::update(float dt) {
 	}
 }
 
-void EngineGlobal::changeActivePlugin(IPlugin* pPlugin) {
+void EngineGlobal::changeActivePlugin(IPlugin* pPlugin)
+{
 	m_activePlugin = pPlugin;
 	m_propertyEditorUIGenFuncs.clear();
 
@@ -153,23 +162,28 @@ void EngineGlobal::changeActivePlugin(IPlugin* pPlugin) {
 	m_onPluginChangeEvent.invokeEvent();
 }
 
-IPlugin* EngineGlobal::getActivePlugin() {
+IPlugin* EngineGlobal::getActivePlugin()
+{
 	return m_activePlugin;
 }
 
-void EngineGlobal::notifyOnPluginPreUnload() {
+void EngineGlobal::notifyOnPluginPreUnload()
+{
 	m_onPluginPreUnloadEvent.invokeEvent();
 }
 
-EventSubscription EngineGlobal::subscribeOnPluginChange(std::function<void()> fn) {
+EventSubscription EngineGlobal::subscribeOnPluginChange(std::function<void()> fn)
+{
 	return m_onPluginChangeEvent.subscribe(std::move(fn));
 }
 
-EventSubscription EngineGlobal::subscribeOnPluginPreUnload(std::function<void()> fn) {
+EventSubscription EngineGlobal::subscribeOnPluginPreUnload(std::function<void()> fn)
+{
 	return m_onPluginPreUnloadEvent.subscribe(std::move(fn));
 }
 
-void EngineGlobal::addWindow(IImGuiWindow* window) {
+void EngineGlobal::addWindow(IImGuiWindow* window)
+{
 	if (window == nullptr) {
 		sgeAssert(false);
 		return;
@@ -179,15 +193,18 @@ void EngineGlobal::addWindow(IImGuiWindow* window) {
 	if (newWindowAsEditorWnd != nullptr) {
 		if (m_editorWindow == nullptr) {
 			m_editorWindow = newWindowAsEditorWnd;
-		} else {
+		}
+		else {
 			sgeAssert(false && "It is expected that there will be only one EditorWindow");
 		}
-	} else {
+	}
+	else {
 		m_allActiveWindows.emplace_back(window);
 	}
 }
 
-void EngineGlobal::removeWindow(IImGuiWindow* window) {
+void EngineGlobal::removeWindow(IImGuiWindow* window)
+{
 	for (int t = 0; t < int(m_allActiveWindows.size()); ++t) {
 		if (m_allActiveWindows[t].get() == window) {
 			m_allActiveWindows.erase(m_allActiveWindows.begin() + t);
@@ -198,15 +215,18 @@ void EngineGlobal::removeWindow(IImGuiWindow* window) {
 	sgeAssert(false && "Trying to remove a window that hasn't been added to the engineGlobal list");
 }
 
-EditorWindow* EngineGlobal::getEditorWindow() {
+EditorWindow* EngineGlobal::getEditorWindow()
+{
 	return m_editorWindow;
 }
 
-std::vector<std::unique_ptr<IImGuiWindow>>& EngineGlobal::getAllWindows() {
+std::vector<std::unique_ptr<IImGuiWindow>>& EngineGlobal::getAllWindows()
+{
 	return m_allActiveWindows;
 }
 
-IImGuiWindow* EngineGlobal::findWindowByName(const char* const name) {
+IImGuiWindow* EngineGlobal::findWindowByName(const char* const name)
+{
 	if (name == nullptr) {
 		return nullptr;
 	}
@@ -220,11 +240,13 @@ IImGuiWindow* EngineGlobal::findWindowByName(const char* const name) {
 	return nullptr;
 }
 
-void EngineGlobal::showNotification(std::string text) {
+void EngineGlobal::showNotification(std::string text)
+{
 	m_notifications.emplace_back(EditorGUINotification(std::move(text)));
 }
 
-const char* EngineGlobal::getNotificationText(const int iNotification) const {
+const char* EngineGlobal::getNotificationText(const int iNotification) const
+{
 	if (iNotification < 0 || iNotification >= m_notifications.size()) {
 		return nullptr;
 	}
@@ -232,31 +254,38 @@ const char* EngineGlobal::getNotificationText(const int iNotification) const {
 	return m_notifications[iNotification].text.c_str();
 }
 
-int EngineGlobal::getNotificationCount() const {
+int EngineGlobal::getNotificationCount() const
+{
 	return int(m_notifications.size());
 }
 
-EngineGlobalAssets& EngineGlobal::getEngineAssets() {
+EngineGlobalAssets& EngineGlobal::getEngineAssets()
+{
 	return m_globalAssets;
 }
 
-void EngineGlobal::setEngineAllowingRelativeCursor(bool isRelativeCursorAllowed) {
+void EngineGlobal::setEngineAllowingRelativeCursor(bool isRelativeCursorAllowed)
+{
 	m_isEngineAllowingRelativeCursor = isRelativeCursorAllowed;
 }
 
-bool EngineGlobal::getEngineAllowingRelativeCursor() const {
+bool EngineGlobal::getEngineAllowingRelativeCursor() const
+{
 	return m_isEngineAllowingRelativeCursor;
 }
 
-void EngineGlobal::setNeedForRelativeCursorThisFrame() {
+void EngineGlobal::setNeedForRelativeCursorThisFrame()
+{
 	m_doesAnythingNeedsRelativeCursorThisFrame |= true;
 }
 
-bool EngineGlobal::doesAnyoneNeedForRelativeCursorThisFrame() const {
+bool EngineGlobal::doesAnyoneNeedForRelativeCursorThisFrame() const
+{
 	return m_doesAnythingNeedsRelativeCursorThisFrame;
 }
 
-void EngineGlobal::clearAnyoneNeedForRelativeCursorThisFrame() {
+void EngineGlobal::clearAnyoneNeedForRelativeCursorThisFrame()
+{
 	m_doesAnythingNeedsRelativeCursorThisFrame = false;
 }
 
@@ -266,7 +295,8 @@ void EngineGlobal::clearAnyoneNeedForRelativeCursorThisFrame() {
 IEngineGlobal* g_worklingEngineGlobal = nullptr;
 std::vector<void (*)()> g_pluginRegisterFunctionsToCall;
 
-IEngineGlobal* createAndInitializeEngineGlobal() {
+IEngineGlobal* createAndInitializeEngineGlobal()
+{
 	if (g_worklingEngineGlobal == nullptr) {
 		g_worklingEngineGlobal = new EngineGlobal();
 		g_worklingEngineGlobal->initialize();
@@ -274,19 +304,23 @@ IEngineGlobal* createAndInitializeEngineGlobal() {
 	return g_worklingEngineGlobal;
 }
 
-IEngineGlobal* getEngineGlobal() {
+IEngineGlobal* getEngineGlobal()
+{
 	return g_worklingEngineGlobal;
 }
 
-void setEngineGlobal(IEngineGlobal* global) {
+void setEngineGlobal(IEngineGlobal* global)
+{
 	g_worklingEngineGlobal = global;
 }
 
-const std::vector<void (*)()>& getPluginRegisterFunctions() {
+const std::vector<void (*)()>& getPluginRegisterFunctions()
+{
 	return g_pluginRegisterFunctionsToCall;
 }
 
-int addPluginRegisterFunction(void (*fnPtr)()) {
+int addPluginRegisterFunction(void (*fnPtr)())
+{
 	g_pluginRegisterFunctionsToCall.push_back(fnPtr);
 	return 0;
 }

@@ -10,7 +10,9 @@ struct Pair {
 
 	Pair(const TFirst& a, const TSecond& b)
 	    : first(a)
-	    , second(b) {}
+	    , second(b)
+	{
+	}
 
 	TFirst first;
 	TSecond second;

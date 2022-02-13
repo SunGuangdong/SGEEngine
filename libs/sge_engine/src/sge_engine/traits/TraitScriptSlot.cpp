@@ -31,7 +31,8 @@ ReflBlock()
 }
 // clang-format on
 
-void TraitScriptSlot::addSlot(const char* const name, TypeId possibleType) {
+void TraitScriptSlot::addSlot(const char* const name, TypeId possibleType)
+{
 	ScriptSlot slot;
 	slot.slotName = name;
 	slot.possibleTypesIncludeList.push_back(possibleType);
@@ -39,14 +40,16 @@ void TraitScriptSlot::addSlot(const char* const name, TypeId possibleType) {
 	slots.push_back(slot);
 }
 
-void TraitScriptSlot_doProperyEditor(GameInspector& inspector, GameObject* const gameObject, MemberChain chain) {
+void TraitScriptSlot_doProperyEditor(GameInspector& inspector, GameObject* const gameObject, MemberChain chain)
+{
 	TraitScriptSlot& ttScriptSlot = *(TraitScriptSlot*)chain.follow(gameObject);
 
 	ImGuiEx::BeginGroupPanel("Scripts", ImVec2(-1, -1));
 
 	if (ttScriptSlot.slots.size() == 0) {
 		ImGui::Text("No slots are defined.");
-	} else {
+	}
+	else {
 		for (int iSlot = 0; iSlot < ttScriptSlot.slots.size(); ++iSlot) {
 			TraitScriptSlot::ScriptSlot& slot = ttScriptSlot.slots[iSlot];
 
@@ -64,7 +67,8 @@ void TraitScriptSlot_doProperyEditor(GameInspector& inspector, GameObject* const
 				ImGui::SameLine();
 				if (ImGui::Button("Create")) {
 					if (slot.possibleTypesIncludeList.size() == 1 && false) {
-					} else {
+					}
+					else {
 						ImGui::OpenPopup(popUpMenuName.c_str());
 					}
 				}

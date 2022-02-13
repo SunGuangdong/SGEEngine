@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sge_renderer/renderer/GraphicsCommon.h"
-#include <string>
 #include <set>
+#include <string>
 
 namespace sge {
 

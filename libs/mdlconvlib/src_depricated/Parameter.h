@@ -5,13 +5,13 @@
 #include <string>
 
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/sge_utils.h"
 #include "sge_utils/containers/StaticArray.h"
+#include "sge_utils/sge_utils.h"
 #include <type_traits>
 
+#include "sge_utils/containers/vector_map.h"
 #include "sge_utils/math/quatf.h"
 #include "sge_utils/math/vec4f.h"
-#include "sge_utils/containers/vector_map.h"
 
 namespace sge {
 
@@ -39,7 +39,8 @@ struct SGE_CORE_API ParameterType {
 		int sizeBytes;
 	};
 
-	static const Info& info(const Enum e) {
+	static const Info& info(const Enum e)
+	{
 		static const Info info[] = {
 		    {"Float", 4}, {"Float2", 8}, {"Float3", 12}, {"Float4", 16}, {"Quaternion", 16}, {"String", 0},
 		};
@@ -47,7 +48,8 @@ struct SGE_CORE_API ParameterType {
 		return info[(int)e];
 	}
 
-	static Enum FromString(const char* const str) {
+	static Enum FromString(const char* const str)
+	{
 		for (int t = 0; t < NumParams; ++t) {
 			if (strcmp(info(Enum(t)).name, str) == 0)
 				return (Enum)t;
@@ -73,7 +75,8 @@ struct SGE_CORE_API ParameterCurve {
 
 	// [TODO] Add an assert if the sizeof(T) != data type size. take care for the string case...
 	template <typename T>
-	bool TAdd(float key, const T& v) {
+	bool TAdd(float key, const T& v)
+	{
 		return Add(key, (void*)&v);
 	}
 	bool Evaluate(float key, void* dest) const;

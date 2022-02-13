@@ -11,10 +11,12 @@
 
 namespace sge {
 ActorCreateWindow::ActorCreateWindow(std::string windowName)
-    : m_windowName(std::move(windowName)) {
+    : m_windowName(std::move(windowName))
+{
 }
 
-void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is)) {
+void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is))
+{
 	const ImVec4 kPrimarySelectionColor(0.f, 1.f, 0.f, 1.f);
 
 	if (isClosed()) {
@@ -81,7 +83,8 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* 
 					const float typeNameTextWidth = ImGui::CalcTextSize(typeDesc->name).x;
 					if (typeNameTextWidth >= kWidgetSize.x) {
 						indent = 0.f;
-					} else {
+					}
+					else {
 						indent = (ImGui::GetContentRegionAvailWidth() - ImGui::CalcTextSize(typeDesc->name).x) * 0.5f;
 					}
 
@@ -112,7 +115,8 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* 
 					numItemsShown++;
 					if (numItemsShown == itemsPerRow) {
 						numItemsShown = 0;
-					} else {
+					}
+					else {
 						ImGui::SameLine();
 					}
 				}

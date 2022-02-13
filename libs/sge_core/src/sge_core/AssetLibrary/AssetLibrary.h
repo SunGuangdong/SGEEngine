@@ -61,7 +61,8 @@ struct SGE_CORE_API AssetLibrary {
 	AssetPtr getAssetFromFile(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true);
 
 	template <typename TAssetIface>
-	std::shared_ptr<TAssetIface> getLoadedAssetIface(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true) {
+	std::shared_ptr<TAssetIface> getLoadedAssetIface(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true)
+	{
 		AssetPtr assetPtr = getAssetFromFile(path, localDirectory, loadIfMissing);
 		if (assetPtr) {
 			return std::dynamic_pointer_cast<TAssetIface>(assetPtr);
@@ -81,7 +82,8 @@ struct SGE_CORE_API AssetLibrary {
 	bool reloadAssetModified(AssetPtr& asset);
 
 	template <typename TAsset>
-	std::shared_ptr<TAsset> newAsset(std::string assetPath) {
+	std::shared_ptr<TAsset> newAsset(std::string assetPath)
+	{
 		if (hasAsset(assetPath)) {
 			sgeAssert(false);
 			return nullptr;
@@ -93,17 +95,17 @@ struct SGE_CORE_API AssetLibrary {
 		return assetPtr;
 	}
 
-	const std::string getAssetsDirAbs() const {
-		return m_gameAssetsDir;
-	}
+	const std::string getAssetsDirAbs() const { return m_gameAssetsDir; }
 
-	void queueAssetForReload(AssetPtr& a) {
+	void queueAssetForReload(AssetPtr& a)
+	{
 		if (a) {
 			m_assetsToReload.insert(a);
 		}
 	}
 
-	void reloadAssets() {
+	void reloadAssets()
+	{
 		for (AssetPtr a : m_assetsToReload) {
 			a->loadAssetFromFile(a->getPath().c_str());
 		}

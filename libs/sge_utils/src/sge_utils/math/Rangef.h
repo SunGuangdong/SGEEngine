@@ -7,20 +7,23 @@ namespace sge {
 struct Rangef {
 	Rangef() = default;
 
-	Rangef(float minAndMax) {
+	Rangef(float minAndMax)
+	{
 		this->locked = true;
 		this->min = minAndMax;
 		this->max = minAndMax;
 	}
 
-	Rangef(float min, float max) {
+	Rangef(float min, float max)
+	{
 		sgeAssert(min <= max);
 		this->locked = false;
 		this->min = min;
 		this->max = min > max ? min : max;
 	}
 
-	float sample(const float v) const {
+	float sample(const float v) const
+	{
 		if (locked) {
 			return min;
 		}
@@ -28,7 +31,8 @@ struct Rangef {
 		return min + v * (max - min);
 	}
 
-	float sampleWithMargin(float v, float margin = 0.f) const {
+	float sampleWithMargin(float v, float margin = 0.f) const
+	{
 		sgeAssert(margin >= 0.f);
 
 		const float minMargin = min + margin;

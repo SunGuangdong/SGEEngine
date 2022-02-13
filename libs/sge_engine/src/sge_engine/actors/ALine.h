@@ -44,7 +44,8 @@ struct SGE_ENGINE_API ALine : public Actor {
 	bool evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float const distance);
 	int getNumPoints() const { return int(points.size()); }
 
-	int getNumSegments() const {
+	int getNumSegments() const
+	{
 		const int pts = getNumPoints();
 		if (pts <= 1) {
 			return 0;
@@ -53,7 +54,8 @@ struct SGE_ENGINE_API ALine : public Actor {
 		return (isLooped) ? pts : pts - 1;
 	}
 
-	bool getSegmentVerts(const int iSegment, int& i0, int& i1) const {
+	bool getSegmentVerts(const int iSegment, int& i0, int& i1) const
+	{
 		const int numSegments = getNumSegments();
 
 		if (iSegment >= numSegments || iSegment < 0) {
@@ -64,7 +66,8 @@ struct SGE_ENGINE_API ALine : public Actor {
 		if (isLooped && iSegment == (numSegments - 1)) {
 			i0 = getNumPoints() - 1;
 			i1 = 0;
-		} else {
+		}
+		else {
 			i0 = iSegment;
 			i1 = iSegment + 1;
 		}
@@ -72,13 +75,15 @@ struct SGE_ENGINE_API ALine : public Actor {
 		return true;
 	}
 
-	int getNumItemsInMode(EditMode const mode) const final {
+	int getNumItemsInMode(EditMode const mode) const final
+	{
 		if (mode == editMode_points)
 			return int(points.size());
 		return Actor::getNumItemsInMode(mode);
 	}
 
-	bool getItemTransform(transf3d& result, EditMode const mode, int itemIndex) final {
+	bool getItemTransform(transf3d& result, EditMode const mode, int itemIndex) final
+	{
 		if (mode == editMode_points) {
 			if (itemIndex > points.size())
 				return false;
@@ -91,7 +96,8 @@ struct SGE_ENGINE_API ALine : public Actor {
 		return Actor::getItemTransform(result, mode, itemIndex);
 	}
 
-	void setItemTransform(EditMode const mode, int itemIndex, const transf3d& tr) {
+	void setItemTransform(EditMode const mode, int itemIndex, const transf3d& tr)
+	{
 		if (mode == editMode_points) {
 			if (itemIndex > points.size()) {
 				sgeAssert(false);
@@ -99,7 +105,8 @@ struct SGE_ENGINE_API ALine : public Actor {
 			}
 			points[itemIndex] = mat_mul_pos(getTransform().toMatrix().inverse(), tr.p);
 			onMemberChanged();
-		} else {
+		}
+		else {
 			Actor::setItemTransform(mode, itemIndex, tr);
 		}
 	}

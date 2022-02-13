@@ -16,7 +16,8 @@ ReflAddTypeIdExists(TraitSprite);
 /// @brief A struct holding the rendering options of a sprite or a texture in 3D.
 struct TraitSpriteImageSets {
 	/// @brief Computes the object-to-node transformation of the sprite so i has its origin in the deisiered location.
-	mat4f getAnchorAlignMtxOS(float imageWidth, float imageHeight) const {
+	mat4f getAnchorAlignMtxOS(float imageWidth, float imageHeight) const
+	{
 		const float sz = imageWidth / m_pixelsPerUnit;
 		const float sy = imageHeight / m_pixelsPerUnit;
 
@@ -86,7 +87,8 @@ struct TraitSpriteImageSets {
 /// a sprite or a texture 2d to get rendered and holds its render settings.
 struct TraitSpriteEntry {
 	TraitSpriteEntry()
-	    : m_assetProperty(assetIface_texture2d, assetIface_spriteAnim) {
+	    : m_assetProperty(assetIface_texture2d, assetIface_spriteAnim)
+	{
 	}
 
 	void setImage(const AssetPtr& asset);
@@ -110,9 +112,7 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 	/// Updates the working sprites. The changes usually occure the the assets has been changed via the Property Editor.
 	/// Returns true if the model has been changed (no matter if it is valid or not).
 	/// If the game object doesn't offer any changed via the UI there is no point in calling it.
-	bool postUpdate() {
-		return updateAssetProperty();
-	}
+	bool postUpdate() { return updateAssetProperty(); }
 
 	Box3f getBBoxOS() const;
 
@@ -120,7 +120,8 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 	void getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
 
   private:
-	bool updateAssetProperty() {
+	bool updateAssetProperty()
+	{
 		bool hadChange = false;
 		for (TraitSpriteEntry& image : images) {
 			hadChange = image.m_assetProperty.update() || hadChange;

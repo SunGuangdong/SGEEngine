@@ -33,10 +33,12 @@ struct StateStorage {
 	//
 	bool expandedWindowIsOpened = false;
 
-	void remapIndicesBecauseTheCurveChanged(const std::vector<int>& remap) {
+	void remapIndicesBecauseTheCurveChanged(const std::vector<int>& remap)
+	{
 		std::unordered_set<int> newSelection;
 		for (const int sel : m_selectedIndices) {
-			if_checked(remap.size() > sel) {
+			if_checked(remap.size() > sel)
+			{
 				if (remap[sel] >= 0) {
 					newSelection.insert(remap[sel]);
 				}
@@ -53,7 +55,8 @@ struct StateStorage {
 	}
 };
 
-void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f widgetSize, bool isThisExpandedOfAnother) {
+void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f widgetSize, bool isThisExpandedOfAnother)
+{
 	const char* const kContextPopupName = "MultiCurve2DEditorContext Menu";
 	const float kPointRadius = 4.f;
 
@@ -61,7 +64,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 		ImVec2 available = ImGui::GetContentRegionAvail();
 		widgetSize.x = available.x;
 		widgetSize.y = available.y - 50.f;
-	} else {
+	}
+	else {
 		widgetSize.x = widgetSize.x < 0 ? ImGui::CalcItemWidth() + (ImGui::GetStyle().FramePadding.x * 2.f) : widgetSize.x;
 		widgetSize.y = widgetSize.y < 0 ? floorf(widgetSize.x * 0.50f) : widgetSize.y;
 	}
@@ -127,7 +131,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 	if (ss.m_state == State::Idle && ImGui::IsWindowFocused()) {
 		if (ImGui::IsMouseDoubleClicked(0)) {
 			m_fn.addSmoothPointSafe(cursorFS.x, cursorFS.y);
-		} else if (ImGui::GetIO().MouseWheel) {
+		}
+		else if (ImGui::GetIO().MouseWheel) {
 			// If the cursor is over some point zoom towards that point, otherwise zoom towards the curson in function space.
 			vec2f zoomTargetCS = cursorCS;
 			vec2f zoomTargetInitialFS = cursorFS;
@@ -152,10 +157,11 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 
 			// The cached function space position of the cursor has changed, update it.
 			cursorFS = client2function(cursorCS);
-
-		} else if (ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
+		}
+		else if (ImGui::IsMouseClicked(1) && ImGui::IsWindowHovered()) {
 			ImGui::OpenPopup(kContextPopupName);
-		} else if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
+		}
+		else if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered()) {
 			// Check if any point is under the cursor, if so, select it.
 			int ptIndexUnderCursor = -1;
 			for (int iPt = 0; iPt < int(m_fn.getPoints().size()); ++iPt) {
@@ -172,13 +178,15 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 				ss.m_selectedIndices.clear();
 				ss.m_state = State::CreatingSelectionRect;
 				ss.m_selectionRectStartPointCS = cursorCS;
-			} else {
+			}
+			else {
 				// If the hovered point is selected the user wants to move points
 				// otherwise the user wants to select (and move) this point alone.
 				if (ss.m_selectedIndices.count(ptIndexUnderCursor)) {
 					ss.m_state = State::MovingPoints;
 					ss.m_movedPointIdx = ptIndexUnderCursor;
-				} else {
+				}
+				else {
 					ss.m_selectedIndices.clear();
 					ss.m_selectedIndices.insert(ptIndexUnderCursor);
 					ss.m_state = State::MovingPoints;
@@ -232,13 +240,15 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 				m_camPosFS = vec2f(0.f);
 				float w = std::max(widgetSize.x, widgetSize.y);
 				m_camViewSizeFS = 2.f * widgetSize * (1.f / w);
-			} else {
+			}
+			else {
 				Box2f bboxFs;
 				if (ss.m_selectedIndices.empty() || ss.m_selectedIndices.size() == 1) {
 					for (auto& pt : m_fn.getPoints()) {
 						bboxFs.expand(pt.getPos());
 					}
-				} else {
+				}
+				else {
 					for (const int iSel : ss.m_selectedIndices) {
 						bboxFs.expand(m_fn.getPoints()[iSel].getPos());
 					}
@@ -254,7 +264,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 					// Stop zooming when number get too small.
 					m_camViewSizeFS.x = std::max(m_camViewSizeFS.x, 1e-3f);
 					m_camViewSizeFS.y = std::max(m_camViewSizeFS.y, 1e-3f);
-				} else {
+				}
+				else {
 					m_camPosFS = bboxFs.center();
 				}
 			}
@@ -264,13 +275,15 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 				m_camPosFS = vec2f(0.f);
 				float w = std::max(widgetSize.x, widgetSize.y);
 				m_camViewSizeFS = 2.f * widgetSize * (1.f / w);
-			} else {
+			}
+			else {
 				Box2f bboxFs;
 				if (ss.m_selectedIndices.empty() || ss.m_selectedIndices.size() == 1) {
 					for (auto& pt : m_fn.getPoints()) {
 						bboxFs.expand(pt.getPos());
 					}
-				} else {
+				}
+				else {
 					for (const int iSel : ss.m_selectedIndices) {
 						bboxFs.expand(m_fn.getPoints()[iSel].getPos());
 					}
@@ -286,7 +299,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 					if (ratios.x < ratios.y) {
 						m_camViewSizeFS.x = bboxFs.diagonal().y * widgetSize.x / widgetSize.y;
 						m_camViewSizeFS.y = bboxFs.diagonal().y;
-					} else {
+					}
+					else {
 						m_camViewSizeFS.x = bboxFs.diagonal().x;
 						m_camViewSizeFS.y = bboxFs.diagonal().x * widgetSize.y / widgetSize.x;
 					}
@@ -295,7 +309,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 					// Stop zooming when number get too small.
 					m_camViewSizeFS.x = std::max(m_camViewSizeFS.x, 1e-3f);
 					m_camViewSizeFS.y = std::max(m_camViewSizeFS.y, 1e-3f);
-				} else {
+				}
+				else {
 					m_camPosFS = bboxFs.center();
 				}
 			}
@@ -341,14 +356,16 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 		if (ImGui::IsMouseReleased(0) || !m_fn.isIndexValid(ss.m_movedPointIdx)) {
 			ss.m_movedPointIdx = -1;
 			ss.m_state = State::Idle;
-		} else {
+		}
+		else {
 			const vec2f originPointFs = m_fn.getPoints()[ss.m_movedPointIdx].getPos();
 			const vec2f movementFs = cursorFS - originPointFs;
 
 			MultiCurve2D original = m_fn;
 
 			for (const int iSel : ss.m_selectedIndices) {
-				if_checked(m_fn.isIndexValid(iSel)) {
+				if_checked(m_fn.isIndexValid(iSel))
+				{
 					m_fn.getPointsMutable()[iSel].x += movementFs.x;
 					m_fn.getPointsMutable()[iSel].y += movementFs.y;
 				}
@@ -359,7 +376,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 
 			if (m_fn.isCurveValid() == false) {
 				m_fn = std::move(original);
-			} else {
+			}
+			else {
 				if (needsIndexRemap) {
 					ss.remapIndicesBecauseTheCurveChanged(indexRemap);
 				}
@@ -385,7 +403,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 				while (yDrawSmall < topRightFS.y) {
 					if (expYSmall < 0) {
 						string_format(number, "%.*f", -expYSmall, yDrawSmall);
-					} else {
+					}
+					else {
 						string_format(number, "%0.*f", abs(expYSmall), yDrawSmall);
 					}
 
@@ -396,7 +415,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 						float f = clamp((yIncrementsSmall * 10.f / m_camViewSizeFS.y), 0.f, 1.f);
 						color = IM_COL32(0xFF, 0xFF, 0xFF, int(255.f * f));
 						showText = true;
-					} else {
+					}
+					else {
 						float f = clamp((yIncrementsSmall / m_camViewSizeFS.y), 0.f, 0.25f);
 						color = IM_COL32(0xFF, 0xFF, 0xFF, int(255.f * f));
 					}
@@ -425,7 +445,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 				while (xDrawSmall < topRightFS.x) {
 					if (expXSmall < 0) {
 						string_format(number, "%.*f", -expXSmall, xDrawSmall);
-					} else {
+					}
+					else {
 						string_format(number, "%0.f", xDrawSmall);
 					}
 
@@ -435,7 +456,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 						float f = clamp((xIncrementsSmall * 10.f / m_camViewSizeFS.x), 0.f, 1.f);
 						color = IM_COL32(0xFF, 0xFF, 0xFF, int(255.f * f));
 						showText = true;
-					} else {
+					}
+					else {
 						float f = clamp((xIncrementsSmall / m_camViewSizeFS.x), 0.f, 0.25f);
 						color = IM_COL32(0xFF, 0xFF, 0xFF, int(255.f * f));
 					}
@@ -506,10 +528,12 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 
 			if (iPt == ptIndexUnderCursor) {
 				wndDrawList->AddCircleFilled(toImGui(ptSS), kPointRadius, 0xAA339099);
-			} else {
+			}
+			else {
 				if (ss.m_selectedIndices.count(iPt)) {
 					wndDrawList->AddCircleFilled(toImGui(ptSS), kPointRadius, 0xAA000599);
-				} else {
+				}
+				else {
 					wndDrawList->AddCircleFilled(toImGui(ptSS), kPointRadius, 0xAA000522);
 					wndDrawList->AddCircleFilled(toImGui(ptSS), kPointRadius, 0xAA000522);
 				}

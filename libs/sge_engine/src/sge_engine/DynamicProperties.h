@@ -15,14 +15,16 @@ struct DynamicProperties {
 		bool isEmpty() const { return type.isNull() || propData.get() == nullptr; }
 
 		template <typename T>
-		T& getRef() {
+		T& getRef()
+		{
 			sgeAssert(type == sgeTypeId(T));
 			sgeAssert(isEmpty() == false);
 			return *(T*)propData.get();
 		}
 
 		template <typename T>
-		T* get() {
+		T* get()
+		{
 			if (type == sgeTypeId(T) && !isEmpty()) {
 				return (T*)propData.get();
 			}
@@ -37,7 +39,8 @@ struct DynamicProperties {
 	void* find(const std::string& name, TypeId type);
 
 	template <typename T>
-	T* findTyped(const char* const name) {
+	T* findTyped(const char* const name)
+	{
 		void* ptr = find(name, sgeTypeId(T));
 		return ptr ? reinterpret_cast<T*>(ptr) : nullptr;
 	}

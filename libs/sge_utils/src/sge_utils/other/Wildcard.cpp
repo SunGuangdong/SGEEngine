@@ -3,7 +3,8 @@
 namespace sge {
 
 // https://www.codeproject.com/Articles/188256/A-Simple-Wildcard-Matching-Function
-bool WildcardMatch(const char* pszString, const char* pszMatch) {
+bool WildcardMatch(const char* pszString, const char* pszMatch)
+{
 	// We have a special case where string is empty ("") and the mask is "*".
 	// We need to handle this too. So we can't test on !*pszString here.
 	// The loop breaks when the match string is exhausted.
@@ -17,7 +18,8 @@ bool WildcardMatch(const char* pszString, const char* pszMatch) {
 			// OK next
 			++pszString;
 			++pszMatch;
-		} else if (*pszMatch == '*') {
+		}
+		else if (*pszMatch == '*') {
 			// Need to do some tricks.
 
 			// 1. The wildcard * is ignored.
@@ -36,7 +38,8 @@ bool WildcardMatch(const char* pszString, const char* pszMatch) {
 
 			// Nothing worked with this wildcard.
 			return false;
-		} else {
+		}
+		else {
 			// Standard compare of 2 chars. Note that *pszSring might be 0
 			// here, but then we never get a match on *pszMask that has always
 			// a value while inside this loop.

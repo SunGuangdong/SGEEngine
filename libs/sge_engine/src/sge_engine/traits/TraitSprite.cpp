@@ -53,7 +53,8 @@ ReflBlock() {
 mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
                                                           const ICamera* const drawCamera,
                                                           const transf3d& nodeToWorldTransform,
-                                                          const mat4f& additionaTransform) const {
+                                                          const mat4f& additionaTransform) const
+{
 	vec2f imageSize = vec2f(0.f);
 	bool hasValidImageToRender = false;
 	if (const AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(asset)) {
@@ -61,7 +62,8 @@ mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
 		const SpriteAnimation::Frame* frame = sprite->spriteAnimation.getFrameForTime(spriteFrameTime);
 		imageSize = vec2f(float(frame->wh.x), float(frame->wh.y));
 		hasValidImageToRender = true;
-	} else if (const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(asset)) {
+	}
+	else if (const AssetIface_Texture2D* texIface = getLoadedAssetIface<AssetIface_Texture2D>(asset)) {
 		if (Texture* tex = texIface->getTexture()) {
 			imageSize = vec2f(float(tex->getDesc().texture2D.width), float(tex->getDesc().texture2D.height));
 			hasValidImageToRender = true;
@@ -77,7 +79,8 @@ mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
 			const mat4f billboardFacingMtx = billboarding_getOrentationMtx(
 			    m_billboarding, nodeToWorldTransform, drawCamera->getCameraPosition(), drawCamera->getView(), defaultFacingAxisZ);
 			objToWorld = billboardFacingMtx * additionaTransform * anchorAlignMtx * localOffsetmtx;
-		} else {
+		}
+		else {
 			objToWorld = anchorAlignMtx * localOffsetmtx * additionaTransform;
 
 			// Hack:
@@ -97,7 +100,8 @@ mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
 	return mat4f::getIdentity();
 }
 
-Box3f TraitSpriteImageSets::computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const {
+Box3f TraitSpriteImageSets::computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const
+{
 	// What is happening here is the following:
 	// When there is no billboarding applied the bounding box computation is pretty strait forward:
 	// Transform the verticies of of quad by object-to-node space transfrom and we are done.
@@ -162,24 +166,28 @@ Box3f TraitSpriteImageSets::computeBBoxOS(const Asset& asset, const mat4f& addit
 //------------------------------------------------------------------------------
 // TraitSpriteEntry
 //------------------------------------------------------------------------------
-void TraitSpriteEntry::setImage(const AssetPtr& asset) {
+void TraitSpriteEntry::setImage(const AssetPtr& asset)
+{
 	m_assetProperty.setAsset(asset);
 }
 
 //------------------------------------------------------------------------------
 // TraitSprite
 //------------------------------------------------------------------------------
-void TraitSprite::addImage(const AssetPtr& imageAsset) {
+void TraitSprite::addImage(const AssetPtr& imageAsset)
+{
 	TraitSpriteEntry newImage;
 	newImage.setImage(imageAsset);
 	images.push_back(newImage);
 }
 
-void TraitSprite::addImage(const char* const assetPath) {
+void TraitSprite::addImage(const char* const assetPath)
+{
 	addImage(getCore()->getAssetLib()->getAssetFromFile(assetPath));
 }
 
-Box3f TraitSprite::getBBoxOS() const {
+Box3f TraitSprite::getBBoxOS() const
+{
 	Box3f bbox;
 
 	for (const TraitSpriteEntry& image : images) {
@@ -189,7 +197,8 @@ Box3f TraitSprite::getBBoxOS() const {
 		if (spriteIface || texIface) {
 			return image.imageSettings.computeBBoxOS(*image.m_assetProperty.getAsset().get(),
 			                                         additionalTransform * image.m_additionalTransform);
-		} else {
+		}
+		else {
 			// Not implemented or no asset is loaded.
 		}
 	}
@@ -197,7 +206,8 @@ Box3f TraitSprite::getBBoxOS() const {
 	return bbox;
 }
 
-void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems) {
+void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems)
+{
 	if (isRenderable == false) {
 		return;
 	}
@@ -238,7 +248,8 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 				renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent || renderItem.colorTint.w < 0.999f ||
 				                               image.imageSettings.forceAlphaBlending;
 			}
-		} else if (const AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(asset)) {
+		}
+		else if (const AssetIface_SpriteAnim* spriteIface = getLoadedAssetIface<AssetIface_SpriteAnim>(asset)) {
 			if (const AssetIface_Texture2D* texIfaceSprite =
 			        getLoadedAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
 				// Get the frame of the sprite to be rendered.
@@ -261,7 +272,8 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 					                               image.imageSettings.forceAlphaBlending;
 				}
 			}
-		} else {
+		}
+		else {
 			// Not implemented for this asset type.
 			continue;
 		}
@@ -273,7 +285,8 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 }
 
 // TraitSprite user interface to be displayed in the propery editor.
-void editUI_for_TraitSprite(GameInspector& inspector, GameObject* actor, MemberChain chain) {
+void editUI_for_TraitSprite(GameInspector& inspector, GameObject* actor, MemberChain chain)
+{
 	if (ImGui::CollapsingHeader(ICON_FK_PICTURE_O " Sprte Trait")) {
 		chain.add(sgeFindMember(TraitSprite, images));
 		ProperyEditorUIGen::doMemberUI(inspector, actor, chain);
@@ -282,7 +295,8 @@ void editUI_for_TraitSprite(GameInspector& inspector, GameObject* actor, MemberC
 }
 
 // TraitSpriteEntry user interface to be displayed in the propery editor.
-void editUI_for_TraitSpriteEntry(GameInspector& inspector, GameObject* actor, MemberChain chain) {
+void editUI_for_TraitSpriteEntry(GameInspector& inspector, GameObject* actor, MemberChain chain)
+{
 	TraitSpriteEntry& image = *(TraitSpriteEntry*)chain.follow(actor);
 
 	if (ImGui::CollapsingHeader(ICON_FK_PICTURE_O " Sprites")) {
@@ -304,7 +318,8 @@ void editUI_for_TraitSpriteEntry(GameInspector& inspector, GameObject* actor, Me
 	}
 }
 
-SgePluginOnLoad() {
+SgePluginOnLoad()
+{
 	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitSprite), editUI_for_TraitSprite);
 	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitSpriteEntry), editUI_for_TraitSpriteEntry);
 }

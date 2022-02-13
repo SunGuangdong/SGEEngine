@@ -4,7 +4,8 @@
 
 namespace sge {
 
-bool EditorCamera::update(const InputState& is, float aspectRatio) {
+bool EditorCamera::update(const InputState& is, float aspectRatio)
+{
 	m_projSets.aspectRatio = aspectRatio;
 	bool const updated = m_orbitCamera.update(is.IsKeyDown(Key_LAlt), is.IsKeyDown(Key_MouseLeft), is.IsKeyDown(Key_MouseMiddle),
 	                                          is.IsKeyDown(Key_MouseRight), is.GetCursorPos());
@@ -15,7 +16,8 @@ bool EditorCamera::update(const InputState& is, float aspectRatio) {
 
 		m_proj = mat4f::getOrthoRHCentered(m_orbitCamera.radius * aspectRatio, m_orbitCamera.radius, m_projSets.near, m_projSets.far,
 		                                   kIsTexcoordStyleD3D);
-	} else {
+	}
+	else {
 		orthoCoeff -= 5.f / 60.f;
 		m_proj =
 		    mat4f::getPerspectiveFovRH(m_projSets.fov, m_projSets.aspectRatio, m_projSets.near, m_projSets.far, 0.f, kIsTexcoordStyleD3D);

@@ -4,7 +4,8 @@
 
 namespace sge {
 
-transf3d transf3d::fromMatrixMultWithScaling(const mat4f& AMtx, const mat4f& BMtx, const vec3f& targetScaling) {
+transf3d transf3d::fromMatrixMultWithScaling(const mat4f& AMtx, const mat4f& BMtx, const vec3f& targetScaling)
+{
 	// The idea of this function is to compute the orientation of the matrix
 	// and then extract the scaling of the matrix.
 	mat4f m = (AMtx * BMtx);
@@ -30,7 +31,8 @@ transf3d transf3d::fromMatrixMultWithScaling(const mat4f& AMtx, const mat4f& BMt
 	return result;
 }
 
-mat4f transf3d::toMatrix() const {
+mat4f transf3d::toMatrix() const
+{
 #if 0
 	const mat4f translation = mat4f::getTranslation(p);
 	const mat4f rotation = mat4f::getRotationQuat(r);
@@ -94,7 +96,8 @@ mat4f transf3d::toMatrix() const {
 #endif
 }
 
-transf3d transf3d::inverseSimple() const {
+transf3d transf3d::inverseSimple() const
+{
 	const quatf invRotation = r.inverse();
 	vec3f invScaling;
 	invScaling.x = s.x ? 1.f / s.x : 1e-6f;
@@ -110,7 +113,8 @@ transf3d transf3d::inverseSimple() const {
 	return result;
 }
 
-transf3d transf3d::computeBindingTransform(const transf3d& parentTrnasform) const {
+transf3d transf3d::computeBindingTransform(const transf3d& parentTrnasform) const
+{
 	const vec3f parentInvScaling = parentTrnasform.s.reciprocalSafe();
 	const quatf parentInvRotation = parentTrnasform.r.inverse();
 
@@ -122,12 +126,14 @@ transf3d transf3d::computeBindingTransform(const transf3d& parentTrnasform) cons
 	return bindTform;
 }
 
-transf3d transf3d::applyBindingTransform(const transf3d& bindTransform, const transf3d& parentTrnasform) {
+transf3d transf3d::applyBindingTransform(const transf3d& bindTransform, const transf3d& parentTrnasform)
+{
 	transf3d child = parentTrnasform * bindTransform;
 	return child;
 }
 
-transf3d operator*(const transf3d& A, const transf3d& B) {
+transf3d operator*(const transf3d& A, const transf3d& B)
+{
 	transf3d result;
 	result.r = A.r * B.r;
 	result.s = A.s * B.s;

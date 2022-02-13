@@ -2,7 +2,8 @@
 
 namespace sge {
 
-BindLocation ShadingProgramRefl::findUniform(const char* const uniformName, ShaderType::Enum shaderType) const {
+BindLocation ShadingProgramRefl::findUniform(const char* const uniformName, ShaderType::Enum shaderType) const
+{
 	{
 		BindLocation bl;
 		bl = numericUnforms.findUniform(uniformName, shaderType);

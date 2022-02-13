@@ -1,9 +1,9 @@
 #pragma once
 
+#include "BulletHelper.h"
 #include "sge_engine/sge_engine_api.h"
 #include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/transform.h"
-#include "BulletHelper.h"
 
 #include <memory>
 #include <vector>
@@ -78,10 +78,7 @@ struct SGE_ENGINE_API CollsionShapeDesc {
 /// Do not share it between multiple rigid bodies, as this is possible but not supported by our wrappers yet!
 struct SGE_ENGINE_API CollisionShape {
 	CollisionShape() = default;
-	~CollisionShape()
-	{
-		destroy();
-	}
+	~CollisionShape() { destroy(); }
 
 	void create(const CollsionShapeDesc* desc, const int numDesc);
 	void destroy()
@@ -91,14 +88,8 @@ struct SGE_ENGINE_API CollisionShape {
 		m_desc.clear();
 	}
 
-	btCollisionShape* getBulletShape()
-	{
-		return m_btShape.get();
-	}
-	const btCollisionShape* getBulletShape() const
-	{
-		return m_btShape.get();
-	}
+	btCollisionShape* getBulletShape() { return m_btShape.get(); }
+	const btCollisionShape* getBulletShape() const { return m_btShape.get(); }
 
   private:
 	std::vector<CollsionShapeDesc> m_desc;

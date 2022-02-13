@@ -12,7 +12,8 @@ struct DummyActor : public Actor {
 
 	virtual AABox3f getBBoxOS() const { return AABox3f(); }
 
-	void create() {
+	void create()
+	{
 		registerTrait(ttRigidbody);
 		registerTrait(ttModel);
 
@@ -20,7 +21,8 @@ struct DummyActor : public Actor {
 		ttRigidbody.createBasedOnModel("assets/editor/models/box.mdl", 0.f, false, false);
 	}
 
-	void update(const GameUpdateSets& u) {
+	void update(const GameUpdateSets& u)
+	{
 		if (u.isSimulationPaused()) {
 			return;
 		}
@@ -28,7 +30,8 @@ struct DummyActor : public Actor {
 		// Add your logic here.
 	}
 
-	void postUpdate(const GameUpdateSets& u) {
+	void postUpdate(const GameUpdateSets& u)
+	{
 		if (u.isSimulationPaused()) {
 			return;
 		}
@@ -38,7 +41,8 @@ struct DummyActor : public Actor {
 };
 
 ReflAddTypeId(DummyActor, 30'02'22'0001);
-ReflBlock() {
+ReflBlock()
+{
 	ReflAddActor(DummyActor);
 }
 

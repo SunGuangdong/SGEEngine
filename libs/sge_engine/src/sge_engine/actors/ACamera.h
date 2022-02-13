@@ -19,7 +19,8 @@ struct PerspectiveCameraSettings {
 	float heightShift = 0.f;
 	bool orthographicMantainRatio = true;
 
-	mat4f calcMatrix(float const aspect) const {
+	mat4f calcMatrix(float const aspect) const
+	{
 		if (orthoGraphicMode) {
 			float w = orthographicWidth * 0.5f;
 			float h = orthographicHeight * 0.5f;

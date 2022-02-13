@@ -1,7 +1,7 @@
 #if defined(WIN32)
-#include <Windows.h>
+	#include <Windows.h>
 #else
-#include <dlfcn.h>
+	#include <dlfcn.h>
 #endif
 
 #include "DLLHandler.h"
@@ -10,7 +10,8 @@
 
 namespace sge {
 
-bool DLLHandler::load(const char* const path) {
+bool DLLHandler::load(const char* const path)
+{
 	unload();
 
 #if defined(WIN32)
@@ -24,7 +25,8 @@ bool DLLHandler::load(const char* const path) {
 #endif
 }
 
-bool DLLHandler::loadNoExt(const char* pPath) {
+bool DLLHandler::loadNoExt(const char* pPath)
+{
 	std::string filename = pPath;
 #if defined(WIN32)
 	filename += ".dll";
@@ -35,7 +37,8 @@ bool DLLHandler::loadNoExt(const char* pPath) {
 	return load(filename.c_str());
 }
 
-void DLLHandler::unload() {
+void DLLHandler::unload()
+{
 #if defined(WIN32)
 	if (m_nativeHandle) {
 		[[maybe_unused]] BOOL success = FreeLibrary((HMODULE)m_nativeHandle);
@@ -50,7 +53,8 @@ void DLLHandler::unload() {
 #endif
 }
 
-void* DLLHandler::getProcAdress(const char* const proc) {
+void* DLLHandler::getProcAdress(const char* const proc)
+{
 #if defined(WIN32)
 	if (m_nativeHandle == nullptr)
 		return nullptr;

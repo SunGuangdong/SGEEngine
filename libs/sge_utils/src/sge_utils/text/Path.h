@@ -30,7 +30,8 @@ std::string replaceExtension(const char* const filepath, const char* const ext);
 /// Windows Only: replaced \ with /  only when it is not used for things like X:\ .
 /// Removes rendundand slashes (again it is OS dependand).
 std::string canonizePathRespectOS(const char* filepath);
-inline std::string canonizePathRespectOS(const std::string& filepath) {
+inline std::string canonizePathRespectOS(const std::string& filepath)
+{
 	return canonizePathRespectOS(filepath.c_str());
 }
 

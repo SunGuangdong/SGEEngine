@@ -18,10 +18,7 @@ struct AKnight : public Actor {
 	ObjectId navMeshActorId;
 	std::vector<vec3f> walkingPathTemp;
 
-	Box3f getBBoxOS() const override
-	{
-		return ttModel.getBBoxOS();
-	}
+	Box3f getBBoxOS() const override { return ttModel.getBBoxOS(); }
 
 	void create() override
 	{
@@ -71,7 +68,7 @@ struct AKnight : public Actor {
 
 		if (targetPointWs) {
 			vec3f walkDir = (targetPointWs.get() - getPosition()).normalized0();
-			
+
 			vec3f newPos = getPosition();
 
 			if (ANavMesh* navMesh = getWorld()->getActor<ANavMesh>(navMeshActorId)) {

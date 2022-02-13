@@ -6,8 +6,8 @@
 #include "sgeImportModel3DFile.h"
 #include "sge_core/AssetLibrary/AssetMaterial.h"
 #include "sge_core/model/Model.h"
-#include "sge_utils/math/transform.h"
 #include "sge_utils/containers/Optional.h"
+#include "sge_utils/math/transform.h"
 
 namespace sge {
 

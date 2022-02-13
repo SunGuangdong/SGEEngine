@@ -1,19 +1,21 @@
 #include "ModelWriter.h"
 #include "Model.h"
+#include "sge_utils/containers/Range.h"
 #include "sge_utils/io/FileStream.h"
 #include "sge_utils/json/json.h"
-#include "sge_utils/containers/Range.h"
 
 namespace sge {
 
-int ModelWriter::newDataChunkFromPtr(const void* const ptr, const size_t sizeBytes) {
+int ModelWriter::newDataChunkFromPtr(const void* const ptr, const size_t sizeBytes)
+{
 	const int newChunkId = (dataChunks.size() == 0) ? 0 : dataChunks.back().id + 1;
 
 	dataChunks.emplace_back(DataChunk(newChunkId, ptr, sizeBytes));
 	return newChunkId;
 }
 
-char* ModelWriter::newDataChunkWithSize(size_t sizeBytes, int& outChunkId) {
+char* ModelWriter::newDataChunkWithSize(size_t sizeBytes, int& outChunkId)
+{
 	const int newChunkId = (dataChunks.size() == 0) ? 0 : dataChunks.back().id + 1;
 
 	std::vector<char> memory(sizeBytes);
@@ -34,7 +36,8 @@ char* ModelWriter::newDataChunkWithSize(size_t sizeBytes, int& outChunkId) {
 	return (char*)chunk.data;
 }
 
-JsonValue* ModelWriter::generateKeyFrames(const KeyFrames& keyfames) {
+JsonValue* ModelWriter::generateKeyFrames(const KeyFrames& keyfames)
+{
 	JsonValue* jKeyFrames = jvb(JID_MAP);
 
 	if (!keyfames.positionKeyFrames.empty()) {
@@ -95,7 +98,8 @@ JsonValue* ModelWriter::generateKeyFrames(const KeyFrames& keyfames) {
 	return jKeyFrames;
 }
 
-void ModelWriter::writeAnimations() {
+void ModelWriter::writeAnimations()
+{
 	if (model->numAnimations() == 0) {
 		return;
 	}
@@ -125,7 +129,8 @@ void ModelWriter::writeAnimations() {
 	}
 }
 
-void ModelWriter::writeNodes() {
+void ModelWriter::writeNodes()
+{
 	JsonValue* jNodes = root->setMember("nodes", jvb(JID_ARRAY));
 	root->setMember("rootNodeIndex", jvb(model->getRootNodeIndex()));
 
@@ -175,7 +180,8 @@ void ModelWriter::writeNodes() {
 	}
 }
 
-void ModelWriter::writeMaterials() {
+void ModelWriter::writeMaterials()
+{
 	JsonValue* const jMaterials = root->setMember("materials", jvb(JID_ARRAY));
 
 	for (const int iMtl : RangeInt(model->numMaterials())) {
@@ -190,7 +196,8 @@ void ModelWriter::writeMaterials() {
 	return;
 }
 
-void ModelWriter::writeMeshes() {
+void ModelWriter::writeMeshes()
+{
 	auto UnformType2String = [](const UniformType::Enum ut) -> const char* {
 		switch (ut) {
 			case UniformType::Uint16:
@@ -282,7 +289,8 @@ void ModelWriter::writeMeshes() {
 	return;
 }
 
-void ModelWriter::writeCollisionData() {
+void ModelWriter::writeCollisionData()
+{
 	const auto transf3dToJson = [&](const transf3d& tr) -> JsonValue* {
 		JsonValue* j = jvb(JID_MAP);
 		j->setMember("p", jvb(tr.p.data, 3));
@@ -372,7 +380,8 @@ void ModelWriter::writeCollisionData() {
 	}
 }
 
-bool ModelWriter::write(const Model& modelToWrite, IWriteStream* iws) {
+bool ModelWriter::write(const Model& modelToWrite, IWriteStream* iws)
+{
 	if (iws == nullptr) {
 		return false;
 	}
@@ -416,7 +425,8 @@ bool ModelWriter::write(const Model& modelToWrite, IWriteStream* iws) {
 	return true;
 }
 
-bool ModelWriter::write(const Model& modelToWrite, const char* const filename) {
+bool ModelWriter::write(const Model& modelToWrite, const char* const filename)
+{
 	if (filename == nullptr) {
 		return false;
 	}

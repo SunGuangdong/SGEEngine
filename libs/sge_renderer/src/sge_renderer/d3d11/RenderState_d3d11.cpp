@@ -6,7 +6,8 @@ namespace sge {
 //////////////////////////////////////////////////////////////////////////////
 // RasterizerStateD3D11
 //////////////////////////////////////////////////////////////////////////////
-bool RasterizerStateD3D11::create(const RasterDesc& desc) {
+bool RasterizerStateD3D11::create(const RasterDesc& desc)
+{
 	destroy();
 
 	m_rasterStateDesc = desc;
@@ -23,19 +24,22 @@ bool RasterizerStateD3D11::create(const RasterDesc& desc) {
 	return true;
 }
 
-void RasterizerStateD3D11::destroy() {
+void RasterizerStateD3D11::destroy()
+{
 	getDevice<SGEDeviceD3D11>()->D3D11_GetContextStateCache()->SetRasterizerState(NULL);
 	m_dx11state.Release();
 }
 
-bool RasterizerStateD3D11::isValid() const {
+bool RasterizerStateD3D11::isValid() const
+{
 	return m_dx11state != NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // DepthStencilStateD3D11
 //////////////////////////////////////////////////////////////////////////////
-bool DepthStencilStateD3D11::create(const DepthStencilDesc& desc) {
+bool DepthStencilStateD3D11::create(const DepthStencilDesc& desc)
+{
 	destroy();
 
 	m_bufferedDesc = desc;
@@ -52,19 +56,22 @@ bool DepthStencilStateD3D11::create(const DepthStencilDesc& desc) {
 	return true;
 }
 
-void DepthStencilStateD3D11::destroy() {
+void DepthStencilStateD3D11::destroy()
+{
 	getDevice<SGEDeviceD3D11>()->D3D11_GetContextStateCache()->SetDepthStencilState(NULL);
 	m_dx11state.Release();
 }
 
-bool DepthStencilStateD3D11::isValid() const {
+bool DepthStencilStateD3D11::isValid() const
+{
 	return m_dx11state != NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 // BlendStateD3D11
 //////////////////////////////////////////////////////////////////////////////
-bool BlendStateD3D11::create(const BlendStateDesc& desc) {
+bool BlendStateD3D11::create(const BlendStateDesc& desc)
+{
 	destroy();
 
 	m_bufferedDesc = desc;
@@ -82,7 +89,8 @@ bool BlendStateD3D11::create(const BlendStateDesc& desc) {
 	return true;
 }
 
-void BlendStateD3D11::destroy() {
+void BlendStateD3D11::destroy()
+{
 	// [TODO] It may be better to first check if the reference count of the
 	// ComPtr is 0 and then unbind the resource from the context state cache.
 	// This is actually applicable to all resuorces.
@@ -90,7 +98,8 @@ void BlendStateD3D11::destroy() {
 	m_dx11state.Release();
 }
 
-bool BlendStateD3D11::isValid() const {
+bool BlendStateD3D11::isValid() const
+{
 	return m_dx11state != NULL;
 }
 

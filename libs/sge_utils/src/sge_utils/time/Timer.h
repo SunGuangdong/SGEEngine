@@ -13,22 +13,26 @@ struct Timer {
 
 	Timer() { reset(); }
 
-	void reset() {
+	void reset()
+	{
 		lastUpdate = clock::now();
 		dtSeconds = 0.f;
 	}
 
-	static uint64 now_nanoseconds_int() {
+	static uint64 now_nanoseconds_int()
+	{
 		uint64 ns = std::chrono::duration_cast<std::chrono::nanoseconds>(clock::now() - application_start_time).count();
 		return ns;
 	}
 
 	// Returns the current time since the application start in seconds.
-	static float now_seconds() {
+	static float now_seconds()
+	{
 		return std::chrono::duration_cast<std::chrono::microseconds>(clock::now() - application_start_time).count() * 1e-6f;
 	}
 
-	static float currentPointTimeSeconds() {
+	static float currentPointTimeSeconds()
+	{
 		return std::chrono::duration_cast<std::chrono::microseconds>(clock::now().time_since_epoch()).count() * 1e-6f;
 	}
 
@@ -38,7 +42,8 @@ struct Timer {
 	}
 #endif
 
-	bool tick() {
+	bool tick()
+	{
 		float minThickLength = maxTicksPerSeconds ? 1.f / maxTicksPerSeconds : 0.f;
 
 		const time_point now = clock::now();

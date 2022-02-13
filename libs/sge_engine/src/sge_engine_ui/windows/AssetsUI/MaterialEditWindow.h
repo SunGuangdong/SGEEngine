@@ -10,24 +10,15 @@ struct GameInspector;
 struct SGE_ENGINE_API MaterialEditWindow : public IImGuiWindow {
 	MaterialEditWindow(std::string windowName);
 
-	void close() override
-	{
-		m_isOpened = false;
-	}
+	void close() override { m_isOpened = false; }
 
-	bool isClosed() override {
-		return !m_isOpened;
-	}
+	bool isClosed() override { return !m_isOpened; }
 
-	const char* getWindowName() const override {
-		return m_windowName.c_str();
-	}
+	const char* getWindowName() const override { return m_windowName.c_str(); }
 
 	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
 
-	void setAsset(std::shared_ptr<AssetIface_Material> newMtlAsset) {
-		mtlProvider = newMtlAsset;
-	}
+	void setAsset(std::shared_ptr<AssetIface_Material> newMtlAsset) { mtlProvider = newMtlAsset; }
 
   private:
 	bool m_isOpened = true;

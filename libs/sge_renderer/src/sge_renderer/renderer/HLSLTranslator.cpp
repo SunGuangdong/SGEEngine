@@ -18,7 +18,8 @@ bool translateHLSL(const char* const pCode,
                    const ShaderType::Enum shaderType,
                    std::string& result,
                    std::string& compilationErrors,
-                   std::set<std::string>* outIncludedFiles) {
+                   std::set<std::string>* outIncludedFiles)
+{
 	M4::g_hlslParserErrors.clear();
 
 	const char* const mOpenGL = "OpenGL";
@@ -61,7 +62,8 @@ bool translateHLSL(const char* const pCode,
 			return false;
 		}
 		result = gen.GetResult();
-	} else if (shadingLanguage == ShadingLanguage::HLSL) {
+	}
+	else if (shadingLanguage == ShadingLanguage::HLSL) {
 		auto target =
 		    shaderType == ShaderType::VertexShader ? M4::HLSLGenerator::Target_VertexShader : M4::HLSLGenerator::Target_PixelShader;
 		auto mainFnName = shaderType == ShaderType::VertexShader ? "vsMain" : "psMain";

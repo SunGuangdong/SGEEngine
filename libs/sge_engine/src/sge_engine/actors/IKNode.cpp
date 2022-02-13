@@ -28,11 +28,13 @@ ReflBlock() {
 }
 // clang-format on
 
-Box3f AIKNode::getBBoxOS() const {
+Box3f AIKNode::getBBoxOS() const
+{
 	return kBBoxObjSpace;
 }
 
-void AIKNode::create() {
+void AIKNode::create()
+{
 	registerTrait(m_traitViewportIcon);
 	registerTrait(*(IActorCustomAttributeEditorTrait*)this);
 
@@ -40,7 +42,8 @@ void AIKNode::create() {
 	m_traitViewportIcon.setObjectSpaceOffset(getBBoxOS().halfDiagonal());
 }
 
-void AIKNode::doAttributeEditor(GameInspector* inspector) {
+void AIKNode::doAttributeEditor(GameInspector* inspector)
+{
 	MemberChain chain;
 
 	chain.add(sgeFindMember(AIKNode, isEnabled));
@@ -98,7 +101,8 @@ void AIKNode::doAttributeEditor(GameInspector* inspector) {
 	}
 }
 
-void AIKNode::bind(ObjectId start, ObjectId end) {
+void AIKNode::bind(ObjectId start, ObjectId end)
+{
 	// Clear all previous state.
 	unbind();
 
@@ -157,7 +161,8 @@ void AIKNode::bind(ObjectId start, ObjectId end) {
 	}
 }
 
-bool AIKNode::getChainActors(std::vector<Actor*>& result) {
+bool AIKNode::getChainActors(std::vector<Actor*>& result)
+{
 	result.clear();
 
 	bool doesAllExist = true;
@@ -170,7 +175,8 @@ bool AIKNode::getChainActors(std::vector<Actor*>& result) {
 	return doesAllExist;
 }
 
-void AIKNode::update(const GameUpdateSets& u) {
+void AIKNode::update(const GameUpdateSets& u)
+{
 	if (isEnabled == false || ikChainActorIds.size() < 2 || chainLengthWs < 1e-6f) {
 		return;
 	}
@@ -221,7 +227,8 @@ void AIKNode::update(const GameUpdateSets& u) {
 
 	if (targetControlsOrientation) {
 		tempChainActors.back()->setOrientation(targetMatchOrientationDiff * aTarget->getOrientation());
-	} else {
+	}
+	else {
 		tempChainActors.back()->setOrientation(originalEndOrientationWs);
 	}
 }

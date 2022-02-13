@@ -9,7 +9,8 @@ namespace sge {
 enum GizmoColors : unsigned { Gizmo_ActiveColor = 0xC000FFFF, Gizmo_ActiveTransp = 0xC0000000, Gizmo_BaseTransp = 0xB0000000 };
 
 
-void drawGizmo(const RenderDestination& rdest, const Gizmo3D& gizmo, const mat4f& projView) {
+void drawGizmo(const RenderDestination& rdest, const Gizmo3D& gizmo, const mat4f& projView)
+{
 	if (gizmo.getMode() == Gizmo3D::Mode_Rotation)
 		drawRotationGizmo(rdest, gizmo.getGizmoRotation(), projView);
 
@@ -24,7 +25,8 @@ void drawGizmo(const RenderDestination& rdest, const Gizmo3D& gizmo, const mat4f
 }
 
 
-void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslation& gizmo, const mat4f& projView) {
+void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslation& gizmo, const mat4f& projView)
+{
 	const mat4f world = mat4f::getTranslation(gizmo.getEditedTranslation()) * mat4f::getScaling(gizmo.getDisplayScale());
 	const mat4f pvw = projView * world;
 
@@ -80,7 +82,8 @@ void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslati
 }
 
 
-void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gizmo, const mat4f& projView) {
+void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gizmo, const mat4f& projView)
+{
 	mat4f const rotation = mat4f::getRotationQuat(gizmo.getEditedRotation());
 	mat4f const world = mat4f::getTranslation(gizmo.getInitialTranslation()) * rotation * mat4f::getScaling(gizmo.getDisplayScale());
 	mat4f const pvw = projView * world;
@@ -147,7 +150,8 @@ void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gi
 	}
 }
 
-void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, const mat4f& projView) {
+void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, const mat4f& projView)
+{
 	const mat4f world = mat4f::getTRS(gizmo.getInitialTranslation(), gizmo.getInitalRotation(), vec3f(gizmo.getDisplayScale()));
 	const mat4f pvw = projView * world;
 
@@ -184,7 +188,8 @@ void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, c
 	getCore()->getQuickDraw().drawSolid_Execute(rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
-void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolume& gizmo, const mat4f& projView) {
+void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolume& gizmo, const mat4f& projView)
+{
 	const mat4f os2ws = gizmo.getEditedTrasform().toMatrix();
 
 	const Box3f boxOs = gizmo.getInitialBBoxOS();

@@ -40,7 +40,9 @@ struct SGE_CORE_API GeomGen {
 
 		PosColorVert(vec3f pt, uint32 rgba)
 		    : pt(pt)
-		    , rgba(rgba) {}
+		    , rgba(rgba)
+		{
+		}
 
 		vec3f pt;
 		uint32 rgba;

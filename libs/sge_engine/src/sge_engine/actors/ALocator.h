@@ -8,7 +8,8 @@ namespace sge {
 // ALocator
 //--------------------------------------------------------------------
 struct SGE_ENGINE_API ALocator : public Actor {
-	Box3f getBBoxOS() const final {
+	Box3f getBBoxOS() const final
+	{
 		Box3f result;
 		result.expand(vec3f(-1.f));
 		result.expand(vec3f(1.f));
@@ -23,7 +24,8 @@ struct SGE_ENGINE_API ALocator : public Actor {
 // ABone
 //--------------------------------------------------------------------
 struct SGE_ENGINE_API ABone : public Actor {
-	Box3f getBBoxOS() const final {
+	Box3f getBBoxOS() const final
+	{
 		Box3f result;
 		result.expand(vec3f(-1.f));
 		result.expand(vec3f(1.f));

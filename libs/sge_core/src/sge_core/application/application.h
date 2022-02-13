@@ -26,7 +26,9 @@ struct WE_Resize_Data {
 
 	WE_Resize_Data(int width, int height)
 	    : width(width)
-	    , height(height) {}
+	    , height(height)
+	{
+	}
 
 	int width;
 	int height;
@@ -48,7 +50,8 @@ struct SGE_CORE_API ApplicationHandler {
   public:
 	~ApplicationHandler() = default;
 
-	static ApplicationHandler* get() {
+	static ApplicationHandler* get()
+	{
 		static ApplicationHandler inst;
 		return &inst;
 	}
@@ -57,7 +60,8 @@ struct SGE_CORE_API ApplicationHandler {
 	void PollEvents();
 
 	template <typename T>
-	T* NewWindow(const char* windowName, int width, int height, bool isMaximized, bool noResize = false) {
+	T* NewWindow(const char* windowName, int width, int height, bool isMaximized, bool noResize = false)
+	{
 		T* wnd = new T;
 		NewWindowInternal(wnd, windowName, width, height, isMaximized, noResize);
 		return wnd;

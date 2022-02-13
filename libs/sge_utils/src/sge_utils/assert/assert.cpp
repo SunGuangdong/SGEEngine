@@ -3,12 +3,13 @@
 #include <string>
 
 #ifdef WIN32
-#include <Windows.h>
+	#include <Windows.h>
 #endif
 
 namespace sge {
 
-int assertAskDisableInternal(const char* const file, const int line, const char* expr) {
+int assertAskDisableInternal(const char* const file, const int line, const char* expr)
+{
 	const std::string title = string_format(
 	    "%s %d triggered an assert, Do you want to Disable it?\nNo - Debug\nYes - Disable and Debug\nCancel - Disable and Ignore", file,
 	    line);
@@ -33,6 +34,7 @@ int assertAskDisableInternal(const char* const file, const int line, const char*
 
 } // namespace sge
 
-int sge_assertAskDisable(const char* const file, const int line, const char* expr) {
+int sge_assertAskDisable(const char* const file, const int line, const char* expr)
+{
 	return sge::assertAskDisableInternal(file, line, expr);
 }

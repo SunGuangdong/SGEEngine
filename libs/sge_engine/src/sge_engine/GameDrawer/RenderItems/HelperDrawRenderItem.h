@@ -10,7 +10,6 @@ struct Actor;
 /// Usually for things that are not visible in the gameplay in any way.
 /// Examples are: cameras view area wireframe, lights wireframes visualizing the area effect of the light, splines and so on.
 struct HelperDrawRenderItem : public IRenderItem {
-
 	HelperDrawRenderItem() = default;
 
 	HelperDrawRenderItem(const SelectedItemDirect& item, DrawReason drawReason);

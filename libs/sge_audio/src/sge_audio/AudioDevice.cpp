@@ -9,7 +9,8 @@ namespace sge {
 
 struct ma_mutex_raii {
 	[[nodiscard]] ma_mutex_raii(ma_mutex& mtx)
-	    : mtx(mtx) {
+	    : mtx(mtx)
+	{
 		ma_mutex_lock(&mtx);
 	}
 
@@ -21,7 +22,8 @@ struct ma_mutex_raii {
 //------------------------------------------------------------------
 // AudioDevice
 //------------------------------------------------------------------
-void AudioDevice::createAudioDevice() {
+void AudioDevice::createAudioDevice()
+{
 	ma_device_config deviceConfig;
 
 	deviceConfig = ma_device_config_init(ma_device_type_playback);
@@ -39,19 +41,22 @@ void AudioDevice::createAudioDevice() {
 	ma_mutex_init(&mutexDataLock);
 }
 
-void AudioDevice::startAudioDevice() {
+void AudioDevice::startAudioDevice()
+{
 	if (ma_device_start(&device) != MA_SUCCESS) {
 		sgeAssertFalse("Failed to initialize AudioDevice");
 		ma_device_uninit(&device);
 	}
 }
 
-void AudioDevice::clear() {
+void AudioDevice::clear()
+{
 	ma_device_uninit(&device);
 	ma_mutex_uninit(&mutexDataLock);
 }
 
-void AudioDevice::play(AudioDecoder* decoder, bool ifAlreadyPlayingSeekToBegining) {
+void AudioDevice::play(AudioDecoder* decoder, bool ifAlreadyPlayingSeekToBegining)
+{
 	if (decoder) {
 		const ma_mutex_raii lock(mutexDataLock);
 
@@ -75,12 +80,14 @@ void AudioDevice::play(AudioDecoder* decoder, bool ifAlreadyPlayingSeekToBeginin
 	}
 }
 
-void AudioDevice::stop(AudioDecoder* decoder) {
+void AudioDevice::stop(AudioDecoder* decoder)
+{
 	const ma_mutex_raii lock(mutexDataLock);
 	stop_noMutexLock(decoder);
 }
 
-void AudioDevice::stop_noMutexLock(AudioDecoder* decoder) {
+void AudioDevice::stop_noMutexLock(AudioDecoder* decoder)
+{
 	if (decoder) {
 		if (decoder->playingDevice != this) {
 			sgeAssert(false && "AudioDecoder could be played only on one device!");
@@ -97,7 +104,8 @@ void AudioDevice::stop_noMutexLock(AudioDecoder* decoder) {
 	}
 }
 
-bool AudioDevice::readFramesFromDecoder(AudioDecoder& decoder, float* output, uint32 frameCount) {
+bool AudioDevice::readFramesFromDecoder(AudioDecoder& decoder, float* output, uint32 frameCount)
+{
 	// Caution:
 	// The fn assumes that @mutexDataLock is already locked!
 
@@ -118,7 +126,8 @@ bool AudioDevice::readFramesFromDecoder(AudioDecoder& decoder, float* output, ui
 		if (decoder.m_syncState.isLooping) {
 			ma_data_source_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration, &framesReadThisIteration,
 			                               ma_bool32(true));
-		} else {
+		}
+		else {
 			framesReadThisIteration = ma_decoder_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration);
 		}
 
@@ -145,7 +154,8 @@ bool AudioDevice::readFramesFromDecoder(AudioDecoder& decoder, float* output, ui
 	return isPlaybackDone && !decoder.m_syncState.isLooping;
 }
 
-void AudioDevice::dataCallback(void* pOutput, const void* UNUSED(pInput), ma_uint32 frameCount) {
+void AudioDevice::dataCallback(void* pOutput, const void* UNUSED(pInput), ma_uint32 frameCount)
+{
 	const ma_mutex_raii lock(mutexDataLock);
 
 	if (decodingTemp.size() < frameCount) {
@@ -168,7 +178,8 @@ void AudioDevice::dataCallback(void* pOutput, const void* UNUSED(pInput), ma_uin
 	}
 }
 
-void AudioDevice::miniaudioDataCallback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount) {
+void AudioDevice::miniaudioDataCallback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount)
+{
 	if (pDevice == nullptr) {
 		return;
 	}
@@ -180,7 +191,8 @@ void AudioDevice::miniaudioDataCallback(ma_device* pDevice, void* pOutput, const
 //------------------------------------------------------------------
 // AudioData
 //------------------------------------------------------------------
-void AudioData::createFromFile(const char* filename) {
+void AudioData::createFromFile(const char* filename)
+{
 	fileData = std::vector<char>();
 	[[maybe_unused]] bool succeeded = FileReadStream::readFile(filename, fileData);
 	sgeAssert(succeeded);
@@ -189,7 +201,8 @@ void AudioData::createFromFile(const char* filename) {
 //------------------------------------------------------------------
 // AudioDecoder
 //------------------------------------------------------------------
-void AudioDecoder::clear() {
+void AudioDecoder::clear()
+{
 	if (playingDevice) {
 		playingDevice->stop(this);
 	}
@@ -202,7 +215,8 @@ void AudioDecoder::clear() {
 	state = State();
 }
 
-void AudioDecoder::createDecoder(AudioDataPtr& audioData) {
+void AudioDecoder::createDecoder(AudioDataPtr& audioData)
+{
 	clear();
 
 	this->audioData = audioData;
@@ -218,7 +232,8 @@ void AudioDecoder::createDecoder(AudioDataPtr& audioData) {
 	ma_decoder_get_available_frames(&decoder, &numFramesInDecoder);
 }
 
-void AudioDecoder::seekToBegining() {
+void AudioDecoder::seekToBegining()
+{
 	if (playingDevice) {
 		ma_mutex_lock(&playingDevice->getDataLockMutex());
 	}
@@ -231,7 +246,8 @@ void AudioDecoder::seekToBegining() {
 	}
 }
 
-void AudioDecoder::seekToBegining_noLock() {
+void AudioDecoder::seekToBegining_noLock()
+{
 	ma_decoder_seek_to_pcm_frame(&decoder, 0);
 }
 

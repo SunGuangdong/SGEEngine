@@ -12,7 +12,8 @@ namespace sge {
 //-----------------------------------------------------------------------
 // ShaderD3D11
 //-----------------------------------------------------------------------
-CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint) {
+CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint)
+{
 	destroy();
 
 	ID3D11Device* const d3ddev = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice();
@@ -21,7 +22,7 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	m_shaderType = type;
 
 	// Just an interestiong flag to be remembered -> D3DCOMPILE_PACK_MATRIX_ROW_MAJOR
-	//const DWORD compileFlags = 0;
+	// const DWORD compileFlags = 0;
 	const DWORD compileFlags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
 	// const DWORD compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0; // For exrternal shader debugging in RenderDoc or PIX
 	// and so on.
@@ -52,10 +53,12 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	if (type == ShaderType::VertexShader) {
 		createShaderResult = d3ddev->CreateVertexShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
 		                                                (ID3D11VertexShader**)&m_dx11Shader);
-	} else if (type == ShaderType::PixelShader) {
+	}
+	else if (type == ShaderType::PixelShader) {
 		createShaderResult = d3ddev->CreatePixelShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
 		                                               (ID3D11PixelShader**)&m_dx11Shader);
-	} else {
+	}
+	else {
 		// Unknown shader type.
 		sgeAssert(false);
 	}
@@ -77,7 +80,8 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	return CreateShaderResult(true, "");
 }
 
-CreateShaderResult ShaderD3D11::createFromNativeBytecode(const ShaderType::Enum type, std::vector<char> nativeBytecode) {
+CreateShaderResult ShaderD3D11::createFromNativeBytecode(const ShaderType::Enum type, std::vector<char> nativeBytecode)
+{
 	destroy();
 
 	m_shaderType = type;
@@ -92,10 +96,12 @@ CreateShaderResult ShaderD3D11::createFromNativeBytecode(const ShaderType::Enum 
 	if (type == ShaderType::VertexShader) {
 		createShaderResult = d3ddev->CreateVertexShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
 		                                                (ID3D11VertexShader**)&m_dx11Shader);
-	} else if (type == ShaderType::PixelShader) {
+	}
+	else if (type == ShaderType::PixelShader) {
 		createShaderResult = d3ddev->CreatePixelShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
 		                                               (ID3D11PixelShader**)&m_dx11Shader);
-	} else {
+	}
+	else {
 		// Unknown shader type.
 		sgeAssert(false);
 	}
@@ -117,11 +123,13 @@ CreateShaderResult ShaderD3D11::createFromNativeBytecode(const ShaderType::Enum 
 	return CreateShaderResult(true, "");
 }
 
-bool ShaderD3D11::isValid() const {
+bool ShaderD3D11::isValid() const
+{
 	return m_dx11Shader != nullptr;
 }
 
-ID3D11InputLayout* ShaderD3D11::D3D11_GetInputLayoutForVertexDeclIndex(const VertexDeclIndex vertexDeclIdx) {
+ID3D11InputLayout* ShaderD3D11::D3D11_GetInputLayoutForVertexDeclIndex(const VertexDeclIndex vertexDeclIdx)
+{
 	sgeAssert(m_shaderType == ShaderType::VertexShader);
 
 	ID3D11InputLayout* const foundLayout = m_inputLayouts[vertexDeclIdx];
@@ -168,7 +176,8 @@ ID3D11InputLayout* ShaderD3D11::D3D11_GetInputLayoutForVertexDeclIndex(const Ver
 	return inputLayout.p;
 }
 
-bool ShaderD3D11::getCreationBytecode(std::vector<char>& outMemory) const {
+bool ShaderD3D11::getCreationBytecode(std::vector<char>& outMemory) const
+{
 	if (m_compiledBlob) {
 		void* memory = m_compiledBlob.p->GetBufferPointer();
 		size_t memorySizeBytes = m_compiledBlob.p->GetBufferSize();
@@ -182,7 +191,8 @@ bool ShaderD3D11::getCreationBytecode(std::vector<char>& outMemory) const {
 	return false;
 }
 
-void ShaderD3D11::destroy() {
+void ShaderD3D11::destroy()
+{
 	m_dx11Shader.Release();
 	m_compiledBlob.Release();
 	m_cachedCode = std::string();

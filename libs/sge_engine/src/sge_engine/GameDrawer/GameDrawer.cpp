@@ -9,7 +9,8 @@
 
 namespace sge {
 
-void IGameDrawer::initialize(GameWorld* const world) {
+void IGameDrawer::initialize(GameWorld* const world)
+{
 	m_world = world;
 }
 

@@ -21,11 +21,9 @@ struct AlignedStorageTyped {
 	union type {
 		// Prevent calling the default constructor.
 		// The owner of this object is responsible for constructing and destructing.
-		type() {
-		}
+		type() {}
 
-		~type() {
-		}
+		~type() {}
 
 		T dataTyped;
 		alignas(T) unsigned char data[sizeof(T)];

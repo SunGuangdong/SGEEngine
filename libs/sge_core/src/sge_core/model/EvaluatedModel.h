@@ -8,11 +8,11 @@
 #include "sge_core/model/Model.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
+#include "sge_utils/containers/ArrayView.h"
+#include "sge_utils/containers/vector_map.h"
 #include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/primitives.h"
-#include "sge_utils/containers/ArrayView.h"
-#include "sge_utils/containers/vector_map.h"
 
 namespace sge {
 
@@ -47,13 +47,12 @@ struct EvaluatedMeshInstance {
 
 struct SGE_CORE_API EvaluatedModel {
 	EvaluatedModel()
-	    : m_model(nullptr) {
+	    : m_model(nullptr)
+	{
 	}
 
 	void initialize(Model* model);
-	bool isInitialized() const {
-		return m_model;
-	}
+	bool isInitialized() const { return m_model; }
 
 	/// Evaluates the model with the specified transforms for each node (in model global space, not local).
 	/// Useful for ragdolls or inverse kinematics.
@@ -65,27 +64,18 @@ struct SGE_CORE_API EvaluatedModel {
 	/// If you want an animation to play use @ModelAnimator.
 	void evaluateStatic();
 
-	int getNumEvalMeshes() const {
-		return int(m_evaluatedMeshes.size());
-	}
+	int getNumEvalMeshes() const { return int(m_evaluatedMeshes.size()); }
 
-	const EvaluatedMesh& getEvalMesh(const int iMesh) const {
-		return m_evaluatedMeshes[iMesh];
-	}
+	const EvaluatedMesh& getEvalMesh(const int iMesh) const { return m_evaluatedMeshes[iMesh]; }
 
-	int getNumEvalNodes() const {
-		return int(m_evaluatedNodes.size());
-	}
+	int getNumEvalNodes() const { return int(m_evaluatedNodes.size()); }
 
-	const EvaluatedNode& getEvalNode(const int iNode) const {
-		return m_evaluatedNodes[iNode];
-	}
+	const EvaluatedNode& getEvalNode(const int iNode) const { return m_evaluatedNodes[iNode]; }
 
-	Texture* getSkinningBonesTexture() const {
-		return m_skinningBoneTransfsTex.GetPtr();
-	}
+	Texture* getSkinningBonesTexture() const { return m_skinningBoneTransfsTex.GetPtr(); }
 
-	int getMeshBonesOffsetInSkinningBonesTexture(const int iMesh) const {
+	int getMeshBonesOffsetInSkinningBonesTexture(const int iMesh) const
+	{
 		if (iMesh >= 0 && iMesh < m_perMeshSkinningBonesTransformOFfsetInTex.size()) {
 			return m_perMeshSkinningBonesTransformOFfsetInTex[iMesh];
 		}
@@ -94,9 +84,7 @@ struct SGE_CORE_API EvaluatedModel {
 		return -1;
 	}
 
-	const std::vector<EvaluatedMeshInstance>& getEvalMeshInstances() const {
-		return m_evalAllMeshInstances;
-	}
+	const std::vector<EvaluatedMeshInstance>& getEvalMeshInstances() const { return m_evalAllMeshInstances; }
 
   private:
 	bool evaluate_ApplyNodeGlobalTransforms(const ArrayView<const mat4f>& boneGlobalTrasnformOverrides);

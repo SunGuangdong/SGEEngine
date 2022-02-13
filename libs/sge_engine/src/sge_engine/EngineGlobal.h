@@ -90,7 +90,8 @@ struct IEngineGlobal {
 };
 
 template <typename TWindowType>
-TWindowType* IEngineGlobal::findFirstWindowOfType() {
+TWindowType* IEngineGlobal::findFirstWindowOfType()
+{
 	for (auto& wnd : getAllWindows()) {
 		TWindowType* const wndTyped = dynamic_cast<TWindowType*>(wnd.get());
 		if (wndTyped != nullptr) {

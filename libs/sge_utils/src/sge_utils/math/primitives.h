@@ -11,19 +11,19 @@ struct Ray {
 
 	Ray(const vec3f& pos, const vec3f& dir)
 	    : pos(pos)
-	    , dir(dir) {
+	    , dir(dir)
+	{
 	}
 
-	vec3f Sample(const float t) const {
-		return pos + (t * dir);
-	}
+	vec3f Sample(const float t) const { return pos + (t * dir); }
 
 	vec3f pos; // origin
 	vec3f dir; // dir
 };
 
 // returns FLT_MAX if no intersection was found.
-inline float intersectRayPlane(const vec3f& pos, const vec3f& dir, const vec3f& planeNormal, float const planeD) {
+inline float intersectRayPlane(const vec3f& pos, const vec3f& dir, const vec3f& planeNormal, float const planeD)
+{
 	float const denom = dot(dir, planeNormal);
 
 	if (denom < 1e-6f && denom > -1e-6f)
@@ -39,33 +39,25 @@ struct Plane {
 	Plane() = default;
 
 	Plane(const vec3f& norm, const float& d)
-	    : v4(norm, d) {
+	    : v4(norm, d)
+	{
 	}
 
 	vec4f v4;
 
-	vec3f norm() const {
-		return v4.xyz();
-	}
+	vec3f norm() const { return v4.xyz(); }
 
-	float d() const {
-		return v4.w;
-	}
+	float d() const { return v4.w; }
 
-	void setNormal(const vec3f& normal) {
-		v4 = vec4f(normal, v4.w);
-	}
+	void setNormal(const vec3f& normal) { v4 = vec4f(normal, v4.w); }
 
-	void setDistance(const float distance) {
-		v4.w = distance;
-	}
+	void setDistance(const float distance) { v4.w = distance; }
 
 
-	float Distance(const vec3f pt) const {
-		return dot(norm(), pt) + d();
-	}
+	float Distance(const vec3f pt) const { return dot(norm(), pt) + d(); }
 
-	Plane Normalized() const {
+	Plane Normalized() const
+	{
 		float l = norm().length();
 
 		if (l < 1e-6f) {
@@ -76,16 +68,13 @@ struct Plane {
 		return Plane(norm() * invL, d() * invL);
 	}
 
-	friend Plane normalized(const Plane& v) {
-		return v.Normalized();
-	}
+	friend Plane normalized(const Plane& v) { return v.Normalized(); }
 
-	vec3f Project(const vec3f& pt) const {
-		return pt - Distance(pt) * norm();
-	}
+	vec3f Project(const vec3f& pt) const { return pt - Distance(pt) * norm(); }
 
 	/// Creates a normalized plane form Counter Clockwise Triangle Winding.
-	static Plane FromTriangle_CCW(const vec3f p[3]) {
+	static Plane FromTriangle_CCW(const vec3f p[3])
+	{
 		const vec3f e1 = p[1] - p[0];
 		const vec3f e2 = p[2] - p[0];
 		const vec3f N = normalized(cross(e1, e2));
@@ -95,7 +84,8 @@ struct Plane {
 	}
 
 	/// Creates a plane defined by the specified position and the normal direction.
-	static Plane FromPosAndDir(const vec3f& pos, const vec3f dir) {
+	static Plane FromPosAndDir(const vec3f& pos, const vec3f dir)
+	{
 		Plane plane;
 		plane.v4 = vec4f(normalized(dir), -dot(pos, dir));
 		return plane;
@@ -103,15 +93,14 @@ struct Plane {
 
 	/// Returns the distance along the ray where the intersection happened.
 	/// FLT_MAX is returned if no intersection was found.
-	float intersectRay(const Ray& ray) const {
-		return intersectRayPlane(ray.pos, ray.dir, v4.xyz(), v4.w);
-	}
+	float intersectRay(const Ray& ray) const { return intersectRayPlane(ray.pos, ray.dir, v4.xyz(), v4.w); }
 };
 
 struct Sphere {
 	Sphere(const vec3f& pos, const float radius)
 	    : pos(pos)
-	    , radius(radius) {
+	    , radius(radius)
+	{
 	}
 
 	vec3f pos;
@@ -122,7 +111,8 @@ struct Sphere {
 
 // Intersects a Ray with a Sphere :
 // Returns the number of intersection points, and the coeff in t0, t1. The points aren't sorted!
-inline int intersectRaySphere(const Ray& ray, const Sphere& sphere, float& t0, float& t1) {
+inline int intersectRaySphere(const Ray& ray, const Sphere& sphere, float& t0, float& t1)
+{
 	// sphere is defined by dot((p - center), (p - center)) = radius^2
 	// line is defined by p = origin + t * direction
 
@@ -168,13 +158,15 @@ inline int intersectRaySphere(const Ray& ray, const Sphere& sphere, float& t0, f
 	return numIntersections;
 }
 
-inline float projectPointOnLine(const vec3f& o1, const vec3f& d1, const vec3f pt) {
+inline float projectPointOnLine(const vec3f& o1, const vec3f& d1, const vec3f pt)
+{
 	const vec3f p = pt - o1;
 	const float proj = dot(d1, p) / sqr(d1.length());
 	return proj;
 }
 
-inline float IntersectRayTriangle(const Ray& ray, const vec3f p[3]) {
+inline float IntersectRayTriangle(const Ray& ray, const vec3f p[3])
+{
 	const vec3f e[2] = {
 	    p[1] - p[0],
 	    p[2] - p[0],
@@ -204,7 +196,8 @@ inline float IntersectRayTriangle(const Ray& ray, const vec3f p[3]) {
 	return t;
 }
 
-inline float IntersectRayQuad(const Ray& ray, const vec3f o, const vec3f e1, const vec3f e2) {
+inline float IntersectRayQuad(const Ray& ray, const vec3f o, const vec3f e1, const vec3f e2)
+{
 	const vec3f P = cross(ray.dir, e2);
 	const float det = dot(e1, P);
 
@@ -230,7 +223,8 @@ inline float IntersectRayQuad(const Ray& ray, const vec3f o, const vec3f e1, con
 }
 
 // https://en.wikipedia.org/wiki/Skew_lines
-inline float getLineDistance(const vec3f& o1, const vec3f& d1, const vec3f& o2, const vec3f& d2) {
+inline float getLineDistance(const vec3f& o1, const vec3f& d1, const vec3f& o2, const vec3f& d2)
+{
 	vec3f n = cross(d1, d2);
 	const float n_ln = n.length();
 
@@ -250,7 +244,8 @@ inline float getLineDistance(const vec3f& o1, const vec3f& d1, const vec3f& o2, 
 }
 
 // https://en.wikipedia.org/wiki/Skew_lines
-inline float getRaySegmentDistance(const vec3f& o1, const vec3f& d1, const vec3f& a, const vec3f& b, float* pRayLerp = nullptr) {
+inline float getRaySegmentDistance(const vec3f& o1, const vec3f& d1, const vec3f& a, const vec3f& b, float* pRayLerp = nullptr)
+{
 	const vec3f d2 = b - a;
 
 	vec3f n = cross(d1, d2);

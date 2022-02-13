@@ -6,7 +6,8 @@
 
 namespace sge {
 
-void CreditsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSED(inspector), const InputState& UNUSED(is)) {
+void CreditsWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
+{
 	if (isClosed()) {
 		return;
 	}

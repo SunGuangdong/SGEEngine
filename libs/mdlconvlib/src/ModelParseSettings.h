@@ -30,7 +30,9 @@ struct ModelParseSettings {
 	    : shouldExportAnimations(shouldExportAnimations)
 	    , meshPacking(meshPacking)
 	    , fileDirectroy(fileDirectroy)
-	    , pRelocaionPolicy(pRelocaionPolicy) {}
+	    , pRelocaionPolicy(pRelocaionPolicy)
+	{
+	}
 
 	//  Is animation export enabled.
 	bool shouldExportAnimations = true;

@@ -5,8 +5,8 @@
 #include "sge_engine/GameObject.h"
 #include "sge_engine/InspectorCmd.h"
 #include "sge_engine_api.h"
-#include "sge_utils/math/transform.h"
 #include "sge_utils/containers/vector_set.h"
+#include "sge_utils/math/transform.h"
 #include <memory>
 #include <set>
 #include <string>
@@ -27,9 +27,7 @@ struct SGE_ENGINE_API CmdCompound : public InspectorCmd {
 	void redo(GameInspector* inspector) final;
 	void undo(GameInspector* inspector) final;
 
-	void getText(std::string& text) final {
-		text = cmdText;
-	}
+	void getText(std::string& text) final { text = cmdText; }
 
 	std::string cmdText = "<Unnamed Compound Command>";
 	std::vector<std::unique_ptr<InspectorCmd>> cmds;
@@ -56,26 +54,25 @@ struct SGE_ENGINE_API CmdMemberChange : public InspectorCmd {
 	           const MemberChain& chain,
 	           const void* originalValue,
 	           const void* newValue,
-	           void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src)) {
-		if_checked(actor) {
-			setup(actor->getId(), chain, originalValue, newValue, customCopyFn);
-		}
+	           void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src))
+	{
+		if_checked(actor) { setup(actor->getId(), chain, originalValue, newValue, customCopyFn); }
 	}
 
-	void setupLogicTransformChange(Actor& actor, const transf3d& initalTransform, const transf3d& newTransform) {
+	void setupLogicTransformChange(Actor& actor, const transf3d& initalTransform, const transf3d& newTransform)
+	{
 		setup(&actor, MemberChain(typeLib().findMember(&Actor::m_logicTransform)), &initalTransform, &newTransform,
 		      &setActorLogicTransform);
 	}
 
-	void setupLogicTransformChange(Actor& actor, const transf3d& newTransform) {
+	void setupLogicTransformChange(Actor& actor, const transf3d& newTransform)
+	{
 		transf3d originalValue = actor.getTransform();
 		setupLogicTransformChange(actor, originalValue, newTransform);
 	}
 
 	void apply(GameInspector* inspector) final;
-	void redo(GameInspector* inspector) final {
-		apply(inspector);
-	}
+	void redo(GameInspector* inspector) final { apply(inspector); }
 	void undo(GameInspector* inspector) final;
 	void getText(std::string& text) final;
 
@@ -101,9 +98,7 @@ struct SGE_ENGINE_API CmdDynamicProperyChanged : public InspectorCmd {
 	void setup(GameObject* obj, const MemberChain& chain, std::string dynamicPropName, const void* originalValue, const void* newValue);
 
 	void apply(GameInspector* inspector) final;
-	void redo(GameInspector* inspector) final {
-		apply(inspector);
-	}
+	void redo(GameInspector* inspector) final { apply(inspector); }
 	void undo(GameInspector* inspector) final;
 	void getText(std::string& text) final;
 
@@ -130,9 +125,7 @@ struct SGE_ENGINE_API CmdActorGrouping : public InspectorCmd {
 	void redo(GameInspector* inspector) final;
 	void undo(GameInspector* inspector) final;
 
-	void getText(std::string& text) final {
-		text = "Grouping Objects";
-	}
+	void getText(std::string& text) final { text = "Grouping Objects"; }
 
 	ObjectId m_parentActorId;
 	std::map<ObjectId, ObjectId> m_newChildrenAndTheirOldParents;
@@ -148,9 +141,7 @@ struct SGE_ENGINE_API CmdObjectDeletion : public InspectorCmd {
 	void redo(GameInspector* inspector) final;
 	void undo(GameInspector* inspector) final;
 
-	void getText(std::string& text) final {
-		text = "CmdObjectDeletion";
-	}
+	void getText(std::string& text) final { text = "CmdObjectDeletion"; }
 
 	struct ParentAndChilds {
 		ObjectId parent;
@@ -173,9 +164,7 @@ struct SGE_ENGINE_API CmdExistingObjectCreation : public InspectorCmd {
 	void redo(GameInspector* inspector) final;
 	void undo(GameInspector* inspector) final;
 
-	void getText(std::string& text) final {
-		text = "CmdObjectDeletion";
-	}
+	void getText(std::string& text) final { text = "CmdObjectDeletion"; }
 
 	struct ParentAndChilds {
 		ObjectId parent;
@@ -199,13 +188,9 @@ struct SGE_ENGINE_API CmdObjectCreation : public InspectorCmd {
 	void redo(GameInspector* inspector) final;
 	void undo(GameInspector* inspector) final;
 
-	void getText(std::string& text) final {
-		text = "CmdObjectCreation";
-	}
+	void getText(std::string& text) final { text = "CmdObjectCreation"; }
 
-	ObjectId getCreatedObjectId() const {
-		return m_createdObjectId;
-	}
+	ObjectId getCreatedObjectId() const { return m_createdObjectId; }
 
   private:
 	TypeId m_objectType;
@@ -220,9 +205,7 @@ struct SGE_ENGINE_API CmdDuplicateSpecial : public InspectorCmd {
 	vector_set<ObjectId> m_createdGameObjectsIds;
 
 
-	void setup(vector_set<ObjectId> objectToDuplicate) {
-		m_sourceGameObjectsIds = std::move(objectToDuplicate);
-	}
+	void setup(vector_set<ObjectId> objectToDuplicate) { m_sourceGameObjectsIds = std::move(objectToDuplicate); }
 
 	void apply(GameInspector* inspector) final;
 	void redo(GameInspector* inspector) final;

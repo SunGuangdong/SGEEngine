@@ -262,17 +262,17 @@ void GameWorld::clear()
 		}
 	}
 
-	//for (auto& itrObjByType : playingObjects) {
+	// for (auto& itrObjByType : playingObjects) {
 	//	for (int t = 0; t < itrObjByType.second.size(); ++t) {
 	//		GameObject* const object = itrObjByType.second[t];
 	//		delete object;
 	//	}
-	//}
+	// }
 
 	playingObjects.clear();
 
 	/*for (GameObject* const object : objectsAwaitingCreation) {
-		delete object;
+	    delete object;
 	}*/
 	objectsAwaitingCreation.clear();
 	m_gameObjectByIdLUT.clear();

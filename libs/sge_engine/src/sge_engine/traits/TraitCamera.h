@@ -1,7 +1,7 @@
 #pragma once
 
-#include "sge_engine/Actor.h"
 #include "sge_core/Camera.h"
+#include "sge_engine/Actor.h"
 
 namespace sge {
 

@@ -52,7 +52,8 @@ float4 psMain(VS_OUTPUT IN) : COLOR {
 namespace sge {
 
 void TexturedPlaneDraw::draw(
-    const RenderDestination& rdest, const mat4f& projViewWorld, Texture* texture, const vec4f& tint, const vec4f uvRegion) {
+    const RenderDestination& rdest, const mat4f& projViewWorld, Texture* texture, const vec4f& tint, const vec4f uvRegion)
+{
 	initialize(rdest.getDevice());
 
 	m_stateGroup.setProgram(m_shadingProgram);
@@ -81,7 +82,8 @@ void TexturedPlaneDraw::draw(
 	rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
 }
 
-void TexturedPlaneDraw::initialize(SGEDevice* sgedev) {
+void TexturedPlaneDraw::initialize(SGEDevice* sgedev)
+{
 	if (m_isInitialized == false) {
 		m_isInitialized = true;
 
@@ -122,11 +124,12 @@ void TexturedPlaneDraw::initialize(SGEDevice* sgedev) {
 	}
 }
 
-Geometry TexturedPlaneDraw::getGeometry(SGEDevice* sgedev) {
+Geometry TexturedPlaneDraw::getGeometry(SGEDevice* sgedev)
+{
 	initialize(sgedev);
 
-	Geometry geom(m_vertexBuffer.GetPtr(), nullptr, nullptr, -1, m_vertexDecl, false, true, true, false, PrimitiveTopology::TriangleList, 0, 0,
-	              sizeof(Vertex), UniformType::Unknown, 6);
+	Geometry geom(m_vertexBuffer.GetPtr(), nullptr, nullptr, -1, m_vertexDecl, false, true, true, false, PrimitiveTopology::TriangleList, 0,
+	              0, sizeof(Vertex), UniformType::Unknown, 6);
 
 	return geom;
 }

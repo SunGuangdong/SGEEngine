@@ -10,7 +10,8 @@ struct span {
 
 	span(T* const elements, const size_t usedElems)
 	    : elements(elements)
-	    , usedElems(usedElems) {
+	    , usedElems(usedElems)
+	{
 		if (usedElems > 0) {
 			sgeAssert(elements != nullptr);
 		}

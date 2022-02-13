@@ -1,13 +1,14 @@
 #include "TraitViewportIcon.h"
+#include "sge_core/AssetLibrary/AssetTexture2D.h"
 #include "sge_core/Camera.h"
 #include "sge_engine/GameDrawer/RenderItems/TraitViewportIconRenderItem.h"
 #include "sge_engine/enums2d.h"
-#include "sge_core/AssetLibrary/AssetTexture2D.h"
 
 namespace sge {
 ReflAddTypeId(TraitViewportIcon, 20'05'22'0001);
 
-ReflBlock() {
+ReflBlock()
+{
 	ReflAddType(TraitViewportIcon);
 }
 
@@ -16,10 +17,12 @@ ReflBlock() {
 //-----------------------------------------------------------------------
 TraitViewportIcon::TraitViewportIcon()
     : m_assetProperty(assetIface_texture2d)
-    , m_pixelSizeUnitsScreenSpace(0.0011f) {
+    , m_pixelSizeUnitsScreenSpace(0.0011f)
+{
 }
 
-mat4f TraitViewportIcon::computeNodeToWorldMtx(const ICamera& camera) const {
+mat4f TraitViewportIcon::computeNodeToWorldMtx(const ICamera& camera) const
+{
 	Texture* const texture = getIconTexture();
 
 	if (texture != nullptr) {
@@ -39,18 +42,21 @@ mat4f TraitViewportIcon::computeNodeToWorldMtx(const ICamera& camera) const {
 		const mat4f objToWorld = billboardFacingMtx * scalingFogScreenSpaceConstantSize * anchorAlignMtx;
 
 		return objToWorld;
-	} else {
+	}
+	else {
 		return getActor()->getTransformMtx();
 	}
 }
 
-Texture* TraitViewportIcon::getIconTexture() const {
+Texture* TraitViewportIcon::getIconTexture() const
+{
 	const AssetIface_Texture2D* texIface = m_assetProperty.getAssetInterface<AssetIface_Texture2D>();
 	Texture* const texture = texIface ? texIface->getTexture() : nullptr;
 	return texture;
 }
 
-void TraitViewportIcon::getRenderItems(std::vector<TraitViewportIconRenderItem>& renderItems) {
+void TraitViewportIcon::getRenderItems(std::vector<TraitViewportIconRenderItem>& renderItems)
+{
 	Texture* const iconTexture = getIconTexture();
 	if (iconTexture) {
 		TraitViewportIconRenderItem ri;

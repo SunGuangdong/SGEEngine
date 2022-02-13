@@ -277,8 +277,7 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 	AssetIface_Model3D* modelIface = getLoadedAssetIface<AssetIface_Model3D>(m_model);
 	Model* model = modelIface ? modelIface->getModel3D() : nullptr;
 
-	if (model)
-	{
+	if (model) {
 		ImGui::Text(ICON_FK_FILM " Animation Count: %d", model->numAnimations());
 		ImGui::Text(ICON_FK_CUBES " Node Count: %d", model->numNodes());
 		ImGui::Text(ICON_FK_CUBE " Mesh Count: %d", model->numMeshes());

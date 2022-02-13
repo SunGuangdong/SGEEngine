@@ -2,7 +2,8 @@
 #include "sge_utils/sge_utils.h"
 #include <string>
 
-int sge_fopen(FILE** ppFile, const char* filename, const char* mode) {
+int sge_fopen(FILE** ppFile, const char* filename, const char* mode)
+{
 	sgeAssert(ppFile != nullptr);
 #ifdef _MSC_VER
 	return fopen_s(ppFile, filename, mode);
@@ -16,7 +17,8 @@ int sge_fopen(FILE** ppFile, const char* filename, const char* mode) {
 #endif
 }
 
-void sge_fclose_safe(FILE* pFile) {
+void sge_fclose_safe(FILE* pFile)
+{
 	if (pFile) {
 		fclose(pFile);
 	}

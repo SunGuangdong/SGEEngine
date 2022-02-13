@@ -1,12 +1,13 @@
 #include "EditorWindowHotReloadData.h"
 #include "sge_utils/io/FileStream.h"
-#include "sge_utils/text/Path.h"
 #include "sge_utils/json/json.h"
+#include "sge_utils/text/Path.h"
 #include "sge_utils/text/format.h"
 
 namespace sge {
 
-void SceneInstanceSerializedData::saveInDirectory(const std::string& dirPath) const {
+void SceneInstanceSerializedData::saveInDirectory(const std::string& dirPath) const
+{
 	createDirectory(dirPath.c_str());
 
 	JsonValueBuffer jvb;
@@ -35,7 +36,8 @@ void SceneInstanceSerializedData::saveInDirectory(const std::string& dirPath) co
 	jw.WriteInFile((dirPath + "/editor_hot_realod_data.json").c_str(), jRoot, true);
 }
 
-bool SceneInstanceSerializedData::loadFromDirectory(const std::string& dirPath) {
+bool SceneInstanceSerializedData::loadFromDirectory(const std::string& dirPath)
+{
 	try {
 		*this = SceneInstanceSerializedData();
 
@@ -68,7 +70,8 @@ bool SceneInstanceSerializedData::loadFromDirectory(const std::string& dirPath) 
 			instances.emplace_back(std::move(instance));
 		}
 		return true;
-	} catch (...) {
+	}
+	catch (...) {
 		return false;
 	}
 }

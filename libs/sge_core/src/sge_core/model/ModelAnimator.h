@@ -1,8 +1,8 @@
 #pragma once
 
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/math/mat4f.h"
 #include "sge_utils/containers/ArrayView.h"
+#include "sge_utils/math/mat4f.h"
 #include <array>
 #include <string>
 #include <unordered_map>
@@ -60,18 +60,18 @@ struct SGE_CORE_API ModelAnimator {
 	void computeModleNodesTrasnforms(mat4f* outNodeTransforms, int outNodeTransformsSize);
 
 	/// @param [out] outNodeTransforms will be automatically resized to hold a transform for each node.
-	void computeModleNodesTrasnforms(std::vector<mat4f>& outNodeTransforms) {
+	void computeModleNodesTrasnforms(std::vector<mat4f>& outNodeTransforms)
+	{
 		outNodeTransforms.resize(getNumNodes());
 		computeModleNodesTrasnforms(outNodeTransforms.data(), (int)outNodeTransforms.size());
 	}
 
 	int getNumNodes() const;
 
-	int getNumTacks() const {
-		return int(m_tracks.size());
-	}
+	int getNumTacks() const { return int(m_tracks.size()); }
 
-	int getPlayingTrackId() const {
+	int getPlayingTrackId() const
+	{
 		if (!m_playbacks.empty())
 			return m_playbacks.back().trackId;
 

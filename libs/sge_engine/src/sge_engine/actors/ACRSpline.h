@@ -45,13 +45,15 @@ struct SGE_ENGINE_API ACRSpline : public Actor {
 	bool evalute(vec3f* outPosition, vec3f* outTanget, float t);
 	float getTotalLength() { return totalLength; }
 
-	int getNumItemsInMode(EditMode const mode) const final {
+	int getNumItemsInMode(EditMode const mode) const final
+	{
 		if (mode == editMode_points)
 			return int(points.size());
 		return Actor::getNumItemsInMode(mode);
 	}
 
-	bool getItemTransform(transf3d& result, EditMode const mode, int itemIndex) final {
+	bool getItemTransform(transf3d& result, EditMode const mode, int itemIndex) final
+	{
 		if (mode == editMode_points) {
 			if (itemIndex > points.size()) {
 				return false;
@@ -65,7 +67,8 @@ struct SGE_ENGINE_API ACRSpline : public Actor {
 		return Actor::getItemTransform(result, mode, itemIndex);
 	}
 
-	void setItemTransform(EditMode const mode, int itemIndex, const transf3d& tr) {
+	void setItemTransform(EditMode const mode, int itemIndex, const transf3d& tr)
+	{
 		if (mode == editMode_points) {
 			if (itemIndex > points.size()) {
 				sgeAssert(false);
@@ -73,7 +76,8 @@ struct SGE_ENGINE_API ACRSpline : public Actor {
 			}
 
 			points[itemIndex] = mat_mul_pos(getTransform().toMatrix().inverse(), tr.p);
-		} else {
+		}
+		else {
 			Actor::setItemTransform(mode, itemIndex, tr);
 		}
 

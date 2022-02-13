@@ -5,9 +5,9 @@ namespace sge {
 /// ChangeIndex is a way to to track if a change to some other part of the software has occured.
 /// It is a workaround in the situation where we do not have callbacks to notify that a change has happened.
 /// The way this works, when a change occures, the the code that does a change needs to call @ChangeIndex::markAChange().
-/// Later, during a function that needs to see if any changes have occured 
+/// Later, during a function that needs to see if any changes have occured
 /// you could call @ChangeIndex::checkForChangeAndUpdate().
-/// If the function returns true. than that means 
+/// If the function returns true. than that means
 /// a unprocessed change has happened since the last call of the function.
 /// Calling checkForChangeAndUpdate again would return false, until a call to markAChange has been made.
 struct ChangeIndex {
@@ -15,23 +15,23 @@ struct ChangeIndex {
 	/// So @checkForChangeAndUpdate would return true if we call it after the constructor.
 	ChangeIndex() = default;
 
-	/// Marks that a change accured so the others interested could check if a change has happened with 
-	/// @checkForChangeAndUpdate. 
-	void markAChange() {
-		upToDateValue++;
-	}
+	/// Marks that a change accured so the others interested could check if a change has happened with
+	/// @checkForChangeAndUpdate.
+	void markAChange() { upToDateValue++; }
 
 	/// Returns true if a change was marked with @markAChange witch accured after the last call to @checkForChangeAndUpdate.
-	bool checkForChangeAndUpdate() {
+	bool checkForChangeAndUpdate()
+	{
 		bool hasChanged = upToDateValue != lastCheckedValued;
 		lastCheckedValued = upToDateValue;
 		return hasChanged;
 	}
 
 	/// Check if the specified @externalTracker is up-to-date with the change index.
-	/// In order for it to work correctly, 
+	/// In order for it to work correctly,
 	/// initialize you externalTracker to 0 before starting to call this function.
-	bool checkForChangeAndUpdate(unsigned& externalTracker) const {
+	bool checkForChangeAndUpdate(unsigned& externalTracker) const
+	{
 		bool hasChanged = upToDateValue != externalTracker;
 		externalTracker = upToDateValue;
 		return hasChanged;

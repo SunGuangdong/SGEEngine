@@ -5,7 +5,8 @@ namespace sge {
 //---------------------------------------------------------------------------
 // PerlinNoise1D
 //---------------------------------------------------------------------------
-void PerlinNoise1D::create(int numOctaves, const int seed) {
+void PerlinNoise1D::create(int numOctaves, const int seed)
+{
 	Random rnd(seed);
 
 	if (numOctaves > 1) {
@@ -18,7 +19,8 @@ void PerlinNoise1D::create(int numOctaves, const int seed) {
 	}
 }
 
-float PerlinNoise1D::sample(const float samplePoint, float octaveMult) const {
+float PerlinNoise1D::sample(const float samplePoint, float octaveMult) const
+{
 	// Find the fractional part of the samplePoint, and wrap it around [0; 1] range
 	float frac = samplePoint - trunc(samplePoint);
 	if (frac < 0.f) {
@@ -53,7 +55,8 @@ float PerlinNoise1D::sample(const float samplePoint, float octaveMult) const {
 //---------------------------------------------------------------------------
 // PerlinNoise3D
 //---------------------------------------------------------------------------
-void PerlinNoise3D::create(const int numPoints, const int seed) {
+void PerlinNoise3D::create(const int numPoints, const int seed)
+{
 	m_pointsPerSide = numPoints;
 	const int numPerlins = m_pointsPerSide * m_pointsPerSide;
 
@@ -64,7 +67,8 @@ void PerlinNoise3D::create(const int numPoints, const int seed) {
 	}
 }
 
-float PerlinNoise3D::sample(vec3f sample) const {
+float PerlinNoise3D::sample(vec3f sample) const
+{
 	sample.x = sample.x - trunc(sample.x);
 	sample.y = sample.y - trunc(sample.y);
 	sample.z = sample.z - trunc(sample.z);

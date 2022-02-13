@@ -8,7 +8,8 @@ namespace sge {
 // https://math.stackexchange.com/questions/1270776/how-to-find-tangent-at-any-point-along-a-cubic-hermite-spline?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 
 // 1D Hermite cubic spline.
-inline float hermiteEval(float t, const float p[4]) {
+inline float hermiteEval(float t, const float p[4])
+{
 	sgeAssert(t >= 0.f && t <= 1.f);
 	const float tt = t * t;
 	const float ttt = tt * t;
@@ -22,7 +23,8 @@ inline float hermiteEval(float t, const float p[4]) {
 	return res;
 }
 
-inline float hermiteEvalTanget(float t, const float p[4]) {
+inline float hermiteEvalTanget(float t, const float p[4])
+{
 	const float tt = t * t;
 
 	float q1 = -3.f * tt + 4.f * t - 1.f;
@@ -35,7 +37,8 @@ inline float hermiteEvalTanget(float t, const float p[4]) {
 }
 
 // 2D Hermite cubic spline.
-inline vec2f hermiteEval(float t, const vec2f p[4]) {
+inline vec2f hermiteEval(float t, const vec2f p[4])
+{
 	sgeAssert(t >= 0.f && t <= 1.f);
 	const float tt = t * t;
 	const float ttt = tt * t;
@@ -49,7 +52,8 @@ inline vec2f hermiteEval(float t, const vec2f p[4]) {
 	return res;
 }
 
-inline vec2f hermiteEvalTanget(float t, const vec2f p[4]) {
+inline vec2f hermiteEvalTanget(float t, const vec2f p[4])
+{
 	const float tt = t * t;
 
 	float q1 = -3.f * tt + 4.f * t - 1.f;
@@ -62,7 +66,8 @@ inline vec2f hermiteEvalTanget(float t, const vec2f p[4]) {
 }
 
 // 3D Hermite cubic spline.
-inline vec3f hermiteEval(float t, const vec3f p[4]) {
+inline vec3f hermiteEval(float t, const vec3f p[4])
+{
 	sgeAssert(t >= 0.f && t <= 1.f);
 	const float tt = t * t;
 	const float ttt = tt * t;
@@ -76,7 +81,8 @@ inline vec3f hermiteEval(float t, const vec3f p[4]) {
 	return res;
 }
 
-inline vec3f hermiteEvalTanget(float t, const vec3f p[4]) {
+inline vec3f hermiteEvalTanget(float t, const vec3f p[4])
+{
 	const float tt = t * t;
 
 	float q1 = -3.f * tt + 4.f * t - 1.f;

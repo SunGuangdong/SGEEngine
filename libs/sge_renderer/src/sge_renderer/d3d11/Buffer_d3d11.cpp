@@ -3,7 +3,8 @@
 
 namespace sge {
 
-bool BufferD3D11::create(const BufferDesc& desc, const void* const pInitalData) {
+bool BufferD3D11::create(const BufferDesc& desc, const void* const pInitalData)
+{
 	destroy();
 
 	ID3D11Device* const d3ddev = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice();
@@ -25,7 +26,8 @@ bool BufferD3D11::create(const BufferDesc& desc, const void* const pInitalData) 
 	return true;
 }
 
-void BufferD3D11::destroy() {
+void BufferD3D11::destroy()
+{
 	// Unbind the buffer form the context state cache.
 	D3D11ContextStateCache* const stateCache = getDevice<SGEDeviceD3D11>()->D3D11_GetContextStateCache();
 	stateCache->BufferUnbind(m_d3d11_buffer);
@@ -35,11 +37,13 @@ void BufferD3D11::destroy() {
 	m_bufferDesc = BufferDesc();
 }
 
-bool BufferD3D11::isValid() const {
+bool BufferD3D11::isValid() const
+{
 	return m_d3d11_buffer != nullptr;
 }
 
-void* BufferD3D11::map(const Map::Enum map, SGEContext* UNUSED(context)) {
+void* BufferD3D11::map(const Map::Enum map, SGEContext* UNUSED(context))
+{
 	// TODO: Fugure out why I wrote this and document it!
 	ID3D11DeviceContext* const d3dcon = getDevice<SGEDeviceD3D11>()->D3D11_GetImmContext();
 
@@ -51,7 +55,8 @@ void* BufferD3D11::map(const Map::Enum map, SGEContext* UNUSED(context)) {
 	return subres.pData;
 }
 
-void BufferD3D11::unMap(SGEContext* UNUSED(context)) {
+void BufferD3D11::unMap(SGEContext* UNUSED(context))
+{
 	// TODO: Fugure out why I wrote this and document it!
 	ID3D11DeviceContext* const d3dcon = getDevice<SGEDeviceD3D11>()->D3D11_GetImmContext();
 	d3dcon->Unmap((ID3D11Resource*)m_d3d11_buffer, 0);

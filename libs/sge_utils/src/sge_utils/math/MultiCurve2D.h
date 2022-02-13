@@ -28,7 +28,9 @@ struct MultiCurve2D {
 		Point(PointType type, float x, float y)
 		    : type(type)
 		    , x(x)
-		    , y(y) {}
+		    , y(y)
+		{
+		}
 
 		vec2f getPos() const { return vec2f(x, y); }
 

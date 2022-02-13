@@ -16,19 +16,10 @@ struct IGameDrawer;
 struct SGE_ENGINE_API GamePlayWindow : public IImGuiWindow {
 	GamePlayWindow(std::string windowName, const char* const worldJsonString);
 
-	void close() override
-	{
-		m_isOpened = false;
-	}
-	bool isClosed() override
-	{
-		return !m_isOpened;
-	}
+	void close() override { m_isOpened = false; }
+	bool isClosed() override { return !m_isOpened; }
 	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
-	const char* getWindowName() const override
-	{
-		return m_windowName.c_str();
-	}
+	const char* getWindowName() const override { return m_windowName.c_str(); }
 
   private:
 	GpuHandle<FrameTarget> m_frameTarget;

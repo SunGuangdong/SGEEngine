@@ -4,7 +4,8 @@
 
 namespace sge {
 
-bool QueryGL::create(QueryType::Enum const queryType) {
+bool QueryGL::create(QueryType::Enum const queryType)
+{
 #if 1 || !defined __EMSCRIPTEN__
 	destroy();
 
@@ -24,7 +25,8 @@ bool QueryGL::create(QueryType::Enum const queryType) {
 #endif
 }
 
-void QueryGL::destroy() {
+void QueryGL::destroy()
+{
 #if 1 || !defined __EMSCRIPTEN__
 	if (m_glQuery) {
 		// sgeAssert(glIsQuery(m_glQuery));
@@ -35,14 +37,15 @@ void QueryGL::destroy() {
 #endif
 }
 
-bool QueryGL::isValid() const {
+bool QueryGL::isValid() const
+{
 #if 1 || !defined __EMSCRIPTEN__
-#ifdef SGE_USE_DEBUG
+	#ifdef SGE_USE_DEBUG
 	if (m_glQuery) {
 		glIsQuery(m_glQuery);
 		DumpAllGLErrors();
 	}
-#endif
+	#endif
 
 	return m_glQuery != 0;
 #else

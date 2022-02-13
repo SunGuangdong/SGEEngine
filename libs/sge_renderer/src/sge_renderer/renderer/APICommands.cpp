@@ -6,7 +6,8 @@ namespace sge {
 //----------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------
-void CBufferFiller::DeleteValue(const int idx) {
+void CBufferFiller::DeleteValue(const int idx)
+{
 	const auto data_begin = data.begin() + values[idx].offsetBytes;
 	const auto data_end = data.begin() + values[idx].offsetBytes + UniformType::GetSizeBytes(values[idx].type);
 
@@ -14,7 +15,8 @@ void CBufferFiller::DeleteValue(const int idx) {
 	values.erase(values.begin() + idx);
 }
 
-void CBufferFiller::SetData(const unsigned nameStrIdx, const UniformType::Enum type, const void* data_arg, const int inDataSizeBytes) {
+void CBufferFiller::SetData(const unsigned nameStrIdx, const UniformType::Enum type, const void* data_arg, const int inDataSizeBytes)
+{
 	sgeAssert(nameStrIdx != 0);
 
 	const ValueDesc& value = getValueDesc(nameStrIdx, type);
@@ -23,7 +25,8 @@ void CBufferFiller::SetData(const unsigned nameStrIdx, const UniformType::Enum t
 	memcpy(data.data() + value.offsetBytes, data_arg, inDataSizeBytes);
 }
 
-CBufferFiller::ValueDesc& CBufferFiller::getValueDesc(const unsigned nameStrIdx, const UniformType::Enum type) {
+CBufferFiller::ValueDesc& CBufferFiller::getValueDesc(const unsigned nameStrIdx, const UniformType::Enum type)
+{
 	int valueWithSameNameIdx = -1;
 	for (size_t t = 0; t < values.size(); ++t) {
 		if (values[t].nameStrIdx == nameStrIdx) {
@@ -64,7 +67,8 @@ CBufferFiller::ValueDesc& CBufferFiller::getValueDesc(const unsigned nameStrIdx,
 	return values.back();
 }
 
-void CBufferFiller::updateCBuffer(SGEContext* context, Buffer* cb, const CBufferFiller& cbRefl) {
+void CBufferFiller::updateCBuffer(SGEContext* context, Buffer* cb, const CBufferFiller& cbRefl)
+{
 	char* const mappedBuffer = (char*)context->map(cb, Map::WriteDiscard);
 	sgeAssert(mappedBuffer);
 
@@ -91,44 +95,52 @@ void CBufferFiller::updateCBuffer(SGEContext* context, Buffer* cb, const CBuffer
 //----------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------
-void StateGroup::setProgram(ShadingProgram* pShadingProgram) {
+void StateGroup::setProgram(ShadingProgram* pShadingProgram)
+{
 	m_shadingProg = pShadingProgram;
 }
 
-void StateGroup::setVB(const int slot, Buffer* pBuffer, const uint32 byteOffset, const uint32 stride) {
+void StateGroup::setVB(const int slot, Buffer* pBuffer, const uint32 byteOffset, const uint32 stride)
+{
 	m_vertexBuffers[slot] = pBuffer;
 	m_vbOffsets[slot] = byteOffset;
 	m_vbStrides[slot] = stride;
 }
 
 
-void StateGroup::setVBDeclIndex(const VertexDeclIndex idx) {
+void StateGroup::setVBDeclIndex(const VertexDeclIndex idx)
+{
 	m_vertDeclIndex = idx;
 }
 
-void StateGroup::setPrimitiveTopology(const PrimitiveTopology::Enum pt) {
+void StateGroup::setPrimitiveTopology(const PrimitiveTopology::Enum pt)
+{
 	m_primTopology = pt;
 }
 
-void StateGroup::setIB(Buffer* pBuffer, const UniformType::Enum format, const uint32 byteOffset) {
+void StateGroup::setIB(Buffer* pBuffer, const UniformType::Enum format, const uint32 byteOffset)
+{
 	m_indexBufferFormat = format;
 	m_indexBuffer = pBuffer;
 	m_indexBufferByteOffset = byteOffset;
 }
 
-void StateGroup::setRenderState(RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState) {
+void StateGroup::setRenderState(RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState)
+{
 	m_rasterState = rasterState;
 	m_depthStencilState = depthStencilState;
 	m_blendState = blendState;
 }
 
 // regular draw call with no index buffer
-void DrawCall::draw(const uint32 numVerts, const uint32 startVert, const uint32 numInstances) {
+void DrawCall::draw(const uint32 numVerts, const uint32 startVert, const uint32 numInstances)
+{
 	m_drawExec.Draw(numVerts, startVert, numInstances);
 }
 
 // draw call with index buffer
-void DrawCall::drawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances) {
+void DrawCall::drawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances)
+{
 	m_drawExec.DrawIndexed(numIndices, startIndex, startVert, numInstances);
 }
 
@@ -139,16 +151,16 @@ bool DrawCall::ValidateDrawCall() const
 
 	// Unfortunatley I wrote those check a bit hastefully as they could contain an unused data that has been used in a previous draw call.
 
-#define SGE_RET_NULL_OR_INVALID(p)                  \
-	if ((p) == nullptr || (p).isValid() == false) { \
-		sgeAssert(false);                           \
-		return false;                               \
-	}
-#define SGE_DCV_FAIL_IF(expr) \
-	if (expr) {               \
-		sgeAssert(false);     \
-		return false;         \
-	}
+	#define SGE_RET_NULL_OR_INVALID(p)                  \
+		if ((p) == nullptr || (p).isValid() == false) { \
+			sgeAssert(false);                           \
+			return false;                               \
+		}
+	#define SGE_DCV_FAIL_IF(expr) \
+		if (expr) {               \
+			sgeAssert(false);     \
+			return false;         \
+		}
 
 	m_shadingProg.isValid();
 	SGE_RET_NULL_OR_INVALID(m_shadingProg);
@@ -213,8 +225,8 @@ bool DrawCall::ValidateDrawCall() const
 	// The draw settings must be specified.
 	SGE_DCV_FAIL_IF(m_drawExec.IsValid() == false);
 
-#undef SGE_ASSERT_AND_RET_FALSE
-#undef SGE_NOT_NULL_VALID
+	#undef SGE_ASSERT_AND_RET_FALSE
+	#undef SGE_NOT_NULL_VALID
 
 	// The draw call shoud be valid.
 	return true;
@@ -224,14 +236,16 @@ bool DrawCall::ValidateDrawCall() const
 //----------------------------------------------------------------------------
 //
 //----------------------------------------------------------------------------
-ClearColorCmd::ClearColorCmd(FrameTarget* frameTarget, int index, const float rgba[4]) {
+ClearColorCmd::ClearColorCmd(FrameTarget* frameTarget, int index, const float rgba[4])
+{
 	m_frameTarget = frameTarget;
 	m_index = index;
 
 	std::copy(rgba, rgba + 4, m_rgba);
 }
 
-ClearDepthStencilCmd::ClearDepthStencilCmd(FrameTarget* frameTarget, float depth) {
+ClearDepthStencilCmd::ClearDepthStencilCmd(FrameTarget* frameTarget, float depth)
+{
 	m_frameTarget = frameTarget;
 	m_depth = depth;
 }

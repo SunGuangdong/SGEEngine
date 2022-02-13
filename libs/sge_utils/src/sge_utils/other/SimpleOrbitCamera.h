@@ -11,7 +11,8 @@ struct orbit_camera {
 	vec3f orbitPoint = vec3f(0.f);
 	vec2f prevMousePos = vec2f(0.f);
 
-	void orientation(vec3f& orbitToEye, vec3f& up, vec3f& right) const {
+	void orientation(vec3f& orbitToEye, vec3f& up, vec3f& right) const
+	{
 		orbitToEye = vec3f(cos(yaw) * cos(pitch), sin(pitch), -sin(yaw) * cos(pitch)) * radius;
 
 		up = normalized(
@@ -22,7 +23,8 @@ struct orbit_camera {
 
 	vec3f eyePosition() const { return orbitPoint + vec3f(cos(yaw) * cos(pitch), sin(pitch), -sin(yaw) * cos(pitch)) * radius; }
 
-	mat4f GetViewMatrix() const {
+	mat4f GetViewMatrix() const
+	{
 		vec3f orbitToEye, up, right;
 		orientation(orbitToEye, up, right);
 
@@ -30,7 +32,8 @@ struct orbit_camera {
 		return mat4f::getLookAtRH(cameraPosition, orbitPoint, up);
 	}
 
-	void strafe(const float amountRight, const float amountUp) {
+	void strafe(const float amountRight, const float amountUp)
+	{
 		vec3f orbitToEye, up, right;
 		orientation(orbitToEye, up, right);
 
@@ -40,7 +43,8 @@ struct orbit_camera {
 
 	// Does a "Maya" style camera movement.
 	// Returns true if the the camera position has been changed by the specfied input.
-	bool update(const bool alt, const bool left, const bool middle, const bool right, const vec2f mousePos) {
+	bool update(const bool alt, const bool left, const bool middle, const bool right, const vec2f mousePos)
+	{
 		bool hasChanged = false;
 
 		const vec2f diff = mousePos - prevMousePos;

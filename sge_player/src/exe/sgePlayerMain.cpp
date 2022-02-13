@@ -1,17 +1,17 @@
 #if 1
-// This thing makes the driver to auto-choose the high-end GPU instead of the "integrated" one.
-#ifdef _WIN32
+    // This thing makes the driver to auto-choose the high-end GPU instead of the "integrated" one.
+	#ifdef _WIN32
 extern "C" {
 __declspec(dllexport) int NvOptimusEnablement = 0x00000001;
 }
 extern "C" {
 __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 }
-#endif
+	#endif
 #endif
 
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
+	#include <emscripten.h>
 #endif
 
 #include "GameMode.h"
@@ -28,11 +28,11 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "sge_engine/IPlugin.h"
 #include "sge_engine/setImGuiContextEngine.h"
 #include "sge_log/Log.h"
-#include "sge_utils/other/FileOpenDialog.h"
 #include "sge_utils/DLL/DLLHandler.h"
 #include "sge_utils/io/FileStream.h"
-#include "sge_utils/text/Path.h"
 #include "sge_utils/json/json.h"
+#include "sge_utils/other/FileOpenDialog.h"
+#include "sge_utils/text/Path.h"
 
 #include <filesystem>
 #include <thread>
@@ -62,7 +62,8 @@ struct SGEGameWindow : public WindowBase {
 
 	vec2i cachedWindowSize = vec2i(0);
 
-	void HandleEvent(const WindowEvent event, const void* const eventData) override {
+	void HandleEvent(const WindowEvent event, const void* const eventData) override
+	{
 		if (event == WE_Create) {
 			OnCreate();
 		}
@@ -88,7 +89,8 @@ struct SGEGameWindow : public WindowBase {
 		}
 	}
 
-	void OnCreate() {
+	void OnCreate()
+	{
 		int const backBufferWidth = this->GetClientWidth();
 		int const backBufferHeight = this->GetClientHeight();
 
@@ -140,7 +142,8 @@ struct SGEGameWindow : public WindowBase {
 
 		if (pluginName.empty()) {
 			return;
-		} else {
+		}
+		else {
 			loadPlugin();
 		}
 #else
@@ -152,7 +155,8 @@ struct SGEGameWindow : public WindowBase {
 		gameMode.create(m_pGameDrawer, g_playerSettings.initalLevel.c_str());
 	}
 
-	void loadPlugin() {
+	void loadPlugin()
+	{
 		// Notify that we are about to unload the plugin.
 		getEngineGlobal()->notifyOnPluginPreUnload();
 #if !defined(__EMSCRIPTEN__)
@@ -174,13 +178,15 @@ struct SGEGameWindow : public WindowBase {
 		typeLib().performRegistration();
 	}
 
-	void run() {
+	void run()
+	{
 		m_timer.tick();
 		getEngineGlobal()->update(m_timer.diff_seconds());
 
 		if (getEngineGlobal()->getEngineAllowingRelativeCursor() && getEngineGlobal()->doesAnyoneNeedForRelativeCursorThisFrame()) {
 			setMouseCursorRelative(true);
-		} else {
+		}
+		else {
 			setMouseCursorRelative(false);
 		}
 		getEngineGlobal()->clearAnyoneNeedForRelativeCursorThisFrame();
@@ -213,18 +219,19 @@ struct SGEGameWindow : public WindowBase {
 };
 
 #ifdef __EMSCRIPTEN__
-#include <SDL2/SDL.h>
-#include <emscripten.h>
-#include <emscripten/html5.h>
+	#include <SDL2/SDL.h>
+	#include <emscripten.h>
+	#include <emscripten/html5.h>
 #else
-#include <SDL.h>
-#include <SDL_syswm.h>
+	#include <SDL.h>
+	#include <SDL_syswm.h>
 #endif
 
 
 
 #ifdef __EMSCRIPTEN__
-EM_BOOL emsc_canvasResizeCb(int eventType, const void* reserved, void* userData) {
+EM_BOOL emsc_canvasResizeCb(int eventType, const void* reserved, void* userData)
+{
 	double width, height;
 	emscripten_get_element_css_size("canvas", &width, &height);
 
@@ -247,7 +254,8 @@ EM_JS(int, sge_emscripten_getCanvasWidth, (), { return document.getElementById("
 EM_JS(int, sge_emscripten_getCanvasHeight, (), { return document.getElementById("canvas").height; });
 #endif
 
-void main_loop() {
+void main_loop()
+{
 #ifdef __EMSCRIPTEN__
 	// [SGE_EMSCRIPTEN_NO_SDL_RESIZE]
 	// SDL does not recieve any events about the canvas chaning size, so as a workaround
@@ -277,7 +285,8 @@ void main_loop() {
 
 // Caution:
 // SDL2 might have a macro (depending on the target platform) for the main function!
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
 	sgeLogInfo("main()\n");
 
 	sgeRegisterMiniDumpHandler();
@@ -304,13 +313,13 @@ int main(int argc, char* argv[]) {
 
 #else
 	SDL_Init(SDL_INIT_EVERYTHING);
-#ifdef SGE_RENDERER_GL
+	#ifdef SGE_RENDERER_GL
 	SDL_SetHint(SDL_HINT_RENDER_DRIVER, "opengl");
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-	// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-#endif
+		// SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	#endif
 #endif
 
 	if (!g_playerSettings.loadFromJsonFile("appdata/game_project_settings.json")) {

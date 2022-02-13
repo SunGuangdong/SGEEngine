@@ -62,7 +62,9 @@ struct SGE_ENGINE_API TerrainGenerator {
 		Vertex() = default;
 		Vertex(const vec3f& p, const vec3f& n)
 		    : p(p)
-		    , n(n) {}
+		    , n(n)
+		{
+		}
 
 		vec3f p = vec3f(0.f);
 		vec3f n = vec3f(0.f, 1.f, 0.f);

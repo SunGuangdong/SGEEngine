@@ -22,17 +22,18 @@ struct MemberFieldChainKnot {
 /// MemberChain is a way to refer to any member (for example member of a member of a member ...) in some memory.
 /// For example:
 /// suppouse we have these types:
-/// 
+///
 /// struct Health { float amountOfHealth; }
 /// struct Monster { Health health; }
-/// 
+///
 /// And we want, via the reflection system, to find that member value.
 /// A way of doing that is by using MemberChain:
-/// 
+///
 /// MemberChain chain;
 /// chain.add(sgeFindMember(Monster, health); // We are going to start with an object of type Monster and its member health.
-/// chain.add(sgeFindMember(Health, amountOfHealth); // Then at the value pointed above, we want to reach out to it's @amountOfHealth member.
-/// 
+/// chain.add(sgeFindMember(Health, amountOfHealth); // Then at the value pointed above, we want to reach out to it's @amountOfHealth
+/// member.
+///
 /// After that we can call:
 /// Monster m;
 /// m.health.amountOfHealth = 42.f;

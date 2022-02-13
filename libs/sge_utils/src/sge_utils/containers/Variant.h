@@ -15,7 +15,8 @@ struct Variant {
 
 	~Variant() { Destroy(); }
 
-	Variant(const Variant& ref) {
+	Variant(const Variant& ref)
+	{
 		if (ref.objectValid) {
 			objectValid = true;
 			copyTypeHolder(ref);
@@ -24,7 +25,8 @@ struct Variant {
 		}
 	}
 
-	Variant(Variant&& ref) {
+	Variant(Variant&& ref)
+	{
 		if (ref.objectValid && ref.GetTypeHolder()->getCompileTimeClassId()) {
 			objectValid = true;
 			copyTypeHolder(ref);
@@ -35,7 +37,8 @@ struct Variant {
 		}
 	}
 
-	Variant& operator=(const Variant& ref) {
+	Variant& operator=(const Variant& ref)
+	{
 		if (ref.objectValid == false) {
 			Destroy();
 			return *this;
@@ -44,7 +47,8 @@ struct Variant {
 		if (objectValid && GetTypeHolder()->getCompileTimeClassId() == ref.GetTypeHolder()->getCompileTimeClassId()) {
 			GetTypeHolder()->assign(object, ref.object);
 			return *this;
-		} else {
+		}
+		else {
 			Destroy();
 
 			objectValid = true;
@@ -60,7 +64,8 @@ struct Variant {
 		return *this;
 	}
 
-	Variant& operator=(Variant&& ref) {
+	Variant& operator=(Variant&& ref)
+	{
 		if (ref.objectValid == false) {
 			Destroy();
 			return *this;
@@ -70,7 +75,8 @@ struct Variant {
 			GetTypeHolder()->move_assign(object, ref.object);
 			ref.objectValid = false;
 			return *this;
-		} else {
+		}
+		else {
 			Destroy();
 
 			objectValid = true;
@@ -85,7 +91,8 @@ struct Variant {
 		}
 	}
 
-	void Destroy() {
+	void Destroy()
+	{
 		if (objectValid != 0) {
 			GetTypeHolder()->destruct(object);
 			objectValid = false;
@@ -93,7 +100,8 @@ struct Variant {
 	}
 
 	template <typename T>
-	T* setVariant() {
+	T* setVariant()
+	{
 		static_assert(sizeof(T) <= Nbytes, "The preallocated buffer isn't large enough");
 
 		// Destroy the current object (if any).
@@ -108,7 +116,8 @@ struct Variant {
 	}
 
 	template <typename T>
-	bool resetVariantToValue(const T& newValue) {
+	bool resetVariantToValue(const T& newValue)
+	{
 		if (setVariant<T>()) {
 			*get<T>() = newValue;
 			return true;
@@ -118,21 +127,24 @@ struct Variant {
 	}
 
 	template <typename T>
-	T* get() {
+	T* get()
+	{
 		if (isVariantSetTo<T>())
 			return reinterpret_cast<T*>(&object[0]);
 		return nullptr;
 	}
 
 	template <typename T>
-	const T* get() const {
+	const T* get() const
+	{
 		if (isVariantSetTo<T>())
 			return reinterpret_cast<const T*>(&object[0]);
 		return nullptr;
 	}
 
 	template <typename T>
-	T& as() {
+	T& as()
+	{
 		return *reinterpret_cast<T*>(&object[0]);
 	}
 
@@ -141,7 +153,8 @@ struct Variant {
 
 	// Check if the currently created object is type "T".
 	template <typename T>
-	bool isVariantSetTo() const {
+	bool isVariantSetTo() const
+	{
 		return objectValid && (sgePerBuildTypeId(T) == GetTypeHolder()->getCompileTimeClassId());
 	}
 
@@ -174,13 +187,15 @@ struct Variant {
 		void* getCompileTimeClassId() const final { return (void*)(sgePerBuildTypeId(T)); }
 	};
 
-	void copyTypeHolder(const Variant& ref) {
+	void copyTypeHolder(const Variant& ref)
+	{
 		for (int iByte = 0; iByte < SGE_ARRSZ(ref.typeHolder); ++iByte) {
 			typeHolder[iByte] = ref.typeHolder[iByte];
 		}
 	}
 
-	struct Dummy {};
+	struct Dummy {
+	};
 
 	TypeInterface* GetTypeHolder() { return (TypeInterface*)typeHolder; }
 	const TypeInterface* GetTypeHolder() const { return (const TypeInterface*)typeHolder; }

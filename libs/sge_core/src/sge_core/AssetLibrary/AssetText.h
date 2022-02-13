@@ -10,12 +10,11 @@ struct SGE_CORE_API IAssetInterface_Text : public IAssetInterface {
 
 struct SGE_CORE_API AssetText : public Asset, public IAssetInterface_Text {
 	AssetText(std::string assetPath, AssetLibrary& ownerAssetLib)
-	    : Asset(assetPath, ownerAssetLib) {
+	    : Asset(assetPath, ownerAssetLib)
+	{
 	}
 
-	virtual const std::string& getText() const override {
-		return m_text;
-	}
+	virtual const std::string& getText() const override { return m_text; }
 
 	bool loadAssetFromFile(const char* const path) override;
 

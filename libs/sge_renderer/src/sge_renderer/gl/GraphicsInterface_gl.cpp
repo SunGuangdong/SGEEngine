@@ -6,9 +6,9 @@
 #include "GraphicsInterface_gl.h"
 
 #if WIN32
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <GL/wglew.h>
+	#define WIN32_LEAN_AND_MEAN
+	#define NOMINMAX
+	#include <GL/wglew.h>
 #endif
 
 namespace sge {
@@ -16,7 +16,8 @@ namespace sge {
 //////////////////////////////////////////////////////////////////////////////////////////
 // Create/Destroy
 //////////////////////////////////////////////////////////////////////////////////////////
-bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc) {
+bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc)
+{
 #if defined(WIN32) && 0
 
 	m_windowFrameTargetDesc = frameTargetDesc;
@@ -75,12 +76,12 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc) {
 	                 2,
 	                 WGL_CONTEXT_PROFILE_MASK_ARB,
 	                 WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-#ifdef SGE_USE_DEBUG
-//	WGL_CONTEXT_FLAGS_ARB,  WGL_CONTEXT_DEBUG_BIT_ARB,
-#else
+	#ifdef SGE_USE_DEBUG
+	//	WGL_CONTEXT_FLAGS_ARB,  WGL_CONTEXT_DEBUG_BIT_ARB,
+	#else
 	                 WGL_CONTEXT_FLAGS_ARB,
 	                 0,
-#endif
+	#endif
 	                 0};
 
 	HGLRC hrc = wglCreateContextAttribsARB(hdc, 0, attribs);
@@ -137,28 +138,33 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc) {
 	return true;
 }
 
-void SGEDeviceImpl::resizeBackBuffer(int width, int height) {
+void SGEDeviceImpl::resizeBackBuffer(int width, int height)
+{
 	m_windowFrameTargetDesc.width = width;
 	m_windowFrameTargetDesc.height = height;
 	m_screenTarget.as<FrameTargetGL>()->GL_CreateWindowFrameTarget(m_windowFrameTargetDesc.width, m_windowFrameTargetDesc.height);
 }
 
-void SGEDeviceImpl::setVsync(const bool enabled) {
+void SGEDeviceImpl::setVsync(const bool enabled)
+{
 	m_VSyncEnabled = enabled;
 
 #if defined(WIN32) && 0
 	if (wglSwapIntervalEXT != NULL) {
 		wglSwapIntervalEXT(m_VSyncEnabled ? 1 : 0);
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 #endif
 }
 
-void SGEDeviceImpl::Destroy() {
+void SGEDeviceImpl::Destroy()
+{
 }
 
-void SGEDeviceImpl::present() {
+void SGEDeviceImpl::present()
+{
 #if defined(WIN32)
 	glFinish();
 	SwapBuffers((HDC)m_gl_hdc);
@@ -173,7 +179,8 @@ void SGEDeviceImpl::present() {
 	m_frameStatistics.lastPresentTime = now;
 }
 
-void SGEContextImmediate::beginQuery(Query* const query) {
+void SGEContextImmediate::beginQuery(Query* const query)
+{
 #ifndef __EMSCRIPTEN__
 	if (!query || !query->isValid()) {
 		sgeAssert(false);
@@ -193,7 +200,8 @@ void SGEContextImmediate::beginQuery(Query* const query) {
 #endif
 }
 
-void SGEContextImmediate::endQuery(Query* const query) {
+void SGEContextImmediate::endQuery(Query* const query)
+{
 #ifndef __EMSCRIPTEN__
 	if (!query || !query->isValid()) {
 		sgeAssert(false);
@@ -215,7 +223,8 @@ void SGEContextImmediate::endQuery(Query* const query) {
 #endif
 }
 
-bool SGEContextImmediate::isQueryReady(Query* const query) {
+bool SGEContextImmediate::isQueryReady(Query* const query)
+{
 #ifndef __EMSCRIPTEN__
 	if (!query || !query->isValid()) {
 		sgeAssert(false);
@@ -235,7 +244,8 @@ bool SGEContextImmediate::isQueryReady(Query* const query) {
 #endif
 }
 
-bool SGEContextImmediate::getQueryData(Query* const query, uint64& queryData) {
+bool SGEContextImmediate::getQueryData(Query* const query, uint64& queryData)
+{
 #ifndef __EMSCRIPTEN__
 	if (!query || !query->isValid()) {
 		sgeAssert(false);
@@ -259,7 +269,8 @@ bool SGEContextImmediate::getQueryData(Query* const query, uint64& queryData) {
 }
 
 
-void SGEContextImmediate::updateTextureData(Texture* texture, const TextureData& texData) {
+void SGEContextImmediate::updateTextureData(Texture* texture, const TextureData& texData)
+{
 	if (texture && texture->getDesc().textureType == UniformType::Texture2D && texData.data) {
 		GLContextStateCache* const glcon = GL_GetContextStateCache();
 
@@ -278,7 +289,8 @@ void SGEContextImmediate::updateTextureData(Texture* texture, const TextureData&
 	}
 }
 
-void SGEContextImmediate::clearColor(FrameTarget* target, int index, const float rgba[4]) {
+void SGEContextImmediate::clearColor(FrameTarget* target, int index, const float rgba[4])
+{
 	if (target == NULL || !target->isValid()) {
 		// Called with initialized or invalid frame target.
 		sgeAssert(false);
@@ -320,7 +332,8 @@ void SGEContextImmediate::clearColor(FrameTarget* target, int index, const float
 //---------------------------------------------------------------------------------------
 // SGEContextImmediate
 //---------------------------------------------------------------------------------------
-void SGEContextImmediate::clearDepth(FrameTarget* target, float depth) {
+void SGEContextImmediate::clearDepth(FrameTarget* target, float depth)
+{
 	// [CAUTION] Some nVidia clearing depth does nothing if the
 	// depth write is not enabled !!!
 	// As a workaround we always enable the depth write when clearing...
@@ -345,13 +358,15 @@ void SGEContextImmediate::clearDepth(FrameTarget* target, float depth) {
 #endif
 }
 
-void* SGEContextImmediate::map(Buffer* buffer, const Map::Enum map) {
+void* SGEContextImmediate::map(Buffer* buffer, const Map::Enum map)
+{
 	void* result = ((BufferGL*)buffer)->map(map);
 	DumpAllGLErrors();
 	return result;
 }
 
-void SGEContextImmediate::unMap(Buffer* buffer) {
+void SGEContextImmediate::unMap(Buffer* buffer)
+{
 	((BufferGL*)buffer)->unMap();
 	DumpAllGLErrors();
 }
@@ -359,7 +374,8 @@ void SGEContextImmediate::unMap(Buffer* buffer) {
 void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
                                           FrameTarget* frameTarget,
                                           const Rect2s* const pViewport,
-                                          const Rect2s* const pScissorsRect) {
+                                          const Rect2s* const pScissorsRect)
+{
 	StateGroup* const stateGroup = drawCall.m_pStateGroup;
 
 	// Check if the draw call is valid:
@@ -408,7 +424,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 	// Depth stencil state.
 	if (stateGroup->m_depthStencilState != nullptr) {
 		glcon->ApplyDepthStencilDesc(stateGroup->m_depthStencilState->getDesc());
-	} else {
+	}
+	else {
 		glcon->ApplyDepthStencilDesc(DepthStencilDesc());
 	}
 
@@ -489,7 +506,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 
 					glUniform1i(binding.bindLocation.bindLocation, binding.bindLocation.glTextureUnit);
 					DumpAllGLErrors();
-				} else {
+				}
+				else {
 					for (int t = 0; t < binding.bindLocation.glArraySize; ++t) {
 						// Bind the texture.
 						TextureGL* const boundTextureGL = static_cast<TextureGL*>(binding.textures[t]);
@@ -553,7 +571,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 			const GLsizei height = pScissorsRect->height;
 
 			glcon->ApplyScissorsRect(x, y, width, height);
-		} else {
+		}
+		else {
 			sgeAssert(false);
 			// In order to make this a bit debuggable just make big scissors rect.
 			const GLint frameTargetWidth = frameTarget->getWidth();
@@ -564,7 +583,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 	// Blending
 	if (stateGroup->m_blendState && stateGroup->m_blendState->isValid()) {
 		glcon->ApplyBlendState(stateGroup->m_blendState->getDesc().blendDesc[0]);
-	} else {
+	}
+	else {
 		glcon->ApplyBlendState(BlendDesc());
 	}
 
@@ -600,8 +620,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 		numPrimitivesDrawn +=
 		    PrimitiveTopology::GetNumPrimitivesByPoints(stateGroup->m_primTopology, drawCall.m_drawExec.IndexedCall().numIndices) *
 		    drawCall.m_drawExec.IndexedCall().numInstances;
-
-	} else {
+	}
+	else {
 		glcon->DrawArrays(PrimitiveTopology_GetGLNative(stateGroup->m_primTopology), drawCall.m_drawExec.LinearCall().startVert,
 		                  drawCall.m_drawExec.LinearCall().numVerts, drawCall.m_drawExec.LinearCall().numInstances);
 
@@ -619,7 +639,8 @@ void glDebugOutput(GLenum source,
                    GLenum severity,
                    GLsizei UNUSED(length),
                    const char* message,
-                   const void* UNUSED(userParam)) {
+                   const void* UNUSED(userParam))
+{
 	// ignore non-significant error/warning codes
 	// if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
@@ -698,7 +719,8 @@ void glDebugOutput(GLenum source,
 }
 #endif
 
-SGEDevice* SGEDevice::create(const MainFrameTargetDesc& frameTargetDesc) {
+SGEDevice* SGEDevice::create(const MainFrameTargetDesc& frameTargetDesc)
+{
 	SGEDeviceImpl* s = new SGEDeviceImpl();
 	s->Create(frameTargetDesc);
 
@@ -711,7 +733,8 @@ SGEDevice* SGEDevice::create(const MainFrameTargetDesc& frameTargetDesc) {
 	return s;
 }
 
-RAIResource* SGEDeviceImpl::requestResource(const ResourceType::Enum resourceType) {
+RAIResource* SGEDeviceImpl::requestResource(const ResourceType::Enum resourceType)
+{
 	RAIResource* result = nullptr;
 
 	if (resourceType == ResourceType::Buffer)
@@ -748,7 +771,8 @@ RAIResource* SGEDeviceImpl::requestResource(const ResourceType::Enum resourceTyp
 }
 
 
-RasterizerState* SGEDeviceImpl::requestRasterizerState(const RasterDesc& desc) {
+RasterizerState* SGEDeviceImpl::requestRasterizerState(const RasterDesc& desc)
+{
 	// Search if the resource exists.
 	auto itr = std::find_if(rasterizerStateCache.begin(), rasterizerStateCache.end(),
 	                        [&desc](const RasterizerState* state) -> bool { return state->getDesc() == desc; });
@@ -770,7 +794,8 @@ RasterizerState* SGEDeviceImpl::requestRasterizerState(const RasterDesc& desc) {
 	return state;
 }
 
-DepthStencilState* SGEDeviceImpl::requestDepthStencilState(const DepthStencilDesc& desc) {
+DepthStencilState* SGEDeviceImpl::requestDepthStencilState(const DepthStencilDesc& desc)
+{
 	// Search if the resource exists.
 	auto itr = std::find_if(depthStencilStateCache.begin(), depthStencilStateCache.end(),
 	                        [&desc](const DepthStencilState* state) -> bool { return state->getDesc() == desc; });
@@ -791,7 +816,8 @@ DepthStencilState* SGEDeviceImpl::requestDepthStencilState(const DepthStencilDes
 	return state;
 }
 
-BlendState* SGEDeviceImpl::requestBlendState(const BlendStateDesc& desc) {
+BlendState* SGEDeviceImpl::requestBlendState(const BlendStateDesc& desc)
+{
 	// Search if the resource exists.
 	auto itr = std::find_if(blendStateCache.begin(), blendStateCache.end(),
 	                        [&desc](const BlendState* state) -> bool { return state->getDesc() == desc; });
@@ -812,7 +838,8 @@ BlendState* SGEDeviceImpl::requestBlendState(const BlendStateDesc& desc) {
 	return state;
 }
 
-VertexDeclIndex SGEDeviceImpl::getVertexDeclIndex(const VertexDecl* const declElems, const int declElemsCount) {
+VertexDeclIndex SGEDeviceImpl::getVertexDeclIndex(const VertexDecl* const declElems, const int declElemsCount)
+{
 	const std::vector<VertexDecl> decl = VertexDecl::NormalizeDecl(declElems, declElemsCount);
 
 	VertexDeclIndex& idx = m_vertexDeclIndexMap[decl];
@@ -824,7 +851,8 @@ VertexDeclIndex SGEDeviceImpl::getVertexDeclIndex(const VertexDecl* const declEl
 	return idx;
 }
 
-const std::vector<VertexDecl>& SGEDeviceImpl::getVertexDeclFromIndex(const VertexDeclIndex index) const {
+const std::vector<VertexDecl>& SGEDeviceImpl::getVertexDeclFromIndex(const VertexDeclIndex index) const
+{
 	for (const auto& e : m_vertexDeclIndexMap) {
 		if (e.second == index) {
 			return e.first;

@@ -2,8 +2,8 @@
 
 #include "sge_engine/sge_engine_api.h"
 #include "sge_utils/math/common.h"
-#include "sge_utils/math/vec3f.h"
 #include "sge_utils/math/quatf.h"
+#include "sge_utils/math/vec3f.h"
 
 #include "CharacterCtrlCommon.h"
 

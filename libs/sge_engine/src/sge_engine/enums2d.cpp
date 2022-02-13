@@ -23,7 +23,8 @@ ReflBlock() {
 // clang-format on
 
 
-mat4f anchor_getPlaneAlignMatrix(const Anchor anchor, const vec2f& planeSizeZY) {
+mat4f anchor_getPlaneAlignMatrix(const Anchor anchor, const vec2f& planeSizeZY)
+{
 	mat4f orientationMtx = mat4f::getScaling(1.f, planeSizeZY.y, planeSizeZY.x);
 
 	switch (anchor) {
@@ -47,7 +48,8 @@ mat4f anchor_getPlaneAlignMatrix(const Anchor anchor, const vec2f& planeSizeZY) 
 }
 
 mat4f billboarding_getOrentationMtx(
-    const Billboarding billboarding, const transf3d& objectTr, const vec3f& camPos, const mat4f& camViewMtx, const bool makeFacingPosZ) {
+    const Billboarding billboarding, const transf3d& objectTr, const vec3f& camPos, const mat4f& camViewMtx, const bool makeFacingPosZ)
+{
 	switch (billboarding) {
 		case billboarding_none: {
 			mat4f result = objectTr.toMatrix();

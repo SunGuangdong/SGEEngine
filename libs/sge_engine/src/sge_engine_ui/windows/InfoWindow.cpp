@@ -1,10 +1,10 @@
 #include "sge_utils/sge_utils.h"
 
 #ifdef WINAPI_FAMILY_DESKTOP_APP
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
-#include <Psapi.h>
-#include <Windows.h>
+	#define NOMINMAX
+	#define WIN32_LEAN_AND_MEAN
+	#include <Psapi.h>
+	#include <Windows.h>
 #endif
 
 #include "sge_core/SGEImGui.h"
@@ -18,7 +18,8 @@
 
 namespace sge {
 
-void InfoWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is)) {
+void InfoWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
+{
 	if (isClosed()) {
 		return;
 	}

@@ -20,7 +20,8 @@ ReflBlock() {
 //--------------------------------------------------------------------
 // TraitPath3DForASpline
 //--------------------------------------------------------------------
-bool TraitPath3DForASpline::isEmpty() const {
+bool TraitPath3DForASpline::isEmpty() const
+{
 	const Actor* a = getActor();
 	if (a && a->getType() == sgeTypeId(ALine)) {
 		const ALine* const spline = static_cast<const ALine*>(a);
@@ -31,7 +32,8 @@ bool TraitPath3DForASpline::isEmpty() const {
 	return true;
 }
 
-float TraitPath3DForASpline::getTotalLength() {
+float TraitPath3DForASpline::getTotalLength()
+{
 	ALine* const spline = static_cast<ALine*>(getActor());
 	if (spline) {
 		return spline->getTotalLength();
@@ -40,7 +42,8 @@ float TraitPath3DForASpline::getTotalLength() {
 	return 0.f;
 }
 
-bool TraitPath3DForASpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float const distance) {
+bool TraitPath3DForASpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float const distance)
+{
 	ALine* const spline = static_cast<ALine*>(getActor());
 	if (spline) {
 		return spline->evaluateAtDistance(outPosition, outTanget, distance);
@@ -52,7 +55,8 @@ bool TraitPath3DForASpline::evaluateAtDistance(vec3f* outPosition, vec3f* outTan
 //--------------------------------------------------------------------
 // ALine
 //--------------------------------------------------------------------
-void ALine::create() {
+void ALine::create()
+{
 	registerTrait(traitPath);
 	registerTrait(m_traitViewportIcon);
 	m_traitViewportIcon.setTexture("assets/editor/textures/icons/obj/ALine.png", true);
@@ -62,7 +66,8 @@ void ALine::create() {
 	points.push_back(vec3f(10.f, 0.f, 0.f));
 }
 
-Box3f ALine::getBBoxOS() const {
+Box3f ALine::getBBoxOS() const
+{
 	Box3f bbox;
 
 	for (const vec3f& pt : points)
@@ -74,11 +79,13 @@ Box3f ALine::getBBoxOS() const {
 	return bbox;
 }
 
-void ALine::onMemberChanged() {
+void ALine::onMemberChanged()
+{
 	makeDirty();
 }
 
-void ALine::computeSegmentsLength() {
+void ALine::computeSegmentsLength()
+{
 	totalLength = 0.f;
 
 	if (isEmpty()) {
@@ -100,7 +107,8 @@ void ALine::computeSegmentsLength() {
 	}
 }
 
-bool ALine::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float distance) {
+bool ALine::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float distance)
+{
 	if (isEmpty()) {
 		return false;
 	}
@@ -157,10 +165,9 @@ bool ALine::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float dista
 	return true;
 }
 
-InspectorCmd* ALine::generateDeleteItemCmd(GameInspector* inspector,
-                                           const SelectedItem* items,
-                                           int numItems,
-                                           bool ifActorModeShouldDeleteActorsUnder) {
+InspectorCmd*
+    ALine::generateDeleteItemCmd(GameInspector* inspector, const SelectedItem* items, int numItems, bool ifActorModeShouldDeleteActorsUnder)
+{
 	if (numItems == 1 && items[0].editMode == editMode_actors) {
 		return Actor::generateDeleteItemCmd(inspector, items, numItems, ifActorModeShouldDeleteActorsUnder);
 	}
@@ -176,7 +183,8 @@ InspectorCmd* ALine::generateDeleteItemCmd(GameInspector* inspector,
 }
 
 InspectorCmd* ALine::generateItemSetTransformCmd(
-    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform) {
+    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform)
+{
 	if (mode == editMode_points) {
 		ASplineMovePointCmd* cmd = new ASplineMovePointCmd;
 		cmd->setup(getId(), itemIndex, initalTrasform.p, newTransform.p);
@@ -189,14 +197,16 @@ InspectorCmd* ALine::generateItemSetTransformCmd(
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ASplineMovePointCmd::setup(ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition) {
+void ASplineMovePointCmd::setup(ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition)
+{
 	m_actorid = actorid;
 	m_pointIndex = pointIndex;
 	m_originalPosition = originalPosition;
 	m_newPosition = newPosition;
 }
 
-void ASplineMovePointCmd::apply(GameInspector* inspector) {
+void ASplineMovePointCmd::apply(GameInspector* inspector)
+{
 	Actor* const actor = inspector->m_world->getActorById(m_actorid);
 
 	if (actor && actor->getType() == sgeTypeId(ALine)) {
@@ -205,29 +215,35 @@ void ASplineMovePointCmd::apply(GameInspector* inspector) {
 		if (m_pointIndex < spline->points.size()) {
 			spline->points[m_pointIndex] = m_newPosition;
 			spline->makeDirtyExternal();
-		} else {
+		}
+		else {
 			sgeAssert(false); // Should never happen.
 		}
-	} else {
+	}
+	else {
 		sgeAssert(false); // Should never happen.
 	}
 }
 
-void ASplineMovePointCmd::redo(GameInspector* inspector) {
+void ASplineMovePointCmd::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void ASplineMovePointCmd::undo(GameInspector* inspector) {
+void ASplineMovePointCmd::undo(GameInspector* inspector)
+{
 	ALine* const spline = inspector->m_world->getActor<ALine>(m_actorid);
 
 	if (spline) {
 		if (m_pointIndex < spline->points.size()) {
 			spline->points[m_pointIndex] = m_originalPosition;
 			spline->makeDirtyExternal();
-		} else {
+		}
+		else {
 			sgeAssert(false); // Should never happen.
 		}
-	} else {
+	}
+	else {
 		sgeAssert(false); // Should never happen.
 	}
 }
@@ -235,7 +251,8 @@ void ASplineMovePointCmd::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ASplineAddPoints::setup(ALine* const spline, std::vector<int> pointsToTessalateBetween) {
+void ASplineAddPoints::setup(ALine* const spline, std::vector<int> pointsToTessalateBetween)
+{
 	sgeAssert(spline);
 
 	m_actorid = spline->getId();
@@ -245,11 +262,13 @@ void ASplineAddPoints::setup(ALine* const spline, std::vector<int> pointsToTessa
 	std::sort(m_pointsToTessalateBetween.begin(), m_pointsToTessalateBetween.end());
 }
 
-void ASplineAddPoints::apply(GameInspector* inspector) {
+void ASplineAddPoints::apply(GameInspector* inspector)
+{
 	ALine* const spline = inspector->m_world->getActor<ALine>(m_actorid);
 	if (spline == nullptr) {
 		return;
-	} else {
+	}
+	else {
 		false;
 	}
 
@@ -269,11 +288,13 @@ void ASplineAddPoints::apply(GameInspector* inspector) {
 	spline->onMemberChanged();
 }
 
-void ASplineAddPoints::redo(GameInspector* inspector) {
+void ASplineAddPoints::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void ASplineAddPoints::undo(GameInspector* inspector) {
+void ASplineAddPoints::undo(GameInspector* inspector)
+{
 	ALine* const spline = inspector->m_world->getActor<ALine>(m_actorid);
 	if (spline) {
 		spline->points = m_originalSplinePoints;
@@ -284,8 +305,10 @@ void ASplineAddPoints::undo(GameInspector* inspector) {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ASplineDeletePoints::setup(ALine* const spline, std::vector<int> indicesToDelete) {
-	if_checked(spline) {
+void ASplineDeletePoints::setup(ALine* const spline, std::vector<int> indicesToDelete)
+{
+	if_checked(spline)
+	{
 		m_indicesToDelete = std::move(indicesToDelete);
 		m_actorid = spline->getId();
 		std::sort(m_indicesToDelete.begin(), m_indicesToDelete.end(), [](int a, int b) { return a > b; });
@@ -293,9 +316,11 @@ void ASplineDeletePoints::setup(ALine* const spline, std::vector<int> indicesToD
 	}
 }
 
-void ASplineDeletePoints::apply(GameInspector* inspector) {
+void ASplineDeletePoints::apply(GameInspector* inspector)
+{
 	ALine* const spline = inspector->m_world->getActor<ALine>(m_actorid);
-	if_checked(spline) {
+	if_checked(spline)
+	{
 		// CAUTION: Assumes that indices are sorted big to small
 		for (int const idxToDel : m_indicesToDelete) {
 			if_checked(idxToDel < spline->points.size()) { spline->points.erase(spline->points.begin() + idxToDel); }
@@ -307,11 +332,13 @@ void ASplineDeletePoints::apply(GameInspector* inspector) {
 
 #define if_asserted(expr) if (const bool v = (expr), sgeAssert(v), v)
 
-void ASplineDeletePoints::redo(GameInspector* inspector) {
+void ASplineDeletePoints::redo(GameInspector* inspector)
+{
 	apply(inspector);
 }
 
-void ASplineDeletePoints::undo(GameInspector* inspector) {
+void ASplineDeletePoints::undo(GameInspector* inspector)
+{
 	ALine* const spline = inspector->m_world->getActor<ALine>(m_actorid);
 	if_checked(spline) { spline->points = m_originalSplinePoints; }
 

@@ -40,7 +40,8 @@ PathLengthFollow::State PathLengthFollow::compute(const float pathLength,
                                                   GameWorld* const world,
                                                   const Settings& settings,
                                                   const State& prevState,
-                                                  const int recursionDepth) {
+                                                  const int recursionDepth)
+{
 	const int kMaxRecursions = 3;
 
 	State result = prevState;
@@ -55,7 +56,8 @@ PathLengthFollow::State PathLengthFollow::compute(const float pathLength,
 		if (result.timeLeftToRest < 0.f) {
 			time = maxOf(-result.timeLeftToRest, 0.f);
 			result.timeLeftToRest = 0.f;
-		} else {
+		}
+		else {
 			isResting = true;
 			time = 0.f;
 		}
@@ -159,7 +161,8 @@ ReflBlock() {
 }
 // clang-format on
 
-Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const world, const Settings& settings, const State& prevState) {
+Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const world, const Settings& settings, const State& prevState)
+{
 	TraitPath3D* const path = getTrait<TraitPath3D>(world->getActorById(settings.pathId));
 
 	if (path == nullptr || path->isEmpty()) {
@@ -183,7 +186,8 @@ Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const
 	if (path->evaluateAtDistance(&resultState.ptWs, nullptr, resultState.evalDistanceAlongPath)) {
 		mat4f const logicTransformMtx = path->getActor()->getTransformMtx();
 		resultState.ptWs = mat_mul_pos(logicTransformMtx, resultState.ptWs);
-	} else {
+	}
+	else {
 		return NullOptional();
 	}
 
@@ -191,7 +195,8 @@ Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const
 }
 
 
-float computePathLength(const std::vector<vec3f>& path) {
+float computePathLength(const std::vector<vec3f>& path)
+{
 	float pathLength = 0.f;
 	for (int t = 1; t < int(path.size()); ++t) {
 		pathLength += distance(path[t], path[t - 1]);
@@ -200,13 +205,15 @@ float computePathLength(const std::vector<vec3f>& path) {
 	return pathLength;
 }
 
-vec3f samplePathLazy(const std::vector<vec3f>& path, float distance) {
+vec3f samplePathLazy(const std::vector<vec3f>& path, float distance)
+{
 	for (int t = 1; t < int(path.size()); ++t) {
 		float segmentLen = path[t].distance(path[t - 1]);
 
 		if (distance > segmentLen) {
 			distance -= segmentLen;
-		} else {
+		}
+		else {
 			float k = distance / segmentLen;
 			return lerp(path[t - 1], path[t], k);
 		}

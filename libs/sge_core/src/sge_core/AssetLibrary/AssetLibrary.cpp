@@ -2,8 +2,8 @@
 
 #include "sge_core/typelib/typeLib.h"
 #include "sge_log/Log.h"
-#include "sge_utils/sge_utils.h"
 #include "sge_utils/io/FileStream.h"
+#include "sge_utils/sge_utils.h"
 #include "sge_utils/text/Path.h"
 #include "sge_utils/text/format.h"
 #include "sge_utils/time/Timer.h"
@@ -22,7 +22,8 @@
 
 namespace sge {
 
-const char* assetIface_getName(const AssetIfaceType type) {
+const char* assetIface_getName(const AssetIfaceType type)
+{
 	switch (type) {
 		case assetIface_model3d:
 			return "3D Model";
@@ -42,7 +43,8 @@ const char* assetIface_getName(const AssetIfaceType type) {
 	}
 }
 
-AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool includeExternalExtensions) {
+AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool includeExternalExtensions)
+{
 	if (ext == nullptr) {
 		return assetIface_unknown;
 	}
@@ -95,17 +97,20 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 	return assetIface_unknown;
 }
 
-bool AssetLibrary::hasAsset(const std::string& path) const {
+bool AssetLibrary::hasAsset(const std::string& path) const
+{
 	auto finditr = m_allAssets.find(path);
 	const bool result = finditr != m_allAssets.end();
 	return result;
 }
 
-const std::map<std::string, AssetPtr>& AssetLibrary::getAllAssets() const {
+const std::map<std::string, AssetPtr>& AssetLibrary::getAllAssets() const
+{
 	return m_allAssets;
 }
 
-void AssetLibrary::scanForAvailableAssets(const char* const path) {
+void AssetLibrary::scanForAvailableAssets(const char* const path)
+{
 	using namespace std;
 
 	m_gameAssetsDir = absoluteOf(path);
@@ -135,7 +140,8 @@ void AssetLibrary::scanForAvailableAssets(const char* const path) {
 	}
 }
 
-AssetPtr AssetLibrary::newAsset(std::string assetPath, AssetIfaceType type) {
+AssetPtr AssetLibrary::newAsset(std::string assetPath, AssetIfaceType type)
+{
 	AssetPtr newlyLoadedAsset;
 
 	switch (type) {
@@ -171,7 +177,8 @@ AssetPtr AssetLibrary::newAsset(std::string assetPath, AssetIfaceType type) {
 	return newlyLoadedAsset;
 }
 
-std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const {
+std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const
+{
 	if (pathRaw == nullptr || pathRaw[0] == '\0') {
 		return std::string();
 	}
@@ -195,7 +202,8 @@ std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const 
 	return std::move(pathToAsset);
 }
 
-AssetPtr AssetLibrary::getAssetFromFile(const char* path, const char* localDirectory, bool loadIfMissing) {
+AssetPtr AssetLibrary::getAssetFromFile(const char* path, const char* localDirectory, bool loadIfMissing)
+{
 	if (path == nullptr || path[0] == '\0') {
 		return nullptr;
 	}
@@ -236,7 +244,8 @@ AssetPtr AssetLibrary::getAssetFromFile(const char* path, const char* localDirec
 			AssetPtr newAssetToMarkExisting = newAsset(pathToAsset.c_str(), assetType);
 			m_allAssets[pathToAsset] = newAssetToMarkExisting;
 			return newAssetToMarkExisting;
-		} else {
+		}
+		else {
 			// The asset is already allocated but not loaded.
 			// The user doesn't want us to load it, so just return it.
 			return itrFindAssetByPath->second;
@@ -258,7 +267,8 @@ AssetPtr AssetLibrary::getAssetFromFile(const char* path, const char* localDirec
 	return assetToModify;
 }
 
-bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify) {
+bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify)
+{
 	if (!assetToModify) {
 		sgeAssert(false);
 		return false;
@@ -292,7 +302,8 @@ bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify) {
 	return true;
 }
 
-SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType type) {
+SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType type)
+{
 	switch (type) {
 		case sge::assetIface_unknown:
 			return true;
@@ -323,11 +334,13 @@ SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType t
 	return false;
 }
 
-SGE_CORE_API bool isAssetSupportingInteface(const AssetPtr& asset, AssetIfaceType type) {
+SGE_CORE_API bool isAssetSupportingInteface(const AssetPtr& asset, AssetIfaceType type)
+{
 	return asset && isAssetSupportingInteface(*asset.get(), type);
 }
 
-SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetIfaceType type) {
+SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetIfaceType type)
+{
 	if (isAssetLoaded(asset) == false) {
 		return false;
 	}
@@ -362,7 +375,8 @@ SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetIfaceType type) {
 }
 
 /// Returns true if the specified asset is loaded and it supports the specified interface.
-bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type) {
+bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type)
+{
 	if (isAssetLoaded(asset) == false) {
 		return false;
 	}

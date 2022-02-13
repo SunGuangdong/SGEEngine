@@ -36,7 +36,8 @@ ReflBlock()
 //---------------------------------------------------------------
 //
 //---------------------------------------------------------------
-void CameraTraitCamera::update(const GameUpdateSets& UNUSED(updateSets)) {
+void CameraTraitCamera::update(const GameUpdateSets& UNUSED(updateSets))
+{
 	GameWorld* const world = getWorld();
 
 	const CameraProjectionSettings& projSets = world->userProjectionSettings;
@@ -50,21 +51,25 @@ void CameraTraitCamera::update(const GameUpdateSets& UNUSED(updateSets)) {
 //---------------------------------------------------------------
 //
 //---------------------------------------------------------------
-ACamera::ACamera() {
+ACamera::ACamera()
+{
 	registerTrait(m_traitViewportIcon);
 	m_traitViewportIcon.setTexture("assets/editor/textures/icons/obj/ACamera.png", true);
 }
 
-void ACamera::create() {
+void ACamera::create()
+{
 	registerTrait(m_traitCamera);
 }
 
-Box3f ACamera::getBBoxOS() const {
+Box3f ACamera::getBBoxOS() const
+{
 	return Box3f::getFromHalfDiagonal(vec3f(1.f, 1.f, 1.f));
 }
 
 
-void ACamera::update(const GameUpdateSets& updateSets) {
+void ACamera::update(const GameUpdateSets& updateSets)
+{
 	m_traitCamera.update(updateSets);
 }
 

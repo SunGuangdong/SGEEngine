@@ -5,8 +5,8 @@
 #include "sge_core/model/Model.h"
 #include "sge_core/shaders/LightDesc.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/math/mat4f.h"
 #include "sge_utils/io/FileStream.h"
+#include "sge_utils/math/mat4f.h"
 
 // Caution:
 // this include is an exception do not include anything else like it.
@@ -22,7 +22,8 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
                                            const ShadowMapBuildInfo& shadowMapBuildInfo,
                                            const Geometry& geometry,
                                            const Texture* diffuseTexForAlphaMask,
-                                           const bool forceNoCulling) {
+                                           const bool forceNoCulling)
+{
 	enum {
 		OPT_LightType,
 		OPT_HasVertexSkinning,
@@ -65,8 +66,8 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		    {uUseDiffuseTexForAlphaMasking, "uUseDiffuseTexForAlphaMasking", ShaderType::PixelShader}};
 
 		SGEDevice* const sgedev = rdest.getDevice();
-		shadingPermutFWDBuildShadowMaps->createFromFile(sgedev, "core_shaders/FWDDefault_buildShadowMaps.hlsl", "shader_cache/FWDBuildShadowMaps.shadercache", compileTimeOptions,
-		                                                uniformsToCache);
+		shadingPermutFWDBuildShadowMaps->createFromFile(sgedev, "core_shaders/FWDDefault_buildShadowMaps.hlsl",
+		                                                "shader_cache/FWDBuildShadowMaps.shadercache", compileTimeOptions, uniformsToCache);
 	}
 
 	const int optHasVertexSkinning = (geometry.hasVertexSkinning()) ? kHasVertexSkinning_Yes : kHasVertexSkinning_No;
@@ -117,7 +118,8 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 	RasterizerState* rasterState = nullptr;
 	if (forceNoCulling) {
 		rasterState = getCore()->getGraphicsResources().RS_noCulling;
-	} else {
+	}
+	else {
 		// TODO: Add a way to specify in the geometry to use the back faces for geometries.
 		// This would remove the shadow acne for those gemetries without needed any depth bias.
 		bool flipCulling = determinant(world) > 0.f;
@@ -129,7 +131,8 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 
 	if (geometry.ibFmt != UniformType::Unknown) {
 		stateGroup.setIB(geometry.indexBuffer, geometry.ibFmt, geometry.ibByteOffset);
-	} else {
+	}
+	else {
 		stateGroup.setIB(nullptr, UniformType::Unknown, 0);
 	}
 
@@ -139,7 +142,8 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 
 	if (geometry.ibFmt != UniformType::Unknown) {
 		dc.drawIndexed(geometry.numElements, 0, 0);
-	} else {
+	}
+	else {
 		dc.draw(geometry.numElements, 0);
 	}
 

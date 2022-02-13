@@ -11,7 +11,9 @@ struct ContentParsingSettings {
 
 	ContentParsingSettings(const std::string& absoluteInputDir, const std::string& absoluteOutputDir)
 	    : absoluteInputDir(absoluteInputDir)
-	    , absoluteOutputDir(absoluteOutputDir) {}
+	    , absoluteOutputDir(absoluteOutputDir)
+	{
+	}
 
 	std::string absoluteInputDir;
 	std::string absoluteOutputDir;
@@ -32,7 +34,9 @@ struct NoneAssetRelocationPolicy final : public IAssetRelocationPolicy {
 
 struct RelativeAssetRelocationPolicy final : public IAssetRelocationPolicy {
 	RelativeAssetRelocationPolicy(const ContentParsingSettings& contentParsingSets)
-	    : m_contentParsingSets(contentParsingSets) {}
+	    : m_contentParsingSets(contentParsingSets)
+	{
+	}
 
 	std::string whatWillBeTheAssetNameOf(const std::string& askerDir, const char* path) final;
 

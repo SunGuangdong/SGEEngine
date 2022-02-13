@@ -22,13 +22,16 @@ struct transf3d {
 	explicit transf3d(const vec3f& p, const quatf& r = quatf::getIdentity(), const vec3f& s = vec3f(1.f))
 	    : p(p)
 	    , r(r)
-	    , s(s) {}
+	    , s(s)
+	{
+	}
 
 	static transf3d getIdentity() { return transf3d(vec3f(0.f), quatf::getIdentity(), vec3f(1.f)); }
 
 	static transf3d fromMatrixMultWithScaling(const mat4f& AMtx, const mat4f& BMtx, const vec3f& targetScaling);
 
-	void set(const vec3f& p_arg, const quatf& r_arg, const vec3f& s_arg) {
+	void set(const vec3f& p_arg, const quatf& r_arg, const vec3f& s_arg)
+	{
 		p = p_arg;
 		r = r_arg;
 		s = s_arg;
@@ -57,7 +60,8 @@ struct transf3d {
 transf3d operator*(const transf3d& A, const transf3d& B);
 
 template <>
-inline transf3d lerp(const transf3d& a, const transf3d& b, const float t) {
+inline transf3d lerp(const transf3d& a, const transf3d& b, const float t)
+{
 	transf3d result;
 	result.s = lerp(a.s, b.s, t);
 	result.r = slerp(a.r, b.r, t);

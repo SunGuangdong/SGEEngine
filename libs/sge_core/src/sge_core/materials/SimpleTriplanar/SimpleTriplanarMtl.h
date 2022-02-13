@@ -3,8 +3,8 @@
 #include "sge_core/AssetLibrary/IAsset.h"
 #include "sge_core/materials/IMaterial.h"
 #include "sge_core/sgecore_api.h"
-#include "sge_utils/math/mat4f.h"
 #include "sge_utils/containers/Optional.h"
+#include "sge_utils/math/mat4f.h"
 
 namespace sge {
 
@@ -13,7 +13,8 @@ struct AssetIface_Texture2D;
 
 struct SGE_CORE_API SimpleTriplanarMtlData : public IMaterialData {
 	SimpleTriplanarMtlData()
-	    : IMaterialData(1002) {
+	    : IMaterialData(1002)
+	{
 	}
 
 	mat4f uvwTransform = mat4f::getIdentity();

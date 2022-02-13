@@ -161,10 +161,7 @@ struct SGE_ENGINE_API ParticleGroupState {
 		float m_timeSpendAlive = 0.f;
 		float m_fSpriteIndex = 0.f; // The sprites are used for rendering this points to the sub-image being used for visualization.
 
-		bool isDead() const
-		{
-			return m_timeSpendAlive >= m_maxLife;
-		}
+		bool isDead() const { return m_timeSpendAlive >= m_maxLife; }
 	};
 
 	// Sprite visulaization mode
@@ -176,10 +173,7 @@ struct SGE_ENGINE_API ParticleGroupState {
 		DefaultPBRMtlData material;
 	};
 
-	mat4f getParticlesToWorldMtx() const
-	{
-		return m_isInWorldSpace ? mat4f::getIdentity() : m_n2w;
-	}
+	mat4f getParticlesToWorldMtx() const { return m_isInWorldSpace ? mat4f::getIdentity() : m_n2w; }
 
   private:
 	Box3f m_bboxFromLastUpdate;
@@ -212,16 +206,10 @@ struct SGE_ENGINE_API ParticleGroupState {
 	/// @param camera the camera to be used to billboard the particles.
 	SpriteRendData* computeSpriteRenderData(SGEContext& sgecon, const ParticleGroupDesc& pdesc, const ICamera& camera);
 
-	const std::vector<ParticleState>& getParticles() const
-	{
-		return m_particles;
-	}
+	const std::vector<ParticleState>& getParticles() const { return m_particles; }
 
 	/// Returns the bounding box in the space they are being simulated (world or node).
-	Box3f getBBox() const
-	{
-		return m_bboxFromLastUpdate;
-	}
+	Box3f getBBox() const { return m_bboxFromLastUpdate; }
 };
 
 //--------------------------------------------------------------
@@ -235,10 +223,7 @@ struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 	void update(const GameUpdateSets& u);
 
 	/// Clear the particles simulation state.
-	void clearParticleState()
-	{
-		m_pgroupState.clear();
-	}
+	void clearParticleState() { m_pgroupState.clear(); }
 
 	Box3f getBBoxOS() const;
 
@@ -282,23 +267,15 @@ struct SGE_ENGINE_API TraitParticlesProgrammable : public Trait {
 		std::vector<ParticleData> allParticles;
 		AssetPtr spriteTexture;
 		vec2i spriteFramsCount = vec2i(1); /// The number of sub-images in X and Y direction.
-		Box3f bbox;                      /// The bounding box of the particles in world or in object space depending on @isInWorldSpace.
+		Box3f bbox;                        /// The bounding box of the particles in world or in object space depending on @isInWorldSpace.
 		bool needsZAlphaSorting = false;
 	};
 
 	void getRenderItems(std::vector<TraitParticlesProgrammableRenderItem>& renderItems);
 
-	virtual int getNumPGroups() const
-	{
-		return 0;
-	}
-	virtual ParticleGroup* getPGroup(const int UNUSED(idx))
-	{
-		return nullptr;
-	}
-	virtual void update(const GameUpdateSets& UNUSED(u))
-	{
-	}
+	virtual int getNumPGroups() const { return 0; }
+	virtual ParticleGroup* getPGroup(const int UNUSED(idx)) { return nullptr; }
+	virtual void update(const GameUpdateSets& UNUSED(u)) {}
 };
 
 struct SGE_ENGINE_API ParticleRenderDataGen {

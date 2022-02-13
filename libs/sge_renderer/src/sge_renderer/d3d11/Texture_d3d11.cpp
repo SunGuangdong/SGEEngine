@@ -7,7 +7,8 @@ namespace sge {
 //---------------------------------------------------------------
 // Texture
 //---------------------------------------------------------------
-bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc samplerDesc) {
+bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc samplerDesc)
+{
 	destroy();
 
 	ID3D11Device* const d3ddev = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice();
@@ -103,7 +104,8 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 
 		// Generate RTV,SRV,DSV its
 		sgeAssert(false);
-	} else if (desc.textureType == UniformType::Texture2D) {
+	}
+	else if (desc.textureType == UniformType::Texture2D) {
 		D3D11_TEXTURE2D_DESC d3dDesc;
 		const auto& tex2D = desc.texture2D;
 
@@ -162,7 +164,8 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 		D3D11_GetSRV();
 		D3D11_GetRTV(TargetDesc::FromTex2D());
 		D3D11_GetDSV(TargetDesc::FromTex2D());
-	} else if (desc.textureType == UniformType::TextureCube) {
+	}
+	else if (desc.textureType == UniformType::TextureCube) {
 		// In D3D11 cube textures are nothing more but an array of 2D texture with
 		// arraySize multiple of 6.
 		D3D11_TEXTURE2D_DESC d3dDesc;
@@ -197,7 +200,8 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 
 		// Generate RTV,SRV,DSV that PROBABLY will be needed
 		D3D11_GetSRV();
-	} else if (desc.textureType == UniformType::Texture3D) {
+	}
+	else if (desc.textureType == UniformType::Texture3D) {
 		D3D11_TEXTURE3D_DESC d3dDesc;
 		const auto& tex3D = desc.texture3D;
 
@@ -223,7 +227,8 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 
 		// Generate RTV,SRV,DSV its
 		sgeAssert(false);
-	} else {
+	}
+	else {
 		//[TODO]not implemented texture type
 		sgeAssert(false);
 	}
@@ -240,7 +245,8 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 	return true;
 }
 //---------------------------------------------------------
-ID3D11ShaderResourceView* TextureD3D11::D3D11_GetSRV() {
+ID3D11ShaderResourceView* TextureD3D11::D3D11_GetSRV()
+{
 	if (!isValid()) {
 		return nullptr;
 	}
@@ -275,22 +281,26 @@ ID3D11ShaderResourceView* TextureD3D11::D3D11_GetSRV() {
 				srvIfDepthResource.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 				srvIfDepthResource.Texture2D.MostDetailedMip = 0;
 				srvIfDepthResource.Texture2D.MipLevels = -1;
-			} else {
+			}
+			else {
 				srvIfDepthResource.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
 				sgeAssert(false && "Not Implemented");
 			}
-		} else if (m_desc.textureType == UniformType::TextureCube) {
+		}
+		else if (m_desc.textureType == UniformType::TextureCube) {
 			sgeAssert(m_desc.textureCube.arraySize == 1);
 			srvIfDepthResource.Format = srv;
 			if (m_desc.textureCube.numSamples == 1) {
 				srvIfDepthResource.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
 				srvIfDepthResource.TextureCube.MostDetailedMip = 0;
 				srvIfDepthResource.TextureCube.MipLevels = -1;
-			} else {
+			}
+			else {
 				srvIfDepthResource.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
 				sgeAssert(false && "Not Implemented");
 			}
-		} else {
+		}
+		else {
 			sgeAssert(false);
 		}
 
@@ -308,7 +318,8 @@ ID3D11ShaderResourceView* TextureD3D11::D3D11_GetSRV() {
 	return m_srv;
 }
 
-ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc) {
+ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc)
+{
 	if (!isValid()) {
 		return nullptr;
 	}
@@ -344,7 +355,8 @@ ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc)
 		descRT.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE1DARRAY;
 		descRT.Texture1DArray.ArraySize = targetDesc.texture1D.arrayIdx;
 		descRT.Texture1DArray.MipSlice = targetDesc.texture1D.mipLevel;
-	} else if (targetDesc.baseTextureType == UniformType::Texture2D) {
+	}
+	else if (targetDesc.baseTextureType == UniformType::Texture2D) {
 		descRT.ViewDimension =
 		    (m_desc.texture2D.numSamples == 1) ? D3D11_RTV_DIMENSION_TEXTURE2DARRAY : D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
 
@@ -352,11 +364,13 @@ ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc)
 			descRT.Texture2DArray.ArraySize = 1;
 			descRT.Texture2DArray.FirstArraySlice = targetDesc.texture2D.arrayIdx;
 			descRT.Texture2DArray.MipSlice = targetDesc.texture2D.mipLevel;
-		} else if (viewDimension == D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY) {
+		}
+		else if (viewDimension == D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY) {
 			descRT.Texture2DMSArray.ArraySize = 1;
 			descRT.Texture2DMSArray.FirstArraySlice = targetDesc.texture2D.arrayIdx;
 		}
-	} else if (targetDesc.baseTextureType == UniformType::TextureCube) {
+	}
+	else if (targetDesc.baseTextureType == UniformType::TextureCube) {
 		descRT.ViewDimension =
 		    (m_desc.texture2D.numSamples == 1) ? D3D11_RTV_DIMENSION_TEXTURE2DARRAY : D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
 
@@ -366,11 +380,13 @@ ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc)
 			descRT.Texture2DArray.ArraySize = 1;
 			descRT.Texture2DArray.FirstArraySlice = faceArrayIdx;
 			descRT.Texture2DArray.MipSlice = targetDesc.textureCube.mipLevel;
-		} else if (viewDimension == D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY) {
+		}
+		else if (viewDimension == D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY) {
 			descRT.Texture2DMSArray.ArraySize = 1;
 			descRT.Texture2DMSArray.FirstArraySlice = faceArrayIdx;
 		}
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 
@@ -386,7 +402,8 @@ ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc)
 	return rtv;
 }
 
-ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc) {
+ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc)
+{
 	if (!isValid()) {
 		return nullptr;
 	}
@@ -420,7 +437,8 @@ ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc)
 		descDS.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE1DARRAY;
 		descDS.Texture1DArray.ArraySize = targetDesc.texture1D.arrayIdx;
 		descDS.Texture1DArray.MipSlice = targetDesc.texture1D.mipLevel;
-	} else if (targetDesc.baseTextureType == UniformType::Texture2D) {
+	}
+	else if (targetDesc.baseTextureType == UniformType::Texture2D) {
 		descDS.ViewDimension =
 		    (m_desc.texture2D.numSamples == 1) ? D3D11_DSV_DIMENSION_TEXTURE2DARRAY : D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
 
@@ -428,11 +446,13 @@ ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc)
 			descDS.Texture2DArray.ArraySize = 1;
 			descDS.Texture2DArray.FirstArraySlice = targetDesc.texture2D.arrayIdx;
 			descDS.Texture2DArray.MipSlice = targetDesc.texture2D.mipLevel;
-		} else if (viewDimension == D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY) {
+		}
+		else if (viewDimension == D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY) {
 			descDS.Texture2DMSArray.ArraySize = 1;
 			descDS.Texture2DMSArray.FirstArraySlice = targetDesc.texture2D.arrayIdx;
 		}
-	} else if (targetDesc.baseTextureType == UniformType::TextureCube) {
+	}
+	else if (targetDesc.baseTextureType == UniformType::TextureCube) {
 		descDS.ViewDimension =
 		    (m_desc.texture2D.numSamples == 1) ? D3D11_DSV_DIMENSION_TEXTURE2DARRAY : D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
 
@@ -442,11 +462,13 @@ ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc)
 			descDS.Texture2DArray.ArraySize = 1;
 			descDS.Texture2DArray.FirstArraySlice = faceArrayIdx;
 			descDS.Texture2DArray.MipSlice = targetDesc.textureCube.mipLevel;
-		} else if (viewDimension == D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY) {
+		}
+		else if (viewDimension == D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY) {
 			descDS.Texture2DMSArray.ArraySize = 1;
 			descDS.Texture2DMSArray.FirstArraySlice = faceArrayIdx;
 		}
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 
@@ -463,7 +485,8 @@ ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc)
 }
 
 //---------------------------------------------------------
-void TextureD3D11::destroy() {
+void TextureD3D11::destroy()
+{
 	// Unbind the buffer form the context state cache.
 	D3D11ContextStateCache* const stateCache = getDevice<SGEDeviceD3D11>()->D3D11_GetContextStateCache();
 
@@ -492,14 +515,14 @@ void TextureD3D11::destroy() {
 }
 
 //---------------------------------------------------------
-bool TextureD3D11::isValid() const {
+bool TextureD3D11::isValid() const
+{
 	return m_dx11Texture != nullptr;
 }
 
 //---------------------------------------------------------
-bool TextureD3D11::D3D11_WrapOverD3D11TextureResource(SGEDevice* UNUSED(pDevice),
-                                                      ID3D11Texture2D* d3d11Texture2D,
-                                                      const TextureDesc& desc) {
+bool TextureD3D11::D3D11_WrapOverD3D11TextureResource(SGEDevice* UNUSED(pDevice), ID3D11Texture2D* d3d11Texture2D, const TextureDesc& desc)
+{
 	// clear the current state
 	destroy();
 
@@ -511,7 +534,8 @@ bool TextureD3D11::D3D11_WrapOverD3D11TextureResource(SGEDevice* UNUSED(pDevice)
 	// render target view
 	if (desc.textureType == UniformType::Texture2D) {
 		D3D11_GetRTV(TargetDesc::FromTex2D());
-	} else {
+	}
+	else {
 		// [TODO]
 		sgeAssert(false);
 	}
@@ -519,7 +543,8 @@ bool TextureD3D11::D3D11_WrapOverD3D11TextureResource(SGEDevice* UNUSED(pDevice)
 	// depth stencil view
 	if (desc.textureType == UniformType::Texture2D) {
 		D3D11_GetDSV(TargetDesc::FromTex2D());
-	} else {
+	}
+	else {
 		// [TODO]
 		sgeAssert(false);
 	}
@@ -528,7 +553,8 @@ bool TextureD3D11::D3D11_WrapOverD3D11TextureResource(SGEDevice* UNUSED(pDevice)
 	return true;
 }
 
-ID3D11SamplerState* TextureD3D11::D3D11_GetSamplerState() {
+ID3D11SamplerState* TextureD3D11::D3D11_GetSamplerState()
+{
 	return (m_samplerState.IsResourceValid()) ? m_samplerState.as<SamplerStateD3D11>()->D3D11_GetResource() : NULL;
 }
 } // namespace sge

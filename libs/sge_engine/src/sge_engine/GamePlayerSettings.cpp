@@ -1,11 +1,12 @@
 #include "GamePlayerSettings.h"
 #include "sge_utils/io/FileStream.h"
-#include "sge_utils/text/Path.h"
 #include "sge_utils/json/json.h"
+#include "sge_utils/text/Path.h"
 
 namespace sge {
 
-bool GamePlayerSettings::loadFromJsonFile(const char* filename) {
+bool GamePlayerSettings::loadFromJsonFile(const char* filename)
+{
 	*this = GamePlayerSettings();
 
 	FileReadStream frs;
@@ -46,7 +47,8 @@ bool GamePlayerSettings::loadFromJsonFile(const char* filename) {
 	return true;
 }
 
-bool GamePlayerSettings::saveToJsonFile(const char* filename) const {
+bool GamePlayerSettings::saveToJsonFile(const char* filename) const
+{
 	if (filename == nullptr) {
 		return false;
 	}

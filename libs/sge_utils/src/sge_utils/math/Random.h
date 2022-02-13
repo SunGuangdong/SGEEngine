@@ -11,7 +11,8 @@ struct Random {
 
 	void setSeed(unsigned int seed) { m_generator.seed(seed); }
 
-	float next01() const {
+	float next01() const
+	{
 		std::uniform_real_distribution<float> distribution(0.f, 1.f);
 
 		// That is why the m_generator is mutable.
@@ -21,14 +22,16 @@ struct Random {
 	}
 
 	/// Returns a random number in the [-1;1] range.
-	float nextSnorm() const {
+	float nextSnorm() const
+	{
 		std::uniform_real_distribution<float> distribution(-1.f, 1.f);
 		const float rnd = distribution(m_generator);
 		return rnd;
 	}
 
 	/// Returns a random non-negative integer.
-	int nextInt() const {
+	int nextInt() const
+	{
 		std::uniform_int_distribution<> distribution;
 		const int rnd = distribution(m_generator);
 		return rnd;

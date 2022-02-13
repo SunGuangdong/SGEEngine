@@ -8,10 +8,10 @@
 
 namespace sge {
 
-//struct DragDropPayload {
+// struct DragDropPayload {
 //	DragDropPayload() = default;
 //	virtual ~DragDropPayload() = default;
-//};
+// };
 
 struct DragDropPayloadActor {
 	static sge::Optional<std::set<sge::ObjectId>> decode(const ImGuiPayload* payload);

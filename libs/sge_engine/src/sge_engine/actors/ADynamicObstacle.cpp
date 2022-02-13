@@ -19,14 +19,16 @@ ReflBlock() {
 }
 // clang-format on
 
-void ADynamicObstacle::create() {
+void ADynamicObstacle::create()
+{
 	m_traitModel.addModel("assets/editor/models/box.mdl");
 
 	registerTrait(m_traitRB);
 	registerTrait(m_traitModel);
 }
 
-void ADynamicObstacle::onPlayStateChanged(bool const isStartingToPlay) {
+void ADynamicObstacle::onPlayStateChanged(bool const isStartingToPlay)
+{
 	Actor::onPlayStateChanged(isStartingToPlay);
 
 	if (isStartingToPlay) {
@@ -36,11 +38,13 @@ void ADynamicObstacle::onPlayStateChanged(bool const isStartingToPlay) {
 	}
 }
 
-void ADynamicObstacle::onDuplocationComplete() {
+void ADynamicObstacle::onDuplocationComplete()
+{
 	m_traitModel.invalidateCachedAssets();
 }
 
-void ADynamicObstacle::update(const GameUpdateSets& UNUSED(u)) {
+void ADynamicObstacle::update(const GameUpdateSets& UNUSED(u))
+{
 	// Update the rigid body config if the attached model changes or if the model
 	// for rigid body has changed as these could affect the rigid body collition shape.
 	if (m_traitModel.postUpdate() || m_rbConfig.m_sourceModel.update()) {
@@ -48,7 +52,8 @@ void ADynamicObstacle::update(const GameUpdateSets& UNUSED(u)) {
 	}
 }
 
-Box3f ADynamicObstacle::getBBoxOS() const {
+Box3f ADynamicObstacle::getBBoxOS() const
+{
 	return m_traitModel.getBBoxOS();
 }
 

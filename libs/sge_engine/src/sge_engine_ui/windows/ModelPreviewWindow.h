@@ -7,8 +7,8 @@
 #include "sge_core/model/EvaluatedModel.h"
 #include "sge_core/model/ModelAnimator.h"
 #include "sge_renderer/renderer/renderer.h"
-#include "sge_utils/other/SimpleOrbitCamera.h"
 #include "sge_utils/containers/Optional.h"
+#include "sge_utils/other/SimpleOrbitCamera.h"
 
 namespace sge {
 
@@ -21,27 +21,19 @@ struct SGE_ENGINE_API ModelPreviewWidget {
 
 struct ModelPreviewWindow : public IImGuiWindow {
 	ModelPreviewWindow(std::string windowName)
-	    : m_windowName(std::move(windowName)) {
-	}
-
-	void close() override
+	    : m_windowName(std::move(windowName))
 	{
-		m_isOpened = false;
 	}
 
-	bool isClosed() override {
-		return !m_isOpened;
-	}
+	void close() override { m_isOpened = false; }
 
-	const char* getWindowName() const override {
-		return m_windowName.c_str();
-	}
+	bool isClosed() override { return !m_isOpened; }
+
+	const char* getWindowName() const override { return m_windowName.c_str(); }
 
 	void update(SGEContext* const sgecon, struct GameInspector* inspector, const InputState& is) override;
 
-	AssetPtr& getModel() {
-		return m_model;
-	}
+	AssetPtr& getModel() { return m_model; }
 
 	void setPreviewModel(AssetPtr asset);
 

@@ -8,7 +8,8 @@ namespace sge {
 //---------------------------------------------------------------
 // Texture
 //---------------------------------------------------------------
-bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc samplerDesc) {
+bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc samplerDesc)
+{
 	DumpAllGLErrors();
 
 	// Cleanup the current state
@@ -54,7 +55,8 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 					glGenerateMipmap(GL_TEXTURE_2D);
 				}
 				DumpAllGLErrors();
-			} else {
+			}
+			else {
 				sgeAssert(initalData);
 				sgeAssert(initalData[iMipLevel].data != NULL);
 				sgeAssert(initalData[iMipLevel].sliceByteSize > 0);
@@ -71,7 +73,6 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 	}
 #if !defined(__EMSCRIPTEN__)
 	else if (glTexTarget == GL_TEXTURE_2D_MULTISAMPLE) {
-
 		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_desc.texture2D.numSamples, glInternalFormat, m_desc.texture2D.width,
 		                        m_desc.texture2D.height, GL_TRUE);
 
@@ -101,7 +102,8 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 						glTexImage3D(OpenGL_CubeFaceInices[iFace], iMipLevel, glInternalFormat, width, height, iArray,
 						             0, // Border,
 						             glFormat, glType, initalData[faceInitalDataIndex].data);
-					} else if (glTexTarget == GL_TEXTURE_CUBE_MAP) {
+					}
+					else if (glTexTarget == GL_TEXTURE_CUBE_MAP) {
 						// Caution:
 						// A single cube. If you think that glTexImage3D could be used for single texture case,
 						// you are wrong as it only works on ATI/AMD cards!
@@ -114,14 +116,16 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 							                       0, // border
 							                       int(initalData[faceInitalDataIndex].sliceByteSize),
 							                       initalData[faceInitalDataIndex].data);
-						} else {
+						}
+						else {
 							const void* const initalDataForFace = (initalData != nullptr) ? initalData[faceInitalDataIndex].data : nullptr;
 
 							glTexImage2D(OpenGL_CubeFaceInices[iFace], iMipLevel, glInternalFormat, width, height,
 							             0, // Border,
 							             glFormat, glType, initalDataForFace);
 						}
-					} else {
+					}
+					else {
 						// Should never happen.
 						sgeAssert(false);
 					}
@@ -136,7 +140,8 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 			}
 #endif
 		}
-	} else {
+	}
+	else {
 		// [TODO] Unimplemented texture type.
 		sgeAssert(false);
 		destroy();
@@ -151,14 +156,16 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 	return true;
 }
 
-void TextureGL::setSamplerState(SamplerState* ss) {
+void TextureGL::setSamplerState(SamplerState* ss)
+{
 	m_samplerState = ss;
 	if (m_samplerState.HasResource()) {
 		applySamplerDesc(m_samplerState->getDesc(), true);
 	}
 }
 
-void TextureGL::applySamplerDesc(const SamplerDesc& samplerDesc, bool shouldBindAndUnBindtexture) {
+void TextureGL::applySamplerDesc(const SamplerDesc& samplerDesc, bool shouldBindAndUnBindtexture)
+{
 	if (!isValid()) {
 		return;
 	}
@@ -197,7 +204,8 @@ void TextureGL::applySamplerDesc(const SamplerDesc& samplerDesc, bool shouldBind
 			samplerFilterMin = m_desc.hasMipMaps() ? GL_NEAREST_MIPMAP_NEAREST : GL_NEAREST;
 			samplerFilterMag = GL_NEAREST;
 		}
-	} else {
+	}
+	else {
 		samplerFilterMin = GL_NEAREST;
 		samplerFilterMag = GL_NEAREST;
 	}
@@ -242,7 +250,8 @@ void TextureGL::applySamplerDesc(const SamplerDesc& samplerDesc, bool shouldBind
 	}
 }
 
-void TextureGL::destroy() {
+void TextureGL::destroy()
+{
 	GLContextStateCache* const glcon = getDevice<SGEDeviceImpl>()->GL_GetContextStateCache();
 
 	if (m_glTexture != 0) {
@@ -251,7 +260,8 @@ void TextureGL::destroy() {
 	}
 }
 
-bool TextureGL::isValid() const {
+bool TextureGL::isValid() const
+{
 	return m_glTexture != 0;
 }
 

@@ -12,7 +12,9 @@ struct vector_map {
 	struct const_iterator {
 		const_iterator(const vector_map& map, size_t idx)
 		    : map(map)
-		    , idx(idx) {}
+		    , idx(idx)
+		{
+		}
 
 		const K& key() const { return map.keys[idx]; }
 		const V& value() const { return map.values[idx]; }
@@ -20,11 +22,13 @@ struct vector_map {
 		bool operator==(const const_iterator& ref) const { return (idx == ref.idx) && (&map == &ref.map); }
 		bool operator!=(const const_iterator& ref) const { return !(*this == ref); }
 
-		const_iterator& operator++() {
+		const_iterator& operator++()
+		{
 			++idx;
 			return *this;
 		}
-		const_iterator& operator--() {
+		const_iterator& operator--()
+		{
 			--idx;
 			return *this;
 		}
@@ -38,7 +42,9 @@ struct vector_map {
 	struct iterator {
 		iterator(vector_map& map, size_t idx)
 		    : map(map)
-		    , idx(idx) {}
+		    , idx(idx)
+		{
+		}
 
 		K& key() { return map.keys[idx]; }
 		const K& key() const { return map.keys[idx]; }
@@ -48,11 +54,13 @@ struct vector_map {
 		bool operator==(const iterator& ref) const { return (idx == ref.idx) && (&map == &ref.map); }
 		bool operator!=(const iterator& ref) const { return !(*this == ref); }
 
-		iterator& operator++() {
+		iterator& operator++()
+		{
 			++idx;
 			return *this;
 		}
-		iterator& operator--() {
+		iterator& operator--()
+		{
 			--idx;
 			return *this;
 		}
@@ -72,12 +80,14 @@ struct vector_map {
 
 	size_t size() const { return keys.size(); }
 
-	void clear() {
+	void clear()
+	{
 		keys.clear();
 		values.clear();
 	}
 
-	void reserve(const size_t elementsCount) {
+	void reserve(const size_t elementsCount)
+	{
 		keys.reserve(elementsCount);
 		values.reserve(elementsCount);
 
@@ -86,7 +96,8 @@ struct vector_map {
 
 	bool empty() const { return size() == 0; }
 
-	V* find_element(const K& key) {
+	V* find_element(const K& key)
+	{
 		debug_verify();
 
 		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key) : std::find(std::begin(keys), std::end(keys), key);
@@ -101,7 +112,8 @@ struct vector_map {
 		return &values[index];
 	}
 
-	int find_element_index(const K& key) const {
+	int find_element_index(const K& key) const
+	{
 		debug_verify();
 
 		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key) : std::find(std::begin(keys), std::end(keys), key);
@@ -116,7 +128,8 @@ struct vector_map {
 		return (int)index;
 	}
 
-	const V* find_element(const K& key) const {
+	const V* find_element(const K& key) const
+	{
 		debug_verify();
 
 		if (TSorted) {
@@ -130,7 +143,8 @@ struct vector_map {
 
 			size_t const index = itr - std::begin(keys);
 			return &values[index];
-		} else {
+		}
+		else {
 			for (int t = 0; t < keys.size(); ++t) {
 				if (keys[t] == key) {
 					return &values[t];
@@ -141,7 +155,8 @@ struct vector_map {
 		}
 	}
 
-	V& operator[](const K& key) {
+	V& operator[](const K& key)
+	{
 		debug_verify();
 
 		if (TSorted) {
@@ -160,7 +175,8 @@ struct vector_map {
 			debug_verify();
 
 			return values[idx];
-		} else {
+		}
+		else {
 			V* const ptr = find_element(key);
 			if (ptr)
 				return *ptr;
@@ -176,7 +192,8 @@ struct vector_map {
 		}
 	}
 
-	void eraseAtIndex(const size_t index) {
+	void eraseAtIndex(const size_t index)
+	{
 		sgeAssert(size() > index);
 		keys.erase(keys.begin() + index);
 		values.erase(values.begin() + index);
@@ -184,7 +201,8 @@ struct vector_map {
 		debug_verify();
 	}
 
-	void eraseKey(const K& key) {
+	void eraseKey(const K& key)
+	{
 		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key) : std::find(std::begin(keys), std::end(keys), key);
 
 		bool found = TSorted ? itr != std::end(keys) && !(key < *itr) : itr != std::end(keys);
@@ -210,7 +228,8 @@ struct vector_map {
 
 	/// A set of function used to help with serialization of vector_maps.
 	void serializationSetKeys(const std::vector<K>& k) { keys = k; }
-	void serializationSetValues(const std::vector<V>& v) {
+	void serializationSetValues(const std::vector<V>& v)
+	{
 		values = v;
 		debug_verify();
 	}

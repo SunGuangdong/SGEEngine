@@ -2,15 +2,15 @@
 
 #ifdef SGE_FBX_SDK_AVAILABLE
 
-#include <fbxsdk.h>
-#include <memory>
+	#include <fbxsdk.h>
+	#include <memory>
 
-#include "ModelParseSettings.h"
-#include "sgeImportModel3DFile.h"
-#include "sge_core/AssetLibrary/AssetMaterial.h"
-#include "sge_core/model/Model.h"
-#include "sge_utils/math/transform.h"
-#include "sge_utils/containers/Optional.h"
+	#include "ModelParseSettings.h"
+	#include "sgeImportModel3DFile.h"
+	#include "sge_core/AssetLibrary/AssetMaterial.h"
+	#include "sge_core/model/Model.h"
+	#include "sge_utils/containers/Optional.h"
+	#include "sge_utils/math/transform.h"
 
 namespace sge {
 

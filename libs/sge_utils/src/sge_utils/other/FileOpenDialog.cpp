@@ -1,5 +1,5 @@
 #ifdef WIN32
-// clang-format off
+    // clang-format off
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -8,7 +8,7 @@
 #include <shlobj.h>
 // clang-format on
 #else
-#include <cstdio>
+	#include <cstdio>
 #endif
 
 #include "FileOpenDialog.h"
@@ -16,7 +16,8 @@
 
 namespace sge {
 
-void DialongOk(const char* caption, const char* message) {
+void DialongOk(const char* caption, const char* message)
+{
 #ifdef WIN32
 	MessageBoxA(NULL, message, caption, MB_OK | MB_ICONQUESTION);
 #elif !defined(__EMSCRIPTEN__)
@@ -27,7 +28,8 @@ void DialongOk(const char* caption, const char* message) {
 #endif
 }
 
-bool DialogYesNo(const char* caption, const char* message) {
+bool DialogYesNo(const char* caption, const char* message)
+{
 #ifdef WIN32
 	int res = MessageBoxA(NULL, message, caption, MB_YESNO | MB_ICONQUESTION);
 	return res == IDYES;
@@ -40,7 +42,8 @@ bool DialogYesNo(const char* caption, const char* message) {
 #endif
 }
 
-std::string FileOpenDialog(const std::string& prompt, bool fileMustExists, const char* fileFilter, const char* initialDir) {
+std::string FileOpenDialog(const std::string& prompt, bool fileMustExists, const char* fileFilter, const char* initialDir)
+{
 #ifdef WIN32
 	static std::mutex mtx;
 	std::lock_guard<std::mutex> mtx_guard(mtx);
@@ -67,7 +70,8 @@ std::string FileOpenDialog(const std::string& prompt, bool fileMustExists, const
 		[[maybe_unused]] const BOOL success = GetOpenFileNameA(&ofns);
 
 		SetCurrentDirectory(currentDir);
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 
@@ -95,7 +99,8 @@ std::string FileOpenDialog(const std::string& prompt, bool fileMustExists, const
 #endif
 }
 
-std::string FileSaveDialog(const std::string& prompt, const char* fileFilter, const char* defaultExtension, const char* initialDir) {
+std::string FileSaveDialog(const std::string& prompt, const char* fileFilter, const char* defaultExtension, const char* initialDir)
+{
 #ifdef WIN32
 	static std::mutex mtx;
 	std::lock_guard<std::mutex> mtx_guard(mtx);
@@ -120,7 +125,8 @@ std::string FileSaveDialog(const std::string& prompt, const char* fileFilter, co
 		[[maybe_unused]] const BOOL success = GetSaveFileNameA(&ofns);
 
 		SetCurrentDirectoryA(currentDir);
-	} else {
+	}
+	else {
 		sgeAssert(false);
 	}
 
@@ -148,7 +154,8 @@ std::string FileSaveDialog(const std::string& prompt, const char* fileFilter, co
 #endif
 }
 
-std::string FolderOpenDialog(const char* const prompt, const std::string& initialPath) {
+std::string FolderOpenDialog(const char* const prompt, const std::string& initialPath)
+{
 #ifdef WIN32
 	CHAR resultPath[MAX_PATH];
 

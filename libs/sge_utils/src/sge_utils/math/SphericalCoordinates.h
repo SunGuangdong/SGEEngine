@@ -43,25 +43,13 @@ struct SphericalRotation {
 	{
 	}
 
-	bool operator==(SphericalRotation& ref) const
-	{
-		return fromY == ref.fromY && aroundY == ref.aroundY;
-	}
+	bool operator==(SphericalRotation& ref) const { return fromY == ref.fromY && aroundY == ref.aroundY; }
 
-	bool operator!=(SphericalRotation& ref) const
-	{
-		return !(*this == ref);
-	}
+	bool operator!=(SphericalRotation& ref) const { return !(*this == ref); }
 
-	vec3f getDirection() const
-	{
-		return fromSphericalYUp(fromY, aroundY, 1.f);
-	}
+	vec3f getDirection() const { return fromSphericalYUp(fromY, aroundY, 1.f); }
 
-	vec3f transformPt(const vec3f& pt) const
-	{
-		return quat_mul_pos(toQuaternion(), pt);
-	}
+	vec3f transformPt(const vec3f& pt) const { return quat_mul_pos(toQuaternion(), pt); }
 
 	quatf toQuaternion() const
 	{
@@ -70,15 +58,9 @@ struct SphericalRotation {
 		return q;
 	}
 
-	static SphericalRotation axis_y()
-	{
-		return SphericalRotation();
-	}
+	static SphericalRotation axis_y() { return SphericalRotation(); }
 
-	static SphericalRotation axis_neg_y()
-	{
-		return SphericalRotation(two_pi(), 0.f);
-	}
+	static SphericalRotation axis_neg_y() { return SphericalRotation(two_pi(), 0.f); }
 
 	static SphericalRotation fromDirection(const vec3f& dir)
 	{
@@ -110,21 +92,12 @@ struct SphericalCoord {
 	{
 	}
 
-	bool operator==(SphericalCoord& ref) const
-	{
-		return fromY == ref.fromY && aroundY == ref.aroundY && radius == ref.radius;
-	}
+	bool operator==(SphericalCoord& ref) const { return fromY == ref.fromY && aroundY == ref.aroundY && radius == ref.radius; }
 
-	bool operator!=(SphericalCoord& ref) const
-	{
-		return !(*this == ref);
-	}
+	bool operator!=(SphericalCoord& ref) const { return !(*this == ref); }
 
 
-	vec3f getDirection() const
-	{
-		return fromSphericalYUp(fromY, aroundY, radius);
-	}
+	vec3f getDirection() const { return fromSphericalYUp(fromY, aroundY, radius); }
 
 	vec3f transformPt(const vec3f& pt) const
 	{

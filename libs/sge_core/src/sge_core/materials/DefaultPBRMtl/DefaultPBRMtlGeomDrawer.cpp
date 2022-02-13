@@ -59,7 +59,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
                                            const ObjectLighting& lighting,
                                            const Geometry& geometry,
                                            const IMaterialData* mtlDataBase,
-                                           const InstanceDrawMods& UNUSED(instDrawMods)) {
+                                           const InstanceDrawMods& UNUSED(instDrawMods))
+{
 	const DefaultPBRMtlData& mtlData = *dynamic_cast<const DefaultPBRMtlData*>(mtlDataBase);
 
 	SGEDevice* const sgedev = rdest.getDevice();
@@ -186,7 +187,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		case DefaultPBRMtlData::diffuseColorSource_vertexColor: {
 			if (OPT_HasVertexColor_choice == kHasVertexColor_Yes) {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromVertexColor;
-			} else {
+			}
+			else {
 				pbrMtlFlags |= kPBRMtl_Flags_DiffuseFromConstantColor;
 			}
 		} break;
@@ -231,14 +233,16 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	stateGroup.setPrimitiveTopology(geometry.topology);
 	if (geometry.ibFmt != UniformType::Unknown) {
 		stateGroup.setIB(geometry.indexBuffer, geometry.ibFmt, geometry.ibByteOffset);
-	} else {
+	}
+	else {
 		stateGroup.setIB(nullptr, UniformType::Unknown, 0);
 	}
 
 	RasterizerState* rasterState = nullptr;
 	if (mtlData.disableCulling) {
 		rasterState = getCore()->getGraphicsResources().RS_noCulling;
-	} else {
+	}
+	else {
 		// We are baking a shadow map and we want to render the backfaces.
 		// *opposing to the regular rendering which uses front faces... duh).
 		// This is done to avoid the Shadow Acne artifacts caused by floating point
@@ -306,7 +310,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		ShaderLightData& shaderLight = paramsCb.lights[iLight];
 		const ShadingLightData* srcLight = lighting.ppLightData[iLight];
 
-		if_checked(srcLight && srcLight->pLightDesc) {
+		if_checked(srcLight && srcLight->pLightDesc)
+		{
 			// We assume that the light is enabled if it reached here.
 			// We don't want to make the code more complicated with redundadnt checks.
 			sgeAssert(srcLight->pLightDesc->isOn == true);
@@ -359,7 +364,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 
 	if (geometry.ibFmt != UniformType::Unknown) {
 		dc.drawIndexed(geometry.numElements, 0, 0);
-	} else {
+	}
+	else {
 		dc.draw(geometry.numElements, 0);
 	}
 

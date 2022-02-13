@@ -37,24 +37,15 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
   public:
 	AssetsWindow(std::string windowName);
 
-	void close() override
-	{
-		m_isOpened = false;
-	}
+	void close() override { m_isOpened = false; }
 
-	bool isClosed() override
-	{
-		return !m_isOpened;
-	}
+	bool isClosed() override { return !m_isOpened; }
 
 	Texture* getThumbnailForAsset(const std::string& localAssetPath);
 	Texture* getThumbnailForModel3D(const std::string& localAssetPath);
 	void update(SGEContext* const sgecon, GameInspector* inspector, const InputState& is) override;
 	void openMaterialEditWindow(std::shared_ptr<sge::AssetIface_Material> mtlIface);
-	const char* getWindowName() const override
-	{
-		return m_windowName.c_str();
-	}
+	const char* getWindowName() const override { return m_windowName.c_str(); }
 
 	//
 	void openAssetImportPopUp();

@@ -27,7 +27,8 @@ struct vector_set {
 
 	void reserve(size_t n) { m_data.reserve(n); }
 
-	int find_index_of(const K& key) const {
+	int find_index_of(const K& key) const
+	{
 		auto itr = std::lower_bound(std::begin(m_data), std::end(m_data), key);
 
 		const bool found = itr != std::end(m_data) && !(key < *itr);
@@ -41,7 +42,8 @@ struct vector_set {
 
 	int count(const K& key) const { return find_index_of(key) == -1 ? 0 : 1; }
 
-	void add(const K& key) {
+	void add(const K& key)
+	{
 		auto itr = std::lower_bound(std::begin(m_data), std::end(m_data), key);
 
 		// Check if the element already exists.
@@ -55,7 +57,8 @@ struct vector_set {
 
 	void insert(const K& key) { add(key); }
 
-	void eraseKey(const K& key) {
+	void eraseKey(const K& key)
+	{
 		auto itr = std::lower_bound(std::begin(m_data), std::end(m_data), key);
 
 		if ((itr != std::end(m_data)) && (key == *itr)) {

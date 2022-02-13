@@ -3,7 +3,8 @@
 #include "sge_core/QuickDraw.h"
 
 namespace sge {
-void GameMode::create(IGameDrawer* gameDrawer, const char* openingLevelPath) {
+void GameMode::create(IGameDrawer* gameDrawer, const char* openingLevelPath)
+{
 	if (openingLevelPath == nullptr) {
 		return;
 	}
@@ -15,14 +16,16 @@ void GameMode::create(IGameDrawer* gameDrawer, const char* openingLevelPath) {
 	m_gameDrawer->initialize(&m_sceneInstance.getWorld());
 }
 
-void GameMode::update(const InputState& is) {
+void GameMode::update(const InputState& is)
+{
 	m_timer.tick();
 	m_sceneInstance.getInspector().m_disableAutoStepping = false;
 	m_sceneInstance.getWorld().m_useEditorCamera = false;
 	m_sceneInstance.update(m_timer.diff_seconds(), is);
 }
 
-void GameMode::draw(const RenderDestination& rdest) {
+void GameMode::draw(const RenderDestination& rdest)
+{
 	GameWorld* const world = m_gameDrawer->getWorld();
 
 	// Update the view aspect ratio.

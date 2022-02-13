@@ -10,7 +10,8 @@
 
 namespace sge {
 
-int SelectionToolModeActors::getNumItems(GameInspector* inspector) {
+int SelectionToolModeActors::getNumItems(GameInspector* inspector)
+{
 	int result = 0;
 
 	// CAUTION: We realy on the same ordering in the whole SelectionToolModeActors.
@@ -21,7 +22,8 @@ int SelectionToolModeActors::getNumItems(GameInspector* inspector) {
 	return result;
 }
 
-void SelectionToolModeActors::drawItem(GameInspector* inspector, int const itemIndex, const GameDrawSets& gameDrawSets) {
+void SelectionToolModeActors::drawItem(GameInspector* inspector, int const itemIndex, const GameDrawSets& gameDrawSets)
+{
 	Actor* const actor = itemIndexToActor(inspector, itemIndex);
 	if (actor != nullptr) {
 		SelectedItemDirect sel;
@@ -36,7 +38,8 @@ void SelectionToolModeActors::setSelected(GameInspector* inspector,
                                           bool promoteToPrimaryIfAlreadySelected,
                                           bool autoSelectHierarchyUnderActorInActorMode,
                                           bool autoSelectHierarchyAboveActorInActorMode,
-                                          bool autoSelectAllRelativesInActorMode) {
+                                          bool autoSelectAllRelativesInActorMode)
+{
 	const Actor* const actor = itemIndexToActor(inspector, itemIndex);
 
 	if (actor) {
@@ -55,7 +58,8 @@ void SelectionToolModeActors::setSelected(GameInspector* inspector,
 				else
 					inspector->deselect(id);
 			}
-		} else {
+		}
+		else {
 			if (autoSelectHierarchyUnderActorInActorMode) {
 				vector_set<ObjectId> actorsUnder;
 				inspector->getWorld()->getAllChildren(actorsUnder, actor->getId());
@@ -83,7 +87,8 @@ void SelectionToolModeActors::setSelected(GameInspector* inspector,
 	}
 }
 
-Actor* SelectionToolModeActors::itemIndexToActor(GameInspector* inspector, int itemIndex) {
+Actor* SelectionToolModeActors::itemIndexToActor(GameInspector* inspector, int itemIndex)
+{
 	for (const auto& objects : inspector->m_world->playingObjects) {
 		size_t const sz = objects.second.size();
 		if (itemIndex < sz) {
@@ -101,7 +106,8 @@ Actor* SelectionToolModeActors::itemIndexToActor(GameInspector* inspector, int i
 //--------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------
-void SelectionToolModePoints::begin(GameInspector* inspector) {
+void SelectionToolModePoints::begin(GameInspector* inspector)
+{
 	items = decltype(items)();
 
 	for (const auto& objects : inspector->m_world->playingObjects)
@@ -119,15 +125,18 @@ void SelectionToolModePoints::begin(GameInspector* inspector) {
 }
 
 
-void SelectionToolModePoints::end(GameInspector* UNUSED(inspector)) {
+void SelectionToolModePoints::end(GameInspector* UNUSED(inspector))
+{
 	items = decltype(items)();
 }
 
-int SelectionToolModePoints::getNumItems(GameInspector* UNUSED(inspector)) {
+int SelectionToolModePoints::getNumItems(GameInspector* UNUSED(inspector))
+{
 	return int(items.size());
 }
 
-void SelectionToolModePoints::drawItem(GameInspector* inspector, int const itemIndex, const GameDrawSets& gameDrawSets) {
+void SelectionToolModePoints::drawItem(GameInspector* inspector, int const itemIndex, const GameDrawSets& gameDrawSets)
+{
 	SelectedItemDirect selItem = SelectedItemDirect::fromSelectedItem(items[itemIndex], *inspector->m_world);
 	if (selItem.gameObject) {
 		gameDrawSets.gameDrawer->drawItem(gameDrawSets, selItem, drawReason_selectionTool);
@@ -140,7 +149,8 @@ void SelectionToolModePoints::setSelected(GameInspector* inspector,
                                           bool promoteToPrimaryIfAlreadySelected,
                                           bool UNUSED(autoSelectHierarchyUnderActorInActorMode),
                                           bool UNUSED(autoSelectHierarchyAboveActorInActorMode),
-                                          bool UNUSED(autoSelectAllRelativesInActorMode)) {
+                                          bool UNUSED(autoSelectAllRelativesInActorMode))
+{
 	// Primary selections here are ignored.
 	(void)(promoteToPrimaryIfAlreadySelected);
 
@@ -165,11 +175,13 @@ void SelectionToolModePoints::setSelected(GameInspector* inspector,
 //--------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------
-void SelectionTool::onSetActive(GameInspector* const UNUSED(inspector)) {
+void SelectionTool::onSetActive(GameInspector* const UNUSED(inspector))
+{
 	m_isSelecting = false;
 }
 
-void SelectionTool::onUI(GameInspector* UNUSED(inspector)) {
+void SelectionTool::onUI(GameInspector* UNUSED(inspector))
+{
 	ImGui::Checkbox("Select Children", &m_autoSelectAllChildren);
 	ImGui::Checkbox("Select Parents", &m_autoSelectAllParents);
 	ImGui::Checkbox("Select All Relatives", &m_autoSelectAllRelatives);
@@ -182,10 +194,9 @@ void SelectionTool::onUI(GameInspector* UNUSED(inspector)) {
 #endif
 }
 
-InspectorToolResult SelectionTool::updateTool(GameInspector* const inspector,
-                                              bool isAllowedToTakeInput,
-                                              const InputState& is,
-                                              const GameDrawSets& drawSets) {
+InspectorToolResult
+    SelectionTool::updateTool(GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
+{
 	InspectorToolResult result;
 
 	m_lastUpdateCursorPos = is.GetCursorPos();
@@ -197,7 +208,8 @@ InspectorToolResult SelectionTool::updateTool(GameInspector* const inspector,
 
 	if (is.isCursorRelative()) {
 		m_isSelecting = false;
-	} else {
+	}
+	else {
 		if (is.IsKeyPressed(Key::Key_MouseLeft)) {
 			m_pickingPointStartCS = is.GetCursorPos();
 			m_isSelecting = true;
@@ -226,11 +238,13 @@ InspectorToolResult SelectionTool::updateTool(GameInspector* const inspector,
 	return result;
 }
 
-void SelectionTool::onCancel(GameInspector* UNUSED(inspector)) {
+void SelectionTool::onCancel(GameInspector* UNUSED(inspector))
+{
 	m_isSelecting = false;
 }
 
-void SelectionTool::drawOverlay(const GameDrawSets& drawSets) {
+void SelectionTool::drawOverlay(const GameDrawSets& drawSets)
+{
 	if (m_isSelecting) {
 		SGEDevice* const sgedev = drawSets.rdest.sgecon->getDevice();
 
@@ -245,7 +259,8 @@ void SelectionTool::drawOverlay(const GameDrawSets& drawSets) {
 }
 
 void SelectionTool::performPicking(
-    GameInspector* inspector, Box2f selectionRectCS, const GameDrawSets& drawSets, bool ctrlDown, bool shiftDown) {
+    GameInspector* inspector, Box2f selectionRectCS, const GameDrawSets& drawSets, bool ctrlDown, bool shiftDown)
+{
 	const bool singleClickSelection = selectionRectCS.halfDiagonal().length() <= 3.f;
 
 	if (singleClickSelection) {
@@ -253,7 +268,8 @@ void SelectionTool::performPicking(
 		selectionRectCS.setEmpty();
 		selectionRectCS.expand(center - vec2f(2.5f, 2.5f));
 		selectionRectCS.expand(center + vec2f(2.5f, 2.5f));
-	} else {
+	}
+	else {
 		// Add an extra pixel on every side to avoid empty render targets.
 		selectionRectCS.expand(selectionRectCS.max + vec2f(1.f, 1.f));
 		selectionRectCS.expand(selectionRectCS.min - vec2f(1.f, 1.f));
@@ -343,7 +359,8 @@ void SelectionTool::performPicking(
 			if (singleClickSelection) {
 				affectedItemIndices.resize(1);
 				affectedItemIndices[0] = iItem;
-			} else {
+			}
+			else {
 				affectedItemIndices.push_back(iItem);
 			}
 		}
