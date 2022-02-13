@@ -38,7 +38,7 @@ __The main features of the engine are:__
  - Material System.
  - Hopefully being easy to setup and use.
 
-[](https://user-images.githubusercontent.com/6237727/114287179-95c8a700-9a6d-11eb-9fdd-54009834ef2f.mp4 =250x)
+[](https://user-images.githubusercontent.com/6237727/114287179-95c8a700-9a6d-11eb-9fdd-54009834ef2f.mp4)
 
  __Roadmap:__
   - Responding to user feedback.
