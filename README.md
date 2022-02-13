@@ -1,27 +1,30 @@
 
 
-__Work-in-Progress The official "early alpha" release should be available anytime soon. I want to have good samples and documentation before releasing it.__
+__Work-in-Progress! The official "early alpha" release should be available anytime soon. 
+I want to have good samples and documentation before releasing it. Stay tuned!__
 
 # SGEEngine
 
 __SGEEngine__ is an open source __(MIT License)__, C++ centric game engine with an editor usable as a sandbox. Aimed at simple projects, SGEEngine is suitable for small games, game jams, learning, personal projects and can be used as a basis for your own game engine.
 
 
-I've build many demos and toys with it.
-The latest one can be tried here.
+I've build many demos and toy projects with it. Below you can try an endless runner game that I made in a few days
+with the engine. It is an endless runner game in a 2.5D world. The game works on desktop, web and web on phones.
 
-<iframe src="https://itch.io/embed/1232486" width="552" height="167" frameborder="0"><a href="https://ongamex.itch.io/broomin-around">Broomin' Around by ongamex, ChrisiaDraws</a></iframe>
+[![Broomin Around ](docs/img/broomin.gif)](https://ongamex.itch.io/broomin-around)
+
+I've also did a small test recording of me explaining the basics of the engine how one could make a small Ballance-like game with it:
+[![SGEEngine demo](docs/img/sgeEngineDemoVidThumbnail.jpg)](https://www.youtube.com/watch?v=aL8-DhXEnWo)
 
 <img src="./docs/img/editor_ss4.jpg" alt="alt text" width="100%">
-
 
 <img src="./docs/img/editor_ss0.png" alt="alt text" width="50%" height="50%"><img src="./docs/img/editor_ss1.png" alt="alt text" width="50%" height="50%">
 <img src="./docs/img/editor_ss2.png" alt="alt text" width="50%" height="50%"><img src="./docs/img/editor_ss3.png" alt="alt text" width="50%" height="50%">
 
 __The main features of the engine are:__
- - Cross platform working on Windows and GNU/Lunix.
- - Scene editor for 3D and pseudo 2D scenes. Having all common.features like transform, tools, property editor, undo/redo, curve editing and more.
- - C++ hot reloading.
+ - Cross platform working on Windows, GNU/Lunix and on the web via Emscripten.
+ - Scene editor for 3D and pseudo 2D scenes. Having all common features like transform, tools, property editor, undo/redo, curve editing and more.
+ - C++ hot reloading (edit you game while it is running).
  - Direct3D 11, OpenGL 3.3 and WebGL 2 rendering backends.
  - Physics.
  - Path finding.
@@ -30,15 +33,25 @@ __The main features of the engine are:__
  - Rich math library.
  - Timeline animations.
  - Material System.
+ - Hopefully being easy to setup and use.
 
 [](https://user-images.githubusercontent.com/6237727/114287179-95c8a700-9a6d-11eb-9fdd-54009834ef2f.mp4)
->>>>>>> 2210545169dc35f6df4587bfc08a7d56cc5110d1
+
+ __Roadmap to 1st release:__
+  - better in-game UI API (in progress)
+  - Sample demo scene and games (in progress)
+  - Documentation
+  - Kinematic Character controller (80% done)
 
  __Roadmap:__
-  - Flexible rendering pipeline.
-  - OSX builds.
-  - Better Particle Systems.
-  - Better Inverse Kinematics.
+  - Responding to user feedback.
+  - Documentation and samples.
+  - MacOS builds and Android.
+  - Terrain tools.
+  - Animaton and VFX tools.
+  - Metal rendering API support.
+  - Shader Graph.
+  - A lot more stuff.
 
 ## Philosophy
  
