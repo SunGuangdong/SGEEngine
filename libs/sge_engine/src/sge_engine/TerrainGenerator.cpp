@@ -55,13 +55,14 @@ ReflBlock() {
 // clang-format on
 
 // Generates the vertex buffer and the bounding boxes needed to represent this geometry for both rendering and physics.
-bool TerrainGenerator::generateStairs(std::vector<Vertex>& vertices,
-                                      std::vector<int>& indices,
-                                      std::vector<Box3f>& bboxes,
-                                      const StairsDesc& desc,
-                                      int* pNumVertsAdded,
-                                      int* pNumIndicesAdded,
-                                      int* pNumBoxesAdded)
+bool TerrainGenerator::generateStairs(
+    std::vector<Vertex>& vertices,
+    std::vector<int>& indices,
+    std::vector<Box3f>& bboxes,
+    const StairsDesc& desc,
+    int* pNumVertsAdded,
+    int* pNumIndicesAdded,
+    int* pNumBoxesAdded)
 {
 	if (!desc.isValid()) {
 		return false;
@@ -223,12 +224,13 @@ bool TerrainGenerator::generateStairs(std::vector<Vertex>& vertices,
 	return true;
 }
 
-bool TerrainGenerator::generateSlope(std::vector<Vertex>& vertices,
-                                     std::vector<int>& indices,
-                                     ModelCollisionMesh& outCollisionMesh,
-                                     const SlopeDesc& desc,
-                                     int* pNumVertsAdded,
-                                     int* pNumIndicesAdded)
+bool TerrainGenerator::generateSlope(
+    std::vector<Vertex>& vertices,
+    std::vector<int>& indices,
+    ModelCollisionMesh& outCollisionMesh,
+    const SlopeDesc& desc,
+    int* pNumVertsAdded,
+    int* pNumIndicesAdded)
 {
 	outCollisionMesh.freeMemory();
 
@@ -351,12 +353,13 @@ bool TerrainGenerator::generateSlope(std::vector<Vertex>& vertices,
 	return true;
 }
 
-bool TerrainGenerator::generateSlantedBlock(std::vector<Vertex>& vertices,
-                                            std::vector<int>& indices,
-                                            ModelCollisionMesh& outCollisionMesh,
-                                            const SlantedBlockDesc& desc,
-                                            int* pNumVertsAdded,
-                                            int* pNumIndicesAdded)
+bool TerrainGenerator::generateSlantedBlock(
+    std::vector<Vertex>& vertices,
+    std::vector<int>& indices,
+    ModelCollisionMesh& outCollisionMesh,
+    const SlantedBlockDesc& desc,
+    int* pNumVertsAdded,
+    int* pNumIndicesAdded)
 {
 	if (!desc.isValid()) {
 		return false;

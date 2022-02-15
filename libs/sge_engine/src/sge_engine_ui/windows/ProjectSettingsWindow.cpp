@@ -15,7 +15,8 @@ ProjectSettingsWindow::ProjectSettingsWindow(std::string windowName)
 	m_gamePlayerSetting.loadFromJsonFile("appdata/game_project_settings.json");
 }
 
-void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
+void ProjectSettingsWindow::update(
+    SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
@@ -33,8 +34,8 @@ void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct Game
 
 		ImGuiEx::Label("Initial Level");
 		if (ImGui::Button(ICON_FK_FOLDER_OPEN)) {
-			std::string pickedLevel =
-			    FileOpenDialog("Select a the Initial level when the game is launched...", true, "*.lvl\0*.lvl\0", "./assets/levels");
+			std::string pickedLevel = FileOpenDialog(
+			    "Select a the Initial level when the game is launched...", true, "*.lvl\0*.lvl\0", "./assets/levels");
 			if (pickedLevel.empty() == false) {
 				try {
 					pickedLevel = canonizePathRespectOS(std::filesystem::proximate(pickedLevel).string());
@@ -79,9 +80,11 @@ void ProjectSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct Game
 				}
 			}
 			else {
-				DialongOk("Game Export",
-				          "Game cannot be exported, as there is no initial project settings specified. To specify them open Windows -> "
-				          "Project Settings");
+				DialongOk(
+				    "Game Export",
+				    "Game cannot be exported, as there is no initial project settings specified. To specify them open "
+				    "Windows -> "
+				    "Project Settings");
 			}
 		}
 	}

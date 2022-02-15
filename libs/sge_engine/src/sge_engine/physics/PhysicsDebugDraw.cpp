@@ -5,7 +5,8 @@
 
 namespace sge {
 
-void BulletPhysicsDebugDraw::preDebugDraw(const mat4f& projView, QuickDraw* const debugDraw, const RenderDestination& rdest)
+void BulletPhysicsDebugDraw::preDebugDraw(
+    const mat4f& projView, QuickDraw* const debugDraw, const RenderDestination& rdest)
 {
 	m_projView = projView;
 	m_quickDraw = debugDraw;

@@ -278,8 +278,10 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 					material->assetForThisMaterial = jMtlAssetPath->GetString();
 				}
 				else {
-					jMaterial->getMember("diffuseColor")->getNumberArrayAs<float>(material->oldInplaceMtl.diffuseColor.data, 4);
-					jMaterial->getMember("emissionColor")->getNumberArrayAs<float>(material->oldInplaceMtl.emissionColor.data, 4);
+					jMaterial->getMember("diffuseColor")
+					    ->getNumberArrayAs<float>(material->oldInplaceMtl.diffuseColor.data, 4);
+					jMaterial->getMember("emissionColor")
+					    ->getNumberArrayAs<float>(material->oldInplaceMtl.emissionColor.data, 4);
 					material->oldInplaceMtl.metallic = jMaterial->getMember("metallic")->getNumberAs<float>();
 					material->oldInplaceMtl.roughness = jMaterial->getMember("roughness")->getNumberAs<float>();
 
@@ -328,7 +330,8 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				}
 
 				mesh->name = jMesh->getMember("name")->GetString();
-				mesh->primitiveTopology = PrimitiveTolologyFromString(jMesh->getMember("primitiveTopology")->GetString());
+				mesh->primitiveTopology =
+				    PrimitiveTolologyFromString(jMesh->getMember("primitiveTopology")->GetString());
 				mesh->vbByteOffset = jMesh->getMember("vbByteOffset")->getNumberAs<uint32>();
 				mesh->numElements = jMesh->getMember("numElements")->getNumberAs<uint32>();
 				mesh->numVertices = jMesh->getMember("numVertices")->getNumberAs<uint32>();
@@ -375,7 +378,8 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 				}
 
 				// Bake the vertex stride.
-				mesh->stride = int(mesh->vertexDecl.back().byteOffset) + UniformType::GetSizeBytes(mesh->vertexDecl.back().format);
+				mesh->stride =
+				    int(mesh->vertexDecl.back().byteOffset) + UniformType::GetSizeBytes(mesh->vertexDecl.back().format);
 
 				// The bones.
 				if (const JsonValue* const jBones = jMesh->getMember("bones")) {
@@ -386,8 +390,10 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 
 						// Becase nodes are loded before meshes, we must do that gymnastic.
 						bone.nodeIdx = jBone->getMember("boneIndex")->getNumberAs<int>();
-						loadDataChunkRaw(&bone.offsetMatrix, sizeof(bone.offsetMatrix),
-						                 jBone->getMember("offsetMatrixChunkId")->getNumberAs<int>());
+						loadDataChunkRaw(
+						    &bone.offsetMatrix,
+						    sizeof(bone.offsetMatrix),
+						    jBone->getMember("offsetMatrixChunkId")->getNumberAs<int>());
 					}
 				}
 			}
@@ -428,7 +434,8 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 
 						MeshAttachment attachmentMesh;
 						attachmentMesh.attachedMeshIndex = jAttachmentMesh->getMember("meshIndex")->getNumberAs<int>();
-						attachmentMesh.attachedMaterialIndex = jAttachmentMesh->getMember("materialIndex")->getNumberAs<int>();
+						attachmentMesh.attachedMaterialIndex =
+						    jAttachmentMesh->getMember("materialIndex")->getNumberAs<int>();
 
 						node->meshAttachments.push_back(attachmentMesh);
 					}
@@ -455,8 +462,10 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 		if (jStaticConvexHulls) {
 			int const numHulls = int(jStaticConvexHulls->arrSize());
 			for (int t = 0; t < numHulls; ++t) {
-				const int hullVertsChunkId = jStaticConvexHulls->arrAt(t)->getMember("vertsChunkId")->getNumberAs<int>();
-				const int hullIndicesChunkId = jStaticConvexHulls->arrAt(t)->getMember("indicesChunkId")->getNumberAs<int>();
+				const int hullVertsChunkId =
+				    jStaticConvexHulls->arrAt(t)->getMember("vertsChunkId")->getNumberAs<int>();
+				const int hullIndicesChunkId =
+				    jStaticConvexHulls->arrAt(t)->getMember("indicesChunkId")->getNumberAs<int>();
 
 				std::vector<vec3f> verts;
 				loadDataChunk(verts, hullVertsChunkId);
@@ -473,8 +482,10 @@ bool ModelReader::loadModel(const ModelLoadSettings loadSets, IReadStream* const
 		if (jStaticConcaveHulls) {
 			int const numHulls = int(jStaticConcaveHulls->arrSize());
 			for (int t = 0; t < numHulls; ++t) {
-				const int hullVertsChunkId = jStaticConcaveHulls->arrAt(t)->getMember("vertsChunkId")->getNumberAs<int>();
-				const int hullIndicesChunkId = jStaticConcaveHulls->arrAt(t)->getMember("indicesChunkId")->getNumberAs<int>();
+				const int hullVertsChunkId =
+				    jStaticConcaveHulls->arrAt(t)->getMember("vertsChunkId")->getNumberAs<int>();
+				const int hullIndicesChunkId =
+				    jStaticConcaveHulls->arrAt(t)->getMember("indicesChunkId")->getNumberAs<int>();
 
 				std::vector<vec3f> verts;
 				loadDataChunk(verts, hullVertsChunkId);

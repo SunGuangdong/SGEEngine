@@ -34,11 +34,12 @@ SGE_ENGINE_API std::string serializeObject(const GameObject* object);
 ///             Usually true should be specified.
 /// @param [out] outOriginalId the id of the object specified in the json string.
 /// @retval a point to the created game object.
-SGE_ENGINE_API GameObject*
-    deserializeObjectFromJson(GameWorld* const world, const std::string& json, const bool shouldGenerateNewId, ObjectId* outOriginalId);
+SGE_ENGINE_API GameObject* deserializeObjectFromJson(
+    GameWorld* const world, const std::string& json, const bool shouldGenerateNewId, ObjectId* outOriginalId);
 
 
-SGE_ENGINE_API JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const data, JsonValueBuffer& jvb);
+SGE_ENGINE_API JsonValue*
+    serializeVariable(const TypeDesc* const typeDesc, const char* const data, JsonValueBuffer& jvb);
 SGE_ENGINE_API bool deserializeVariable(char* const valueData, const JsonValue* jValue, const TypeDesc* const typeDesc);
 
 

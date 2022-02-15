@@ -258,7 +258,8 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 
 		if (m_passiveParticleBirthAccumulator >= 1.f) {
 			numParticlesToSpawn += (int)floorf(m_passiveParticleBirthAccumulator);
-			m_passiveParticleBirthAccumulator = m_passiveParticleBirthAccumulator - floorf(m_passiveParticleBirthAccumulator);
+			m_passiveParticleBirthAccumulator =
+			    m_passiveParticleBirthAccumulator - floorf(m_passiveParticleBirthAccumulator);
 		}
 	}
 
@@ -274,7 +275,8 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 
 		if (m_contiiousParticleBirthAccumulator >= 1.f) {
 			numParticlesToSpawn += (int)floorf(m_contiiousParticleBirthAccumulator);
-			m_contiiousParticleBirthAccumulator = m_contiiousParticleBirthAccumulator - floorf(m_contiiousParticleBirthAccumulator);
+			m_contiiousParticleBirthAccumulator =
+			    m_contiiousParticleBirthAccumulator - floorf(m_contiiousParticleBirthAccumulator);
 		}
 	}
 
@@ -365,14 +367,16 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 		particle.opacity = 1.f;
 
 		// Fade-in after birth.
-		if (pgDesc.alpha.fadeInTimeAfterBirth > 1e-3f && particle.m_timeSpendAlive < pgDesc.alpha.fadeInTimeAfterBirth) {
+		if (pgDesc.alpha.fadeInTimeAfterBirth > 1e-3f &&
+		    particle.m_timeSpendAlive < pgDesc.alpha.fadeInTimeAfterBirth) {
 			particle.opacity *= sqr(clamp01(particle.m_timeSpendAlive / pgDesc.alpha.fadeInTimeAfterBirth));
 		}
 
 		// Fade-out before death.
 		if (pgDesc.alpha.fadeOutTimeBeforeDeath > 1e-3f &&
 		    (particle.m_timeSpendAlive > particle.m_maxLife - pgDesc.alpha.fadeOutTimeBeforeDeath)) {
-			particle.opacity *= sqr(clamp01((particle.m_maxLife - particle.m_timeSpendAlive) / pgDesc.alpha.fadeOutTimeBeforeDeath));
+			particle.opacity *=
+			    sqr(clamp01((particle.m_maxLife - particle.m_timeSpendAlive) / pgDesc.alpha.fadeOutTimeBeforeDeath));
 		}
 
 		vec3f addedVelocity = vec3f(0.f);
@@ -400,8 +404,8 @@ void ParticleGroupState::update(bool isInWorldSpace, const mat4f node2world, con
 	m_timeRunning += dt;
 }
 
-ParticleGroupState::SpriteRendData*
-    ParticleGroupState::computeSpriteRenderData(SGEContext& sgecon, const ParticleGroupDesc& pdesc, const ICamera& camera)
+ParticleGroupState::SpriteRendData* ParticleGroupState::computeSpriteRenderData(
+    SGEContext& sgecon, const ParticleGroupDesc& pdesc, const ICamera& camera)
 {
 	struct Vertex {
 		vec3f pos = vec3f(0.f);
@@ -425,8 +429,9 @@ ParticleGroupState::SpriteRendData*
 		indicesForSorting[t].distanceAlongRay = projectPointOnLine(camPosWs, camLookWs, m_particles[t].pos);
 	}
 
-	std::sort(indicesForSorting.begin(), indicesForSorting.end(),
-	          [&](const SortingData& a, const SortingData& b) { return a.distanceAlongRay > b.distanceAlongRay; });
+	std::sort(indicesForSorting.begin(), indicesForSorting.end(), [&](const SortingData& a, const SortingData& b) {
+		return a.distanceAlongRay > b.distanceAlongRay;
+	});
 
 	// Obtain the sprite texture and check if it is valid.
 	const AssetIface_Texture2D* texIface = pdesc.m_particlesSprite.getAssetInterface<AssetIface_Texture2D>();
@@ -519,8 +524,8 @@ ParticleGroupState::SpriteRendData*
 	const int strideSizeBytes = sizeof(vertices[0]);
 	const int neededVtxBufferByteSize = int(vertices.size()) * strideSizeBytes;
 
-	const bool isVtxBufferCorrectSize =
-	    spriteRenderData->vertexBuffer.IsResourceValid() && spriteRenderData->vertexBuffer->getDesc().sizeBytes == neededVtxBufferByteSize;
+	const bool isVtxBufferCorrectSize = spriteRenderData->vertexBuffer.IsResourceValid() &&
+	                                    spriteRenderData->vertexBuffer->getDesc().sizeBytes == neededVtxBufferByteSize;
 
 	if (isVtxBufferCorrectSize == false) {
 		BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(neededVtxBufferByteSize, ResourceUsage::Dynamic);
@@ -545,9 +550,22 @@ ParticleGroupState::SpriteRendData*
 
 	VertexDeclIndex vertexDeclIdx = sgecon.getDevice()->getVertexDeclIndex(vertexDecl, SGE_ARRSZ(vertexDecl));
 
-	spriteRenderData->geometry =
-	    Geometry(spriteRenderData->vertexBuffer, nullptr, nullptr, -1, vertexDeclIdx, true, true, true, false,
-	             PrimitiveTopology::TriangleList, 0, 0, strideSizeBytes, UniformType::Unknown, int(vertices.size()));
+	spriteRenderData->geometry = Geometry(
+	    spriteRenderData->vertexBuffer,
+	    nullptr,
+	    nullptr,
+	    -1,
+	    vertexDeclIdx,
+	    true,
+	    true,
+	    true,
+	    false,
+	    PrimitiveTopology::TriangleList,
+	    0,
+	    0,
+	    strideSizeBytes,
+	    UniformType::Unknown,
+	    int(vertices.size()));
 
 	spriteRenderData->material.diffuseColorSrc = DefaultPBRMtlData::diffuseColorSource_diffuseMap;
 	spriteRenderData->material.diffuseTexture = sprite;
@@ -630,10 +648,11 @@ void TraitParticlesProgrammable::getRenderItems(std::vector<TraitParticlesProgra
 // ParticleRenderDataGen
 //--------------------------------------------------------------
 ReflAddTypeId(TraitParticlesProgrammable, 20'11'23'0001);
-bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleGroup& particles,
-                                     SGEContext& sgecon,
-                                     const ICamera& camera,
-                                     const mat4f& n2w)
+bool ParticleRenderDataGen::generate(
+    const TraitParticlesProgrammable::ParticleGroup& particles,
+    SGEContext& sgecon,
+    const ICamera& camera,
+    const mat4f& n2w)
 {
 	if (particles.allParticles.empty()) {
 		return false;
@@ -648,11 +667,13 @@ bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleG
 		indicesForSorting.resize(particles.allParticles.size());
 		for (int t = 0; t < int(indicesForSorting.size()); ++t) {
 			indicesForSorting[t].index = t;
-			indicesForSorting[t].distanceAlongRay = projectPointOnLine(camPosWs, camLookWs, particles.allParticles[t].position);
+			indicesForSorting[t].distanceAlongRay =
+			    projectPointOnLine(camPosWs, camLookWs, particles.allParticles[t].position);
 		}
 
-		std::sort(indicesForSorting.begin(), indicesForSorting.end(),
-		          [&](const SortingData& a, const SortingData& b) { return a.distanceAlongRay > b.distanceAlongRay; });
+		std::sort(indicesForSorting.begin(), indicesForSorting.end(), [&](const SortingData& a, const SortingData& b) {
+			return a.distanceAlongRay > b.distanceAlongRay;
+		});
 	}
 
 	// Obtain the sprite texture and check if it is valid.
@@ -733,7 +754,8 @@ bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleG
 	const int strideSizeBytes = sizeof(vertices[0]);
 	const int neededVtxBufferByteSize = int(vertices.size()) * strideSizeBytes;
 
-	const bool isVtxBufferCorrectSize = vertexBuffer.IsResourceValid() && vertexBuffer->getDesc().sizeBytes == neededVtxBufferByteSize;
+	const bool isVtxBufferCorrectSize =
+	    vertexBuffer.IsResourceValid() && vertexBuffer->getDesc().sizeBytes == neededVtxBufferByteSize;
 
 	if (isVtxBufferCorrectSize == false) {
 		BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(neededVtxBufferByteSize, ResourceUsage::Dynamic);
@@ -758,8 +780,22 @@ bool ParticleRenderDataGen::generate(const TraitParticlesProgrammable::ParticleG
 
 	VertexDeclIndex vertexDeclIdx = sgecon.getDevice()->getVertexDeclIndex(vertexDecl, SGE_ARRSZ(vertexDecl));
 
-	geometry = Geometry(vertexBuffer, nullptr, nullptr, -1, vertexDeclIdx, false, true, true, false, PrimitiveTopology::TriangleList, 0, 0,
-	                    strideSizeBytes, UniformType::Unknown, int(vertices.size()));
+	geometry = Geometry(
+	    vertexBuffer,
+	    nullptr,
+	    nullptr,
+	    -1,
+	    vertexDeclIdx,
+	    false,
+	    true,
+	    true,
+	    false,
+	    PrimitiveTopology::TriangleList,
+	    0,
+	    0,
+	    strideSizeBytes,
+	    UniformType::Unknown,
+	    int(vertices.size()));
 
 	material.diffuseTexture = sprite;
 

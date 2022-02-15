@@ -75,7 +75,8 @@ struct SGE_CORE_API ApplicationHandler {
   private:
 	WindowBase* findWindowBySDLId(const uint32 id);
 	void removeWindow(WindowBase* const wndToRemove);
-	void NewWindowInternal(WindowBase* window, const char* windowName, int width, int height, bool isMaximized, bool noResize);
+	void NewWindowInternal(
+	    WindowBase* window, const char* windowName, int width, int height, bool isMaximized, bool noResize);
 
   private:
 	bool m_isAppQuitRequested = false;

@@ -1,5 +1,7 @@
 ﻿---
-AlignAfterOpenBracket: Align 
+#AlignOperands: AlignAfterOperator # Not supported yet, but seems like something I want
+BreakBeforeTernaryOperators : 'true'
+AlignAfterOpenBracket: AlwaysBreak 
 AlignEscapedNewlinesLeft: 'true'
 AllowAllParametersOfDeclarationOnNextLine: 'true'
 AllowShortBlocksOnASingleLine: 'false'
@@ -8,12 +10,13 @@ AllowShortIfStatementsOnASingleLine: 'false'
 AllowShortLoopsOnASingleLine: 'false'
 AlwaysBreakBeforeMultilineStrings: 'true'
 AlwaysBreakTemplateDeclarations: 'true'
+BinPackArguments: 'false'
 BinPackParameters: 'false'
 BreakBeforeBraces: Stroustrup
 IndentPPDirectives: BeforeHash
 BreakConstructorInitializersBeforeComma: 'true'
 BreakBeforeTernaryOperators: 'true'
-ColumnLimit: '140'
+ColumnLimit: '120'
 IndentCaseLabels: 'true'
 IndentWidth: '4'
 IndentWrappedFunctionNames: 'true'

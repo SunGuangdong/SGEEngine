@@ -29,7 +29,9 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 	const bool isCompressed = TextureFormat::IsBC(m_desc.format);
 
 	if (desc.generateMips) {
-		sgeAssert(desc.textureType == UniformType::Texture2D && "The auto generated mips has been written so far only for 2D textures!");
+		sgeAssert(
+		    desc.textureType == UniformType::Texture2D &&
+		    "The auto generated mips has been written so far only for 2D textures!");
 	}
 
 	GLint glInternalFormat;
@@ -49,7 +51,16 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 			if (isCompressed == false) {
 				// The next line is used in Emscripen debugging, as there is no way of breaking here.
 				const void* initialDataForMipLevel = (initalData) ? initalData[iMipLevel].data : NULL;
-				glTexImage2D(GL_TEXTURE_2D, iMipLevel, glInternalFormat, width, height, 0, glFormat, glType, initialDataForMipLevel);
+				glTexImage2D(
+				    GL_TEXTURE_2D,
+				    iMipLevel,
+				    glInternalFormat,
+				    width,
+				    height,
+				    0,
+				    glFormat,
+				    glType,
+				    initialDataForMipLevel);
 				DumpAllGLErrors();
 				if (m_desc.generateMips && m_desc.texture2D.numMips == 1) {
 					glGenerateMipmap(GL_TEXTURE_2D);
@@ -61,9 +72,15 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 				sgeAssert(initalData[iMipLevel].data != NULL);
 				sgeAssert(initalData[iMipLevel].sliceByteSize > 0);
 
-				glCompressedTexImage2D(GL_TEXTURE_2D, iMipLevel, glInternalFormat, width, height,
-				                       0, // border
-				                       int(initalData[iMipLevel].sliceByteSize), initalData[iMipLevel].data);
+				glCompressedTexImage2D(
+				    GL_TEXTURE_2D,
+				    iMipLevel,
+				    glInternalFormat,
+				    width,
+				    height,
+				    0, // border
+				    int(initalData[iMipLevel].sliceByteSize),
+				    initalData[iMipLevel].data);
 				DumpAllGLErrors();
 			}
 
@@ -73,16 +90,25 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 	}
 #if !defined(__EMSCRIPTEN__)
 	else if (glTexTarget == GL_TEXTURE_2D_MULTISAMPLE) {
-		glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, m_desc.texture2D.numSamples, glInternalFormat, m_desc.texture2D.width,
-		                        m_desc.texture2D.height, GL_TRUE);
+		glTexImage2DMultisample(
+		    GL_TEXTURE_2D_MULTISAMPLE,
+		    m_desc.texture2D.numSamples,
+		    glInternalFormat,
+		    m_desc.texture2D.width,
+		    m_desc.texture2D.height,
+		    GL_TRUE);
 
 		DumpAllGLErrors();
 	}
 #endif
 	else if (glTexTarget == GL_TEXTURE_CUBE_MAP) {
 		const GLuint OpenGL_CubeFaceInices[6] = {
-		    GL_TEXTURE_CUBE_MAP_POSITIVE_X, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
-		    GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
+		    GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		    GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		    GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		    GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		    GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		    GL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
 		};
 
 		for (int iArray = 0; iArray < m_desc.textureCube.arraySize; ++iArray) {
@@ -99,9 +125,17 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 						sgeAssert(isCompressed == false); // Not supported yet!
 
 						// Cube arrays.
-						glTexImage3D(OpenGL_CubeFaceInices[iFace], iMipLevel, glInternalFormat, width, height, iArray,
-						             0, // Border,
-						             glFormat, glType, initalData[faceInitalDataIndex].data);
+						glTexImage3D(
+						    OpenGL_CubeFaceInices[iFace],
+						    iMipLevel,
+						    glInternalFormat,
+						    width,
+						    height,
+						    iArray,
+						    0, // Border,
+						    glFormat,
+						    glType,
+						    initalData[faceInitalDataIndex].data);
 					}
 					else if (glTexTarget == GL_TEXTURE_CUBE_MAP) {
 						// Caution:
@@ -112,17 +146,30 @@ bool TextureGL::create(const TextureDesc& desc, const TextureData initalData[], 
 							sgeAssert(initalData[iMipLevel].data != NULL);
 							sgeAssert(initalData[iMipLevel].sliceByteSize > 0);
 
-							glCompressedTexImage2D(OpenGL_CubeFaceInices[iFace], iMipLevel, glInternalFormat, width, height,
-							                       0, // border
-							                       int(initalData[faceInitalDataIndex].sliceByteSize),
-							                       initalData[faceInitalDataIndex].data);
+							glCompressedTexImage2D(
+							    OpenGL_CubeFaceInices[iFace],
+							    iMipLevel,
+							    glInternalFormat,
+							    width,
+							    height,
+							    0, // border
+							    int(initalData[faceInitalDataIndex].sliceByteSize),
+							    initalData[faceInitalDataIndex].data);
 						}
 						else {
-							const void* const initalDataForFace = (initalData != nullptr) ? initalData[faceInitalDataIndex].data : nullptr;
+							const void* const initalDataForFace =
+							    (initalData != nullptr) ? initalData[faceInitalDataIndex].data : nullptr;
 
-							glTexImage2D(OpenGL_CubeFaceInices[iFace], iMipLevel, glInternalFormat, width, height,
-							             0, // Border,
-							             glFormat, glType, initalDataForFace);
+							glTexImage2D(
+							    OpenGL_CubeFaceInices[iFace],
+							    iMipLevel,
+							    glInternalFormat,
+							    width,
+							    height,
+							    0, // Border,
+							    glFormat,
+							    glType,
+							    initalDataForFace);
 						}
 					}
 					else {

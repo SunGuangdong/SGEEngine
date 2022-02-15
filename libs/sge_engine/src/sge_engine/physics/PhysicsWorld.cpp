@@ -17,7 +17,8 @@ void PhysicsWorld::create()
 	collisionConfiguration.reset(new btDefaultCollisionConfiguration());
 	dispatcher.reset(new SgeCollisionDispatcher(collisionConfiguration.get()));
 	solver.reset(new btSequentialImpulseConstraintSolver());
-	dynamicsWorld.reset(new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
+	dynamicsWorld.reset(
+	    new btDiscreteDynamicsWorld(dispatcher.get(), broadphase.get(), solver.get(), collisionConfiguration.get()));
 	dynamicsWorld->setForceUpdateAllAabbs(false);
 
 	// [SGE_BULLET_GHOSTS]
@@ -46,7 +47,8 @@ void PhysicsWorld::addPhysicsObject(RigidBody& obj)
 		// we need to change their bullet filter mask.
 		// We wanna do this as for example kinematic characters
 		// need to be able to recover form collision with the level.
-		dynamicsWorld->addCollisionObject(obj.m_collisionObject.get(), btBroadphaseProxy::AllFilter, btBroadphaseProxy::AllFilter);
+		dynamicsWorld->addCollisionObject(
+		    obj.m_collisionObject.get(), btBroadphaseProxy::AllFilter, btBroadphaseProxy::AllFilter);
 	}
 }
 

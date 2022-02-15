@@ -28,10 +28,11 @@ struct SGE_ENGINE_API INavMesh {
 	INavMesh() = default;
 	virtual ~INavMesh() = default;
 
-	virtual bool findPath(std::vector<vec3f>& outPath,
-	                      const vec3f& startPos,
-	                      const vec3f& endPos,
-	                      const vec3f nearestPointSearchHalfDiagonal = vec3f(0.5f)) = 0;
+	virtual bool findPath(
+	    std::vector<vec3f>& outPath,
+	    const vec3f& startPos,
+	    const vec3f& endPos,
+	    const vec3f nearestPointSearchHalfDiagonal = vec3f(0.5f)) = 0;
 
 	virtual vec3f moveAlongNavMesh(const vec3f& start, const vec3f& end) = 0;
 };
@@ -52,10 +53,11 @@ struct SGE_ENGINE_API ANavMesh : public Actor, public IActorCustomAttributeEdito
 	void doAttributeEditor(GameInspector* inspector) override;
 
 	// From INavMesh:
-	bool findPath(std::vector<vec3f>& outPath,
-	              const vec3f& startPos,
-	              const vec3f& endPos,
-	              const vec3f nearestPointSearchHalfDiagonal = vec3f(0.5f)) final;
+	bool findPath(
+	    std::vector<vec3f>& outPath,
+	    const vec3f& startPos,
+	    const vec3f& endPos,
+	    const vec3f nearestPointSearchHalfDiagonal = vec3f(0.5f)) final;
 
 
 	vec3f moveAlongNavMesh(const vec3f& start, const vec3f& end) final;

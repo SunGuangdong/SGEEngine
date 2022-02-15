@@ -3,7 +3,8 @@
 	#define NOMINMAX
 	#include <Windows.h>
 	#include <shlwapi.h>
-	#pragma comment(lib, "Shlwapi.lib") // https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathfindfilenamea
+	#pragma comment( \
+	    lib, "Shlwapi.lib") // https://docs.microsoft.com/en-us/windows/win32/api/shlwapi/nf-shlwapi-pathfindfilenamea
 #endif
 
 #include <sys/stat.h>
@@ -42,7 +43,9 @@ int FileReadStream::open(const char* const filename, const size_t bufsz /*= 0*/)
 			::FindClose(hFind);
 			const char* const foundPathName = ::PathFindFileNameA(filename);
 			if (0 != strcmp(wfd.cFileName, foundPathName)) {
-				sgeAssert(false && "File case mismatch, the file will be opened on Windows, but will fail on other platforms!");
+				sgeAssert(
+				    false &&
+				    "File case mismatch, the file will be opened on Windows, but will fail on other platforms!");
 			}
 		}
 	}

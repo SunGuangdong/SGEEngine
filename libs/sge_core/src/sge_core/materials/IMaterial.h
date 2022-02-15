@@ -15,11 +15,11 @@ struct TypeId;
 ///
 /// Why is it needed, when we have IMaterial?
 /// This structure has all of the IMateial data crunched and ready do get rendered.
-/// the @IMaterialData is not expected to be valid after the frame ends, on each frame it is asked to get generated again.
-/// The idea is that this structure lifts the weight of the @IGeometryDrawer to load and deal with assets.
+/// the @IMaterialData is not expected to be valid after the frame ends, on each frame it is asked to get generated
+/// again. The idea is that this structure lifts the weight of the @IGeometryDrawer to load and deal with assets.
 /// Usually a material has some textures in it and it is applied to multiple instances.
-/// Having the IGeomDrawer asking for each draw call to resolve the material assets (witch would not change) seems like are
-/// redundand and slow work (however I did not measure it).
+/// Having the IGeomDrawer asking for each draw call to resolve the material assets (witch would not change) seems like
+/// are redundand and slow work (however I did not measure it).
 struct SGE_CORE_API IMaterialData {
 	IMaterialData(uint32 materialFamilyId)
 	    : materialFamilyId(materialFamilyId)

@@ -106,7 +106,8 @@ struct TimelineWindow final : public IImGuiWindow {
 };
 
 
-void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+void TimelineWindow::update(
+    SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
@@ -141,7 +142,8 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 		};
 
 		ImGui::Text(ICON_FK_EXCLAMATION_TRIANGLE
-		            " While editing the gameplay animation will not update. Close this window to let the gameplay animaton to take place");
+		            " While editing the gameplay animation will not update. Close this window to let the gameplay "
+		            "animaton to take place");
 		ImGui::Text("Animating %s. %d is 1 second", timeline->getDisplayNameCStr(), timeline->framesPerSecond);
 		ImGuiEx::Label("Frames Count");
 		ImGui::InputInt("##Frame Count", &timeline->frameCount, 1, 1);
@@ -162,8 +164,14 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 		scrollBarRectScreen.Max.y = scrollBarRectScreen.Min.y + kScrollBarHeigth;
 
 		static float scrollBarXOffsetPixels = 0.f;
-		ImGui::ScrollbarEx(scrollBarRectScreen, ImGui::GetID("##ScrollbarTimeline"), ImGuiAxis_X, &scrollBarXOffsetPixels,
-		                   ImGui::GetContentRegionAvail().x, totalTimelineWidthPixels, ImDrawCornerFlags_All);
+		ImGui::ScrollbarEx(
+		    scrollBarRectScreen,
+		    ImGui::GetID("##ScrollbarTimeline"),
+		    ImGuiAxis_X,
+		    &scrollBarXOffsetPixels,
+		    ImGui::GetContentRegionAvail().x,
+		    totalTimelineWidthPixels,
+		    ImDrawCornerFlags_All);
 
 		const ImVec2 preTimelineCursorPosWindowSpace = ImGui::GetCursorPos() + ImVec2(0.f, kScrollBarHeigth);
 
@@ -174,9 +182,9 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 		timelineRectScreen.Max.x += totalTimelineWidthPixels;
 
 		// Workaround:
-		// By default in ImGui if the user holds the left mouse button in a window (but not over widget) the window will be moved.
-		// We do not want that to happen when the users scrubs the timeline. So to workaround that we tell ImGui that the mouse
-		// is interacting with something by setting the active id in the window.
+		// By default in ImGui if the user holds the left mouse button in a window (but not over widget) the window will
+		// be moved. We do not want that to happen when the users scrubs the timeline. So to workaround that we tell
+		// ImGui that the mouse is interacting with something by setting the active id in the window.
 
 		ImGui::InvisibleButton("Timeline invisible Button", ImVec2(totalTimelineWidthPixels, kTimelineHeightPixels));
 
@@ -212,7 +220,10 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 			if (hasKeyframe) {
 				// Draw something that marks that here we have a keyframe.
 				ImVec2 textSize = ImGui::CalcTextSize(ICON_FK_KEY);
-				drawList->AddText(frameBBoxMinScreen + ImVec2(textSize.x * 0.5f, kTimelineHeightPixels * 0.5f), 0xff0000ab, ICON_FK_KEY);
+				drawList->AddText(
+				    frameBBoxMinScreen + ImVec2(textSize.x * 0.5f, kTimelineHeightPixels * 0.5f),
+				    0xff0000ab,
+				    ICON_FK_KEY);
 			}
 
 			// Draw the number of the frame.
@@ -254,7 +265,9 @@ void TimelineWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 			if (ImGui::MenuItem(ICON_FK_KEY " Set Key")) {
 				bool hadAChange = false;
 				for (const SelectedItem& sel : inspector->getSelection()) {
-					if (sel.objectId != timeline->getId()) { // Do not keyframe the timeline. the user might have selected it by mistake.
+					if (sel.objectId !=
+					    timeline
+					        ->getId()) { // Do not keyframe the timeline. the user might have selected it by mistake.
 						if (Actor* actor = world.getActorById(sel.objectId)) {
 							timeline->keyFrames[m_lastRightClickedFrame][actor->getId()] = actor->getTransform();
 							hadAChange = true;
@@ -341,7 +354,8 @@ void ATimeline::update(const GameUpdateSets& u)
 	const float singleFrameTime = framesPerSecond != 0 ? 1.f / float(framesPerSecond) : 0.f;
 	const float totalAnimLength = float(frameCount - 1) * singleFrameTime;
 
-	const bool shouldUpdate = (u.isPlaying() && !isInEditMode && m_isEnabled) || (isInEditMode && doesEditModeNeedsUpdate);
+	const bool shouldUpdate =
+	    (u.isPlaying() && !isInEditMode && m_isEnabled) || (isInEditMode && doesEditModeNeedsUpdate);
 
 	if (playbackMethod != playbackMethod_flipflop) {
 		flipFlopDir = 1.f;
@@ -358,8 +372,8 @@ void ATimeline::update(const GameUpdateSets& u)
 			m_gameplayEvalTime -= std::floor(m_gameplayEvalTime / totalAnimLength) * totalAnimLength;
 		}
 		else if (playbackMethod == playbackMethod_flipflop) {
-			m_gameplayEvalTime =
-			    totalAnimLength - (m_gameplayEvalTime - std::floor(m_gameplayEvalTime / totalAnimLength) * totalAnimLength);
+			m_gameplayEvalTime = totalAnimLength - (m_gameplayEvalTime -
+			                                        std::floor(m_gameplayEvalTime / totalAnimLength) * totalAnimLength);
 			flipFlopDir *= -1.f;
 		}
 		else {
@@ -450,7 +464,8 @@ void ATimeline::update(const GameUpdateSets& u)
 								TraitRigidBody* const actorTraitRB = getTrait<TraitRigidBody>(pair.key());
 								bool applyRotation = true;
 								if (actorTraitRB) {
-									const btVector3 actorAngFactor = actorTraitRB->getRigidBody()->getBulletRigidBody()->getAngularFactor();
+									const btVector3 actorAngFactor =
+									    actorTraitRB->getRigidBody()->getBulletRigidBody()->getAngularFactor();
 
 									applyRotation &= isEpsEqual(actorAngFactor.getX(), 1.f);
 									applyRotation &= isEpsEqual(actorAngFactor.getY(), 1.f);
@@ -506,7 +521,8 @@ void ATimeline::doAttributeEditor(GameInspector* inspector)
 	chain.pop();
 
 	if (ImGui::Button(ICON_FK_FILM " Animate")) {
-		std::string windowName = string_format(ICON_FK_TIMES " Timeline %s##%d", this->getDisplayName().c_str(), this->getId().id);
+		std::string windowName =
+		    string_format(ICON_FK_TIMES " Timeline %s##%d", this->getDisplayName().c_str(), this->getId().id);
 
 		IImGuiWindow* wnd = getEngineGlobal()->findWindowByName(windowName.c_str());
 		if (wnd) {

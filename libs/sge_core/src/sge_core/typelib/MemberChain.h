@@ -15,7 +15,8 @@ struct MemberFieldChainKnot {
 
 	const MemberDesc* mfd = nullptr;
 
-	// If the type of the member is array or std::vector this thing is isused to point at the element, if not this is just -1.
+	// If the type of the member is array or std::vector this thing is isused to point at the element, if not this is
+	// just -1.
 	int arrayIdx = -1;
 };
 
@@ -30,9 +31,9 @@ struct MemberFieldChainKnot {
 /// A way of doing that is by using MemberChain:
 ///
 /// MemberChain chain;
-/// chain.add(sgeFindMember(Monster, health); // We are going to start with an object of type Monster and its member health.
-/// chain.add(sgeFindMember(Health, amountOfHealth); // Then at the value pointed above, we want to reach out to it's @amountOfHealth
-/// member.
+/// chain.add(sgeFindMember(Monster, health); // We are going to start with an object of type Monster and its member
+/// health. chain.add(sgeFindMember(Health, amountOfHealth); // Then at the value pointed above, we want to reach out to
+/// it's @amountOfHealth member.
 ///
 /// After that we can call:
 /// Monster m;
@@ -108,7 +109,8 @@ struct SGE_CORE_API MemberChain {
 	void forEachMember(void* root, std::function<void(void* root, const MemberChain&)>& lambda);
 
   public:
-	void forEachMemberInternal(void* root, MemberChain chain, std::function<void(void* root, const MemberChain&)>& lambda);
+	void forEachMemberInternal(
+	    void* root, MemberChain chain, std::function<void(void* root, const MemberChain&)>& lambda);
 
 	std::vector<MemberFieldChainKnot> knots;
 };

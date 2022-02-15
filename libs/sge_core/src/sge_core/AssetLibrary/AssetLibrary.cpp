@@ -73,8 +73,8 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 		return assetIface_model3d;
 	}
 
-	if (sge_stricmp(ext, "png") == 0 || sge_stricmp(ext, "dds") == 0 || sge_stricmp(ext, "jpg") == 0 || sge_stricmp(ext, "tga") == 0 ||
-	    sge_stricmp(ext, "bmp") == 0 || sge_stricmp(ext, "hdr") == 0) {
+	if (sge_stricmp(ext, "png") == 0 || sge_stricmp(ext, "dds") == 0 || sge_stricmp(ext, "jpg") == 0 ||
+	    sge_stricmp(ext, "tga") == 0 || sge_stricmp(ext, "bmp") == 0 || sge_stricmp(ext, "hdr") == 0) {
 		return assetIface_texture2d;
 	}
 
@@ -191,7 +191,8 @@ std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const
 
 	// The commented code below, not only makes the path cannonical, but it also makes it absolute, which we don't want.
 	// std::error_code pathToAssetCanonicalError;
-	// const std::filesystem::path pathToAssetCanonical = std::filesystem::weakly_canonical(pathToAssetRelative, pathToAssetCanonicalError);
+	// const std::filesystem::path pathToAssetCanonical = std::filesystem::weakly_canonical(pathToAssetRelative,
+	// pathToAssetCanonicalError);
 
 	if (pathToAssetRelativeError) {
 		sgeAssert(false && "Failed to transform the asset path to relative");
@@ -288,7 +289,8 @@ bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify)
 
 	const bool loadSucceeded = assetToModify->loadAssetFromFile(assetToModify->getPath().c_str());
 	assetToModify->m_status = loadSucceeded ? AssetStatus_Loaded : AssetStatus_LoadFailed;
-	assetToModify->m_loadAssetFromFileData.lastAcessTime = FileReadStream::getFileModTime(assetToModify->getPath().c_str());
+	assetToModify->m_loadAssetFromFileData.lastAcessTime =
+	    FileReadStream::getFileModTime(assetToModify->getPath().c_str());
 
 	if (!loadSucceeded) {
 		sgeAssert(false);
@@ -297,7 +299,8 @@ bool AssetLibrary::reloadAssetModified(AssetPtr& assetToModify)
 
 	// Measure the loading time.
 	const float reloadEndTime = Timer::now_seconds();
-	sgeLogInfo("Asset '%s' reloaded in %f seconds.\n", assetToModify->getPath().c_str(), reloadEndTime - reloadStartTime);
+	sgeLogInfo(
+	    "Asset '%s' reloaded in %f seconds.\n", assetToModify->getPath().c_str(), reloadEndTime - reloadStartTime);
 
 	return true;
 }

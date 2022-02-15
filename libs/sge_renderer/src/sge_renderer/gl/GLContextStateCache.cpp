@@ -91,20 +91,22 @@ void GLContextStateCache::BindBuffer(const GLenum bufferTarget, const GLuint buf
 }
 
 //---------------------------------------------------------------------
-void GLContextStateCache::SetVertexAttribSlotState(const bool bEnabled,
-                                                   const GLuint index,
-                                                   const GLuint buffer,
-                                                   const GLuint size,
-                                                   const GLenum type,
-                                                   const GLboolean normalized,
-                                                   const GLuint stride,
-                                                   const GLuint byteOffset)
+void GLContextStateCache::SetVertexAttribSlotState(
+    const bool bEnabled,
+    const GLuint index,
+    const GLuint buffer,
+    const GLuint size,
+    const GLenum type,
+    const GLboolean normalized,
+    const GLuint stride,
+    const GLuint byteOffset)
 {
 	VertexAttribSlotDesc& currentState = m_vertAttribPointers[index];
 
 	// If currently the slot is enabled just disable it and bypass the call to
 	// glVertexAttribPointer.
-	// Calling glDisableVertexAttribArray("index") will invalidate the previous glVertexAttribPointer on "index"-th slot.
+	// Calling glDisableVertexAttribArray("index") will invalidate the previous glVertexAttribPointer on "index"-th
+	// slot.
 	bool justEnabled = false;
 
 	if (bEnabled != currentState.isEnabled) {
@@ -121,9 +123,9 @@ void GLContextStateCache::SetVertexAttribSlotState(const bool bEnabled,
 	}
 
 	if (currentState.isEnabled) {
-		const bool stateDiff = (currentState.buffer != buffer) || (currentState.size != size) || (currentState.type != type) ||
-		                       (currentState.normalized != normalized) || (currentState.stride != stride) ||
-		                       (currentState.byteOffset != byteOffset);
+		const bool stateDiff = (currentState.buffer != buffer) || (currentState.size != size) ||
+		                       (currentState.type != type) || (currentState.normalized != normalized) ||
+		                       (currentState.stride != stride) || (currentState.byteOffset != byteOffset);
 
 		BindBuffer(GL_ARRAY_BUFFER, buffer);
 		DumpAllGLErrors();
@@ -143,12 +145,21 @@ void GLContextStateCache::SetVertexAttribSlotState(const bool bEnabled,
 			// Even if we specify GL_INT as a type. glGetError will not report any errors,
 			// but in shader we will not get the integers we've specified.
 			if (currentState.type == GL_INT || currentState.type == GL_UNSIGNED_INT) {
-				glVertexAttribIPointer(index, currentState.size, currentState.type, currentState.stride,
-				                       (GLvoid*)(std::ptrdiff_t(currentState.byteOffset)));
+				glVertexAttribIPointer(
+				    index,
+				    currentState.size,
+				    currentState.type,
+				    currentState.stride,
+				    (GLvoid*)(std::ptrdiff_t(currentState.byteOffset)));
 			}
 			else {
-				glVertexAttribPointer(index, currentState.size, currentState.type, currentState.normalized, currentState.stride,
-				                      (GLvoid*)(std::ptrdiff_t(currentState.byteOffset)));
+				glVertexAttribPointer(
+				    index,
+				    currentState.size,
+				    currentState.type,
+				    currentState.normalized,
+				    currentState.stride,
+				    (GLvoid*)(std::ptrdiff_t(currentState.byteOffset)));
 			}
 			DumpAllGLErrors();
 		}
@@ -326,7 +337,8 @@ void GLContextStateCache::ApplyRasterDesc(const RasterDesc& desc)
 
 void GLContextStateCache::ApplyScissorsRect(GLint x, GLint y, GLsizei width, GLsizei height)
 {
-	const bool diff = m_scissorsRect.x != x || m_scissorsRect.y != y || m_scissorsRect.width != width || m_scissorsRect.height != height;
+	const bool diff = m_scissorsRect.x != x || m_scissorsRect.y != y || m_scissorsRect.width != width ||
+	                  m_scissorsRect.height != height;
 
 	if (diff == false) {
 		return;
@@ -381,10 +393,14 @@ void GLContextStateCache::ApplyBlendState(const BlendDesc& blendDesc)
 
 		// if(m_blendDesc != blendDesc)
 		//{
-		glBlendFuncSeparate(Blend_GetGLNative(m_blendDesc.srcBlend), Blend_GetGLNative(m_blendDesc.destBlend),
-		                    Blend_GetGLNative(m_blendDesc.alphaSrcBlend), Blend_GetGLNative(m_blendDesc.alphaDestBlend));
+		glBlendFuncSeparate(
+		    Blend_GetGLNative(m_blendDesc.srcBlend),
+		    Blend_GetGLNative(m_blendDesc.destBlend),
+		    Blend_GetGLNative(m_blendDesc.alphaSrcBlend),
+		    Blend_GetGLNative(m_blendDesc.alphaDestBlend));
 
-		glBlendEquationSeparate(BlendOp_GetGLNative(m_blendDesc.blendOp), BlendOp_GetGLNative(m_blendDesc.alphaBlendOp));
+		glBlendEquationSeparate(
+		    BlendOp_GetGLNative(m_blendDesc.blendOp), BlendOp_GetGLNative(m_blendDesc.alphaBlendOp));
 
 		m_blendDesc = blendDesc;
 	}
@@ -392,11 +408,12 @@ void GLContextStateCache::ApplyBlendState(const BlendDesc& blendDesc)
 	DumpAllGLErrors();
 }
 
-void GLContextStateCache::DrawElements(const GLenum primTopology,
-                                       const GLuint numIndices,
-                                       const GLenum elemArrayBufferFormat,
-                                       const GLvoid* indices,
-                                       const GLsizei instanceCount)
+void GLContextStateCache::DrawElements(
+    const GLenum primTopology,
+    const GLuint numIndices,
+    const GLenum elemArrayBufferFormat,
+    const GLvoid* indices,
+    const GLsizei instanceCount)
 {
 	if (instanceCount == 1)
 		glDrawElements(primTopology, numIndices, elemArrayBufferFormat, indices);
@@ -406,10 +423,8 @@ void GLContextStateCache::DrawElements(const GLenum primTopology,
 	DumpAllGLErrors();
 }
 
-void GLContextStateCache::DrawArrays(const GLenum primTopology,
-                                     const GLuint startVertex,
-                                     const GLuint numVerts,
-                                     const GLsizei instanceCount)
+void GLContextStateCache::DrawArrays(
+    const GLenum primTopology, const GLuint startVertex, const GLuint numVerts, const GLsizei instanceCount)
 {
 	if (instanceCount == 1)
 		glDrawArrays(primTopology, startVertex, numVerts);
@@ -542,9 +557,11 @@ bool GLContextStateCache::IsBufferTargetSupported(const GLenum bufferTarget)
 			return true;
 	}
 #ifdef SGE_USE_DEBUG
-	sgeAssert(false &&
-	          "Unsupported buffer target encountered! Everything might be fine, but this something really rare so I wanted to let you know "
-	          "that it happend.");
+	sgeAssert(
+	    false &&
+	    "Unsupported buffer target encountered! Everything might be fine, but this something really rare so I wanted "
+	    "to let you know "
+	    "that it happend.");
 #endif
 	return false;
 }

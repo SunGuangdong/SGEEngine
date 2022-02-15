@@ -15,14 +15,15 @@
 
 namespace sge {
 
-void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
-                                           const vec3f& camPos,
-                                           const mat4f& projView,
-                                           const mat4f& world,
-                                           const ShadowMapBuildInfo& shadowMapBuildInfo,
-                                           const Geometry& geometry,
-                                           const Texture* diffuseTexForAlphaMask,
-                                           const bool forceNoCulling)
+void FWDBuildShadowMapShader::drawGeometry(
+    const RenderDestination& rdest,
+    const vec3f& camPos,
+    const mat4f& projView,
+    const mat4f& world,
+    const ShadowMapBuildInfo& shadowMapBuildInfo,
+    const Geometry& geometry,
+    const Texture* diffuseTexForAlphaMask,
+    const bool forceNoCulling)
 {
 	enum {
 		OPT_LightType,
@@ -49,7 +50,9 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		    {OPT_LightType,
 		     "OPT_LightType",
 		     {SGE_MACRO_STR(FWDDBSM_OPT_LightType_SpotOrDirectional), SGE_MACRO_STR(FWDDBSM_OPT_LightType_Point)}},
-		    {OPT_HasVertexSkinning, "OPT_HasVertexSkinning", {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
+		    {OPT_HasVertexSkinning,
+		     "OPT_HasVertexSkinning",
+		     {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
 		    {OPT_HasDiffuseTexForAlphaMasking,
 		     "OPT_HasDiffuseTexForAlphaMasking",
 		     {SGE_MACRO_STR(kasDiffuseTexForAlphaMasking_No), SGE_MACRO_STR(kHasDiffuseTexForAlphaMasking_Yes)}},
@@ -66,22 +69,28 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		    {uUseDiffuseTexForAlphaMasking, "uUseDiffuseTexForAlphaMasking", ShaderType::PixelShader}};
 
 		SGEDevice* const sgedev = rdest.getDevice();
-		shadingPermutFWDBuildShadowMaps->createFromFile(sgedev, "core_shaders/FWDDefault_buildShadowMaps.hlsl",
-		                                                "shader_cache/FWDBuildShadowMaps.shadercache", compileTimeOptions, uniformsToCache);
+		shadingPermutFWDBuildShadowMaps->createFromFile(
+		    sgedev,
+		    "core_shaders/FWDDefault_buildShadowMaps.hlsl",
+		    "shader_cache/FWDBuildShadowMaps.shadercache",
+		    compileTimeOptions,
+		    uniformsToCache);
 	}
 
 	const int optHasVertexSkinning = (geometry.hasVertexSkinning()) ? kHasVertexSkinning_Yes : kHasVertexSkinning_No;
 	const int optHasDiffuseTexForAlphaMasking = geometry.vertexDeclHasUv && diffuseTexForAlphaMask != nullptr;
 
 	const OptionPermuataor::OptionChoice optionChoice[kNumOptions] = {
-	    {OPT_LightType, shadowMapBuildInfo.isPointLight ? FWDDBSM_OPT_LightType_Point : FWDDBSM_OPT_LightType_SpotOrDirectional},
+	    {OPT_LightType,
+	     shadowMapBuildInfo.isPointLight ? FWDDBSM_OPT_LightType_Point : FWDDBSM_OPT_LightType_SpotOrDirectional},
 	    {OPT_HasVertexSkinning, optHasVertexSkinning},
 	    {OPT_HasDiffuseTexForAlphaMasking, optHasDiffuseTexForAlphaMasking},
 	};
 
-	const int iShaderPerm =
-	    shadingPermutFWDBuildShadowMaps->getCompileTimeOptionsPerm().computePermutationIndex(optionChoice, SGE_ARRSZ(optionChoice));
-	const ShadingProgramPermuator::Permutation& shaderPerm = shadingPermutFWDBuildShadowMaps->getShadersPerPerm()[iShaderPerm];
+	const int iShaderPerm = shadingPermutFWDBuildShadowMaps->getCompileTimeOptionsPerm().computePermutationIndex(
+	    optionChoice, SGE_ARRSZ(optionChoice));
+	const ShadingProgramPermuator::Permutation& shaderPerm =
+	    shadingPermutFWDBuildShadowMaps->getShadersPerPerm()[iShaderPerm];
 
 	StaticArray<BoundUniform, 8> uniforms;
 
@@ -91,13 +100,15 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 	if (shadowMapBuildInfo.isPointLight) {
 		vec3f pointLightPositionWs = camPos;
 		shaderPerm.bind<8>(uniforms, uPointLightPositionWs, (void*)&pointLightPositionWs);
-		shaderPerm.bind<8>(uniforms, uPointLightFarPlaneDistance, (void*)&shadowMapBuildInfo.pointLightFarPlaneDistance);
+		shaderPerm.bind<8>(
+		    uniforms, uPointLightFarPlaneDistance, (void*)&shadowMapBuildInfo.pointLightFarPlaneDistance);
 	}
 
 	if (optHasVertexSkinning == kHasVertexSkinning_Yes) {
 		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uSkinningBones], (geometry.skinningBoneTransforms)));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uSkinningFirstBoneOffsetInTex], (void*)&geometry.firstBoneOffset));
+		uniforms.push_back(
+		    BoundUniform(shaderPerm.uniformLUT[uSkinningFirstBoneOffsetInTex], (void*)&geometry.firstBoneOffset));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
 
@@ -105,7 +116,8 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		int intTrue = 1;
 		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uUseDiffuseTexForAlphaMasking], &intTrue));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uDiffuseTexForAlphaMasking], (void*)diffuseTexForAlphaMask));
+		uniforms.push_back(
+		    BoundUniform(shaderPerm.uniformLUT[uDiffuseTexForAlphaMasking], (void*)diffuseTexForAlphaMask));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
 
@@ -123,7 +135,8 @@ void FWDBuildShadowMapShader::drawGeometry(const RenderDestination& rdest,
 		// TODO: Add a way to specify in the geometry to use the back faces for geometries.
 		// This would remove the shadow acne for those gemetries without needed any depth bias.
 		bool flipCulling = determinant(world) > 0.f;
-		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
+		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default
+		                          : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
 	}
 
 

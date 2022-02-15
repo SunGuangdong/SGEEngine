@@ -249,7 +249,10 @@ struct quatf {
 
 	/// Transforms the specified point by the quaternion q.
 	friend vec3f quat_mul_pos(const quatf& q, const vec3f& p) { return (q * quatf(p, 0) * q.inverse()).xyz(); }
-	friend vec3f normalizedQuat_mul_pos(const quatf& q, const vec3f& p) { return (q * quatf(p, 0) * q.conjugate()).xyz(); }
+	friend vec3f normalizedQuat_mul_pos(const quatf& q, const vec3f& p)
+	{
+		return (q * quatf(p, 0) * q.conjugate()).xyz();
+	}
 
 	float dot(const quatf& q) const
 	{
@@ -353,7 +356,8 @@ struct quatf {
 	/// Computes the quaternion which would rotate the vector @fromNormalized to @toNormalized.
 	/// @fallbackAxis is used if vectors are pointing in the oposite directions.
 	/// In that case the rotation will be around that axis..
-	static quatf fromNormalizedVectors(const vec3f& fromNormalized, const vec3f& toNormalized, const vec3f& fallbackAxis)
+	static quatf
+	    fromNormalizedVectors(const vec3f& fromNormalized, const vec3f& toNormalized, const vec3f& fallbackAxis)
 	{
 		float dotProd = clamp(fromNormalized.dot(toNormalized), -1.f, 1.f);
 

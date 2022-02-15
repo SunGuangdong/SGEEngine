@@ -186,7 +186,8 @@ struct Pos {
 	Box2f getBBoxPixels(const Box2f& parentBBox, vec2f parentContentOriginPixels, const Size& size) const
 	{
 		const vec2f parentBBoxSizePixels = parentBBox.size();
-		const vec2f anchorPosSS(posX.computeSizePixels(true, parentBBoxSizePixels), posY.computeSizePixels(false, parentBBoxSizePixels));
+		const vec2f anchorPosSS(
+		    posX.computeSizePixels(true, parentBBoxSizePixels), posY.computeSizePixels(false, parentBBoxSizePixels));
 		const vec2f sizeSS = size.computeSizePixels(parentBBox.size());
 		const vec2f posTopLeftSS = anchorPosSS - sizeSS * anchorCoeff + parentBBox.min + parentContentOriginPixels;
 
@@ -199,7 +200,8 @@ struct Pos {
 
 	vec2f toPixels(const vec2f& parentBBoxSizePixels) const
 	{
-		const vec2f posSS(posX.computeSizePixels(true, parentBBoxSizePixels), posY.computeSizePixels(false, parentBBoxSizePixels));
+		const vec2f posSS(
+		    posX.computeSizePixels(true, parentBBoxSizePixels), posY.computeSizePixels(false, parentBBoxSizePixels));
 		return posSS;
 	}
 
@@ -208,7 +210,8 @@ struct Pos {
 	{
 		float xPixels = posX.computeSizePixels(true, dimensionsSize);
 		float yPixels = posY.computeSizePixels(false, dimensionsSize);
-		return Pos::fromFrac(dimensionsSize.x ? xPixels / dimensionsSize.x : 0.f, dimensionsSize.y ? yPixels / dimensionsSize.y : 0);
+		return Pos::fromFrac(
+		    dimensionsSize.x ? xPixels / dimensionsSize.x : 0.f, dimensionsSize.y ? yPixels / dimensionsSize.y : 0);
 	}
 };
 

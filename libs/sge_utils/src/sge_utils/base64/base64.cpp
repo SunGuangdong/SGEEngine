@@ -123,8 +123,10 @@ void base64_encode(const void* vptrData, size_t datasize, char* encodedString)
 		encodedString[0] = base64_characters[encodedIndices[0]];
 		encodedString[1] = base64_characters[encodedIndices[1]];
 		encodedString[2] =
-		    (paddedBytes == 1) ? '=' : base64_characters[encodedIndices[2]]; // if exactly one byte is converted this must be '='
-		encodedString[3] = '=';                                              // this is always '='
+		    (paddedBytes == 1)
+		        ? '='
+		        : base64_characters[encodedIndices[2]]; // if exactly one byte is converted this must be '='
+		encodedString[3] = '=';                         // this is always '='
 	}
 }
 

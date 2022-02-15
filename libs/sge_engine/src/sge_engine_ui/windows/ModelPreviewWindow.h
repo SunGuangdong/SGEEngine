@@ -16,7 +16,11 @@ namespace sge {
 struct SGE_ENGINE_API ModelPreviewWidget {
 	orbit_camera camera;
 	GpuHandle<FrameTarget> m_frameTarget;
-	void doWidget(SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize = NullOptional());
+	void doWidget(
+	    SGEContext* const sgecon,
+	    const InputState& is,
+	    EvaluatedModel& m_eval,
+	    Optional<vec2f> widgetSize = NullOptional());
 };
 
 struct ModelPreviewWindow : public IImGuiWindow {

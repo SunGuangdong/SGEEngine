@@ -97,7 +97,8 @@ struct SGE_ENGINE_API CollisionShape {
 	// The main shape used to be attached to the bullet rigid body.
 	std::unique_ptr<btCollisionShape> m_btShape;
 
-	// In case the collision shape is represented by concave triangle mesh, this object stores the actual triangles used by bullet physics.
+	// In case the collision shape is represented by concave triangle mesh, this object stores the actual triangles used
+	// by bullet physics.
 	std::vector<std::unique_ptr<btTriangleMesh>> m_triangleMeshes;
 };
 

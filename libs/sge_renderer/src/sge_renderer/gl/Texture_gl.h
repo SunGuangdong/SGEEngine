@@ -17,7 +17,8 @@ struct TextureGL : public Texture {
 	// arrayElem0(mip0, mip1, mip2, ...)
 	// arrayElem1(mip0, mip1, mip2, ...)
 	// arrayElem2(mip0, mip1, mip2, ...)
-	bool create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc sampler = SamplerDesc()) final;
+	bool create(
+	    const TextureDesc& desc, const TextureData initalData[], const SamplerDesc sampler = SamplerDesc()) final;
 
 	virtual void destroy() final;
 	virtual bool isValid() const final;

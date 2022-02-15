@@ -18,11 +18,12 @@ struct FrameTargetD3D11 : public FrameTarget {
 	~FrameTargetD3D11() { destroy(); }
 
 	// Sets render target and depth stencil elements can be NULL.
-	bool create(int numRenderTargets,
-	            Texture* renderTargets[],
-	            TargetDesc renderTargetDescs[],
-	            Texture* depthStencil,
-	            const TargetDesc& depthTargetDesc) final;
+	bool create(
+	    int numRenderTargets,
+	    Texture* renderTargets[],
+	    TargetDesc renderTargetDescs[],
+	    Texture* depthStencil,
+	    const TargetDesc& depthTargetDesc) final;
 
 	// In order Create to succeed all textures must share:
 	// - the same type
@@ -31,10 +32,11 @@ struct FrameTargetD3D11 : public FrameTarget {
 	bool create() final;
 
 	// Just a shortcut that makes a single 2D render target and optionally a 2D depth stencil texture.
-	bool create2D(int width,
-	              int height,
-	              TextureFormat::Enum renderTargetFmt = TextureFormat::R8G8B8A8_UNORM,
-	              TextureFormat::Enum depthTextureFmt = TextureFormat::D24_UNORM_S8_UINT) final;
+	bool create2D(
+	    int width,
+	    int height,
+	    TextureFormat::Enum renderTargetFmt = TextureFormat::R8G8B8A8_UNORM,
+	    TextureFormat::Enum depthTextureFmt = TextureFormat::D24_UNORM_S8_UINT) final;
 
 	// Attaches(overrides) the color atachment to the FrameTargetD3D11
 	void setRenderTarget(const int slot, Texture* texture, const TargetDesc& targetDesc) final;

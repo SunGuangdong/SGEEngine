@@ -55,7 +55,8 @@ struct StateStorage {
 	}
 };
 
-void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f widgetSize, bool isThisExpandedOfAnother)
+void MultiCurve2DEditor(
+    const char* const widgetName, MultiCurve2D& m_fn, vec2f widgetSize, bool isThisExpandedOfAnother)
 {
 	const char* const kContextPopupName = "MultiCurve2DEditorContext Menu";
 	const float kPointRadius = 4.f;
@@ -66,7 +67,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 		widgetSize.y = available.y - 50.f;
 	}
 	else {
-		widgetSize.x = widgetSize.x < 0 ? ImGui::CalcItemWidth() + (ImGui::GetStyle().FramePadding.x * 2.f) : widgetSize.x;
+		widgetSize.x =
+		    widgetSize.x < 0 ? ImGui::CalcItemWidth() + (ImGui::GetStyle().FramePadding.x * 2.f) : widgetSize.x;
 		widgetSize.y = widgetSize.y < 0 ? floorf(widgetSize.x * 0.50f) : widgetSize.y;
 	}
 
@@ -74,7 +76,11 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 	widgetSize.y = std::max(16.f, widgetSize.y);
 
 
-	if (!ImGui::BeginChild(ImGui::GetID(widgetName), toImGui(widgetSize), true, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove)) {
+	if (!ImGui::BeginChild(
+	        ImGui::GetID(widgetName),
+	        toImGui(widgetSize),
+	        true,
+	        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoMove)) {
 		ImGui::EndChild();
 		return;
 	}
@@ -133,7 +139,8 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 			m_fn.addSmoothPointSafe(cursorFS.x, cursorFS.y);
 		}
 		else if (ImGui::GetIO().MouseWheel) {
-			// If the cursor is over some point zoom towards that point, otherwise zoom towards the curson in function space.
+			// If the cursor is over some point zoom towards that point, otherwise zoom towards the curson in function
+			// space.
 			vec2f zoomTargetCS = cursorCS;
 			vec2f zoomTargetInitialFS = cursorFS;
 			for (int iPt = 0; iPt < int(m_fn.getPoints().size()); ++iPt) {
@@ -503,8 +510,10 @@ void MultiCurve2DEditor(const char* const widgetName, MultiCurve2D& m_fn, vec2f 
 
 			int iAttacment = m_fn.findHandleAttachmentPoint(iPt);
 			if (m_fn.isIndexValid(iAttacment)) {
-				wndDrawList->AddLine(toImGui(function2screen(m_fn.getPoints()[iPt].getPos())),
-				                     toImGui(function2screen(m_fn.getPoints()[iAttacment].getPos())), 0x66000000);
+				wndDrawList->AddLine(
+				    toImGui(function2screen(m_fn.getPoints()[iPt].getPos())),
+				    toImGui(function2screen(m_fn.getPoints()[iAttacment].getPos())),
+				    0x66000000);
 			}
 		}
 	}

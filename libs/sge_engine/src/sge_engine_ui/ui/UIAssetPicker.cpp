@@ -18,11 +18,12 @@
 
 namespace sge {
 
-bool assetPicker(const char* label,
-                 std::string& assetPath,
-                 AssetLibrary* const assetLibrary,
-                 const AssetIfaceType assetTypes[],
-                 const int numAssetIfaceTypes)
+bool assetPicker(
+    const char* label,
+    std::string& assetPath,
+    AssetLibrary* const assetLibrary,
+    const AssetIfaceType assetTypes[],
+    const int numAssetIfaceTypes)
 {
 	ImGuiEx::IDGuard idGuard(label);
 	ImGuiEx::Label(label);
@@ -58,7 +59,8 @@ bool assetPicker(const char* label,
 	// Handle accepting drops from drag and drop.
 	if (ImGui::BeginDragDropTarget()) {
 		if (Optional<std::string> droppedAssetPath = DragDropPayloadAsset::accept()) {
-			AssetPtr droppedAsset = getCore()->getAssetLib()->getAssetFromFile(droppedAssetPath->c_str(), nullptr, false);
+			AssetPtr droppedAsset =
+			    getCore()->getAssetLib()->getAssetFromFile(droppedAssetPath->c_str(), nullptr, false);
 			if (droppedAsset) {
 				// Check if the dropped asset is of correct interface type.
 				bool isOfAcceptedInterfaces = false;
@@ -93,7 +95,8 @@ bool assetPicker(const char* label,
 		auto doAssetIfaceTypeMenu = [&](const AssetIfaceType assetType) -> void {
 			filter.Draw();
 			if (ImGui::IsItemClicked(2)) {
-				ImGui::ClearActiveID(); // Hack: (if we do not make this call ImGui::InputText will set it's cached value.
+				ImGui::ClearActiveID(); // Hack: (if we do not make this call ImGui::InputText will set it's cached
+				                        // value.
 				filter.Clear();
 			}
 
@@ -176,17 +179,26 @@ bool assetPicker(const char* label,
 						getCore()->getDevice()->getContext()->clearColor(frameTarget, 0, vec4f(0.f).data);
 						getCore()->getDevice()->getContext()->clearDepth(frameTarget, 1.f);
 
-						const vec3f camPos =
-						    mat_mul_pos(mat4f::getRotationY(passedTime * sge2Pi * 0.25f),
-						                mdlIface->getStaticEval().aabox.halfDiagonal() * 1.66f + mdlIface->getStaticEval().aabox.center());
-						const mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(90.f), 1.f, 0.01f, 10000.f, 0.f, kIsTexcoordStyleD3D);
-						const mat4f lookAt = mat4f::getLookAtRH(camPos, vec3f(0.f), vec3f(0.f, kIsTexcoordStyleD3D ? 1.f : -1.f, 0.f));
+						const vec3f camPos = mat_mul_pos(
+						    mat4f::getRotationY(passedTime * sge2Pi * 0.25f),
+						    mdlIface->getStaticEval().aabox.halfDiagonal() * 1.66f +
+						        mdlIface->getStaticEval().aabox.center());
+						const mat4f proj =
+						    mat4f::getPerspectiveFovRH(deg2rad(90.f), 1.f, 0.01f, 10000.f, 0.f, kIsTexcoordStyleD3D);
+						const mat4f lookAt =
+						    mat4f::getLookAtRH(camPos, vec3f(0.f), vec3f(0.f, kIsTexcoordStyleD3D ? 1.f : -1.f, 0.f));
 
 						RawCamera camera = RawCamera(camPos, lookAt, proj);
 
 						RenderDestination rdest(getCore()->getDevice()->getContext(), frameTarget);
 
-						drawEvalModel(rdest, camera, mat4f::getIdentity(), ObjectLighting(), mdlIface->getStaticEval(), InstanceDrawMods());
+						drawEvalModel(
+						    rdest,
+						    camera,
+						    mat4f::getIdentity(),
+						    ObjectLighting(),
+						    mdlIface->getStaticEval(),
+						    InstanceDrawMods());
 
 						ImGui::Image(frameTarget->getRenderTarget(0), ImVec2(textureSize, textureSize));
 						ImGui::EndTooltip();
@@ -228,7 +240,11 @@ bool assetPicker(const char* label,
 }
 
 SGE_ENGINE_API bool assetPicker(
-    const char* label, AssetPtr& asset, AssetLibrary* const assetLibrary, const AssetIfaceType assetTypes[], const int numAssetIfaceTypes)
+    const char* label,
+    AssetPtr& asset,
+    AssetLibrary* const assetLibrary,
+    const AssetIfaceType assetTypes[],
+    const int numAssetIfaceTypes)
 {
 	std::string tempPath = isAssetLoaded(asset) ? asset->getPath() : "";
 
@@ -241,7 +257,11 @@ SGE_ENGINE_API bool assetPicker(
 }
 
 bool actorPicker(
-    const char* label, GameWorld& world, ObjectId& ioValue, std::function<bool(const GameObject&)> filter, bool pickPrimarySelection)
+    const char* label,
+    GameWorld& world,
+    ObjectId& ioValue,
+    std::function<bool(const GameObject&)> filter,
+    bool pickPrimarySelection)
 {
 	GameInspector* inspector = world.getInspector();
 

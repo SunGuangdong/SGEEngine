@@ -115,7 +115,8 @@ struct ChunkContainer {
 
 	void clear()
 	{
-		const int totalSize = (int)(lastChunkTouchCount + ((chunks.size() != 0) ? (chunks.size() - 1) * CHUNK_SIZE : 0));
+		const int totalSize =
+		    (int)(lastChunkTouchCount + ((chunks.size() != 0) ? (chunks.size() - 1) * CHUNK_SIZE : 0));
 
 		// Free all elements.
 		// free_element checks internally if the element is already freed!

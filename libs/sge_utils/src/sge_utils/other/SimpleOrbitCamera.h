@@ -15,13 +15,18 @@ struct orbit_camera {
 	{
 		orbitToEye = vec3f(cos(yaw) * cos(pitch), sin(pitch), -sin(yaw) * cos(pitch)) * radius;
 
-		up = normalized(
-		    vec3f(cos(yaw) * cos(pitch + half_pi<float>()), sin(pitch + half_pi<float>()), -sin(yaw) * cos(pitch + half_pi<float>())));
+		up = normalized(vec3f(
+		    cos(yaw) * cos(pitch + half_pi<float>()),
+		    sin(pitch + half_pi<float>()),
+		    -sin(yaw) * cos(pitch + half_pi<float>())));
 
 		right = normalized(cross(up, orbitToEye));
 	}
 
-	vec3f eyePosition() const { return orbitPoint + vec3f(cos(yaw) * cos(pitch), sin(pitch), -sin(yaw) * cos(pitch)) * radius; }
+	vec3f eyePosition() const
+	{
+		return orbitPoint + vec3f(cos(yaw) * cos(pitch), sin(pitch), -sin(yaw) * cos(pitch)) * radius;
+	}
 
 	mat4f GetViewMatrix() const
 	{

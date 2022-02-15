@@ -142,7 +142,8 @@ struct ParticleGroupDesc {
 	float simulationSpeed = 1.f;
 
 	AssetProperty m_particlesSprite = AssetProperty(assetIface_texture2d);
-	vec2i m_spriteGrid = vec2i(1); // The number of sub images in the specified texture by x and y. They go row-wise left to right.
+	vec2i m_spriteGrid =
+	    vec2i(1); // The number of sub images in the specified texture by x and y. They go row-wise left to right.
 	float m_spritePixelsPerUnit = 32.f;
 	float m_spriteFPS = 30.f;
 };
@@ -159,7 +160,8 @@ struct SGE_ENGINE_API ParticleGroupState {
 		float opacity = 1.f;
 
 		float m_timeSpendAlive = 0.f;
-		float m_fSpriteIndex = 0.f; // The sprites are used for rendering this points to the sub-image being used for visualization.
+		float m_fSpriteIndex =
+		    0.f; // The sprites are used for rendering this points to the sub-image being used for visualization.
 
 		bool isDead() const { return m_timeSpendAlive >= m_maxLife; }
 	};
@@ -231,7 +233,8 @@ struct SGE_ENGINE_API TraitParticlesSimple : public Trait {
 
   public:
 	bool m_isEnabled = true;
-	bool m_isInWorldSpace = false; // if true, the particles are in world space, false is node space of the owning actor.
+	bool m_isInWorldSpace =
+	    false; // if true, the particles are in world space, false is node space of the owning actor.
 	std::vector<ParticleGroupDesc> m_pgroups;
 	std::unordered_map<std::string, ParticleGroupState> m_pgroupState;
 
@@ -267,7 +270,7 @@ struct SGE_ENGINE_API TraitParticlesProgrammable : public Trait {
 		std::vector<ParticleData> allParticles;
 		AssetPtr spriteTexture;
 		vec2i spriteFramsCount = vec2i(1); /// The number of sub-images in X and Y direction.
-		Box3f bbox;                        /// The bounding box of the particles in world or in object space depending on @isInWorldSpace.
+		Box3f bbox; /// The bounding box of the particles in world or in object space depending on @isInWorldSpace.
 		bool needsZAlphaSorting = false;
 	};
 
@@ -293,7 +296,11 @@ struct SGE_ENGINE_API ParticleRenderDataGen {
 
   public:
 	/// Returns true if there was data ready for rendering and it succeeded.
-	bool generate(const TraitParticlesProgrammable::ParticleGroup& particles, SGEContext& sgecon, const ICamera& camera, const mat4f& n2w);
+	bool generate(
+	    const TraitParticlesProgrammable::ParticleGroup& particles,
+	    SGEContext& sgecon,
+	    const ICamera& camera,
+	    const mat4f& n2w);
 
 	std::vector<SortingData> indicesForSorting;
 	std::vector<Pair<vec2f, vec2f>> spriteFramesUVCache;

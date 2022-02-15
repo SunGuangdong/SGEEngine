@@ -7,9 +7,10 @@
 
 namespace sge {
 
-/// Generates a ray, coresponding to a pixel (specified in "uv" space (0,0) is top left, (1,1) is bottom right) in world space.
-/// The generated ray.pos + ray.dir is a point on the near projection plane.
-inline Ray rayFromProjectionMatrix(const mat4f& proj, const mat4f& projInv, const mat4f& viewInv, const vec2f& cursorsUV)
+/// Generates a ray, coresponding to a pixel (specified in "uv" space (0,0) is top left, (1,1) is bottom right) in world
+/// space. The generated ray.pos + ray.dir is a point on the near projection plane.
+inline Ray
+    rayFromProjectionMatrix(const mat4f& proj, const mat4f& projInv, const mat4f& viewInv, const vec2f& cursorsUV)
 {
 	bool const isOrthographic = proj.data[2][3] == 0.f;
 

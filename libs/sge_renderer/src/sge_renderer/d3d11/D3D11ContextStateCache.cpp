@@ -87,9 +87,12 @@ void D3D11ContextStateCache::BindVertexBuffers(
 		}
 
 		if ((!changed || isLastBuffer) && bindNumElems) {
-			m_d3dcon->IASetVertexBuffers(bindSlotStartAccum, bindNumElems, &m_boundVertBuffers.buffer[bindSlotStartAccum],
-			                             &m_boundVertBuffers.stride[bindSlotStartAccum],
-			                             &m_boundVertBuffers.byteOffset[bindSlotStartAccum]);
+			m_d3dcon->IASetVertexBuffers(
+			    bindSlotStartAccum,
+			    bindNumElems,
+			    &m_boundVertBuffers.buffer[bindSlotStartAccum],
+			    &m_boundVertBuffers.stride[bindSlotStartAccum],
+			    &m_boundVertBuffers.byteOffset[bindSlotStartAccum]);
 
 			// Update the next binding pos and reset counters.
 			bindSlotStartAccum = startSlot + t + 1;
@@ -132,7 +135,8 @@ void D3D11ContextStateCache::SetPS(ID3D11PixelShader* pixelShader)
 	}
 }
 
-void D3D11ContextStateCache::BindConstantBuffers(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11Buffer** pBuffers)
+void D3D11ContextStateCache::BindConstantBuffers(
+    const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11Buffer** pBuffers)
 {
 	bool shouldCallAPI = false;
 	for (unsigned int t = startSlot; t < numElements; ++t) {
@@ -147,10 +151,12 @@ void D3D11ContextStateCache::BindConstantBuffers(const ShaderType::Enum stage, U
 
 		switch (stage) {
 			case ShaderType::VertexShader:
-				m_d3dcon->VSSetConstantBuffers(startSlot, numElements, m_boundResources[stage].cbuffers.data() + startSlot);
+				m_d3dcon->VSSetConstantBuffers(
+				    startSlot, numElements, m_boundResources[stage].cbuffers.data() + startSlot);
 				break;
 			case ShaderType::PixelShader:
-				m_d3dcon->PSSetConstantBuffers(startSlot, numElements, m_boundResources[stage].cbuffers.data() + startSlot);
+				m_d3dcon->PSSetConstantBuffers(
+				    startSlot, numElements, m_boundResources[stage].cbuffers.data() + startSlot);
 				break;
 			default:
 				sgeAssert(false);
@@ -220,7 +226,8 @@ bool D3D11ContextStateCache::IsResourceBoundAsRTVorDSV(const ID3D11Resource* res
 	return false;
 }
 
-void D3D11ContextStateCache::BindSRVs(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11ShaderResourceView** pSRVs)
+void D3D11ContextStateCache::BindSRVs(
+    const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11ShaderResourceView** pSRVs)
 {
 	UINT bindSlotStartAccum = startSlot;
 	UINT bindNumElems = 0;
@@ -238,7 +245,8 @@ void D3D11ContextStateCache::BindSRVs(const ShaderType::Enum stage, UINT startSl
 				pSRVs[t]->GetResource(&resource);
 
 				if (IsResourceBoundAsRTVorDSV(resource)) {
-					sgeAssert(false && "Trying to bind SRV resource that is already bound as RTV/DSV. SGE will bind NULL.");
+					sgeAssert(
+					    false && "Trying to bind SRV resource that is already bound as RTV/DSV. SGE will bind NULL.");
 					m_boundResources[stage].srvs[slot] = nullptr;
 				}
 			}
@@ -269,7 +277,8 @@ void D3D11ContextStateCache::BindSRVs(const ShaderType::Enum stage, UINT startSl
 	}
 }
 
-void D3D11ContextStateCache::BindSamplers(const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11SamplerState** pSamplers)
+void D3D11ContextStateCache::BindSamplers(
+    const ShaderType::Enum stage, UINT startSlot, UINT numElements, ID3D11SamplerState** pSamplers)
 {
 	UINT bindSlotStartAccum = startSlot;
 	UINT bindNumElems = 0;
@@ -363,9 +372,11 @@ void D3D11ContextStateCache::ResolveBindRTVorDSVHazzard(ID3D11Resource* const* r
 
 				if (srvResource == resources[iResource]) {
 					sgeLogWarn(
-					    "[RES-HAZZARD][D3D11]Trying to bind resource(stage:%d, slot:%d) as RTV/DSV while it's already bound as SRV."
+					    "[RES-HAZZARD][D3D11]Trying to bind resource(stage:%d, slot:%d) as RTV/DSV while it's already "
+					    "bound as SRV."
 					    "SRV will be unbound! The D3D11 warrning will be silenced by this action!\n",
-					    iStage, iSlot);
+					    iStage,
+					    iSlot);
 					ID3D11ShaderResourceView* nullSRVs[] = {NULL};
 					BindSRVs((ShaderType::Enum)iStage, iSlot, 1, nullSRVs);
 				}
@@ -375,10 +386,8 @@ void D3D11ContextStateCache::ResolveBindRTVorDSVHazzard(ID3D11Resource* const* r
 			}
 }
 
-void D3D11ContextStateCache::SetRenderTargetsAndDepthStencil(const UINT startSlot,
-                                                             const UINT numRenderTargets,
-                                                             ID3D11RenderTargetView** rtvs,
-                                                             ID3D11DepthStencilView* dsv)
+void D3D11ContextStateCache::SetRenderTargetsAndDepthStencil(
+    const UINT startSlot, const UINT numRenderTargets, ID3D11RenderTargetView** rtvs, ID3D11DepthStencilView* dsv)
 {
 	bool shouldCallAPIFunc = false;
 
@@ -465,12 +474,13 @@ void D3D11ContextStateCache::BufferUnbind(ID3D11Buffer* const buffer)
 		}
 }
 
-void D3D11ContextStateCache::TextureUnbind(ID3D11ShaderResourceView* const srvs[],
-                                           const int srvCnt,
-                                           ID3D11RenderTargetView* const rtvs[],
-                                           const int rtvCnt,
-                                           ID3D11DepthStencilView* const dsvs[],
-                                           const int dsvCnt)
+void D3D11ContextStateCache::TextureUnbind(
+    ID3D11ShaderResourceView* const srvs[],
+    const int srvCnt,
+    ID3D11RenderTargetView* const rtvs[],
+    const int rtvCnt,
+    ID3D11DepthStencilView* const dsvs[],
+    const int dsvCnt)
 {
 	if (srvs && srvCnt) {
 		for (const auto srv : ArrayView<ID3D11ShaderResourceView* const>(srvs, srvCnt))

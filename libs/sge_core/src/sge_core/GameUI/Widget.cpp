@@ -102,8 +102,14 @@ std::shared_ptr<ColoredWidget> ColoredWidget::create(UIContext& owningContext, P
 void ColoredWidget::draw(const UIDrawSets& drawSets)
 {
 	const Box2f bboxScissorsSS = getScissorBoxSS();
-	drawSets.quickDraw->drawRect(drawSets.rdest, bboxScissorsSS.min.x, bboxScissorsSS.min.y, bboxScissorsSS.size().x,
-	                             bboxScissorsSS.size().y, m_color, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	drawSets.quickDraw->drawRect(
+	    drawSets.rdest,
+	    bboxScissorsSS.min.x,
+	    bboxScissorsSS.min.y,
+	    bboxScissorsSS.size().x,
+	    bboxScissorsSS.size().y,
+	    m_color,
+	    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
 void TextWidget::draw(const UIDrawSets& drawSets)
@@ -129,13 +135,15 @@ void TextWidget::draw(const UIDrawSets& drawSets)
 	//                             getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	const Rect2s scissors = getScissorRect();
-	drawSets.quickDraw->drawTextLazy(drawSets.rdest, *font, vec2f(textPosX, textPosY), m_color, m_text.c_str(), textHeight, &scissors);
+	drawSets.quickDraw->drawTextLazy(
+	    drawSets.rdest, *font, vec2f(textPosX, textPosY), m_color, m_text.c_str(), textHeight, &scissors);
 }
 
 //----------------------------------------------------
 // ImageWidget
 //----------------------------------------------------
-std::shared_ptr<ImageWidget> ImageWidget::create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture)
+std::shared_ptr<ImageWidget>
+    ImageWidget::create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture)
 {
 	float(texture->getDesc().texture2D.width), float(texture->getDesc().texture2D.height);
 	gamegui::Size size;
@@ -148,7 +156,8 @@ std::shared_ptr<ImageWidget> ImageWidget::create(UIContext& owningContext, Pos p
 	return w;
 }
 
-std::shared_ptr<ImageWidget> ImageWidget::createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture)
+std::shared_ptr<ImageWidget>
+    ImageWidget::createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture)
 {
 	float(texture->getDesc().texture2D.width), float(texture->getDesc().texture2D.height);
 	gamegui::Size size;
@@ -167,15 +176,22 @@ void ImageWidget::draw(const UIDrawSets& drawSets)
 	if (m_texture.IsResourceValid()) {
 		const Box2f bboxSS = getBBoxPixels();
 		float opacity = calcTotalOpacity();
-		drawSets.quickDraw->drawRectTexture(drawSets.rdest, bboxSS, m_texture, getCore()->getGraphicsResources().BS_backToFrontAlpha,
-		                                    vec2f(0), vec2f(1.f), opacity);
+		drawSets.quickDraw->drawRectTexture(
+		    drawSets.rdest,
+		    bboxSS,
+		    m_texture,
+		    getCore()->getGraphicsResources().BS_backToFrontAlpha,
+		    vec2f(0),
+		    vec2f(1.f),
+		    opacity);
 	}
 }
 
 //----------------------------------------------------
 // ButtonWidget
 //----------------------------------------------------
-std::shared_ptr<ButtonWidget> ButtonWidget::create(UIContext& owningContext, Pos position, Size size, const char* const text)
+std::shared_ptr<ButtonWidget>
+    ButtonWidget::create(UIContext& owningContext, Pos position, Size size, const char* const text)
 {
 	auto btn = std::make_shared<ButtonWidget>(owningContext, position, size);
 	if (text != nullptr) {
@@ -199,7 +215,8 @@ void ButtonWidget::draw(const UIDrawSets& drawSets)
 		bgColor = m_bgColorHovered;
 	}
 
-	drawSets.quickDraw->drawRect(drawSets.rdest, bboxScissorsSS, bgColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	drawSets.quickDraw->drawRect(
+	    drawSets.rdest, bboxScissorsSS, bgColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	DebugFont* const font = m_font ? m_font : getContext().getDefaultFont();
 	if (font != nullptr && !m_text.empty()) {
@@ -211,27 +228,40 @@ void ButtonWidget::draw(const UIDrawSets& drawSets)
 		const float textPosY = bboxSS.center().y + textDim.y * 0.5f;
 
 		const Rect2s scissors = getScissorRect();
-		drawSets.quickDraw->drawTextLazy(drawSets.rdest, *font, vec2f(textPosX, textPosY), m_textColor, m_text.c_str(), textHeight,
-		                                 &scissors);
+		drawSets.quickDraw->drawTextLazy(
+		    drawSets.rdest, *font, vec2f(textPosX, textPosY), m_textColor, m_text.c_str(), textHeight, &scissors);
 	}
 
 	if (m_text.empty()) {
 		const Rect2s scissors = getScissorRect();
 
 		if (m_triangleDir == axis_x_pos) {
-			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, 0, m_textColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+			drawSets.quickDraw->drawTriLeft(
+			    drawSets.rdest, bboxSS, 0, m_textColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 		else if (m_triangleDir == axis_y_neg) {
-			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, deg2rad(90.f), m_textColor,
-			                                getCore()->getGraphicsResources().BS_backToFrontAlpha);
+			drawSets.quickDraw->drawTriLeft(
+			    drawSets.rdest,
+			    bboxSS,
+			    deg2rad(90.f),
+			    m_textColor,
+			    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 		else if (m_triangleDir == axis_x_neg) {
-			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, deg2rad(180.f), m_textColor,
-			                                getCore()->getGraphicsResources().BS_backToFrontAlpha);
+			drawSets.quickDraw->drawTriLeft(
+			    drawSets.rdest,
+			    bboxSS,
+			    deg2rad(180.f),
+			    m_textColor,
+			    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 		else if (m_triangleDir == axis_x_neg) {
-			drawSets.quickDraw->drawTriLeft(drawSets.rdest, bboxSS, deg2rad(-90.f), m_textColor,
-			                                getCore()->getGraphicsResources().BS_backToFrontAlpha);
+			drawSets.quickDraw->drawTriLeft(
+			    drawSets.rdest,
+			    bboxSS,
+			    deg2rad(-90.f),
+			    m_textColor,
+			    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 	}
 }
@@ -252,7 +282,8 @@ std::shared_ptr<HorizontalComboBox> HorizontalComboBox::create(UIContext& owning
 
 	std::shared_ptr<HorizontalComboBox> hcombo = std::make_shared<HorizontalComboBox>(owningContext, position, size);
 
-	std::shared_ptr<ButtonWidget> leftBtn = std::make_shared<ButtonWidget>(owningContext, Pos(0_f, 0_f), Size(1_hf, 1_hf));
+	std::shared_ptr<ButtonWidget> leftBtn =
+	    std::make_shared<ButtonWidget>(owningContext, Pos(0_f, 0_f), Size(1_hf, 1_hf));
 	std::shared_ptr<ButtonWidget> rightBtn =
 	    std::make_shared<ButtonWidget>(owningContext, Pos(1_f, 0_f, vec2f(1.f, 0.f)), Size(1_hf, 1_hf));
 
@@ -291,8 +322,14 @@ void HorizontalComboBox::draw(const UIDrawSets& drawSets)
 		const float textPosY = bboxPixels.center().y + textHeight * 0.5f - textDim.y * 0.5f;
 
 		const Rect2s scissors = getScissorRect();
-		drawSets.quickDraw->drawTextLazy(drawSets.rdest, *getContext().getDefaultFont(), vec2f(textPosX, textPosY), vec4f(1.f),
-		                                 text.c_str(), textHeight, &scissors);
+		drawSets.quickDraw->drawTextLazy(
+		    drawSets.rdest,
+		    *getContext().getDefaultFont(),
+		    vec2f(textPosX, textPosY),
+		    vec4f(1.f),
+		    text.c_str(),
+		    textHeight,
+		    &scissors);
 	}
 }
 
@@ -320,7 +357,8 @@ void HorizontalComboBox::rightPressed()
 //----------------------------------------------------
 // Checkbox
 //----------------------------------------------------
-std::shared_ptr<Checkbox> Checkbox::create(UIContext& owningContext, Pos position, Size size, const char* const text, bool isOn)
+std::shared_ptr<Checkbox>
+    Checkbox::create(UIContext& owningContext, Pos position, Size size, const char* const text, bool isOn)
 {
 	auto checkbox = std::make_shared<gamegui::Checkbox>(owningContext, position, size);
 	if (text) {
@@ -340,8 +378,8 @@ void Checkbox::draw(const UIDrawSets& drawSets)
 	const Rect2s scissors = getScissorRect();
 
 	if (m_isPressed) {
-		drawSets.quickDraw->drawRect(drawSets.rdest, bboxScissors, colorBlack(0.333f),
-		                             getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		drawSets.quickDraw->drawRect(
+		    drawSets.rdest, bboxScissors, colorBlack(0.333f), getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 
 	if (m_text.empty() == false) {
@@ -351,8 +389,14 @@ void Checkbox::draw(const UIDrawSets& drawSets)
 		const float textPosX = bboxPixels.min.x;
 		const float textPosY = bboxPixels.center().y + textHeight * 0.5f - textDim.y * 0.5f;
 
-		drawSets.quickDraw->drawTextLazy(drawSets.rdest, *getContext().getDefaultFont(), vec2f(textPosX, textPosY), vec4f(1.f),
-		                                 m_text.c_str(), textHeight, &scissors);
+		drawSets.quickDraw->drawTextLazy(
+		    drawSets.rdest,
+		    *getContext().getDefaultFont(),
+		    vec2f(textPosX, textPosY),
+		    vec4f(1.f),
+		    m_text.c_str(),
+		    textHeight,
+		    &scissors);
 	}
 
 	// Draw the checkbox square.
@@ -362,8 +406,8 @@ void Checkbox::draw(const UIDrawSets& drawSets)
 	const Box2f checkBoxRectPixelSpace =
 	    checboxPos.getBBoxPixels(bboxPixels, getParentContentOrigin().toPixels(bboxPixels.size()), checkboxSize);
 	const vec4f checkBoxColor = m_isOn ? vec4f(0.f, 1.f, 0.f, 1.f) : vec4f(0.3f, 0.3f, 0.3f, 1.f);
-	drawSets.quickDraw->drawRect(drawSets.rdest, checkBoxRectPixelSpace, checkBoxColor,
-	                             getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	drawSets.quickDraw->drawRect(
+	    drawSets.rdest, checkBoxRectPixelSpace, checkBoxColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
 bool Checkbox::onPress()

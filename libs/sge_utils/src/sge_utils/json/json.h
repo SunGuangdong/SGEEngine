@@ -91,7 +91,8 @@ struct JsonValue {
 	JsonValue* setMember(const char* const name, JsonValue* value); // Returns value.
 	const JsonValue* getMember(const char* const name) const;
 
-	/// @brief Retrieves a member or throws JsonExceptAccess is missing or its type is different form @explectedType if != JID_NULL.
+	/// @brief Retrieves a member or throws JsonExceptAccess is missing or its type is different form @explectedType if
+	/// != JID_NULL.
 	const JsonValue& getMemberOrThrow(const char* const name, JID explectedType = JID_NULL) const;
 
 	// const JsonValue& operator[](const char* const) const;
@@ -297,9 +298,11 @@ class JsonParser : protected JsonValueBuffer {
 	JID getNextJID();                        // returns the JID of the next element
 	bool skipSeparatorAhead(char separator); // skips to 1st non space symbol. retval is (symbol == separator)
 	void skipSpacesAhead();                  // skips all spaces ahead
-	void readString(std::vector<unsigned char>& str,
-	                const bool procStringTokens); // if procStringTokens is true than the parser will try to convert \n \r \t symbols
-	void readNumber();                            // reads a number and stores the string in (numconvert,numconvertidx)
+	void readString(
+	    std::vector<unsigned char>& str,
+	    const bool
+	        procStringTokens); // if procStringTokens is true than the parser will try to convert \n \r \t symbols
+	void readNumber();         // reads a number and stores the string in (numconvert,numconvertidx)
 
 	// reads a value form the stream
 	JsonValue* parseValue(JID selfJID);
@@ -340,8 +343,9 @@ class JsonWriter {
 	void writeVairable(const JsonValue* const value);
 
 	void write(const char ch, bool forceNoPretty = false);
-	void writeString(const char* string,
-	                 const bool procStringTokens); // set procStringTokens to true to convert \t\n\r ect to '\' + 'n' ect..
+	void writeString(
+	    const char* string,
+	    const bool procStringTokens); // set procStringTokens to true to convert \t\n\r ect to '\' + 'n' ect..
 
 	std::vector<char> encodedData;
 	std::array<char, 32> numconvert;

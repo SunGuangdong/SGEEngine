@@ -42,7 +42,9 @@ __declspec(align(4))
 };
 
 #ifdef __cplusplus
-static_assert(sizeof(ShaderLightData) % sizeof(sge::vec4f) == 0, "Keep the size of Light multiple of float4 as it's used in cbuffers!");
+static_assert(
+    sizeof(ShaderLightData) % sizeof(sge::vec4f) == 0,
+    "Keep the size of Light multiple of float4 as it's used in cbuffers!");
 #endif
 
 #ifdef __cplusplus

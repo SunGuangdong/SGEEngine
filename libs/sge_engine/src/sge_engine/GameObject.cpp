@@ -33,10 +33,8 @@ ReflBlock()
 //--------------------------------------------------------------------
 // GameObject
 //--------------------------------------------------------------------
-void GameObject::private_GameWorld_performInitialization(GameWorld* const world,
-                                                         const ObjectId id,
-                                                         const TypeId typeId,
-                                                         std::string displayName)
+void GameObject::private_GameWorld_performInitialization(
+    GameWorld* const world, const ObjectId id, const TypeId typeId, std::string displayName)
 {
 	m_id = id;
 	m_type = typeId;
@@ -85,7 +83,8 @@ void GameObject::registerTrait(Trait& trait)
 	for (int t = 0; t < int(m_traits.size()); ++t) {
 		if (m_traits[t].traitFamilyType == family) {
 			sgeAssertFalse(
-			    "It seems that the trait of that family is already registered. Having multiple traits of the same family is not suported. "
+			    "It seems that the trait of that family is already registered. Having multiple traits of the same "
+			    "family is not suported. "
 			    "The current registration will get discarded.");
 			return;
 		}

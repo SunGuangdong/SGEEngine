@@ -16,7 +16,8 @@ MaterialEditWindow::MaterialEditWindow(std::string windowName)
 {
 }
 
-void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
+void MaterialEditWindow::update(
+    SGEContext* const UNUSED(sgecon), GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
@@ -53,11 +54,13 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), GameInspector*
 						    assetIface_texture2d,
 						};
 
-						std::shared_ptr<AssetIface_Texture2D>* pTexIface = (std::shared_ptr<AssetIface_Texture2D>*)chain.follow(mtl);
+						std::shared_ptr<AssetIface_Texture2D>* pTexIface =
+						    (std::shared_ptr<AssetIface_Texture2D>*)chain.follow(mtl);
 						AssetPtr asset = pTexIface ? std::dynamic_pointer_cast<Asset>(*pTexIface) : nullptr;
 
 						if (asset) {
-							hadChange |= assetPicker(md.name, asset, getCore()->getAssetLib(), assetTypes, SGE_ARRSZ(assetTypes));
+							hadChange |= assetPicker(
+							    md.name, asset, getCore()->getAssetLib(), assetTypes, SGE_ARRSZ(assetTypes));
 							if (hadChange) {
 								*pTexIface = std::dynamic_pointer_cast<AssetIface_Texture2D>(asset);
 							}
@@ -66,11 +69,16 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), GameInspector*
 							// If nothing is attached, or the attached thing is not an asset,
 							// we want to offer to use to attach an asset.
 							std::string newAssetPathToAttach;
-							hadChange |=
-							    assetPicker(md.name, newAssetPathToAttach, getCore()->getAssetLib(), assetTypes, SGE_ARRSZ(assetTypes));
+							hadChange |= assetPicker(
+							    md.name,
+							    newAssetPathToAttach,
+							    getCore()->getAssetLib(),
+							    assetTypes,
+							    SGE_ARRSZ(assetTypes));
 							if (hadChange) {
 								*pTexIface = std::dynamic_pointer_cast<AssetIface_Texture2D>(
-								    getCore()->getAssetLib()->getAssetFromFile(newAssetPathToAttach.c_str(), nullptr, true));
+								    getCore()->getAssetLib()->getAssetFromFile(
+								        newAssetPathToAttach.c_str(), nullptr, true));
 							}
 						}
 					}
@@ -87,14 +95,30 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), GameInspector*
 					else if (md.typeId == sgeTypeId(vec3f)) {
 						vec3f& v3 = *(vec3f*)chain.follow(mtl);
 						ImGuiEx::Label(md.prettyName.c_str());
-						hadChange |= SGEImGui::DragFloats("##edit", v3.data, 3, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float,
-						                                  md.max_float);
+						hadChange |= SGEImGui::DragFloats(
+						    "##edit",
+						    v3.data,
+						    3,
+						    nullptr,
+						    nullptr,
+						    0.f,
+						    md.sliderSpeed_float,
+						    md.min_float,
+						    md.max_float);
 					}
 					else if (md.typeId == sgeTypeId(vec2f)) {
 						vec2f& v2 = *(vec2f*)chain.follow(mtl);
 						ImGuiEx::Label(md.prettyName.c_str());
-						hadChange |= SGEImGui::DragFloats("##edit", v2.data, 2, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float,
-						                                  md.max_float);
+						hadChange |= SGEImGui::DragFloats(
+						    "##edit",
+						    v2.data,
+						    2,
+						    nullptr,
+						    nullptr,
+						    0.f,
+						    md.sliderSpeed_float,
+						    md.min_float,
+						    md.max_float);
 					}
 					else if (md.typeId == sgeTypeId(float)) {
 						float& f = *(float*)chain.follow(mtl);
@@ -104,8 +128,8 @@ void MaterialEditWindow::update(SGEContext* const UNUSED(sgecon), GameInspector*
 						}
 
 						ImGuiEx::Label(md.prettyName.c_str());
-						hadChange |=
-						    SGEImGui::DragFloats("##edit", &f, 1, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float, md.max_float);
+						hadChange |= SGEImGui::DragFloats(
+						    "##edit", &f, 1, nullptr, nullptr, 0.f, md.sliderSpeed_float, md.min_float, md.max_float);
 
 						if (md.flags & MFF_FloatAsDegrees) {
 							f = deg2rad(f);

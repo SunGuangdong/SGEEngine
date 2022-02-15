@@ -18,7 +18,8 @@
 
 namespace sge {
 
-void InfoWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
+void InfoWindow::update(
+    SGEContext* const UNUSED(sgecon), struct GameInspector* UNUSED(inspector), const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
@@ -52,7 +53,12 @@ void InfoWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* 
 				ImGui::Text("Declaration idx=%d, size=%d", declPair.second, declPair.first.size());
 
 				for (const VertexDecl& decl : declPair.first) {
-					ImGui::Text("\tslot=%d %s offset=%d fmt=%d", decl.bufferSlot, decl.semantic.c_str(), decl.byteOffset, decl.format);
+					ImGui::Text(
+					    "\tslot=%d %s offset=%d fmt=%d",
+					    decl.bufferSlot,
+					    decl.semantic.c_str(),
+					    decl.byteOffset,
+					    decl.format);
 				}
 
 				ImGui::Separator();

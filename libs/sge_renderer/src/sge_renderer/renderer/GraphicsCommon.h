@@ -283,7 +283,10 @@ struct TextureFormat {
 	static size_t GetSizeBytes(const TextureFormat::Enum format);
 
 	// Check if the texture format is suitable for depth buffer
-	static bool IsDepth(const TextureFormat::Enum format) { return (format > MARKER_DEPTH_BEGIN) && (format < MARKER_DEPTH_END); }
+	static bool IsDepth(const TextureFormat::Enum format)
+	{
+		return (format > MARKER_DEPTH_BEGIN) && (format < MARKER_DEPTH_END);
+	}
 
 	// Check if the texture format is a BC format.
 	static bool IsBC(const TextureFormat::Enum format)
@@ -421,7 +424,8 @@ struct Texture2DDesc {
 struct TextureCubeDesc {
 	TextureCubeDesc() = default;
 
-	TextureCubeDesc(int width, int height, int numMips = 1, int arraySize = 1, int numSamples = 1, int sampleQuality = 0)
+	TextureCubeDesc(
+	    int width, int height, int numMips = 1, int arraySize = 1, int numSamples = 1, int sampleQuality = 0)
 	    : width(width)
 	    , height(height)
 	    , numMips(numMips)
@@ -470,9 +474,15 @@ struct TextureUsage {
 		return e == ImmutableResource || e == DynamicResource || e == RenderTargetResource || e == DepthStencilResource;
 	}
 
-	static bool CanBeRenderTarget(const TextureUsage::Enum e) { return e == RenderTargetResource || e == RenderTargetOnly; }
+	static bool CanBeRenderTarget(const TextureUsage::Enum e)
+	{
+		return e == RenderTargetResource || e == RenderTargetOnly;
+	}
 
-	static bool CanBeDepthStencil(const TextureUsage::Enum e) { return e == DepthStencilResource || e == DepthStencilOnly; }
+	static bool CanBeDepthStencil(const TextureUsage::Enum e)
+	{
+		return e == DepthStencilResource || e == DepthStencilOnly;
+	}
 
 	SGE_GPRAHICS_COMMON_ENUM_HIDE;
 };
@@ -675,8 +685,10 @@ struct BufferDesc {
 	size_t structByteStride; // size in bytes of a single <strctured buffer> element
 
 	//[TODO]some useful functions
-	static BufferDesc GetDefaultVertexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage = ResourceUsage::Immutable);
-	static BufferDesc GetDefaultIndexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage = ResourceUsage::Immutable);
+	static BufferDesc
+	    GetDefaultVertexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage = ResourceUsage::Immutable);
+	static BufferDesc
+	    GetDefaultIndexBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage = ResourceUsage::Immutable);
 	static BufferDesc GetDefaultConstantBuffer(const size_t sizeBytes, const ResourceUsage::Enum usage);
 };
 
@@ -810,10 +822,11 @@ struct RasterDesc {
 	float depthBiasAdd = 0.f;
 	float depthBiasSlope = 0.f;
 
-	RasterDesc(const bool backFaceCW = false,
-	           const CullMode::Enum cullMode = CullMode::Back,
-	           const FillMode::Enum fillMode = FillMode::Solid,
-	           const bool useScissor = false)
+	RasterDesc(
+	    const bool backFaceCW = false,
+	    const CullMode::Enum cullMode = CullMode::Back,
+	    const FillMode::Enum fillMode = FillMode::Solid,
+	    const bool useScissor = false)
 	    : backFaceCCW(backFaceCW)
 	    , cullMode(cullMode)
 	    , fillMode(fillMode)
@@ -824,7 +837,8 @@ struct RasterDesc {
 	bool operator==(const RasterDesc& other) const
 	{
 		return backFaceCCW == other.backFaceCCW && cullMode == other.cullMode && fillMode == other.fillMode &&
-		       useScissor == other.useScissor && depthBiasAdd == other.depthBiasAdd && depthBiasSlope == other.depthBiasSlope;
+		       useScissor == other.useScissor && depthBiasAdd == other.depthBiasAdd &&
+		       depthBiasSlope == other.depthBiasSlope;
 	}
 
 	bool operator!=(const RasterDesc& other) const { return !(*this == other); }

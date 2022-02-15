@@ -73,7 +73,8 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 
 	if (m_isUsingGamepad) {
 		if (getGamepadTarget() == nullptr || getGamepadTarget()->isSuspended()) {
-			std::function<bool(const std::shared_ptr<IWidget>&)> findGamepadTarget = [&](const std::shared_ptr<IWidget>& w) -> bool {
+			std::function<bool(const std::shared_ptr<IWidget>&)> findGamepadTarget =
+			    [&](const std::shared_ptr<IWidget>& w) -> bool {
 				if (w->isSuspended()) {
 					return false;
 				}
@@ -245,8 +246,8 @@ void UIContext::draw(const UIDrawSets& drawSets)
 
 	if (auto gamepadTarget = getGamepadTarget(); m_isUsingGamepad && gamepadTarget && !gamepadTarget->isSuspended()) {
 		Box2f bb = gamepadTarget->getBBoxPixels();
-		drawSets.quickDraw->drawRect(drawSets.rdest, bb, vec4f(1.f, 1.f, 0.f, 0.33f),
-		                             getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		drawSets.quickDraw->drawRect(
+		    drawSets.rdest, bb, vec4f(1.f, 1.f, 0.f, 0.33f), getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 }
 

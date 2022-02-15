@@ -59,7 +59,8 @@ bool TraitRigidBody::createBasedOnModel(const char* modelPath, float mass, bool 
 		return false;
 	}
 
-	return createBasedOnModel(getLoadedAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval(), mass, noResponse, addToWorldNow);
+	return createBasedOnModel(
+	    getLoadedAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval(), mass, noResponse, addToWorldNow);
 }
 
 bool TraitRigidBody::isInWorld() const

@@ -23,8 +23,8 @@ namespace sge {
 struct SGE_CORE_API ShadingProgramPermuator {
 	struct Unform {
 		/// The user specified to the ShadingProgramPermuator an array of uniforms to be found. In order to decrease
-		/// debugging we want this index to be the same as the index in the array specified by the user, as they are going
-		/// to access them by that index.
+		/// debugging we want this index to be the same as the index in the array specified by the user, as they are
+		/// going to access them by that index.
 		int safetyIndex;
 		const char* uniformName;
 
@@ -43,9 +43,11 @@ struct SGE_CORE_API ShadingProgramPermuator {
 		void bind(StaticArray<BoundUniform, N>& uniforms, const int uniformEnumId, void* const dataPointer) const
 		{
 			if (uniformLUT[uniformEnumId].isNull() == false) {
-				[[maybe_unused]] bool bindSucceeded = uniforms.push_back(BoundUniform(uniformLUT[uniformEnumId], (dataPointer)));
+				[[maybe_unused]] bool bindSucceeded =
+				    uniforms.push_back(BoundUniform(uniformLUT[uniformEnumId], (dataPointer)));
 				sgeAssert(bindSucceeded);
-				sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
+				sgeAssert(
+				    uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 			};
 		}
 	};
@@ -54,36 +56,39 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	/// Create a shader by using the specified filename as the root code.
 	/// Additional code may be #include-ed (currently force to core_shaders/ directory).
 	/// if a valid @precompiledCacheFile exists the shader bytecode is going to get loaded from there
-	/// avoiding the need to call the slow D3DCompile every time. If the cachefile doesn't exists a new one will be created.
-	/// if you don't wanna use caching just pass nullptr for @precompiledCacheFile.
-	bool createFromFile(SGEDevice* sgedev,
-	                    const char* const fileName,
-	                    std::string precompiledCacheFile,
-	                    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
-	                    const std::vector<Unform>& uniformsToCacheInLUT,
-	                    std::set<std::string>* outIncludedFiles = nullptr);
+	/// avoiding the need to call the slow D3DCompile every time. If the cachefile doesn't exists a new one will be
+	/// created. if you don't wanna use caching just pass nullptr for @precompiledCacheFile.
+	bool createFromFile(
+	    SGEDevice* sgedev,
+	    const char* const fileName,
+	    std::string precompiledCacheFile,
+	    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
+	    const std::vector<Unform>& uniformsToCacheInLUT,
+	    std::set<std::string>* outIncludedFiles = nullptr);
 
 	/// See the comment for @createFromFile.
-	bool create(SGEDevice* sgedev,
-	            const char* const shaderCode,
-	            const char* const shaderCodeFileName,
-	            std::string precompiledCacheFilePrefix,
-	            const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
-	            const std::vector<Unform>& uniformsToCacheInLUT,
-	            std::set<std::string>* outIncludedFiles = nullptr);
+	bool create(
+	    SGEDevice* sgedev,
+	    const char* const shaderCode,
+	    const char* const shaderCodeFileName,
+	    std::string precompiledCacheFilePrefix,
+	    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
+	    const std::vector<Unform>& uniformsToCacheInLUT,
+	    std::set<std::string>* outIncludedFiles = nullptr);
 
 
 	const OptionPermuataor getCompileTimeOptionsPerm() const { return compileTimeOptionsPermutator; }
 	const std::vector<Permutation>& getShadersPerPerm() const { return perPermutationShadingProg; }
 
   private:
-	bool createInternal(SGEDevice* sgedev,
-	                    const char* const shaderCode,
-	                    const char* const shaderCodeFileName,
-	                    std::string precompiledCacheFilePrefix,
-	                    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
-	                    const std::vector<Unform>& uniformsToCacheInLUT,
-	                    std::set<std::string>* outIncludedFiles = nullptr);
+	bool createInternal(
+	    SGEDevice* sgedev,
+	    const char* const shaderCode,
+	    const char* const shaderCodeFileName,
+	    std::string precompiledCacheFilePrefix,
+	    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
+	    const std::vector<Unform>& uniformsToCacheInLUT,
+	    std::set<std::string>* outIncludedFiles = nullptr);
 
 
 	/// Generates the cache file for the shader compilation cache.

@@ -34,7 +34,8 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 		}
 
 		for (const Model_CollisionShapeCapsule& capsule : model->m_collisionCapsules) {
-			shapeDescs.emplace_back(CollsionShapeDesc::createCapsule(capsule.radius, capsule.halfHeight * 2.f, capsule.transform));
+			shapeDescs.emplace_back(
+			    CollsionShapeDesc::createCapsule(capsule.radius, capsule.halfHeight * 2.f, capsule.transform));
 		}
 
 		for (const Model_CollisionShapeCylinder& cylinder : model->m_collisionCylinders) {
@@ -69,7 +70,8 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 	return true;
 }
 
-bool addCollisionShapeBasedOnModelRenderGeom(std::vector<CollsionShapeDesc>& shapeDescs, const EvaluatedModel& evaluatedModel)
+bool addCollisionShapeBasedOnModelRenderGeom(
+    std::vector<CollsionShapeDesc>& shapeDescs, const EvaluatedModel& evaluatedModel)
 {
 	std::vector<vec3f> triangleList;
 	std::vector<int> triangleIndices;
@@ -95,7 +97,8 @@ bool addCollisionShapeBasedOnModelRenderGeom(std::vector<CollsionShapeDesc>& sha
 			triangleIndices.reserve(triangleIndices.size() + numTriangles);
 
 			int numVertsAddedFromCurrMesh = 0;
-			if (modelMesh->primitiveTopology == PrimitiveTopology::TriangleList && modelMesh->ibFmt == UniformType::Uint) {
+			if (modelMesh->primitiveTopology == PrimitiveTopology::TriangleList &&
+			    modelMesh->ibFmt == UniformType::Uint) {
 				for (int iTri = 0; iTri < numTriangles; ++iTri) {
 					unsigned vertIdx[3];
 					if (indexBuffer) {
@@ -140,7 +143,8 @@ bool addCollisionShapeBasedOnModelRenderGeom(std::vector<CollsionShapeDesc>& sha
 	sgeAssert(triangleList.size() % 3 == 0 && "We expect a triangle list here");
 	sgeAssert(triangleIndices.size() % 3 == 0 && "We expect a triangle list here");
 	if (triangleList.empty() == false) {
-		CollsionShapeDesc shapeDesc = CollsionShapeDesc::createTriMesh(std::move(triangleList), std::move(triangleIndices));
+		CollsionShapeDesc shapeDesc =
+		    CollsionShapeDesc::createTriMesh(std::move(triangleList), std::move(triangleIndices));
 		shapeDescs.emplace_back(std::move(shapeDesc));
 		return true;
 	}
@@ -155,7 +159,8 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 		return false;
 	}
 
-	return addCollisionShapeBasedOnModel(shapeDescs, getLoadedAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval());
+	return addCollisionShapeBasedOnModel(
+	    shapeDescs, getLoadedAssetIface<AssetIface_Model3D>(modelAsset)->getStaticEval());
 }
 
 bool addCollisionShapeBasedOnTraitModel(std::vector<CollsionShapeDesc>& shapeDescs, TraitModel& traitModel)

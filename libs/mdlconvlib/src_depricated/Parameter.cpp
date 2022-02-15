@@ -317,7 +317,8 @@ void Parameter::Evalute(void* const resultData, const char* const curveName, con
 //-------------------------------------------------------------------------
 // ParameterBlock
 //-------------------------------------------------------------------------
-Parameter* ParameterBlock::FindParameter(const char* const name, const ParameterType::Enum typeIfMissing, const void* staticValue)
+Parameter* ParameterBlock::FindParameter(
+    const char* const name, const ParameterType::Enum typeIfMissing, const void* staticValue)
 {
 	// Search if the parameter already exists, if not create a new one depending on the input type.
 	auto itr = m_parameters.find(name);

@@ -144,7 +144,8 @@ bool ALine::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float dista
 
 			segmentVerts[0] = points[i0];
 			segmentVerts[1] = points[i1];
-			interpolationCoeffInSegment = lastSegmentDistance > 0.f ? evalDistanceInLastSegment / lastSegmentDistance : 0.f;
+			interpolationCoeffInSegment =
+			    lastSegmentDistance > 0.f ? evalDistanceInLastSegment / lastSegmentDistance : 0.f;
 			segmentFound = true;
 			break;
 		}
@@ -165,8 +166,8 @@ bool ALine::evaluateAtDistance(vec3f* outPosition, vec3f* outTanget, float dista
 	return true;
 }
 
-InspectorCmd*
-    ALine::generateDeleteItemCmd(GameInspector* inspector, const SelectedItem* items, int numItems, bool ifActorModeShouldDeleteActorsUnder)
+InspectorCmd* ALine::generateDeleteItemCmd(
+    GameInspector* inspector, const SelectedItem* items, int numItems, bool ifActorModeShouldDeleteActorsUnder)
 {
 	if (numItems == 1 && items[0].editMode == editMode_actors) {
 		return Actor::generateDeleteItemCmd(inspector, items, numItems, ifActorModeShouldDeleteActorsUnder);
@@ -183,7 +184,11 @@ InspectorCmd*
 }
 
 InspectorCmd* ALine::generateItemSetTransformCmd(
-    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform)
+    GameInspector* inspector,
+    EditMode const mode,
+    int itemIndex,
+    const transf3d& initalTrasform,
+    const transf3d& newTransform)
 {
 	if (mode == editMode_points) {
 		ASplineMovePointCmd* cmd = new ASplineMovePointCmd;
@@ -197,7 +202,8 @@ InspectorCmd* ALine::generateItemSetTransformCmd(
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ASplineMovePointCmd::setup(ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition)
+void ASplineMovePointCmd::setup(
+    ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition)
 {
 	m_actorid = actorid;
 	m_pointIndex = pointIndex;
@@ -272,7 +278,8 @@ void ASplineAddPoints::apply(GameInspector* inspector)
 		false;
 	}
 
-	int offs = 0; // "How many times have we tessalated?", when we add a new point the even newer points have to be shifted.
+	int offs =
+	    0; // "How many times have we tessalated?", when we add a new point the even newer points have to be shifted.
 	for (int t = 0; t < m_pointsToTessalateBetween.size() - 1; ++t) {
 		int const idx0 = m_pointsToTessalateBetween[t] + offs;
 		int const idx1 = m_pointsToTessalateBetween[t + 1] + offs;

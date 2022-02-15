@@ -36,8 +36,10 @@ bool ShadingProgramPermuatorCache::saveToFile(const char* cacheFilename) const
 	for (const ShadingProgramByteCode& bytecode : perPermutBytecode) {
 		JsonValue* jShadeProgByteCode = jPermutationsBytecodes->arrPush(jvb(JID_MAP));
 
-		std::string vsDataEncoded = base64Encode(bytecode.vsBytecode.data(), bytecode.vsBytecode.size() * sizeof(bytecode.vsBytecode[0]));
-		std::string psDataEncoded = base64Encode(bytecode.psBytecode.data(), bytecode.psBytecode.size() * sizeof(bytecode.psBytecode[0]));
+		std::string vsDataEncoded =
+		    base64Encode(bytecode.vsBytecode.data(), bytecode.vsBytecode.size() * sizeof(bytecode.vsBytecode[0]));
+		std::string psDataEncoded =
+		    base64Encode(bytecode.psBytecode.data(), bytecode.psBytecode.size() * sizeof(bytecode.psBytecode[0]));
 
 		jShadeProgByteCode->setMember("vsDataEncoded", jvb(vsDataEncoded));
 		jShadeProgByteCode->setMember("psDataEncoded", jvb(psDataEncoded));

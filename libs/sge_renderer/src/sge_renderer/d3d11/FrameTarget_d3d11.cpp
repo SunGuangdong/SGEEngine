@@ -11,11 +11,12 @@ bool FrameTargetD3D11::create()
 }
 
 //--------------------------------------------------------------
-bool FrameTargetD3D11::create(int numRenderTargets,
-                              Texture* renderTargets[],
-                              TargetDesc renderTargetDescs[],
-                              Texture* depthStencil,
-                              const TargetDesc& depthTargetDesc)
+bool FrameTargetD3D11::create(
+    int numRenderTargets,
+    Texture* renderTargets[],
+    TargetDesc renderTargetDescs[],
+    Texture* depthStencil,
+    const TargetDesc& depthTargetDesc)
 {
 	destroy();
 
@@ -134,7 +135,8 @@ void FrameTargetD3D11::updateAttachmentsInfo(Texture* texture)
 	}
 }
 
-bool FrameTargetD3D11::create2D(int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt)
+bool FrameTargetD3D11::create2D(
+    int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt)
 {
 	// Render Target texture.
 	GpuHandle<Texture> renderTarget = getDevice()->requestResource<Texture>();
@@ -158,8 +160,12 @@ bool FrameTargetD3D11::create2D(int width, int height, TextureFormat::Enum rende
 
 	// Create the frame target itself.
 	TargetDesc singleColorTargetDesc[] = {TargetDesc::FromTex2D()};
-	return create(renderTarget.IsResourceValid() ? 1 : 0, renderTarget.PtrPtr(), singleColorTargetDesc, depthStencilTexture,
-	              TargetDesc::FromTex2D());
+	return create(
+	    renderTarget.IsResourceValid() ? 1 : 0,
+	    renderTarget.PtrPtr(),
+	    singleColorTargetDesc,
+	    depthStencilTexture,
+	    TargetDesc::FromTex2D());
 }
 
 

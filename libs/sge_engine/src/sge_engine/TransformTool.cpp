@@ -107,8 +107,8 @@ void TransformTool::onSetActive(GameInspector* const inspector)
 	// m_gizmo.interact(InputState(), Ray(vec3f(0.f), vec3f(1.f, 0.f, 0.f)), nullptr, nullptr);
 }
 
-InspectorToolResult
-    TransformTool::updateTool(GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
+InspectorToolResult TransformTool::updateTool(
+    GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
 {
 	InspectorToolResult result;
 
@@ -176,14 +176,18 @@ InspectorToolResult
 			}
 
 			// Update the item's location.
-			actor->setItemTransform(perItemData[t].item.editMode, perItemData[t].item.index, perItemData[t].editedTransform);
+			actor->setItemTransform(
+			    perItemData[t].item.editMode, perItemData[t].item.index, perItemData[t].editedTransform);
 			actor->onMemberChanged();
 
 			if (cmdMassMove) {
 				// Generate the command that would move the item.
-				InspectorCmd* const cmd =
-				    actor->generateItemSetTransformCmd(inspector, perItemData[t].item.editMode, perItemData[t].item.index,
-				                                       perItemData[t].initialTasform, perItemData[t].editedTransform);
+				InspectorCmd* const cmd = actor->generateItemSetTransformCmd(
+				    inspector,
+				    perItemData[t].item.editMode,
+				    perItemData[t].item.index,
+				    perItemData[t].initialTasform,
+				    perItemData[t].editedTransform);
 
 				cmdMassMove->addCommand(cmd);
 			}
@@ -247,7 +251,8 @@ bool TransformTool::interact(
 		m_useSnapSettings = !m_useSnapSettings;
 	}
 
-	GizmoInteractArgs const args(&is, m_useSnapSettings ? &m_snapSettings : nullptr, Ray(rayOrigin, rayDir), customScale);
+	GizmoInteractArgs const args(
+	    &is, m_useSnapSettings ? &m_snapSettings : nullptr, Ray(rayOrigin, rayDir), customScale);
 	GizmoInteractResult const gizmoRes = m_gizmo.interact(args);
 
 	if (hasClickedAway) {

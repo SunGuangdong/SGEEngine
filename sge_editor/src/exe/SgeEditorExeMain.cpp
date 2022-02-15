@@ -128,7 +128,8 @@ struct SGEGameWindow : public WindowBase {
 		// Obtain the backbuffer render target initialize the device and the immediate context.
 		SGEDevice* const device = SGEDevice::create(mainTargetDesc);
 
-		SGEImGui::initialize(device->getContext(), device->getWindowFrameTarget(), device->getWindowFrameTarget()->getViewport());
+		SGEImGui::initialize(
+		    device->getContext(), device->getWindowFrameTarget(), device->getWindowFrameTarget()->getViewport());
 		ImGui::SetCurrentContext(getImGuiContextCore());
 		setImGuiContextEngine(getImGuiContextCore());
 
@@ -190,7 +191,8 @@ struct SGEGameWindow : public WindowBase {
 			// Unload the old plugin DLL and load the new one.
 			m_dllHandler.unload();
 
-			// Hack: Sleep for a bit for the OS to have time to register that nobody references the old working_plugin.dll.
+			// Hack: Sleep for a bit for the OS to have time to register that nobody references the old
+			// working_plugin.dll.
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 			copyFile(pluginFileName.c_str(), "working_plugin.dll");
@@ -198,7 +200,8 @@ struct SGEGameWindow : public WindowBase {
 			m_workingDLLModTime = modtime;
 
 			// Obain the new plugin interop interface.
-			GetInpteropFnPtr interopGetter = reinterpret_cast<GetInpteropFnPtr>(m_dllHandler.getProcAdress("getInterop"));
+			GetInpteropFnPtr interopGetter =
+			    reinterpret_cast<GetInpteropFnPtr>(m_dllHandler.getProcAdress("getInterop"));
 			sgeAssert(interopGetter != nullptr && "The loaded game dll does not have a getInterop()!\n");
 			if (interopGetter) {
 				m_pluginInst = interopGetter();
@@ -228,7 +231,8 @@ struct SGEGameWindow : public WindowBase {
 
 		loadPlugin();
 
-		if (getEngineGlobal()->getEngineAllowingRelativeCursor() && getEngineGlobal()->doesAnyoneNeedForRelativeCursorThisFrame()) {
+		if (getEngineGlobal()->getEngineAllowingRelativeCursor() &&
+		    getEngineGlobal()->doesAnyoneNeedForRelativeCursorThisFrame()) {
 			setMouseCursorRelative(true);
 		}
 		else {
@@ -297,7 +301,8 @@ int sge_main(int argc, char** argv)
 		frs.close();
 	}
 
-	sge::ApplicationHandler::get()->NewWindow<SGEGameWindow>("SGEEngine Editor", windowSize.x, windowSize.y, isMaximized);
+	sge::ApplicationHandler::get()->NewWindow<SGEGameWindow>(
+	    "SGEEngine Editor", windowSize.x, windowSize.y, isMaximized);
 
 #ifdef __EMSCRIPTEN__
 	// In web browsers we cannot loop ourselves as we are going to make the page freeze.

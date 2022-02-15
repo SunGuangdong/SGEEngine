@@ -68,7 +68,8 @@ D3D11_MAP Map_D3D11_Native(const Map::Enum map)
 	return D3D11_MAP_READ;
 }
 
-void TextureFormat_D3D11_Native(const TextureFormat::Enum format, DXGI_FORMAT& srv, DXGI_FORMAT& dsv, DXGI_FORMAT& typeless)
+void TextureFormat_D3D11_Native(
+    const TextureFormat::Enum format, DXGI_FORMAT& srv, DXGI_FORMAT& dsv, DXGI_FORMAT& typeless)
 {
 	switch (format) {
 		case TextureFormat::Unknown:
@@ -578,8 +579,8 @@ D3D11_RASTERIZER_DESC RasterDesc_GetD3D11Nativce(const RasterDesc& desc)
 
 D3D11_DEPTH_STENCIL_DESC DepthStencilDesc_D3D11_Native(const DepthStencilDesc& desc)
 {
-	const D3D11_DEPTH_STENCILOP_DESC defaultDepthStencilOp = {D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP,
-	                                                          D3D11_COMPARISON_ALWAYS};
+	const D3D11_DEPTH_STENCILOP_DESC defaultDepthStencilOp = {
+	    D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_STENCIL_OP_KEEP, D3D11_COMPARISON_ALWAYS};
 
 	D3D11_DEPTH_STENCIL_DESC result;
 

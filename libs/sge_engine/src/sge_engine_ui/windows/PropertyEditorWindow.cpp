@@ -35,18 +35,19 @@ namespace ProperyEditorUIGen {
 		int createObjComboIdx = 0;
 		int inspectObjComboIdx = 0;
 
-		// In order to create CmdMemberChange commands, we must keep the inial value of the variable that is being changed
-		// and when the user is done interacting with the object we use this value for the "original" state of the variable.
+		// In order to create CmdMemberChange commands, we must keep the inial value of the variable that is being
+		// changed and when the user is done interacting with the object we use this value for the "original" state of
+		// the variable.
 		enum { VariantSizeInBytes = sizeof(transf3d) };
 		Variant<VariantSizeInBytes> widgetSavedData;
 	};
 
 	// Caution:
 	// This one instance of the  UI state hold additinal data per each widget in the Property Editor window.
-	// The idea is to store somewhere the original value of the property being edited so when the change of the value is complete (meaning
-	// that the user is no longer interacting with the widget) we can generate undo/redo histroy).
-	// One instance of this state should be enough as the user can only interact with one widget at the time (as there is only one mouse and
-	// one keyboard.
+	// The idea is to store somewhere the original value of the property being edited so when the change of the value is
+	// complete (meaning that the user is no longer interacting with the widget) we can generate undo/redo histroy). One
+	// instance of this state should be enough as the user can only interact with one widget at the time (as there is
+	// only one mouse and one keyboard.
 	UIState g_propWidgetState;
 } // namespace ProperyEditorUIGen
 
@@ -54,8 +55,8 @@ void ProperyEditorUIGen::doGameObjectUI(GameInspector& inspector, GameObject* co
 {
 	const TypeDesc* const pDesc = typeLib().find(gameObject->getType());
 	if (pDesc != nullptr) {
-		const AssetIface_Texture2D* iconImg =
-		    getLoadedAssetIface<AssetIface_Texture2D>(getEngineGlobal()->getEngineAssets().getIconForObjectType(gameObject->getType()));
+		const AssetIface_Texture2D* iconImg = getLoadedAssetIface<AssetIface_Texture2D>(
+		    getEngineGlobal()->getEngineAssets().getIconForObjectType(gameObject->getType()));
 		if (iconImg && iconImg->getTexture()) {
 			ImGui::Image(iconImg->getTexture(), ImVec2(32.f, 32.f));
 			ImGui::SameLine();
@@ -70,10 +71,11 @@ void ProperyEditorUIGen::doGameObjectUI(GameInspector& inspector, GameObject* co
 		ImGui::InputText("##GameObject_Id", objIdText, SGE_ARRSZ(objIdText), ImGuiInputTextFlags_ReadOnly);
 
 		if (ImGui::BeginChild("PropertyEditorObjectProperties")) {
-			IActorCustomAttributeEditorTrait* const actorCustomAETrait = getTrait<IActorCustomAttributeEditorTrait>(gameObject);
+			IActorCustomAttributeEditorTrait* const actorCustomAETrait =
+			    getTrait<IActorCustomAttributeEditorTrait>(gameObject);
 			if (actorCustomAETrait) {
-				// If the attribute editor is customly made, make sure that we show the most common properties automatically.
-				// It is thedious to always add them manually.
+				// If the attribute editor is customly made, make sure that we show the most common properties
+				// automatically. It is thedious to always add them manually.
 				ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(GameObject, m_displayName));
 				if (gameObject->isActor()) {
 					ProperyEditorUIGen::doMemberUI(inspector, gameObject, sgeFindMember(Actor, m_logicTransform));
@@ -93,7 +95,8 @@ void ProperyEditorUIGen::doGameObjectUI(GameInspector& inspector, GameObject* co
 	}
 }
 
-void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const gameObject, MemberChain chain, int flags)
+void ProperyEditorUIGen::doMemberUI(
+    GameInspector& inspector, GameObject* const gameObject, MemberChain chain, int flags)
 {
 	const TypeDesc* const memberTypeDesc = chain.getType();
 	// Caution:
@@ -186,7 +189,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			lockedScaling = !lockedScaling;
 		}
 
-		scalingDragsWidth = std::max(scalingDragsWidth - ImGui::GetItemRectSize().x - ImGui::GetStyle().ItemSpacing.x, 10.f);
+		scalingDragsWidth =
+		    std::max(scalingDragsWidth - ImGui::GetItemRectSize().x - ImGui::GetStyle().ItemSpacing.x, 10.f);
 
 		ImGui::SameLine();
 		ImGui::PushItemWidth(scalingDragsWidth);
@@ -202,7 +206,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 				// Locked non-uniform scaling.
 				float uniformScalePreDiff = v.s.x;
 				float uniformScale = v.s.x;
-				change |= SGEImGui::DragFloats("##Scaling", &uniformScale, 1, &justReleased, &justActivated, 1.f, 0.01f);
+				change |=
+				    SGEImGui::DragFloats("##Scaling", &uniformScale, 1, &justReleased, &justActivated, 1.f, 0.01f);
 				float diff = uniformScale / uniformScalePreDiff;
 				v.s *= diff;
 			}
@@ -252,12 +257,20 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 				CmdMemberChange* cmd = new CmdMemberChange;
 				if (isLogicTransform) {
 					if (thisIsTransformInLocalSpace) {
-						cmd->setup(gameObject, chain, g_propWidgetState.widgetSavedData.get<transf3d>(), &v,
-						           &CmdMemberChange::setActorLocalTransform);
+						cmd->setup(
+						    gameObject,
+						    chain,
+						    g_propWidgetState.widgetSavedData.get<transf3d>(),
+						    &v,
+						    &CmdMemberChange::setActorLocalTransform);
 					}
 					else {
-						cmd->setup(gameObject, chain, g_propWidgetState.widgetSavedData.get<transf3d>(), &v,
-						           &CmdMemberChange::setActorLogicTransform);
+						cmd->setup(
+						    gameObject,
+						    chain,
+						    g_propWidgetState.widgetSavedData.get<transf3d>(),
+						    &v,
+						    &CmdMemberChange::setActorLogicTransform);
 					}
 				}
 				else {
@@ -287,8 +300,12 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		AssetPtr assetToChange = assetPropery.m_asset;
 		bool hadAChange = false;
 		if (assetPropery.m_uiPossibleAssets.empty()) {
-			hadAChange = assetPicker(memberName, assetToChange, getCore()->getAssetLib(), assetPropery.m_acceptedAssetIfaceTypes.data(),
-			                         assetPropery.m_acceptedAssetIfaceTypes.size());
+			hadAChange = assetPicker(
+			    memberName,
+			    assetToChange,
+			    getCore()->getAssetLib(),
+			    assetPropery.m_acceptedAssetIfaceTypes.data(),
+			    assetPropery.m_acceptedAssetIfaceTypes.size());
 		}
 		else {
 			ImGuiEx::Label(memberName);
@@ -413,8 +430,16 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		bool change = false;
 
 		ImGuiEx::Label(memberName);
-		change = SGEImGui::DragFloats("##Drag_vec2f", vedit.data, 2, &justReleased, &justActivated, 0.f, member.sliderSpeed_float,
-		                              member.min_float, member.max_float);
+		change = SGEImGui::DragFloats(
+		    "##Drag_vec2f",
+		    vedit.data,
+		    2,
+		    &justReleased,
+		    &justActivated,
+		    0.f,
+		    member.sliderSpeed_float,
+		    member.min_float,
+		    member.max_float);
 
 
 		if (justActivated) {
@@ -465,7 +490,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 
 		if (justReleased) {
 			// Check if the new data is actually different, as the UI may fire a lot of updates at us.
-			if (g_propWidgetState.widgetSavedData.get<quatf>() && *g_propWidgetState.widgetSavedData.get<quatf>() != quatRef) {
+			if (g_propWidgetState.widgetSavedData.get<quatf>() &&
+			    *g_propWidgetState.widgetSavedData.get<quatf>() != quatRef) {
 				CmdMemberChange* cmd = new CmdMemberChange;
 				cmd->setup(gameObject, chain, g_propWidgetState.widgetSavedData.get<quatf>(), &quatRef, nullptr);
 				inspector.appendCommand(cmd, true);
@@ -519,7 +545,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 
 		ImGuiEx::Label(memberName);
 		if (member.flags & MFF_Vec4fAsColor) {
-			change = SGEImGui::ColorPicker4(memberName, v4edit.data, &justReleased, &justActivated, ImGuiColorEditFlags_AlphaBar);
+			change = SGEImGui::ColorPicker4(
+			    memberName, v4edit.data, &justReleased, &justActivated, ImGuiColorEditFlags_AlphaBar);
 		}
 		else {
 			change = SGEImGui::DragFloats(memberName, v4edit.data, 4, &justReleased, &justActivated);
@@ -558,11 +585,13 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		ImGuiEx::Label("Angle Around +Y");
 		bool justReleased0 = false;
 		bool justActivated0 = false;
-		change |= SGEImGui::DragFloats("##SphericalRotation_RotationFromY", &v3edit.aroundY, 1, &justReleased0, &justActivated0);
+		change |= SGEImGui::DragFloats(
+		    "##SphericalRotation_RotationFromY", &v3edit.aroundY, 1, &justReleased0, &justActivated0);
 		ImGuiEx::Label("Angle From +Y");
 		bool justReleased1 = false;
 		bool justActivated1 = false;
-		change |= SGEImGui::DragFloats("##SphericalRotation_RotationAroundY", &v3edit.fromY, 1, &justReleased1, &justActivated1);
+		change |= SGEImGui::DragFloats(
+		    "##SphericalRotation_RotationAroundY", &v3edit.fromY, 1, &justReleased1, &justActivated1);
 		ImGuiEx::EndGroupPanel();
 
 		bool justReleased = justReleased0 || justReleased1;
@@ -583,7 +612,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			// Check if the new data is actually different, as the UI may fire a lot of updates at us.
 			if (*g_propWidgetState.widgetSavedData.get<SphericalRotation>() != v3ref) {
 				CmdMemberChange* cmd = new CmdMemberChange;
-				cmd->setup(gameObject, chain, g_propWidgetState.widgetSavedData.get<SphericalRotation>(), &v3edit, nullptr);
+				cmd->setup(
+				    gameObject, chain, g_propWidgetState.widgetSavedData.get<SphericalRotation>(), &v3edit, nullptr);
 				inspector.appendCommand(cmd, true);
 
 				g_propWidgetState.widgetSavedData.Destroy();
@@ -626,8 +656,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 
 		int enumElemIdx = memberTypeDesc->enumValueToNameLUT.find_element_index(enumAsInt);
 		if (enumElemIdx >= 0 && memberTypeDesc->enumUnderlayingType == sgeTypeId(int)) {
-			bool (*comboBoxEnumNamesGetter)(void* data, int idx, const char** out_text) = [](void* data, int idx,
-			                                                                                 const char** out_text) -> bool {
+			bool (*comboBoxEnumNamesGetter)(void* data, int idx, const char** out_text) =
+			    [](void* data, int idx, const char** out_text) -> bool {
 				const TypeDesc* const enumTypeDesc = (TypeDesc*)data;
 				if (enumTypeDesc == nullptr)
 					return false;
@@ -643,9 +673,12 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			};
 
 			ImGuiEx::Label(memberName);
-			bool const changed =
-			    ImGui::Combo("##Combo", &enumElemIdx, comboBoxEnumNamesGetter, (void*)(const_cast<TypeDesc*>(memberTypeDesc)),
-			                 int(memberTypeDesc->enumValueToNameLUT.size()));
+			bool const changed = ImGui::Combo(
+			    "##Combo",
+			    &enumElemIdx,
+			    comboBoxEnumNamesGetter,
+			    (void*)(const_cast<TypeDesc*>(memberTypeDesc)),
+			    int(memberTypeDesc->enumValueToNameLUT.size()));
 
 			if (changed) {
 				int const originalValue = *(int*)pMember;
@@ -658,7 +691,10 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 			}
 		}
 		else {
-			ImGui::Text("%s is of type enum %s with unknown value", memberName, typeLib().find(memberTypeDesc->enumUnderlayingType)->name);
+			ImGui::Text(
+			    "%s is of type enum %s with unknown value",
+			    memberName,
+			    typeLib().find(memberTypeDesc->enumUnderlayingType)->name);
 		}
 	}
 	else if (memberTypeDesc->members.size() != 0) {
@@ -668,7 +704,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		if (showCollapsingHeader) {
 			char headerName[256];
 			sge_snprintf(headerName, SGE_ARRSZ(headerName), "%s of %s", memberName, memberTypeDesc->name);
-			shouldDoUI = ImGui::CollapsingHeader(headerName, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding);
+			shouldDoUI =
+			    ImGui::CollapsingHeader(headerName, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_FramePadding);
 		}
 		else {
 			shouldDoUI = true;
@@ -727,7 +764,8 @@ void ProperyEditorUIGen::doMemberUI(GameInspector& inspector, GameObject* const 
 		}
 	}
 	else {
-		const char* const typeName = typeLib().find(memberTypeDesc->typeId) ? typeLib().find(memberTypeDesc->typeId)->name : "<Unknown>";
+		const char* const typeName =
+		    typeLib().find(memberTypeDesc->typeId) ? typeLib().find(memberTypeDesc->typeId)->name : "<Unknown>";
 
 		ImGui::Text("Non editable value '%s' of type '%s'", memberName, typeName);
 	}
@@ -750,8 +788,17 @@ void ProperyEditorUIGen::editFloat(GameInspector& inspector, const char* label, 
 			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.1f);
 		}
 		else {
-			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.f, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_float,
-			                     mdMayBeNull->max_float, "%3.f Degrees");
+			SGEImGui::DragFloats(
+			    label,
+			    &v,
+			    1,
+			    &justReleased,
+			    &justActivated,
+			    0.f,
+			    mdMayBeNull->sliderSpeed_float,
+			    mdMayBeNull->min_float,
+			    mdMayBeNull->max_float,
+			    "%3.f Degrees");
 		}
 
 		v = deg2rad(v);
@@ -763,8 +810,17 @@ void ProperyEditorUIGen::editFloat(GameInspector& inspector, const char* label, 
 			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.1f);
 		}
 		else {
-			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.f, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_float,
-			                     mdMayBeNull->max_float, "%.3f %%");
+			SGEImGui::DragFloats(
+			    label,
+			    &v,
+			    1,
+			    &justReleased,
+			    &justActivated,
+			    0.f,
+			    mdMayBeNull->sliderSpeed_float,
+			    mdMayBeNull->min_float,
+			    mdMayBeNull->max_float,
+			    "%.3f %%");
 		}
 
 		v = v * 0.01f;
@@ -774,8 +830,16 @@ void ProperyEditorUIGen::editFloat(GameInspector& inspector, const char* label, 
 			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.1f);
 		}
 		else {
-			SGEImGui::DragFloats(label, &v, 1, &justReleased, &justActivated, 0.f, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_float,
-			                     mdMayBeNull->max_float);
+			SGEImGui::DragFloats(
+			    label,
+			    &v,
+			    1,
+			    &justReleased,
+			    &justActivated,
+			    0.f,
+			    mdMayBeNull->sliderSpeed_float,
+			    mdMayBeNull->min_float,
+			    mdMayBeNull->max_float);
 		}
 	}
 
@@ -786,7 +850,8 @@ void ProperyEditorUIGen::editFloat(GameInspector& inspector, const char* label, 
 	*pActorsValue = v;
 
 	if (justReleased) {
-		if (g_propWidgetState.widgetSavedData.isVariantSetTo<float>() && g_propWidgetState.widgetSavedData.as<float>() != v) {
+		if (g_propWidgetState.widgetSavedData.isVariantSetTo<float>() &&
+		    g_propWidgetState.widgetSavedData.as<float>() != v) {
 			CmdMemberChange* cmd = new CmdMemberChange;
 			cmd->setup(actor, chain, g_propWidgetState.widgetSavedData.get<float>(), &v, nullptr);
 			inspector.appendCommand(cmd, true);
@@ -814,8 +879,15 @@ void ProperyEditorUIGen::editInt(GameInspector& inspector, const char* label, Ga
 		SGEImGui::DragInts("##EditInt", &v, 1, &justReleased, &justActivated);
 	}
 	else {
-		SGEImGui::DragInts("##EditInt", &v, 1, &justReleased, &justActivated, mdMayBeNull->sliderSpeed_float, mdMayBeNull->min_int,
-		                   mdMayBeNull->max_int);
+		SGEImGui::DragInts(
+		    "##EditInt",
+		    &v,
+		    1,
+		    &justReleased,
+		    &justActivated,
+		    mdMayBeNull->sliderSpeed_float,
+		    mdMayBeNull->min_int,
+		    mdMayBeNull->max_int);
 	}
 
 	if (justActivated) {
@@ -825,7 +897,8 @@ void ProperyEditorUIGen::editInt(GameInspector& inspector, const char* label, Ga
 	*pActorsValue = v;
 
 	if (justReleased) {
-		if (g_propWidgetState.widgetSavedData.isVariantSetTo<int>() && g_propWidgetState.widgetSavedData.as<int>() != v) {
+		if (g_propWidgetState.widgetSavedData.isVariantSetTo<int>() &&
+		    g_propWidgetState.widgetSavedData.as<int>() != v) {
 			CmdMemberChange* cmd = new CmdMemberChange;
 			cmd->setup(actor, chain, g_propWidgetState.widgetSavedData.get<int>(), &v, nullptr);
 			inspector.appendCommand(cmd, true);
@@ -834,7 +907,8 @@ void ProperyEditorUIGen::editInt(GameInspector& inspector, const char* label, Ga
 		}
 	}
 }
-void ProperyEditorUIGen::editString(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain)
+void ProperyEditorUIGen::editString(
+    GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain)
 {
 	std::string& srcString = *(std::string*)chain.follow(gameObject);
 
@@ -851,17 +925,19 @@ void ProperyEditorUIGen::editString(GameInspector& inspector, const char* label,
 	}
 }
 
-void ProperyEditorUIGen::editStringAsAssetPath(GameInspector& inspector,
-                                               const char* label,
-                                               GameObject* gameObject,
-                                               MemberChain chain,
-                                               const AssetIfaceType possibleAssetIfaceTypes[],
-                                               const int numPossibleAssetIfaceTypes)
+void ProperyEditorUIGen::editStringAsAssetPath(
+    GameInspector& inspector,
+    const char* label,
+    GameObject* gameObject,
+    MemberChain chain,
+    const AssetIfaceType possibleAssetIfaceTypes[],
+    const int numPossibleAssetIfaceTypes)
 {
 	std::string& srcString = *(std::string*)chain.follow(gameObject);
 	std::string stringEdit = srcString;
 
-	bool const change = assetPicker(label, stringEdit, getCore()->getAssetLib(), possibleAssetIfaceTypes, numPossibleAssetIfaceTypes);
+	bool const change =
+	    assetPicker(label, stringEdit, getCore()->getAssetLib(), possibleAssetIfaceTypes, numPossibleAssetIfaceTypes);
 
 	if (change) {
 		std::string newData = stringEdit;
@@ -873,7 +949,8 @@ void ProperyEditorUIGen::editStringAsAssetPath(GameInspector& inspector,
 	}
 }
 
-void ProperyEditorUIGen::editDynamicProperties(GameInspector& inspector, GameObject* gameObject, MemberChain chainToDynamicProps)
+void ProperyEditorUIGen::editDynamicProperties(
+    GameInspector& inspector, GameObject* gameObject, MemberChain chainToDynamicProps)
 {
 	DynamicProperties* dynPops = (DynamicProperties*)chainToDynamicProps.follow(gameObject);
 
@@ -901,7 +978,12 @@ void ProperyEditorUIGen::editDynamicProperties(GameInspector& inspector, GameObj
 				// Check if the new data is actually different, as the UI may fire a lot of updates at us.
 				if (*g_propWidgetState.widgetSavedData.get<int>() != data) {
 					CmdDynamicProperyChanged* cmd = new CmdDynamicProperyChanged;
-					cmd->setup(gameObject, chainToDynamicProps, itrProp.first, g_propWidgetState.widgetSavedData.get<int>(), &dataForEdit);
+					cmd->setup(
+					    gameObject,
+					    chainToDynamicProps,
+					    itrProp.first,
+					    g_propWidgetState.widgetSavedData.get<int>(),
+					    &dataForEdit);
 					inspector.appendCommand(cmd, true);
 
 					g_propWidgetState.widgetSavedData.Destroy();
@@ -914,15 +996,17 @@ void ProperyEditorUIGen::editDynamicProperties(GameInspector& inspector, GameObj
 //----------------------------------------------------------
 // PropertyEditorWindow
 //----------------------------------------------------------
-void PropertyEditorWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+void PropertyEditorWindow::update(
+    SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
 	}
 
 	if (ImGui::Begin(m_windowName.c_str(), &m_isOpened, ImGuiWindowFlags_AlwaysVerticalScrollbar)) {
-		GameObject* gameObject =
-		    !inspector->m_selection.empty() ? inspector->getWorld()->getObjectById(inspector->m_selection[0].objectId) : nullptr;
+		GameObject* gameObject = !inspector->m_selection.empty()
+		                           ? inspector->getWorld()->getObjectById(inspector->m_selection[0].objectId)
+		                           : nullptr;
 		if (gameObject == nullptr) {
 			ImGui::TextUnformatted("Meke a selection!");
 		}

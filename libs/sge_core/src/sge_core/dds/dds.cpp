@@ -295,7 +295,8 @@ namespace {
 	}
 
 #define DDS_MAKEFOURCC(c0, c1, c2, c3) (((c3) << 24) | ((c2) << 16) | ((c1) << 8) | (c0))
-#define ISBITMASK(r, g, b, a) (ddpf.dwRBitMask == r && ddpf.dwGBitMask == g && ddpf.dwBBitMask == b && ddpf.dwABitMask == a)
+#define ISBITMASK(r, g, b, a) \
+	(ddpf.dwRBitMask == r && ddpf.dwGBitMask == g && ddpf.dwBBitMask == b && ddpf.dwABitMask == a)
 
 	TextureFormat::Enum GetTextureFormat(const DDS_PIXELFORMAT& ddpf)
 	{
@@ -331,7 +332,8 @@ namespace {
 						return TextureFormat::R10G10B10A2_UNORM;
 					}
 
-					// No DXGI format maps to ISBITMASK(0x000003ff,0x000ffc00,0x3ff00000,0xc0000000) aka D3DFMT_A2R10G10B10
+					// No DXGI format maps to ISBITMASK(0x000003ff,0x000ffc00,0x3ff00000,0xc0000000) aka
+					// D3DFMT_A2R10G10B10
 
 					if (ISBITMASK(0x0000ffff, 0xffff0000, 0x00000000, 0x00000000)) {
 						return TextureFormat::R16G16_UNORM;
@@ -369,7 +371,8 @@ namespace {
 
 					// No DXGI format maps to ISBITMASK(0x0f00,0x00f0,0x000f,0x0000) aka D3DFMT_X4R4G4B4
 
-					// No 3:3:2, 3:3:2:8, or paletted DXGI formats aka D3DFMT_A8R3G3B2, D3DFMT_R3G3B2, D3DFMT_P8, D3DFMT_A8P8, etc.
+					// No 3:3:2, 3:3:2:8, or paletted DXGI formats aka D3DFMT_A8R3G3B2, D3DFMT_R3G3B2, D3DFMT_P8,
+					// D3DFMT_A8P8, etc.
 					break;
 			}
 		}
@@ -411,7 +414,8 @@ namespace {
 					return TextureFormat::R16G16_SNORM; // D3DX10/11 writes this out as DX10 extension
 				}
 
-				// No DXGI format maps to ISBITMASK(0x3ff00000, 0x000ffc00, 0x000003ff, 0xc0000000) aka D3DFMT_A2W10V10U10
+				// No DXGI format maps to ISBITMASK(0x3ff00000, 0x000ffc00, 0x000003ff, 0xc0000000) aka
+				// D3DFMT_A2W10V10U10
 			}
 		}
 		else if (ddpf.dwFlags & DDPF_FOURCC) {
@@ -510,7 +514,8 @@ namespace {
 //---------------------------------------------------------------
 // DDS loader implementation.
 //---------------------------------------------------------------
-bool DDSLoader::load(const char* inputData, const size_t inputDataSizeBytes, TextureDesc& desc, std::vector<TextureData>& initalData)
+bool DDSLoader::load(
+    const char* inputData, const size_t inputDataSizeBytes, TextureDesc& desc, std::vector<TextureData>& initalData)
 {
 	m_ddsData = inputData;
 	m_ddsDataSizeBytes = inputDataSizeBytes;
@@ -528,14 +533,15 @@ bool DDSLoader::load(const char* inputData, const size_t inputDataSizeBytes, Tex
 	// Read the DXT10 header (if any).
 	// "If the DDS_PIXELFORMAT dwFlags is set to DDPF_FOURCC and dwFourCC is set to "DX10"
 	// an additional DDS_HEADER_DXT10 structure will be present..."
-	const bool hasDXT10Hheader = (dds_header.dwFlags & DDPF_FOURCC) && (dds_header.ddspf.dwFourCC == DDS_MAKEFOURCC('D', 'X', '1', '0'));
+	const bool hasDXT10Hheader =
+	    (dds_header.dwFlags & DDPF_FOURCC) && (dds_header.ddspf.dwFourCC == DDS_MAKEFOURCC('D', 'X', '1', '0'));
 	const DDS_HEADER_DXT10 dxt10ext = (hasDXT10Hheader) ? readNextAs<DDS_HEADER_DXT10>() : DDS_HEADER_DXT10();
 
 	// The texture description
 	TextureFormat::Enum textureFormat = TextureFormat::Unknown;
 	const int mipCount = (dds_header.dwMipMapCount != 0) ? dds_header.dwMipMapCount : 1;
-	int arraySize = 1; // Actually the nuber of surfaces(Example is Cube textures, they have 6 surfaces and in D3D11 they are represended
-	                   // with Texture2DArray).
+	int arraySize = 1; // Actually the nuber of surfaces(Example is Cube textures, they have 6 surfaces and in D3D11
+	                   // they are represended with Texture2DArray).
 	int width = dds_header.dwWidth;
 	int height = dds_header.dwHeight;
 	int depth = dds_header.dwDepth;
@@ -696,7 +702,8 @@ bool DDSLoader::load(const char* inputData, const size_t inputDataSizeBytes, Tex
 	return true;
 }
 
-DDSLoader::SurfaceInfo DDSLoader::getSurfaceInfo(const int width, const int height, const TextureFormat::Enum textureFormat)
+DDSLoader::SurfaceInfo
+    DDSLoader::getSurfaceInfo(const int width, const int height, const TextureFormat::Enum textureFormat)
 {
 	const size_t bpp = TextureFormat::GetSizeBits(textureFormat);
 	const bool isBC = TextureFormat::IsBC(textureFormat);

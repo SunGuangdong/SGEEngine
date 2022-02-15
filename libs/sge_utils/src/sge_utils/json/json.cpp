@@ -578,7 +578,8 @@ JsonValue* JsonParser::parseValue(const JID selfJID)
 
 			// get the member value
 			JsonValue* member = parseValue(getNextJID());
-			result->members.emplace_back(std::pair<std::vector<unsigned char>, JsonValue*>(std::move(idnetifier), std::move(member)));
+			result->members.emplace_back(
+			    std::pair<std::vector<unsigned char>, JsonValue*>(std::move(idnetifier), std::move(member)));
 
 #if 1
 			// ckeck for comma ahead.

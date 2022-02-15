@@ -109,9 +109,8 @@ ModelCollisionMesh assimpMeshToCollisionMesh(const aiMesh* const asmpMesh)
 // @param [in] asmpScene the assimp scene being imported.
 // @param [in] asmpMtlTexName is the name returned bvy aiMaterial::Get method.
 // @return the filename to be referenced in the material for this texture.
-std::string extractTextureFilenameAndEmbeddedTex(ModelImportAdditionalResult* additionalResult,
-                                                 const aiScene* asmpScene,
-                                                 const aiString& asmpMtlTexName)
+std::string extractTextureFilenameAndEmbeddedTex(
+    ModelImportAdditionalResult* additionalResult, const aiScene* asmpScene, const aiString& asmpMtlTexName)
 {
 	const aiTexture* embeddedTexture = asmpScene->GetEmbeddedTexture(asmpMtlTexName.C_Str());
 	if (embeddedTexture) {
@@ -122,7 +121,8 @@ std::string extractTextureFilenameAndEmbeddedTex(ModelImportAdditionalResult* ad
 		// the buffer in pcData is of size mWidth (bytes I assume) and it is just a dump of that file contents.
 		// So basically if we just create a file with the specified memory we will end up with an image file.
 		if (embeddedTexture->mHeight == 0) {
-			std::string suggestedFilename = std::string(embeddedTexture->mFilename.C_Str()) + "." + embeddedTexture->achFormatHint;
+			std::string suggestedFilename =
+			    std::string(embeddedTexture->mFilename.C_Str()) + "." + embeddedTexture->achFormatHint;
 
 			// Check if the texture has already been marked for creation.
 			if (additionalResult->textureToCopy.count(suggestedFilename) == 0) {
@@ -147,12 +147,13 @@ std::string extractTextureFilenameAndEmbeddedTex(ModelImportAdditionalResult* ad
 //----------------------------------------------------------------------------
 // AssimpImporter
 //----------------------------------------------------------------------------
-bool AssimpImporter::parse(Model* result,
-                           ModelImportAdditionalResult& additionalResult,
-                           std::string& materialsPrefix,
-                           const aiScene* scene,
-                           aiNode* enforcedRootNode,
-                           const ModelParseSettings& parseSettings)
+bool AssimpImporter::parse(
+    Model* result,
+    ModelImportAdditionalResult& additionalResult,
+    std::string& materialsPrefix,
+    const aiScene* scene,
+    aiNode* enforcedRootNode,
+    const ModelParseSettings& parseSettings)
 {
 	try {
 		m_model = result;
@@ -217,7 +218,8 @@ int AssimpImporter::discoverNodesRecursive(const aiNode* const asmpNode)
 	// Check if the geometry attached to this node should
 	// be used for as collsion geometry and not for rendering.
 	// This is guessed by the prefix in the node name.
-	bool const isCollisionGeometryTriMeshNode = node->name.find("SCConcave_") == 0 || node->name.find("SCTriMesh_") == 0;
+	bool const isCollisionGeometryTriMeshNode =
+	    node->name.find("SCConcave_") == 0 || node->name.find("SCTriMesh_") == 0;
 	bool const isCollisionGeometryConvexNode = node->name.find("SCConvex_") == 0;
 	bool const isCollisionGeometryBoxNode = node->name.find("SCBox_") == 0;
 	bool const isCollisionGeometryCapsuleNode = node->name.find("SCCapsule_") == 0;
@@ -348,11 +350,16 @@ void AssimpImporter::importMaterials()
 
 		ExternalPBRMaterialSettings importedMtlSets;
 
-		importedMtlSets.diffuseTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpBaseColorTexName);
-		importedMtlSets.emissionTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpEmissionTexName);
-		importedMtlSets.metallicTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpMetallicTexName);
-		importedMtlSets.roughnessTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpRoughnessTexName);
-		importedMtlSets.normalTextureName = extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, normalMapTexName);
+		importedMtlSets.diffuseTextureName =
+		    extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpBaseColorTexName);
+		importedMtlSets.emissionTextureName =
+		    extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpEmissionTexName);
+		importedMtlSets.metallicTextureName =
+		    extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpMetallicTexName);
+		importedMtlSets.roughnessTextureName =
+		    extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, asmpRoughnessTexName);
+		importedMtlSets.normalTextureName =
+		    extractTextureFilenameAndEmbeddedTex(m_additionalResult, asmpScene, normalMapTexName);
 
 		importedMtlSets.diffuseColor = fromAssimp(asmpDiffuseColor, 1.f);
 		importedMtlSets.emissionColor = fromAssimp(asmpDiffuseColor, 0.f);
@@ -385,7 +392,8 @@ void AssimpImporter::importMeshes(const bool importSkinningData)
 	}
 }
 
-void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int importedMeshIndex, const bool importSkinningData)
+void AssimpImporter::importMeshes_singleMesh(
+    unsigned asimpMeshIndex, int importedMeshIndex, const bool importSkinningData)
 {
 	const aiMesh* asmpMesh = asmpScene->mMeshes[asimpMeshIndex];
 
@@ -570,7 +578,9 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 		bool hasVertsWithNoBonesAttached = perVertexIdBoneInfuence.size() != asmpMesh->mNumVertices;
 
 		if (asmpMesh->mNumBones > 0 && hasVertsWithNoBonesAttached) {
-			printf("Found a skinned mesh with vertices that have no bones infuencing them. A workaround soultion will take place.");
+			printf(
+			    "Found a skinned mesh with vertices that have no bones infuencing them. A workaround soultion will "
+			    "take place.");
 			for (int iVert = 0; iVert < (int)asmpMesh->mNumVertices; ++iVert) {
 				if (perVertexIdBoneInfuence.count(iVert) == 0) {
 					// The vertex doesn't have any bones infuencing it.
@@ -583,9 +593,10 @@ void AssimpImporter::importMeshes_singleMesh(unsigned asimpMeshIndex, int import
 						const aiVector3D vertexPos = asmpMesh->mVertices[iVert];
 						const aiVector3D vertexPosRelToBone = asmpBone->mOffsetMatrix * vertexPos;
 
-						const aiVector3D bonePosition =
-						    aiVector3D(asmpBone->mNode->mTransformation[0][3], asmpBone->mNode->mTransformation[1][3],
-						               asmpBone->mNode->mTransformation[2][3]);
+						const aiVector3D bonePosition = aiVector3D(
+						    asmpBone->mNode->mTransformation[0][3],
+						    asmpBone->mNode->mTransformation[1][3],
+						    asmpBone->mNode->mTransformation[2][3]);
 
 						float currDistanceSqr = (bonePosition - vertexPosRelToBone).SquareLength();
 						if (currDistanceSqr < bestClosestDistanceSqr) {
@@ -845,7 +856,8 @@ void AssimpImporter::importAnimations()
 			const int nodeIndex = m_model->findFistNodeIndexWithName(nodeName);
 			if (nodeIndex < 0) {
 				throw ImportExcept(
-				    "Animated node not found by name. Assimp promises that the names in assimp scene and in aiNodeAnim will match but "
+				    "Animated node not found by name. Assimp promises that the names in assimp scene and in aiNodeAnim "
+				    "will match but "
 				    "something is wrong somewhere!");
 			}
 
@@ -884,7 +896,8 @@ void AssimpImporter::importAnimations()
 		// FBX exporters tend to do this for some reason.
 		if (!perNodeKeyFrames.empty()) {
 			const int newAnimIndex = m_model->makeNewAnim();
-			*(m_model->animationAt(newAnimIndex)) = ModelAnimation(animationName, animationDuration, std::move(perNodeKeyFrames));
+			*(m_model->animationAt(newAnimIndex)) =
+			    ModelAnimation(animationName, animationDuration, std::move(perNodeKeyFrames));
 		}
 	}
 }
@@ -902,12 +915,14 @@ void AssimpImporter::importCollisionGeometry()
 			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
-				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
+				mat4f const n2w =
+				    m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
 				for (vec3f& v : verticesWS) {
 					v = mat_mul_pos(n2w, v);
 				}
 
-				m_model->m_convexHulls.emplace_back(ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
+				m_model->m_convexHulls.emplace_back(
+				    ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
 			}
 		}
 		else {
@@ -926,12 +941,14 @@ void AssimpImporter::importCollisionGeometry()
 			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
-				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
+				mat4f const n2w =
+				    m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
 				for (vec3f& v : verticesWS) {
 					v = mat_mul_pos(n2w, v);
 				}
 
-				m_model->m_concaveHulls.emplace_back(ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
+				m_model->m_concaveHulls.emplace_back(
+				    ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
 			}
 		}
 		else {

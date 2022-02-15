@@ -141,16 +141,17 @@ enum DDS_RESOURCE_DIMENSION : uint32 {
 
 enum DDPF_FLAGS : uint32 {
 	DDPF_ALPHAPIXELS = 0x1, // Texture contains alpha data; dwRGBAlphaBitMask contains valid data.
-	DDPF_ALPHA = 0x2,  // Used in some older DDS files for alpha channel only uncompressed data (dwRGBBitCount contains the alpha channel
-	                   // bitcount; dwABitMask contains valid data)
+	DDPF_ALPHA = 0x2,  // Used in some older DDS files for alpha channel only uncompressed data (dwRGBBitCount contains
+	                   // the alpha channel bitcount; dwABitMask contains valid data)
 	DDPF_FOURCC = 0x4, // Texture contains compressed RGB data; dwFourCC contains valid data.
-	DDPF_RGB = 0x40, // Texture contains uncompressed RGB data; dwRGBBitCount and the RGB masks (dwRBitMask, dwGBitMask, dwBBitMask) contain
-	                 // valid data.
-	DDPF_YUV = 0x200, // Used in some older DDS files for YUV uncompressed data (dwRGBBitCount contains the YUV bit count; dwRBitMask
-	                  // contains the Y mask, dwGBitMask contains the U mask, dwBBitMask contains the V mask)
-	DDPF_LUMINANCE =
-	    0x20000, // Used in some older DDS files for single channel color uncompressed data (dwRGBBitCount contains the luminance channel
-	             // bit count; dwRBitMask contains the channel mask). Can be combined with DDPF_ALPHAPIXELS for a two channel DDS file.
+	DDPF_RGB = 0x40, // Texture contains uncompressed RGB data; dwRGBBitCount and the RGB masks (dwRBitMask, dwGBitMask,
+	                 // dwBBitMask) contain valid data.
+	DDPF_YUV =
+	    0x200, // Used in some older DDS files for YUV uncompressed data (dwRGBBitCount contains the YUV bit count;
+	           // dwRBitMask contains the Y mask, dwGBitMask contains the U mask, dwBBitMask contains the V mask)
+	DDPF_LUMINANCE = 0x20000, // Used in some older DDS files for single channel color uncompressed data (dwRGBBitCount
+	                          // contains the luminance channel bit count; dwRBitMask contains the channel mask). Can be
+	                          // combined with DDPF_ALPHAPIXELS for a two channel DDS file.
 	DDPF_BUMPDUDV = 0x00080000
 };
 
@@ -183,8 +184,8 @@ enum DDSD_FLAGS {
 };
 
 enum DDSCAPS_FALGS {
-	DDSCAPS_COMPLEX = 0x8, // Optional; must be used on any file that contains more than one surface (a mipmap, a cubic environment map, or
-	                       // mipmapped volume texture).
+	DDSCAPS_COMPLEX = 0x8, // Optional; must be used on any file that contains more than one surface (a mipmap, a cubic
+	                       // environment map, or mipmapped volume texture).
 	DDSCAPS_MIPMAP = 0x400000, // Optional; should be used for a mipmap.
 	DDSCAPS_TEXTURE = 0x1000,  // Required.
 };
@@ -199,8 +200,9 @@ enum DDSCAPS2_FLAG {
 	DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x8000, // Required when these surfaces are stored in a cube map.
 	DDSCAPS2_VOLUME = 0x200000,          // Required for a volume texture.
 
-	DDSCAPS2_CUBEMAP_ALL = DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX | DDSCAPS2_CUBEMAP_POSITIVEY |
-	                       DDSCAPS2_CUBEMAP_NEGATIVEY | DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ
+	DDSCAPS2_CUBEMAP_ALL = DDSCAPS2_CUBEMAP | DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX |
+	                       DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY | DDSCAPS2_CUBEMAP_POSITIVEZ |
+	                       DDSCAPS2_CUBEMAP_NEGATIVEZ
 };
 
 struct DDS_HEADER {
@@ -244,7 +246,11 @@ struct SGE_CORE_API DDSLoader {
 	{
 	}
 
-	bool load(const char* inputData, const size_t inputDataSizeBytes, TextureDesc& desc, std::vector<TextureData>& initalData);
+	bool load(
+	    const char* inputData,
+	    const size_t inputDataSizeBytes,
+	    TextureDesc& desc,
+	    std::vector<TextureData>& initalData);
 
   private:
 	struct SurfaceInfo {

@@ -150,7 +150,8 @@ void Core::setup(SGEDevice* const sgedev, AudioDevice* const sgeAudioDevice)
 
 	// Blend Staets.
 	{
-		m_graphicsResources.BS_backToFrontAlpha = sgedev->requestBlendState(BlendStateDesc::GetDefaultBackToFrontAlpha());
+		m_graphicsResources.BS_backToFrontAlpha =
+		    sgedev->requestBlendState(BlendStateDesc::GetDefaultBackToFrontAlpha());
 		m_graphicsResources.BS_addativeColor = sgedev->requestBlendState(BlendStateDesc::getColorAdditiveBlending());
 	}
 

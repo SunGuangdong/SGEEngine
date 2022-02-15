@@ -34,7 +34,8 @@ struct SGE_ENGINE_API Actor : public GameObject {
 	const vec3f getDirZ() const { return getTransformMtx().c2.xyz(); }
 
 	/// Changes the transform of the actor and its assigned main rigid body (if any).
-	/// @param [in] killVelocity set it to true if you want the rigid body of the actor (if any) to not have any velocty.
+	/// @param [in] killVelocity set it to true if you want the rigid body of the actor (if any) to not have any
+	/// velocty.
 	void setTransform(const transf3d& transform, bool killVelocity = true);
 
 	/// Sets the local transform of the actor according to its parent objects.
@@ -47,8 +48,10 @@ struct SGE_ENGINE_API Actor : public GameObject {
 	void setOrientation(const quatf& r, bool killVelocity = true);
 
 	/// Called after the physics simulation has ended and before update().
-	/// It is used so the physics engine can change the transformation of the actor without looping back to the physics engine.
-	void setTransformEx(const transf3d& transform, bool killVelocity, bool recomputeBinding, bool shouldChangeRigidBodyTransform);
+	/// It is used so the physics engine can change the transformation of the actor without looping back to the physics
+	/// engine.
+	void setTransformEx(
+	    const transf3d& transform, bool killVelocity, bool recomputeBinding, bool shouldChangeRigidBodyTransform);
 
 	/// Returns the bounding box in object space. The box may be empty if not applicable.
 	/// This is not intended for physics or any game logic.
@@ -60,10 +63,14 @@ struct SGE_ENGINE_API Actor : public GameObject {
 	virtual int getNumItemsInMode(EditMode const mode) const;
 	virtual bool getItemTransform(transf3d& result, EditMode const mode, int UNUSED(itemIndex));
 	virtual void setItemTransform(EditMode const mode, int UNUSED(itemIndex), const transf3d& tr);
-	virtual InspectorCmd*
-	    generateDeleteItemCmd(GameInspector* inspector, const SelectedItem* items, int numItems, bool ifActorModeShouldDeleteActorsUnder);
+	virtual InspectorCmd* generateDeleteItemCmd(
+	    GameInspector* inspector, const SelectedItem* items, int numItems, bool ifActorModeShouldDeleteActorsUnder);
 	virtual InspectorCmd* generateItemSetTransformCmd(
-	    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform);
+	    GameInspector* inspector,
+	    EditMode const mode,
+	    int itemIndex,
+	    const transf3d& initalTrasform,
+	    const transf3d& newTransform);
 
   public:
 	/// The transform of the actor in world space. this is the transform that

@@ -70,8 +70,10 @@ struct ObjectArenaUntyped {
 		~Chunk()
 		{
 			if (chunkData && perObjStatus) {
-				sgeAssert(objectInfo.isValid() &&
-				          "Are you sure the type didn't change or if it is correct? It is expected that the type is destructable.");
+				sgeAssert(
+				    objectInfo.isValid() &&
+				    "Are you sure the type didn't change or if it is correct? It is expected that the type is "
+				    "destructable.");
 
 				if (objectInfo.isValid()) {
 					freeList.clear();

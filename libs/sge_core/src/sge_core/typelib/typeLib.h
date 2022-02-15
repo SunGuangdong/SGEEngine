@@ -222,8 +222,8 @@ struct SGE_CORE_API MemberDesc {
 	std::string prettyName;
 	TypeId typeId;
 	int byteOffset = 0;
-	int sizeBytes = 0; // CAUTION: This is a bit redundant but it simplfies the code a bit. This value must be the same that is stored in
-	                   // the type register for that type!.
+	int sizeBytes = 0; // CAUTION: This is a bit redundant but it simplfies the code a bit. This value must be the same
+	                   // that is stored in the type register for that type!.
 	TypeId inheritedForm;
 	unsigned int flags = 0;
 
@@ -423,10 +423,11 @@ struct SGE_CORE_API TypeDesc {
 
 	// Registers a new member to the struct.
 	template <typename T, typename M>
-	TypeDesc& member2base(const char* const name,
-	                      void (*getDataFn)(void* object, void* dest),
-	                      void (*setDataFn)(void* object, const void* src),
-	                      unsigned const flags)
+	TypeDesc& member2base(
+	    const char* const name,
+	    void (*getDataFn)(void* object, void* dest),
+	    void (*setDataFn)(void* object, const void* src),
+	    unsigned const flags)
 	{
 		sgeAssert(sgeTypeId(T) == typeId);
 
@@ -521,7 +522,8 @@ struct SGE_CORE_API TypeDesc {
 	TypeId typeId;
 	int sizeBytes = 0;
 
-	TypeId enumUnderlayingType;      ///< The type that is used to represent an enum. If the type is not enum this is nullptr.
+	TypeId
+	    enumUnderlayingType; ///< The type that is used to represent an enum. If the type is not enum this is nullptr.
 	TypeId stdVectorUnderlayingType; ///< Set if the type is std::vector. Unset otherwise.
 
 	TypeId stdMapKeyType;

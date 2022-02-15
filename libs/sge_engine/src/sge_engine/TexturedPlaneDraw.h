@@ -8,11 +8,12 @@
 namespace sge {
 
 struct SGE_ENGINE_API TexturedPlaneDraw {
-	void draw(const RenderDestination& rdest,
-	          const mat4f& projViewWorld,
-	          Texture* texture,
-	          const vec4f& tint,
-	          const vec4f uvRegion = vec4f(0.f, 0.f, 1.f, 1.f));
+	void draw(
+	    const RenderDestination& rdest,
+	    const mat4f& projViewWorld,
+	    Texture* texture,
+	    const vec4f& tint,
+	    const vec4f uvRegion = vec4f(0.f, 0.f, 1.f, 1.f));
 
 	Geometry getGeometry(SGEDevice* sgedev);
 

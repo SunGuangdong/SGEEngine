@@ -70,29 +70,33 @@ struct SGE_ENGINE_API TerrainGenerator {
 		vec3f n = vec3f(0.f, 1.f, 0.f);
 	};
 
-	// Generates the vertex buffer and the bounding boxes needed to represent this geometry for both rendering and physics.
-	static bool generateStairs(std::vector<Vertex>& vertices,
-	                           std::vector<int>& indices,
-	                           std::vector<Box3f>& bboxes,
-	                           const StairsDesc& desc,
-	                           int* pNumVertsAdded = nullptr,
-	                           int* pNumIndicesAdded = nullptr,
-	                           int* pNumBoxesAdded = nullptr);
+	// Generates the vertex buffer and the bounding boxes needed to represent this geometry for both rendering and
+	// physics.
+	static bool generateStairs(
+	    std::vector<Vertex>& vertices,
+	    std::vector<int>& indices,
+	    std::vector<Box3f>& bboxes,
+	    const StairsDesc& desc,
+	    int* pNumVertsAdded = nullptr,
+	    int* pNumIndicesAdded = nullptr,
+	    int* pNumBoxesAdded = nullptr);
 
 
-	static bool generateSlope(std::vector<Vertex>& vertices,
-	                          std::vector<int>& indices,
-	                          ModelCollisionMesh& outCollisionMesh,
-	                          const SlopeDesc& desc,
-	                          int* pNumVertsAdded = nullptr,
-	                          int* pNumIndicesAdded = nullptr);
+	static bool generateSlope(
+	    std::vector<Vertex>& vertices,
+	    std::vector<int>& indices,
+	    ModelCollisionMesh& outCollisionMesh,
+	    const SlopeDesc& desc,
+	    int* pNumVertsAdded = nullptr,
+	    int* pNumIndicesAdded = nullptr);
 
-	static bool generateSlantedBlock(std::vector<Vertex>& vertices,
-	                                 std::vector<int>& indices,
-	                                 ModelCollisionMesh& outCollisionMesh,
-	                                 const SlantedBlockDesc& desc,
-	                                 int* pNumVertsAdded = nullptr,
-	                                 int* pNumIndicesAdded = nullptr);
+	static bool generateSlantedBlock(
+	    std::vector<Vertex>& vertices,
+	    std::vector<int>& indices,
+	    ModelCollisionMesh& outCollisionMesh,
+	    const SlantedBlockDesc& desc,
+	    int* pNumVertsAdded = nullptr,
+	    int* pNumIndicesAdded = nullptr);
 };
 
 

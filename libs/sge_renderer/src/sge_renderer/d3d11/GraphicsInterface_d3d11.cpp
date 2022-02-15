@@ -30,7 +30,11 @@ bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc)
 	m_windowFrameTargetDesc = mainFrameDesc;
 
 	const D3D_FEATURE_LEVEL featureLevels[] = {
-	    D3D_FEATURE_LEVEL_11_1, D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_1, D3D_FEATURE_LEVEL_10_0, D3D_FEATURE_LEVEL_9_3,
+	    D3D_FEATURE_LEVEL_11_1,
+	    D3D_FEATURE_LEVEL_11_0,
+	    D3D_FEATURE_LEVEL_10_1,
+	    D3D_FEATURE_LEVEL_10_0,
+	    D3D_FEATURE_LEVEL_9_3,
 	};
 
 	DWORD deviceFlags = 0;
@@ -42,9 +46,17 @@ bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc)
 
 	if (!g_d3d11Device) {
 		for (int itr = 0; true; itr++) {
-			const HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, deviceFlags, NULL,
-			                                     NULL, // featureLevels, _ARRAYSIZE(featureLevels),
-			                                     D3D11_SDK_VERSION, &g_d3d11Device, &m_workingFeatureLevel, &g_d3d11ImmDeviceContext);
+			const HRESULT hr = D3D11CreateDevice(
+			    NULL,
+			    D3D_DRIVER_TYPE_HARDWARE,
+			    NULL,
+			    deviceFlags,
+			    NULL,
+			    NULL, // featureLevels, _ARRAYSIZE(featureLevels),
+			    D3D11_SDK_VERSION,
+			    &g_d3d11Device,
+			    &m_workingFeatureLevel,
+			    &g_d3d11ImmDeviceContext);
 
 			if (FAILED(hr)) {
 				if (deviceFlags | D3D11_CREATE_DEVICE_DEBUG) {
@@ -76,9 +88,9 @@ bool SGEDeviceD3D11::Create(const MainFrameTargetDesc& mainFrameDesc)
 		d3dInfoQueue->SetBreakOnCategory(D3D11_MESSAGE_CATEGORY_RESOURCE_MANIPULATION, TRUE);
 		// d3dInfoQueue->SetBreakOnCategory(D3D11_MESSAGE_CATEGORY_EXECUTION, TRUE);
 
-		// D3D11 WARNING : ID3D11DeviceContext::DrawIndexed : The Pixel Shader unit expects a Sampler to be set at Slot 0, but none is
-		// bound.This is perfectly valid, as a NULL Sampler maps to default Sampler state.However, the developer may not want to rely on the
-		// defaults.[EXECUTION WARNING #352: DEVICE_DRAW_SAMPLER_NOT_SET]
+		// D3D11 WARNING : ID3D11DeviceContext::DrawIndexed : The Pixel Shader unit expects a Sampler to be set at Slot
+		// 0, but none is bound.This is perfectly valid, as a NULL Sampler maps to default Sampler state.However, the
+		// developer may not want to rely on the defaults.[EXECUTION WARNING #352: DEVICE_DRAW_SAMPLER_NOT_SET]
 		// d3dInfoQueue->SetBreakOnID(D3D11_MESSAGE_ID_DEVICE_DRAW_SAMPLER_NOT_SET, FALSE);
 	}
 #endif
@@ -203,7 +215,8 @@ bool SGEDeviceD3D11::D3D11_CreateSwapChain(const MainFrameTargetDesc& desc)
 	textureDesc.texture2D.height = desc.height;
 
 	m_windowRenderTarget = requestResource(ResourceType::Texture);
-	((TextureD3D11*)m_windowRenderTarget.GetPtr())->D3D11_WrapOverD3D11TextureResource(this, backBufferRenderTarget, textureDesc);
+	((TextureD3D11*)m_windowRenderTarget.GetPtr())
+	    ->D3D11_WrapOverD3D11TextureResource(this, backBufferRenderTarget, textureDesc);
 	backBufferRenderTarget->Release();
 
 	// Create the default depth buffer
@@ -249,7 +262,11 @@ void SGEDeviceD3D11::resizeBackBuffer(int width, int height)
 	m_d3d11_contextStateCache.SetRenderTargetsAndDepthStencil(0, 0, 0, 0);
 
 	[[maybe_unused]] HRESULT hr = m_d3d11SwapChain->ResizeBuffers(
-	    m_windowFrameTargetDesc.numBuffers + ((m_windowFrameTargetDesc.bWindowed) ? 0 : 1), width, height, DXGI_FORMAT_UNKNOWN, 0);
+	    m_windowFrameTargetDesc.numBuffers + ((m_windowFrameTargetDesc.bWindowed) ? 0 : 1),
+	    width,
+	    height,
+	    DXGI_FORMAT_UNKNOWN,
+	    0);
 	sgeAssert(SUCCEEDED(hr));
 
 	// Create the render target
@@ -271,7 +288,8 @@ void SGEDeviceD3D11::resizeBackBuffer(int width, int height)
 	textureDesc.texture2D.width = desc.width;
 	textureDesc.texture2D.height = desc.height;
 
-	((TextureD3D11*)(m_windowRenderTarget.GetPtr()))->D3D11_WrapOverD3D11TextureResource(this, backBufferRenderTarget, textureDesc);
+	((TextureD3D11*)(m_windowRenderTarget.GetPtr()))
+	    ->D3D11_WrapOverD3D11TextureResource(this, backBufferRenderTarget, textureDesc);
 	backBufferRenderTarget->Release();
 
 	// Create the default depth buffer
@@ -415,7 +433,8 @@ void SGEContextImmediateD3D11::updateTextureData(Texture* texture, const Texture
 		TextureD3D11* texD3D = ((TextureD3D11*)texture);
 
 		D3D11_MAPPED_SUBRESOURCE mapped;
-		HRESULT hr = D3D11_GetImmContext()->Map(texD3D->D3D11_GetTextureResource(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
+		HRESULT hr =
+		    D3D11_GetImmContext()->Map(texD3D->D3D11_GetTextureResource(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped);
 
 		if (SUCCEEDED(hr)) {
 			char* rowWriteLocation = (char*)mapped.pData;
@@ -470,10 +489,8 @@ bool SGEContextImmediateD3D11::getQueryData(Query* const query, uint64& queryDat
 }
 
 //--------------------------------------------------------------------------
-void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
-                                               FrameTarget* frameTarget,
-                                               const Rect2s* const pViewport,
-                                               const Rect2s* const pScissorsRect)
+void SGEContextImmediateD3D11::executeDrawCall(
+    DrawCall& drawCall, FrameTarget* frameTarget, const Rect2s* const pViewport, const Rect2s* const pScissorsRect)
 {
 	if (drawCall.m_pStateGroup == nullptr) {
 		sgeAssert(false && "Aborting draw call! No state group is specified!\n");
@@ -526,9 +543,11 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 		int globalCBufferSlot[ShaderType::NumElems] = {-1};
 
 		for (int t = 0; t < ShaderType::NumElems; ++t) {
-			globalCBufferSlot[t] = ((ShadingProgramD3D11*)(stateGroup.m_shadingProg))->getGlobalCBufferSlot((ShaderType::Enum)t);
+			globalCBufferSlot[t] =
+			    ((ShadingProgramD3D11*)(stateGroup.m_shadingProg))->getGlobalCBufferSlot((ShaderType::Enum)t);
 			if (globalCBufferSlot[t] >= 0) {
-				BufferD3D11* const cbuffer = (BufferD3D11*)getDeviceD3D11()->D3D11_GetGlobalUniformsBuffer((ShaderType::Enum)t);
+				BufferD3D11* const cbuffer =
+				    (BufferD3D11*)getDeviceD3D11()->D3D11_GetGlobalUniformsBuffer((ShaderType::Enum)t);
 				globalCBufferMappedMem[t] = cbuffer->map(Map::WriteDiscard, this);
 			}
 		}
@@ -547,12 +566,14 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 					// uniform.texture and not an array with uniform.textures with 1 element specified.
 					if (bindLocation.texArraySize_or_numericUniformSizeBytes == 1) {
 						TextureD3D11* texture = reinterpret_cast<TextureD3D11*>(uniform.texture);
-						srvs[bindLocation.shaderFreq][bindLocation.bindLocation] = texture ? texture->D3D11_GetSRV() : nullptr;
+						srvs[bindLocation.shaderFreq][bindLocation.bindLocation] =
+						    texture ? texture->D3D11_GetSRV() : nullptr;
 					}
 					else {
 						for (int t = 0; t < bindLocation.texArraySize_or_numericUniformSizeBytes; ++t) {
 							TextureD3D11* const d3d11Tex = static_cast<TextureD3D11*>(uniform.textures[t]);
-							srvs[bindLocation.shaderFreq][bindLocation.bindLocation + t] = d3d11Tex ? d3d11Tex->D3D11_GetSRV() : nullptr;
+							srvs[bindLocation.shaderFreq][bindLocation.bindLocation + t] =
+							    d3d11Tex ? d3d11Tex->D3D11_GetSRV() : nullptr;
 						}
 					}
 				} break;
@@ -575,7 +596,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 				} break;
 
 				case UniformType::ConstantBuffer: {
-					cbuffers[bindLocation.shaderFreq][bindLocation.bindLocation] = ((BufferD3D11*)(uniform.buffer))->D3D11_GetResource();
+					cbuffers[bindLocation.shaderFreq][bindLocation.bindLocation] =
+					    ((BufferD3D11*)(uniform.buffer))->D3D11_GetResource();
 				} break;
 
 				default: {
@@ -583,8 +605,10 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 						char* const cBufferMem = (char*)globalCBufferMappedMem[bindLocation.shaderFreq];
 						if_checked(cBufferMem != nullptr)
 						{
-							memcpy(cBufferMem + bindLocation.bindLocation, uniform.data,
-							       bindLocation.texArraySize_or_numericUniformSizeBytes);
+							memcpy(
+							    cBufferMem + bindLocation.bindLocation,
+							    uniform.data,
+							    bindLocation.texArraySize_or_numericUniformSizeBytes);
 						}
 					}
 					else {
@@ -598,7 +622,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 		// Now unmap the previously mapped buffers and bind them.
 		for (int t = 0; t < ShaderType::NumElems; ++t) {
 			if (globalCBufferMappedMem[t] != nullptr) {
-				BufferD3D11* const cbuffer = (BufferD3D11*)getDeviceD3D11()->D3D11_GetGlobalUniformsBuffer((ShaderType::Enum)t);
+				BufferD3D11* const cbuffer =
+				    (BufferD3D11*)getDeviceD3D11()->D3D11_GetGlobalUniformsBuffer((ShaderType::Enum)t);
 				cbuffer->unMap(this);
 				cbuffers[t][globalCBufferSlot[t]] = cbuffer->D3D11_GetResource();
 			}
@@ -614,8 +639,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 	}
 
 	// Input layout.
-	ID3D11InputLayout* const inputLayout =
-	    ((ShaderD3D11*)stateGroup.m_shadingProg->getVertexShader())->D3D11_GetInputLayoutForVertexDeclIndex(stateGroup.m_vertDeclIndex);
+	ID3D11InputLayout* const inputLayout = ((ShaderD3D11*)stateGroup.m_shadingProg->getVertexShader())
+	                                           ->D3D11_GetInputLayoutForVertexDeclIndex(stateGroup.m_vertDeclIndex);
 
 #ifdef SGE_USE_DEBUG
 	// In order to simplfy debugging, find the vertex declaration in debug builds.
@@ -661,7 +686,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 		stateCache->SetBlendState(((BlendStateD3D11*)stateGroup.m_blendState)->D3D11_GetResource());
 	}
 	else {
-		stateCache->SetBlendState(((BlendStateD3D11*)(getDeviceD3D11()->m_default_blendState.GetPtr()))->D3D11_GetResource());
+		stateCache->SetBlendState(
+		    ((BlendStateD3D11*)(getDeviceD3D11()->m_default_blendState.GetPtr()))->D3D11_GetResource());
 	}
 
 	// Rasterizer state with scissors.
@@ -683,8 +709,11 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 				return Rect2s(viewport.width, viewport.height);
 			}();
 
-			const CD3D11_RECT d3d11_rect(scissorsRect.x, scissorsRect.y, scissorsRect.x + scissorsRect.width,
-			                             scissorsRect.y + scissorsRect.height);
+			const CD3D11_RECT d3d11_rect(
+			    scissorsRect.x,
+			    scissorsRect.y,
+			    scissorsRect.x + scissorsRect.width,
+			    scissorsRect.y + scissorsRect.height);
 
 			stateCache->SetScissors(&d3d11_rect, 1);
 		}
@@ -697,7 +726,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 
 	// Depth stencil state.
 	if (stateGroup.m_depthStencilState && stateGroup.m_depthStencilState->isValid()) {
-		stateCache->SetDepthStencilState(((DepthStencilStateD3D11*)stateGroup.m_depthStencilState)->D3D11_GetResource());
+		stateCache->SetDepthStencilState(
+		    ((DepthStencilStateD3D11*)stateGroup.m_depthStencilState)->D3D11_GetResource());
 	}
 	else {
 		stateCache->SetDepthStencilState(
@@ -719,7 +749,8 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 	if (drawCall.m_drawExec.GetType() == DrawExecDesc::Type_Linear) {
 		const auto& call = drawCall.m_drawExec.LinearCall();
 
-		numPrimitivesDrawn = PrimitiveTopology::GetNumPrimitivesByPoints(stateGroup.m_primTopology, call.numVerts) * call.numInstances;
+		numPrimitivesDrawn =
+		    PrimitiveTopology::GetNumPrimitivesByPoints(stateGroup.m_primTopology, call.numVerts) * call.numInstances;
 
 		if (call.numInstances == 1) {
 			stateCache->m_d3dcon->Draw(call.numVerts, call.startVert);
@@ -731,13 +762,15 @@ void SGEContextImmediateD3D11::executeDrawCall(DrawCall& drawCall,
 	else if (drawCall.m_drawExec.GetType() == DrawExecDesc::Type_Indexed) {
 		const auto& call = drawCall.m_drawExec.IndexedCall();
 
-		numPrimitivesDrawn = PrimitiveTopology::GetNumPrimitivesByPoints(stateGroup.m_primTopology, call.numIndices) * call.numInstances;
+		numPrimitivesDrawn =
+		    PrimitiveTopology::GetNumPrimitivesByPoints(stateGroup.m_primTopology, call.numIndices) * call.numInstances;
 
 		if (call.numInstances == 1) {
 			stateCache->m_d3dcon->DrawIndexed(call.numIndices, call.startIndex, call.startVertex);
 		}
 		else {
-			stateCache->m_d3dcon->DrawIndexedInstanced(call.numIndices, call.numInstances, call.startIndex, call.startVertex, 0);
+			stateCache->m_d3dcon->DrawIndexedInstanced(
+			    call.numIndices, call.numInstances, call.startIndex, call.startVertex, 0);
 		}
 	}
 
@@ -791,8 +824,10 @@ RAIResource* SGEDeviceD3D11::requestResource(const ResourceType::Enum resourceTy
 RasterizerState* SGEDeviceD3D11::requestRasterizerState(const RasterDesc& desc)
 {
 	// Search if the resource exists.
-	auto itr = std::find_if(rasterizerStateCache.begin(), rasterizerStateCache.end(),
-	                        [&desc](const RasterizerState* state) -> bool { return state->getDesc() == desc; });
+	auto itr = std::find_if(
+	    rasterizerStateCache.begin(), rasterizerStateCache.end(), [&desc](const RasterizerState* state) -> bool {
+		    return state->getDesc() == desc;
+	    });
 
 	if (itr != std::end(rasterizerStateCache)) {
 		return *itr;
@@ -814,8 +849,10 @@ RasterizerState* SGEDeviceD3D11::requestRasterizerState(const RasterDesc& desc)
 DepthStencilState* SGEDeviceD3D11::requestDepthStencilState(const DepthStencilDesc& desc)
 {
 	// Search if the resource exists.
-	auto itr = std::find_if(depthStencilStateCache.begin(), depthStencilStateCache.end(),
-	                        [&desc](const DepthStencilState* state) -> bool { return state->getDesc() == desc; });
+	auto itr = std::find_if(
+	    depthStencilStateCache.begin(), depthStencilStateCache.end(), [&desc](const DepthStencilState* state) -> bool {
+		    return state->getDesc() == desc;
+	    });
 
 	if (itr != std::end(depthStencilStateCache)) {
 		return *itr;
@@ -836,8 +873,9 @@ DepthStencilState* SGEDeviceD3D11::requestDepthStencilState(const DepthStencilDe
 BlendState* SGEDeviceD3D11::requestBlendState(const BlendStateDesc& desc)
 {
 	// Search if the resource exists.
-	auto itr = std::find_if(blendStateCache.begin(), blendStateCache.end(),
-	                        [&desc](const BlendState* state) -> bool { return state->getDesc() == desc; });
+	auto itr = std::find_if(blendStateCache.begin(), blendStateCache.end(), [&desc](const BlendState* state) -> bool {
+		return state->getDesc() == desc;
+	});
 
 	if (itr != std::end(blendStateCache)) {
 		return *itr;
@@ -858,8 +896,10 @@ BlendState* SGEDeviceD3D11::requestBlendState(const BlendStateDesc& desc)
 SamplerState* SGEDeviceD3D11::requestSamplerState(const SamplerDesc& desc)
 {
 	// Search if the resource exists.
-	auto itr = std::find_if(samplerStateCache.begin(), samplerStateCache.end(),
-	                        [&desc](const SamplerState* state) -> bool { return state->getDesc() == desc; });
+	auto itr =
+	    std::find_if(samplerStateCache.begin(), samplerStateCache.end(), [&desc](const SamplerState* state) -> bool {
+		    return state->getDesc() == desc;
+	    });
 
 	if (itr != std::end(samplerStateCache)) {
 		return *itr;

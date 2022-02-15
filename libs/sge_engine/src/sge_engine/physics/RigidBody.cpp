@@ -59,7 +59,8 @@ void SgeCustomMoutionState::setWorldTransform(const btTransform& UNUSED(centerOf
 //-------------------------------------------------------------------------
 // RigidBody
 //-------------------------------------------------------------------------
-void RigidBody::create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce)
+void RigidBody::create(
+    Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce)
 {
 	CollisionShape* collisionShape = new CollisionShape();
 	collisionShape->create(shapeDesc, numShapeDescs);
@@ -94,14 +95,16 @@ void RigidBody::create(Actor* const actor, CollisionShape* collisionShapeToBeOwn
 
 	if (mass == 0.f) {
 		getBulletRigidBody()->setActivationState(ISLAND_SLEEPING);
-		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+		m_collisionObject->setCollisionFlags(
+		    m_collisionObject->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 	}
 	else {
 		getBulletRigidBody()->setActivationState(DISABLE_DEACTIVATION);
 	}
 
 	if (noResponce) {
-		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+		m_collisionObject->setCollisionFlags(
+		    m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 
 	this->actor = actor;
@@ -120,10 +123,12 @@ void RigidBody::createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs
 	m_collisionObject.reset(ghostBullet);
 
 
-	m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
+	m_collisionObject->setCollisionFlags(
+	    m_collisionObject->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT);
 
 	if (noResponse) {
-		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+		m_collisionObject->setCollisionFlags(
+		    m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 
 	this->actor = actor;
@@ -133,7 +138,8 @@ void RigidBody::createGhost(Actor* actor, CollsionShapeDesc* descs, int numDescs
 void RigidBody::setNoCollisionResponse(bool dontRespontToCollisions)
 {
 	if (dontRespontToCollisions) {
-		m_collisionObject->setCollisionFlags(m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+		m_collisionObject->setCollisionFlags(
+		    m_collisionObject->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 	else {
 		int flags = m_collisionObject->getCollisionFlags();
@@ -526,7 +532,8 @@ Actor* getOtherActorFromManifoldMutable(const btPersistentManifold* const manifo
 	return nullptr;
 }
 
-const btCollisionObject* getOtherFromManifold(const btPersistentManifold* const manifold, const btCollisionObject* const you, int* youIdx)
+const btCollisionObject*
+    getOtherFromManifold(const btPersistentManifold* const manifold, const btCollisionObject* const you, int* youIdx)
 {
 	const btCollisionObject* const a0 = manifold->getBody0();
 	const btCollisionObject* const a1 = manifold->getBody1();
@@ -547,7 +554,8 @@ const btCollisionObject* getOtherFromManifold(const btPersistentManifold* const 
 	return nullptr;
 }
 
-const btCollisionObject* getOtherBodyFromManifold(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx)
+const btCollisionObject*
+    getOtherBodyFromManifold(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx)
 {
 	const Actor* const a0 = getActorFromPhysicsObject(manifold->getBody0());
 	const Actor* const a1 = getActorFromPhysicsObject(manifold->getBody1());
@@ -568,7 +576,8 @@ const btCollisionObject* getOtherBodyFromManifold(const btPersistentManifold* co
 	return nullptr;
 }
 
-SGE_ENGINE_API const Actor* getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx)
+SGE_ENGINE_API const Actor*
+    getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx)
 {
 	btCollisionObject* obj0 = static_cast<btCollisionObject*>(pair->m_pProxy0->m_clientObject);
 	btCollisionObject* obj1 = static_cast<btCollisionObject*>(pair->m_pProxy1->m_clientObject);

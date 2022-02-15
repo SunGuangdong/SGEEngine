@@ -16,11 +16,12 @@ struct Asset;
 struct SGE_CORE_API SpriteAnimation {
 	/// @brief Frame describes a region for a texture that contains a sub image.
 	struct Frame {
-		vec2i xy = vec2i(0);         /// The position of the 1st pixel of the frame.
-		vec2i wh = vec2i(0);         /// The width and height of the region of the frame starting form "xy".
-		vec4f uvRegion = vec4f(0.f); /// The uv region in the source texture to be used. (x,y) top-left, (w,z) bottom-right
-		float duration = 0.f;        /// The duration of the frame in seconds.
-		float frameStart = 0.f;      /// The time offset in the global animation when this frame should appear.
+		vec2i xy = vec2i(0); /// The position of the 1st pixel of the frame.
+		vec2i wh = vec2i(0); /// The width and height of the region of the frame starting form "xy".
+		vec4f uvRegion =
+		    vec4f(0.f);         /// The uv region in the source texture to be used. (x,y) top-left, (w,z) bottom-right
+		float duration = 0.f;   /// The duration of the frame in seconds.
+		float frameStart = 0.f; /// The time offset in the global animation when this frame should appear.
 	};
 
 	/// @brief Imports a Sprite Sheet form our internal format.
@@ -57,15 +58,16 @@ struct SGE_CORE_API SpriteAnimationWithTextures {
 	/// @param [in] filename the path to the json file to be imported.
 	/// @param [in] assetLib the asset library needed to loaded the image texture.
 	/// @return true if succeeded.
-	static bool importSprite(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib);
+	static bool
+	    importSprite(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib);
 
 	/// @brief Imports a Sprite Sheet form Asperite exported json. Expects that the json is in "array" format.
 	/// @param [out] outSprite hold the imported sprite
 	/// @param [in] filename the path to the json file to be imported.
 	/// @param [in] assetLib the asset library needed to loaded the image texture.
 	/// @return true if succeeded.
-	static bool
-	    importFromAsepriteSpriteSheetJsonFile(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib);
+	static bool importFromAsepriteSpriteSheetJsonFile(
+	    SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib);
 
 	SpriteAnimation spriteAnimation;
 	AssetPtr textureAsset; /// The texture that holds the frames of the sprite.

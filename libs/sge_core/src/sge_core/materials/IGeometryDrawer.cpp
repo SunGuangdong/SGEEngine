@@ -8,13 +8,14 @@
 
 namespace sge {
 
-SGE_CORE_API void drawGeometry(const RenderDestination& rdest,
-                               const ICamera& camera,
-                               const mat4f& geomWorldTransfrom,
-                               const ObjectLighting& lighting,
-                               const Geometry& geometry,
-                               const IMaterialData* mtlDataBase,
-                               const InstanceDrawMods& instDrawMods)
+SGE_CORE_API void drawGeometry(
+    const RenderDestination& rdest,
+    const ICamera& camera,
+    const mat4f& geomWorldTransfrom,
+    const ObjectLighting& lighting,
+    const Geometry& geometry,
+    const IMaterialData* mtlDataBase,
+    const InstanceDrawMods& instDrawMods)
 {
 	if_checked(mtlDataBase)
 	{
@@ -25,17 +26,19 @@ SGE_CORE_API void drawGeometry(const RenderDestination& rdest,
 		// This means that this function should not be here
 		if_checked(family && family->geometryDrawer)
 		{
-			family->geometryDrawer->drawGeometry(rdest, camera, geomWorldTransfrom, lighting, geometry, mtlDataBase, instDrawMods);
+			family->geometryDrawer->drawGeometry(
+			    rdest, camera, geomWorldTransfrom, lighting, geometry, mtlDataBase, instDrawMods);
 		}
 	}
 }
 
-SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
-                                const ICamera& camera,
-                                const mat4f& geomWorldTransfrom,
-                                const ObjectLighting& lighting,
-                                const EvaluatedModel& evalModel,
-                                const InstanceDrawMods& instDrawMods)
+SGE_CORE_API void drawEvalModel(
+    const RenderDestination& rdest,
+    const ICamera& camera,
+    const mat4f& geomWorldTransfrom,
+    const ObjectLighting& lighting,
+    const EvaluatedModel& evalModel,
+    const InstanceDrawMods& instDrawMods)
 {
 	for (const EvaluatedMeshInstance& meshInst : evalModel.getEvalMeshInstances()) {
 		IMaterial* mtl = evalModel.m_model->loadedMaterialAt(meshInst.iMaterial);
@@ -47,12 +50,14 @@ SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
 			    getCore()->getMaterialLib()->findFamilyById(mdlData->materialFamilyId);
 
 			// If there is skinning the node transformation is already applied in the bones of that mesh.
-			const mat4f finalTrasform =
-			    (meshInst.geometry.hasVertexSkinning()) ? geomWorldTransfrom : geomWorldTransfrom * meshInst.modelSpaceTransform;
+			const mat4f finalTrasform = (meshInst.geometry.hasVertexSkinning())
+			                              ? geomWorldTransfrom
+			                              : geomWorldTransfrom * meshInst.modelSpaceTransform;
 
 			if_checked(family && family->geometryDrawer)
 			{
-				family->geometryDrawer->drawGeometry(rdest, camera, finalTrasform, lighting, meshInst.geometry, mdlData, instDrawMods);
+				family->geometryDrawer->drawGeometry(
+				    rdest, camera, finalTrasform, lighting, meshInst.geometry, mdlData, instDrawMods);
 			}
 		}
 	}

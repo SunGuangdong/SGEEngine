@@ -37,7 +37,8 @@ void ABlockingObstacle::create()
 	m_rbPropConfig.extractPropsFromRigidBody(*m_traitRB.getRigidBody());
 	m_rbPropConfig.dontShowDynamicProperties = true;
 
-	postUpdateSubscription = Actor::getWorld()->onPostUpdate.subscribe([this](const GameUpdateSets& u) { postUpdate(u); });
+	postUpdateSubscription =
+	    Actor::getWorld()->onPostUpdate.subscribe([this](const GameUpdateSets& u) { postUpdate(u); });
 }
 
 void ABlockingObstacle::onPlayStateChanged(bool const isStartingToPlay)
@@ -104,8 +105,10 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 
 			GameObject::getWorld()->physicsWorld.addPhysicsObject(*m_traitRB.getRigidBody());
 		}
-		else if (currentDesc.type == SimpleObstacleType::Slope &&
-		         TerrainGenerator::generateSlope(vertices, indices, slopeCollisionMesh, currentDesc.slope, &numVerts, &numIndices)) {
+		else if (
+		    currentDesc.type == SimpleObstacleType::Slope &&
+		    TerrainGenerator::generateSlope(
+		        vertices, indices, slopeCollisionMesh, currentDesc.slope, &numVerts, &numIndices)) {
 			// Create the rendering resources.
 			BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(vertices.size() * sizeof(vertices[0]));
 			BufferDesc const ibDesc = BufferDesc::GetDefaultIndexBuffer(indices.size() * sizeof(indices[0]));
@@ -117,7 +120,8 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 			this->indexBuffer->create(ibDesc, indices.data());
 
 			// Create the physics rigid body.
-			CollsionShapeDesc convexHullDesc = CollsionShapeDesc::createConvexPoly(slopeCollisionMesh.vertices, slopeCollisionMesh.indices);
+			CollsionShapeDesc convexHullDesc =
+			    CollsionShapeDesc::createConvexPoly(slopeCollisionMesh.vertices, slopeCollisionMesh.indices);
 			m_traitRB.getRigidBody()->create((Actor*)this, &convexHullDesc, 1, 0.f, false);
 			m_rbPropConfig.applyProperties(*this);
 
@@ -131,9 +135,10 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 
 			GameObject::getWorld()->physicsWorld.addPhysicsObject(*m_traitRB.getRigidBody());
 		}
-		else if (currentDesc.type == SimpleObstacleType::SlantedBlock &&
-		         TerrainGenerator::generateSlantedBlock(vertices, indices, slopeCollisionMesh, currentDesc.slantedBlock, &numVerts,
-		                                                &numIndices)) {
+		else if (
+		    currentDesc.type == SimpleObstacleType::SlantedBlock &&
+		    TerrainGenerator::generateSlantedBlock(
+		        vertices, indices, slopeCollisionMesh, currentDesc.slantedBlock, &numVerts, &numIndices)) {
 			// Create the rendering resources.
 			BufferDesc const vbDesc = BufferDesc::GetDefaultVertexBuffer(vertices.size() * sizeof(vertices[0]));
 			BufferDesc const ibDesc = BufferDesc::GetDefaultIndexBuffer(indices.size() * sizeof(indices[0]));
@@ -145,7 +150,8 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 			this->indexBuffer->create(ibDesc, indices.data());
 
 			// Create the physics rigid body.
-			CollsionShapeDesc convexHullDesc = CollsionShapeDesc::createConvexPoly(slopeCollisionMesh.vertices, slopeCollisionMesh.indices);
+			CollsionShapeDesc convexHullDesc =
+			    CollsionShapeDesc::createConvexPoly(slopeCollisionMesh.vertices, slopeCollisionMesh.indices);
 			m_traitRB.getRigidBody()->create((Actor*)this, &convexHullDesc, 1, 0.f, false);
 			m_rbPropConfig.applyProperties(*this);
 
@@ -167,8 +173,22 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 
 		VertexDeclIndex vertexDeclIdx = getCore()->getDevice()->getVertexDeclIndex(vertexDecl, SGE_ARRSZ(vertexDecl));
 
-		geometry = Geometry(vertexBuffer, indexBuffer, nullptr, -1, vertexDeclIdx, false, false, true, false,
-		                    PrimitiveTopology::TriangleList, 0, 0, sizeof(vec3f) * 2, UniformType::Uint, numIndices);
+		geometry = Geometry(
+		    vertexBuffer,
+		    indexBuffer,
+		    nullptr,
+		    -1,
+		    vertexDeclIdx,
+		    false,
+		    false,
+		    true,
+		    false,
+		    PrimitiveTopology::TriangleList,
+		    0,
+		    0,
+		    sizeof(vec3f) * 2,
+		    UniformType::Uint,
+		    numIndices);
 
 
 		tt_rendGeom.geoms.resize(1);
@@ -180,11 +200,11 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 		material = SimpleTriplanarMtlData();
 
 		material.diffuseTextureX = m_textureX.getAssetInterface<AssetIface_Texture2D>()
-		                               ? m_textureX.getAssetInterface<AssetIface_Texture2D>()->getTexture()
-		                               : nullptr;
+		                             ? m_textureX.getAssetInterface<AssetIface_Texture2D>()->getTexture()
+		                             : nullptr;
 		material.diffuseTextureY = m_textureY.getAssetInterface<AssetIface_Texture2D>()
-		                               ? m_textureY.getAssetInterface<AssetIface_Texture2D>()->getTexture()
-		                               : nullptr;
+		                             ? m_textureY.getAssetInterface<AssetIface_Texture2D>()->getTexture()
+		                             : nullptr;
 		material.diffuseTextureZ = material.diffuseTextureX;
 
 		material.uvwTransform = mat4f::getScaling(m_textureXScale, m_textureYScale, m_textureXScale);

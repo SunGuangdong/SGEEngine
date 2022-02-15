@@ -31,9 +31,10 @@ struct SGE_ENGINE_API TraitRigidBody : public Trait {
 	void destroyRigidBody();
 
 	// Create a rigid body by using the collision shapes described by the 3d model.
-	// It is not mandatory to use these functions to create a rigid body. You can get it from @getRigidBody and configure it yourself.
-	// @addToWorldNow - will not prevent adding the object to the world in onPlayStateChanged() callback, it means if the object should be
-	// added now or not. Use it when the rigid body has changed during an update.
+	// It is not mandatory to use these functions to create a rigid body. You can get it from @getRigidBody and
+	// configure it yourself.
+	// @addToWorldNow - will not prevent adding the object to the world in onPlayStateChanged() callback, it means if
+	// the object should be added now or not. Use it when the rigid body has changed during an update.
 	bool createBasedOnModel(const char* modelPath, float mass, bool noResponse, bool addToWorldNow);
 	bool createBasedOnModel(const EvaluatedModel& eval, float mass, bool noResponse, bool addToWorldNow);
 

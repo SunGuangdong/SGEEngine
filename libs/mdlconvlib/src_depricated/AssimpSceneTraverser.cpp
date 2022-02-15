@@ -24,10 +24,11 @@ namespace sge {
 //---------------------------------------------------------------------
 //
 //---------------------------------------------------------------------
-void AssimpSceneParser::parse(Model* result,
-                              const aiScene* scene,
-                              const ModelParseSettings& settings,
-                              std::vector<std::string>* pReferencedTextures)
+void AssimpSceneParser::parse(
+    Model* result,
+    const aiScene* scene,
+    const ModelParseSettings& settings,
+    std::vector<std::string>* pReferencedTextures)
 {
 	sgeAssert(result != NULL && scene != NULL);
 
@@ -119,7 +120,8 @@ void AssimpSceneParser::ParseMesh(aiMesh* impMesh)
 
 	unsigned stride = 0; // Single vertex size accumulator.
 	std::vector<void*> channelsData;
-	std::vector<int> impChannelByteStep; // ASSIMP stores UV coordinates as a 3D UVW coordinates, this is why that variables exists
+	std::vector<int>
+	    impChannelByteStep; // ASSIMP stores UV coordinates as a 3D UVW coordinates, this is why that variables exists
 
 	// Find the MeshData storage and allocate a new mesh.
 	Model::MeshData* meshData = GetBestSuitableMeshData(impMesh);
@@ -153,7 +155,8 @@ void AssimpSceneParser::ParseMesh(aiMesh* impMesh)
 		bone.offsetMatrix = bone.offsetMatrix.transposed();
 	}
 
-	// Compose a name for the mesh. ASSIMP may use one name for multiple meshes, and assimp may not give a name to the mesh.
+	// Compose a name for the mesh. ASSIMP may use one name for multiple meshes, and assimp may not give a name to the
+	// mesh.
 	mesh->id = getNextId();
 	mesh->name = (impMesh->mName.length > 0) ? impMesh->mName.C_Str() : "ImporterAutoAssignedMeshName";
 
@@ -219,7 +222,8 @@ void AssimpSceneParser::ParseMesh(aiMesh* impMesh)
 	mesh->primTopo = PrimitiveTopology::TriangleList;
 	mesh->vertexDecl = sge::VertexDecl::NormalizeDecl(mesh->vertexDecl.data(), mesh->vertexDecl.size());
 
-	const int strideSize = mesh->vertexDecl.back().byteOffset + sge::UniformType::GetSizeBytes(mesh->vertexDecl.back().format);
+	const int strideSize =
+	    mesh->vertexDecl.back().byteOffset + sge::UniformType::GetSizeBytes(mesh->vertexDecl.back().format);
 	const int bufferSizeBytes = strideSize * impMesh->mNumVertices;
 	unsigned const numVerts = impMesh->mNumVertices;
 
@@ -239,7 +243,8 @@ void AssimpSceneParser::ParseMesh(aiMesh* impMesh)
 			// Insert the vertex data into the buffers.
 			const VertexDecl& vertexDecl = mesh->vertexDecl[declIdx];
 			const size_t writeOffset =
-			    strideSize * vertIdx + vertexDecl.byteOffset; // The data offset location form the begining of our buffer.
+			    strideSize * vertIdx +
+			    vertexDecl.byteOffset; // The data offset location form the begining of our buffer.
 
 			// Copy the data to the result buffer.
 			char* destLoc = (char*)vbData + writeOffset;
@@ -286,8 +291,8 @@ void AssimpSceneParser::ParseMesh(aiMesh* impMesh)
 			// [TODO] Do something....
 		}
 
-		isIbSequental &=
-		    (face.mIndices[0] == ibSeqCnt) && (face.mIndices[1] == face.mIndices[0] + 1) && (face.mIndices[2] == face.mIndices[1] + 1);
+		isIbSequental &= (face.mIndices[0] == ibSeqCnt) && (face.mIndices[1] == face.mIndices[0] + 1) &&
+		                 (face.mIndices[2] == face.mIndices[1] + 1);
 
 		ibSeqCnt += 3;
 
@@ -305,7 +310,8 @@ void AssimpSceneParser::ParseMesh(aiMesh* impMesh)
 		}
 		else {
 			// Unknown mesh index buffer data format!
-			printf("FATAL ERROR: Uknown mesh index buffer data format for assimp mesh: '%s'!\n", impMesh->mName.C_Str());
+			printf(
+			    "FATAL ERROR: Uknown mesh index buffer data format for assimp mesh: '%s'!\n", impMesh->mName.C_Str());
 			sgeAssert(false);
 		}
 	}
@@ -375,7 +381,8 @@ Model::Node* AssimpSceneParser::ParseNodesRecursive(const aiNode* const impNode)
 		printf("\t\t Attached mesh'%s'\n", impScene->mMeshes[impMeshIdx]->mName.C_Str());
 
 		aiMesh* const impMesh = impScene->mMeshes[impMeshIdx];
-		aiMaterial* const impMaterial = (impMesh->mMaterialIndex >= 0) ? impScene->mMaterials[impMesh->mMaterialIndex] : nullptr;
+		aiMaterial* const impMaterial =
+		    (impMesh->mMaterialIndex >= 0) ? impScene->mMaterials[impMesh->mMaterialIndex] : nullptr;
 
 		Model::MeshAttachment meshAttachment;
 		meshAttachment.mesh = FindMesh(impScene->mMeshes[impMeshIdx]);
@@ -415,12 +422,13 @@ void AssimpSceneParser::ParseAnimations()
 {
 	static_assert(sizeof(aiVector3D) == 3 * sizeof(float), "");
 
-	// Store all found animations(or as I call them 'curves'). This is used to later define all the animation in the model.
+	// Store all found animations(or as I call them 'curves'). This is used to later define all the animation in the
+	// model.
 	std::map<std::string, float> curvesDurations;
 
-	// [KEYFRAME_REDUCE] This function tries to eleminate keyframes that doens't have any meaning for the animation(aka dfdx for frame T is
-	// the same as the one for T-1) Currently the algorighm is clearly wrong for quaternions, but it's useful becase it removes duplicate
-	// keyframes. [TODO] Find a way to remove the duplicated code...
+	// [KEYFRAME_REDUCE] This function tries to eleminate keyframes that doens't have any meaning for the animation(aka
+	// dfdx for frame T is the same as the one for T-1) Currently the algorighm is clearly wrong for quaternions, but
+	// it's useful becase it removes duplicate keyframes. [TODO] Find a way to remove the duplicated code...
 
 	// [TODO] add these as parameters they are scene dependant.
 	const float dfdx_epsilon = 1e-2f; // not the best constant...

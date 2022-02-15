@@ -109,7 +109,8 @@ struct SGEGameWindow : public WindowBase {
 		// initialized the device and the immediate context
 		SGEDevice* const device = SGEDevice::create(mainTargetDesc);
 
-		SGEImGui::initialize(device->getContext(), device->getWindowFrameTarget(), device->getWindowFrameTarget()->getViewport());
+		SGEImGui::initialize(
+		    device->getContext(), device->getWindowFrameTarget(), device->getWindowFrameTarget()->getViewport());
 
 #if !defined(__EMSCRIPTEN__)
 		ImGui::SetCurrentContext(getImGuiContextCore());
@@ -183,7 +184,8 @@ struct SGEGameWindow : public WindowBase {
 		m_timer.tick();
 		getEngineGlobal()->update(m_timer.diff_seconds());
 
-		if (getEngineGlobal()->getEngineAllowingRelativeCursor() && getEngineGlobal()->doesAnyoneNeedForRelativeCursorThisFrame()) {
+		if (getEngineGlobal()->getEngineAllowingRelativeCursor() &&
+		    getEngineGlobal()->doesAnyoneNeedForRelativeCursorThisFrame()) {
 			setMouseCursorRelative(true);
 		}
 		else {
@@ -323,7 +325,8 @@ int main(int argc, char* argv[])
 #endif
 
 	if (!g_playerSettings.loadFromJsonFile("appdata/game_project_settings.json")) {
-		DialongOk("Error", "appData/game_project_settings.json seems to be missing or invalid! The game will not start!");
+		DialongOk(
+		    "Error", "appData/game_project_settings.json seems to be missing or invalid! The game will not start!");
 		return 0;
 	}
 

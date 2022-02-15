@@ -22,20 +22,24 @@ BindLocation TextureRefl::computeBindLocation() const
 {
 #if !defined(__EMSCRIPTEN__)
 	if (gl_textureTarget == GL_TEXTURE_1D) {
-		return BindLocation((short)gl_bindLocation, (short)UniformType::Texture1D, short(arraySize), short(gl_bindUnit));
+		return BindLocation(
+		    (short)gl_bindLocation, (short)UniformType::Texture1D, short(arraySize), short(gl_bindUnit));
 	}
 #endif
 
 	if (gl_textureTarget == GL_TEXTURE_2D) {
-		return BindLocation((short)gl_bindLocation, (short)UniformType::Texture2D, short(arraySize), short(gl_bindUnit));
+		return BindLocation(
+		    (short)gl_bindLocation, (short)UniformType::Texture2D, short(arraySize), short(gl_bindUnit));
 	}
 
 	if (gl_textureTarget == GL_TEXTURE_CUBE_MAP) {
-		return BindLocation((short)gl_bindLocation, (short)UniformType::TextureCube, short(arraySize), short(gl_bindUnit));
+		return BindLocation(
+		    (short)gl_bindLocation, (short)UniformType::TextureCube, short(arraySize), short(gl_bindUnit));
 	}
 
 	if (gl_textureTarget == GL_TEXTURE_3D) {
-		return BindLocation((short)gl_bindLocation, (short)UniformType::Texture3D, short(arraySize), short(gl_bindUnit));
+		return BindLocation(
+		    (short)gl_bindLocation, (short)UniformType::Texture3D, short(arraySize), short(gl_bindUnit));
 	}
 
 	sgeAssert(false);
@@ -94,8 +98,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 		// Caution:
 		// Different OpenGL implementations report OpenGL array uniforms differently.
 		// For example on my current Intel HD, a single array is reported by:
-		//     myUniformArray[0] myUniformArray[1] ... // myUniformArray[N] : One for every element, however the [0] has the correct num
-		//     elements returned.
+		//     myUniformArray[0] myUniformArray[1] ... // myUniformArray[N] : One for every element, however the [0] has
+		//     the correct num elements returned.
 		// On other platforms it is just:
 		//    myUniformArray
 		bool isNameLookingLikeArray = false;
@@ -109,7 +113,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 		// Because of the array naming inconsistency we need to use that:
 		std::string_view nameToUse =
 		    (isNameLookingLikeArray)
-		        ? nameToUse = std::string_view(name, std::max(nameLen - 3, 0)) // drop the [0] to be consistent with Direct 3D reflections.
+		        ? nameToUse = std::string_view(
+		              name, std::max(nameLen - 3, 0)) // drop the [0] to be consistent with Direct 3D reflections.
 		        : nameToUse = std::string_view(name);
 
 		if (UniformType_FromGLNumericUniformType(gl_type) != UniformType::Unknown) {
@@ -170,9 +175,12 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 		std::vector<GLint> varArrSize(numVariableInBlock);
 
 		glGetActiveUniformBlockiv(program, t, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, varIndices.data());
-		glGetActiveUniformsiv(program, numVariableInBlock, (GLuint*)varIndices.data(), GL_UNIFORM_TYPE, varTypes.data());
-		glGetActiveUniformsiv(program, numVariableInBlock, (GLuint*)varIndices.data(), GL_UNIFORM_OFFSET, varOffsets.data());
-		glGetActiveUniformsiv(program, numVariableInBlock, (GLuint*)varIndices.data(), GL_UNIFORM_SIZE, varArrSize.data());
+		glGetActiveUniformsiv(
+		    program, numVariableInBlock, (GLuint*)varIndices.data(), GL_UNIFORM_TYPE, varTypes.data());
+		glGetActiveUniformsiv(
+		    program, numVariableInBlock, (GLuint*)varIndices.data(), GL_UNIFORM_OFFSET, varOffsets.data());
+		glGetActiveUniformsiv(
+		    program, numVariableInBlock, (GLuint*)varIndices.data(), GL_UNIFORM_SIZE, varArrSize.data());
 
 		CBufferRefl cbuffer;
 

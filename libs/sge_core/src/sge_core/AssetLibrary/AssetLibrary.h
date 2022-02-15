@@ -61,7 +61,8 @@ struct SGE_CORE_API AssetLibrary {
 	AssetPtr getAssetFromFile(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true);
 
 	template <typename TAssetIface>
-	std::shared_ptr<TAssetIface> getLoadedAssetIface(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true)
+	std::shared_ptr<TAssetIface>
+	    getLoadedAssetIface(const char* path, const char* localDirectory = nullptr, bool loadIfMissing = true)
 	{
 		AssetPtr assetPtr = getAssetFromFile(path, localDirectory, loadIfMissing);
 		if (assetPtr) {

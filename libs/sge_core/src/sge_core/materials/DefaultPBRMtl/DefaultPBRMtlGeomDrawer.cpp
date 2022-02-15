@@ -42,7 +42,8 @@ __declspec(align(4)) struct ParamsCbFWDDefaultShading {
 	float uAmbientFakeDetailAmount;
 
 	// Skinning.
-	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is
+	                                   ///< being drawn.
 	int uSkinningFirstBoneOffsetInTex_padding[3];
 
 	ShaderLightData lights[kMaxLights];
@@ -53,13 +54,14 @@ __declspec(align(4)) struct ParamsCbFWDDefaultShading {
 //-----------------------------------------------------------------------------
 // BasicModelDraw
 //-----------------------------------------------------------------------------
-void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
-                                           const ICamera& camera,
-                                           const mat4f& geomWorldTransfrom,
-                                           const ObjectLighting& lighting,
-                                           const Geometry& geometry,
-                                           const IMaterialData* mtlDataBase,
-                                           const InstanceDrawMods& UNUSED(instDrawMods))
+void DefaultPBRMtlGeomDrawer::drawGeometry(
+    const RenderDestination& rdest,
+    const ICamera& camera,
+    const mat4f& geomWorldTransfrom,
+    const ObjectLighting& lighting,
+    const Geometry& geometry,
+    const IMaterialData* mtlDataBase,
+    const InstanceDrawMods& UNUSED(instDrawMods))
 {
 	const DefaultPBRMtlData& mtlData = *dynamic_cast<const DefaultPBRMtlData*>(mtlDataBase);
 
@@ -148,9 +150,13 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		};
 
 		std::set<std::string> includedFilesByShaders;
-		shadingPermutFWDShading->createFromFile(sgedev, "core_shaders/FWDDefault_shading.hlsl",
-		                                        "shader_cache/FWDDefault_shading.shadercache", compileTimeOptions, uniformsToCache,
-		                                        &includedFilesByShaders);
+		shadingPermutFWDShading->createFromFile(
+		    sgedev,
+		    "core_shaders/FWDDefault_shading.hlsl",
+		    "shader_cache/FWDDefault_shading.shadercache",
+		    compileTimeOptions,
+		    uniformsToCache,
+		    &includedFilesByShaders);
 
 		shaderFilesWatcher.initialize(includedFilesByShaders);
 	}
@@ -171,7 +177,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	// Depending on the shader settings we might turn off some options as we would not need them.
 	int pbrMtlFlags = 0;
 
-	if (OPT_HasUV_choice != kHasUV_No && OPT_HasNormals_choice == kHasTangetSpace_Yes && mtlData.texNormalMap != nullptr) {
+	if (OPT_HasUV_choice != kHasUV_No && OPT_HasNormals_choice == kHasTangetSpace_Yes &&
+	    mtlData.texNormalMap != nullptr) {
 		pbrMtlFlags |= kPBRMtl_Flags_HasNormalMap;
 	}
 
@@ -215,13 +222,14 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	}
 
 	// Find the shader permuatation that we are going to use.
-	const OptionPermuataor::OptionChoice optionChoice[kNumOptions] = {{OPT_HasVertexColor, OPT_HasVertexColor_choice},
-	                                                                  {OPT_HasUV, OPT_HasUV_choice},
-	                                                                  {OPT_HasTangentSpace, OPT_HasNormals_choice},
-	                                                                  {OPT_HasVertexSkinning, OPT_HasVertexSkinning_choice}};
+	const OptionPermuataor::OptionChoice optionChoice[kNumOptions] = {
+	    {OPT_HasVertexColor, OPT_HasVertexColor_choice},
+	    {OPT_HasUV, OPT_HasUV_choice},
+	    {OPT_HasTangentSpace, OPT_HasNormals_choice},
+	    {OPT_HasVertexSkinning, OPT_HasVertexSkinning_choice}};
 
-	const int iShaderPerm =
-	    shadingPermutFWDShading->getCompileTimeOptionsPerm().computePermutationIndex(optionChoice, SGE_ARRSZ(optionChoice));
+	const int iShaderPerm = shadingPermutFWDShading->getCompileTimeOptionsPerm().computePermutationIndex(
+	    optionChoice, SGE_ARRSZ(optionChoice));
 	const ShadingProgramPermuator::Permutation& shaderPerm = shadingPermutFWDShading->getShadersPerPerm()[iShaderPerm];
 
 	// Assemble the draw call.
@@ -248,7 +256,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		// This is done to avoid the Shadow Acne artifacts caused by floating point
 		// innacuraties introduced by the depth texture.
 		bool flipCulling = determinant(geomWorldTransfrom) > 0.f;
-		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
+		rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default
+		                          : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
 	}
 
 	StaticArray<BoundUniform, 64> uniforms;
@@ -349,8 +358,10 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	paramsCb.uAmbientLightColor = lighting.ambientLightColor;
 	paramsCb.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
 
-	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-	                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	stateGroup.setRenderState(
+	    rasterState,
+	    getCore()->getGraphicsResources().DSS_default_lessEqual,
+	    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);
 	memcpy(paramsMappedData, &paramsCb, sizeof(paramsCb));

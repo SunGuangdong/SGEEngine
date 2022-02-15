@@ -33,7 +33,8 @@ struct AInvisibleRigidObstacle;
 
 CharaterCtrlOutcome CharacterCtrlDynamic::update(const GameUpdateSets& updateSets, const CharacterCtrlInput& input)
 {
-	const float kAllowedJumpTimeDelay = 0.1f; // The time we allow the player jump even if he is no longer on a walkable land.
+	const float kAllowedJumpTimeDelay =
+	    0.1f; // The time we allow the player jump even if he is no longer on a walkable land.
 
 	GameWorld* const world = m_actor->getWorld();
 
@@ -48,7 +49,8 @@ CharaterCtrlOutcome CharacterCtrlDynamic::update(const GameUpdateSets& updateSet
 		float k = (dot(input.facingDir, m_targetFacingDir) + 1.f) * 0.5f;
 		float rotationSpeed = deg2rad(480.f) + deg2rad(480.f) * (1.f - k);
 		outcome.facingDir =
-		    rotateTowards(input.facingDir, m_targetFacingDir, updateSets.dt * rotationSpeed, vec3f(0.f, 1.f, 0.f)).normalized();
+		    rotateTowards(input.facingDir, m_targetFacingDir, updateSets.dt * rotationSpeed, vec3f(0.f, 1.f, 0.f))
+		        .normalized();
 	}
 	else {
 		outcome.facingDir = m_targetFacingDir;
@@ -65,7 +67,8 @@ CharaterCtrlOutcome CharacterCtrlDynamic::update(const GameUpdateSets& updateSet
 	}
 
 	// isLogicallyGrounded - this for the logic for all other game object and animations.
-	// isGroundSlopeClimbable - The physics should use this to check if the player can walk normally or if it is falling.
+	// isGroundSlopeClimbable - The physics should use this to check if the player can walk normally or if it is
+	// falling.
 	bool isLogicallyGrounded = false;
 	bool isGroundSlopeClimbable = false;
 	float groundCosine = 1.f; // The least extreme cosine between the ground and the up vector.
@@ -83,7 +86,8 @@ CharaterCtrlOutcome CharacterCtrlDynamic::update(const GameUpdateSets& updateSet
 	// The velocity that is going to be applied.
 	vec3f velocityToApply(0.f);
 
-	const std::vector<const btPersistentManifold*>& manifolds = world->m_physicsManifoldList[myRigidBody->getRigidBody()];
+	const std::vector<const btPersistentManifold*>& manifolds =
+	    world->m_physicsManifoldList[myRigidBody->getRigidBody()];
 
 	vec3f correctedWalkDir = m_walkDirSmoothAccumulator;
 
@@ -202,10 +206,12 @@ CharaterCtrlOutcome CharacterCtrlDynamic::update(const GameUpdateSets& updateSet
 
 		velocityToApply -= initalLinearVelocty;
 		velocityToApply +=
-		    walkDirProjectedOnGround * speedLerp2(initialSpeedAlongMovementVector, targetSpeed, velocityChangeSpeed * updateSets.dt);
+		    walkDirProjectedOnGround *
+		    speedLerp2(initialSpeedAlongMovementVector, targetSpeed, velocityChangeSpeed * updateSets.dt);
 		sgeAssert(!velocityToApply.hasNan());
 	#else
-		// float initialSpeedAlongMovementVector = maxOf(0.f,  dot(walkDirProjectedOnGround.normalized0(), initalLinearVelocty));
+		// float initialSpeedAlongMovementVector = maxOf(0.f,  dot(walkDirProjectedOnGround.normalized0(),
+		// initalLinearVelocty));
 		float maxSpeed = 8.f;
 		float timeToMaxSpeed = 0.5f;
 		float acceleration = maxSpeed / timeToMaxSpeed;
@@ -234,8 +240,8 @@ CharaterCtrlOutcome CharacterCtrlDynamic::update(const GameUpdateSets& updateSet
 		float const airVelocityChangeSpeed = 16.6f;
 		vec3f targetHorizontalVel = input.walkDir * maxOf(m_cfg.walkSpeed * 1.f, m_jumpingHorizontalVelocity);
 
-		velocityToApply +=
-		    speedLerp(initalHorizontalVel, targetHorizontalVel, airVelocityChangeSpeed * updateSets.dt) - initalHorizontalVel;
+		velocityToApply += speedLerp(initalHorizontalVel, targetHorizontalVel, airVelocityChangeSpeed * updateSets.dt) -
+		                   initalHorizontalVel;
 		sgeAssert(!velocityToApply.hasNan());
 	}
 #endif

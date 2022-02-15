@@ -23,7 +23,8 @@ namespace sge {
 
 struct AStaticObstacle;
 
-void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& isOriginal)
+void SceneWindow::update(
+    SGEContext* const sgecon, struct GameInspector* UNUSED(inspector), const InputState& isOriginal)
 {
 	if (m_gameDrawer == nullptr) {
 		return;
@@ -49,12 +50,13 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 
 		is.setDomainFromPosAndSize(m_canvasPos, m_canvasSize);
 
-		is.m_wasActiveWhilePolling =
-		    ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem |
-		                           ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows);
+		is.m_wasActiveWhilePolling = ImGui::IsWindowHovered(
+		    ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem |
+		    ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows);
 
-		const bool isFrameTargetCorrect =
-		    m_frameTarget.IsResourceValid() && m_frameTarget->getWidth() == m_canvasSize.x && m_frameTarget->getHeight() == m_canvasSize.y;
+		const bool isFrameTargetCorrect = m_frameTarget.IsResourceValid() &&
+		                                  m_frameTarget->getWidth() == m_canvasSize.x &&
+		                                  m_frameTarget->getHeight() == m_canvasSize.y;
 
 		if (isFrameTargetCorrect == false) {
 			if (!m_frameTarget.HasResource()) {
@@ -96,11 +98,17 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 
 		if (world->gridShouldDraw) {
 			drawSets.quickDraw->drawWired_Clear();
-			drawSets.quickDraw->drawWiredAdd_Grid(vec3f(0.f), vec3f::getAxis(0, world->gridSegmentsSpacing),
-			                                      vec3f::getAxis(2, world->gridSegmentsSpacing), world->gridNumSegments.x,
-			                                      world->gridNumSegments.y, 0xFF888888);
-			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(),
-			                                      getCore()->getGraphicsResources().BS_backToFrontAlpha);
+			drawSets.quickDraw->drawWiredAdd_Grid(
+			    vec3f(0.f),
+			    vec3f::getAxis(0, world->gridSegmentsSpacing),
+			    vec3f::getAxis(2, world->gridSegmentsSpacing),
+			    world->gridNumSegments.x,
+			    world->gridNumSegments.y,
+			    0xFF888888);
+			drawSets.quickDraw->drawWired_Execute(
+			    drawSets.rdest,
+			    drawSets.drawCamera->getProjView(),
+			    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 
 		m_gameDrawer->drawWorld(drawSets, world->m_useEditorCamera ? drawReason_editing : drawReason_gameplay);
@@ -168,18 +176,21 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(m_canvasSize.x, m_canvasSize.y));
 		}
 		else {
-			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(m_canvasSize.x, m_canvasSize.y), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image(
+			    m_frameTarget->getRenderTarget(0), ImVec2(m_canvasSize.x, m_canvasSize.y), ImVec2(0, 1), ImVec2(1, 0));
 		}
 
 		if (ImGui::BeginDragDropTarget()) {
 			if (Optional<std::string> droppedAssetPath = DragDropPayloadAsset::accept()) {
 				if (droppedAssetPath) {
-					if (getLoadedAssetIface<AssetIface_Model3D>(getCore()->getAssetLib()->getAssetFromFile(droppedAssetPath->c_str()))) {
+					if (getLoadedAssetIface<AssetIface_Model3D>(
+					        getCore()->getAssetLib()->getAssetFromFile(droppedAssetPath->c_str()))) {
 						CmdObjectCreation* cmd = new CmdObjectCreation;
 						cmd->setup(sgeTypeId(AStaticObstacle));
 						inspector->appendCommand(cmd, true);
 
-						AStaticObstacle* newActorToBePlaced = inspector->getWorld()->getActor<AStaticObstacle>(cmd->getCreatedObjectId());
+						AStaticObstacle* newActorToBePlaced =
+						    inspector->getWorld()->getActor<AStaticObstacle>(cmd->getCreatedObjectId());
 						if_checked(newActorToBePlaced)
 						{
 							// TODO: add a undo/redo command for this change.
@@ -199,7 +210,8 @@ void SceneWindow::update(SGEContext* const sgecon, struct GameInspector* UNUSED(
 
 				if (succeeded) {
 					vector_set<ObjectId> newObjects;
-					inspector->getWorld()->instantiatePrefab(prefabWorld, true, true, nullptr, &newObjects, NullOptional());
+					inspector->getWorld()->instantiatePrefab(
+					    prefabWorld, true, true, nullptr, &newObjects, NullOptional());
 
 					inspector->m_plantingTool.setup(newObjects, *inspector->getWorld());
 					inspector->setTool(&inspector->m_plantingTool);
@@ -255,7 +267,8 @@ void SceneWindow::updateRightClickMenu(bool canOpen)
 			createActorFilter.Draw(ICON_FK_SEARCH);
 
 			if (ImGui::IsItemClicked(2)) {
-				ImGui::ClearActiveID(); // Hack: (if we do not make this call ImGui::InputText will set it's cached value.
+				ImGui::ClearActiveID(); // Hack: (if we do not make this call ImGui::InputText will set it's cached
+				                        // value.
 				createActorFilter.Clear();
 			}
 
@@ -291,9 +304,17 @@ void SceneWindow::updateRightClickMenu(bool canOpen)
 		}
 
 		if (ImGui::BeginMenu("Edit Mode")) {
-			if (ImGui::MenuItem("Actor Mode", nullptr, inspector->editMode == editMode_actors, inspector->editMode != editMode_actors))
+			if (ImGui::MenuItem(
+			        "Actor Mode",
+			        nullptr,
+			        inspector->editMode == editMode_actors,
+			        inspector->editMode != editMode_actors))
 				inspector->editMode = editMode_actors;
-			if (ImGui::MenuItem("Point Mode", nullptr, inspector->editMode == editMode_points, inspector->editMode != editMode_points))
+			if (ImGui::MenuItem(
+			        "Point Mode",
+			        nullptr,
+			        inspector->editMode == editMode_points,
+			        inspector->editMode != editMode_points))
 				inspector->editMode = editMode_points;
 
 			ImGui::EndMenu();
@@ -421,7 +442,8 @@ bool SceneWindow::updateToolsAndOverlay(const InputState& is, const GameDrawSets
 		inspector->m_toolInAction = &inspector->m_selectionTool;
 	}
 	else if (inspector->m_toolInAction) {
-		InspectorToolResult res = inspector->m_toolInAction->updateTool(inspector, canInteractWithViewport, is, drawSets);
+		InspectorToolResult res =
+		    inspector->m_toolInAction->updateTool(inspector, canInteractWithViewport, is, drawSets);
 
 		if (canInteractWithViewport) {
 			if (res.reapply) {
@@ -460,7 +482,8 @@ void SceneWindow::drawOverlay(const GameDrawSets& drawSets)
 	for (int t = 0; t < inspector->m_selection.size(); ++t) {
 		SelectedItemDirect selItem = SelectedItemDirect::fromSelectedItem(inspector->m_selection[t], *world);
 		if (selItem.gameObject != nullptr) {
-			drawSets.gameDrawer->drawItem(drawSets, selItem, t == 0 ? drawReason_visualizeSelectionPrimary : drawReason_visualizeSelection);
+			drawSets.gameDrawer->drawItem(
+			    drawSets, selItem, t == 0 ? drawReason_visualizeSelectionPrimary : drawReason_visualizeSelection);
 		}
 	}
 

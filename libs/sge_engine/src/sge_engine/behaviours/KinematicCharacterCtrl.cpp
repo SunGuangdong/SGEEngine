@@ -16,7 +16,8 @@ struct FindContactCallback : public btManifoldResult {
 	{
 	}
 
-	void FindContactCallback::addContactPoint(const btVector3& normalOnBInWorld, const btVector3& pointInWorldOnB, btScalar depth)
+	void FindContactCallback::addContactPoint(
+	    const btVector3& normalOnBInWorld, const btVector3& pointInWorldOnB, btScalar depth)
 	{
 		if (m_penetration_distance > depth) {
 			const bool isSwapped = m_manifoldPtr->getBody0() != m_body0Wrap->getCollisionObject();
@@ -42,8 +43,11 @@ struct ScanCollisionsResult {
 	Optional<vec3f> groundNormalWs;
 };
 
-ScanCollisionsResult
-    scanCollisions(btCollisionWorld* collisionWorld, btCollisionObject* colObj, float feetLevelWorld, float UNUSED(maxPenetrationDepth))
+ScanCollisionsResult scanCollisions(
+    btCollisionWorld* collisionWorld,
+    btCollisionObject* colObj,
+    float feetLevelWorld,
+    float UNUSED(maxPenetrationDepth))
 {
 	ScanCollisionsResult result;
 
@@ -65,10 +69,12 @@ ScanCollisionsResult
 		if (otherCo == colObj) {
 			continue;
 		}
-		btCollisionObjectWrapper obB(nullptr, otherCo->getCollisionShape(), otherCo, otherCo->getWorldTransform(), -1, -1);
+		btCollisionObjectWrapper obB(
+		    nullptr, otherCo->getCollisionShape(), otherCo, otherCo->getWorldTransform(), -1, -1);
 
 		// Find the collision algorithm that computes the actual penetration depth.
-		btCollisionAlgorithm* algorithm = collisionWorld->getDispatcher()->findAlgorithm(&obA, &obB, nullptr, BT_CONTACT_POINT_ALGORITHMS);
+		btCollisionAlgorithm* algorithm =
+		    collisionWorld->getDispatcher()->findAlgorithm(&obA, &obB, nullptr, BT_CONTACT_POINT_ALGORITHMS);
 		if (algorithm) {
 			FindContactCallback manifold(&obA, &obB);
 			algorithm->processCollision(&obA, &obB, collisionWorld->getDispatchInfo(), &manifold);
@@ -113,11 +119,13 @@ void CharacterCtrlKinematic::update(const CharacterCtrlInput& input, RigidBody& 
 	ScanCollisionsResult scanCollision;
 	{
 		btTransform transformAfterMovement = rbBullet->getWorldTransform();
-		transformAfterMovement.setOrigin(transformAfterMovement.getOrigin() + toBullet((velocity + inputVelocity) * deltaTime));
+		transformAfterMovement.setOrigin(
+		    transformAfterMovement.getOrigin() + toBullet((velocity + inputVelocity) * deltaTime));
 		rbBullet->setWorldTransform(transformAfterMovement);
 		collisionWorldBullet->updateSingleAabb(rbBullet);
 
-		scanCollision = scanCollisions(collisionWorldBullet, rbBullet, transformAfterMovement.getOrigin().y() + m_cfg.feetLevel, 0.02f);
+		scanCollision = scanCollisions(
+		    collisionWorldBullet, rbBullet, transformAfterMovement.getOrigin().y() + m_cfg.feetLevel, 0.02f);
 		if (scanCollision.hadAnyPenetration) {
 			btTransform newTransform = rbBullet->getWorldTransform();
 			newTransform.setOrigin(newTransform.getOrigin() + scanCollision.recoveryVector);

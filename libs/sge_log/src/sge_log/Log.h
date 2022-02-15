@@ -13,7 +13,8 @@ struct SGE_LOG_API Log : public NoCopy {
 	enum MessageType : int {
 		/// Just a message that something has been done.
 		messageType_log,
-		/// A message that something important or anticipated has been done. Usually a normal message that we want to outline ot the user.
+		/// A message that something important or anticipated has been done. Usually a normal message that we want to
+		/// outline ot the user.
 		messageType_check,
 		/// A warrning that something might be worng or the user needs to pay attention.
 		messageType_warning,

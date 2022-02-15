@@ -95,7 +95,8 @@ struct SGE_CORE_API EvaluatedModel {
 	/// The model being animated.
 	Model* m_model = nullptr;
 
-	/// Stores the state of each node, the index in this array corresponts to the index of the node in the @Model::m_nodes array.
+	/// Stores the state of each node, the index in this array corresponts to the index of the node in the
+	/// @Model::m_nodes array.
 	std::vector<EvaluatedNode> m_evaluatedNodes;
 
 	/// @brief Since meshes can be animated only by bone transforms, which only modify their bones.

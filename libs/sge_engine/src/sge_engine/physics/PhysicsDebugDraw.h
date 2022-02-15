@@ -17,8 +17,8 @@ struct RenderDestination;
 struct SGE_ENGINE_API BulletPhysicsDebugDraw : public btIDebugDraw {
 	BulletPhysicsDebugDraw() = default;
 
-	int m_debugMode = DBG_DrawWireframe | DBG_DrawContactPoints | DBG_DrawNormals | DBG_EnableCCD | DBG_DrawConstraints | DBG_DrawFrames |
-	                  DBG_DrawContactPoints;
+	int m_debugMode = DBG_DrawWireframe | DBG_DrawContactPoints | DBG_DrawNormals | DBG_EnableCCD |
+	                  DBG_DrawConstraints | DBG_DrawFrames | DBG_DrawContactPoints;
 	mat4f m_projView = mat4f::getIdentity();
 	QuickDraw* m_quickDraw = nullptr;
 
@@ -38,11 +38,12 @@ struct SGE_ENGINE_API BulletPhysicsDebugDraw : public btIDebugDraw {
 
 	void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) final;
 
-	void drawContactPoint(const btVector3& UNUSED(PointOnB),
-	                      const btVector3& UNUSED(normalOnB),
-	                      btScalar UNUSED(distance),
-	                      int UNUSED(lifeTime),
-	                      const btVector3& UNUSED(color)) final
+	void drawContactPoint(
+	    const btVector3& UNUSED(PointOnB),
+	    const btVector3& UNUSED(normalOnB),
+	    btScalar UNUSED(distance),
+	    int UNUSED(lifeTime),
+	    const btVector3& UNUSED(color)) final
 	{
 	}
 

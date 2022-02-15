@@ -39,7 +39,10 @@ struct SGEDeviceD3D11 : public SGEDevice {
 
 	VertexDeclIndex getVertexDeclIndex(const VertexDecl* const declElems, const int declElemsCount) final;
 	const std::vector<VertexDecl>& getVertexDeclFromIndex(const VertexDeclIndex index) const final;
-	const std::map<std::vector<VertexDecl>, VertexDeclIndex>& getVertexDeclMap() const final { return m_vertexDeclIndexMap; }
+	const std::map<std::vector<VertexDecl>, VertexDeclIndex>& getVertexDeclMap() const final
+	{
+		return m_vertexDeclIndexMap;
+	}
 
 	SamplerState* requestSamplerState(const SamplerDesc& desc);
 	RasterizerState* requestRasterizerState(const RasterDesc& desc) final;
@@ -134,10 +137,11 @@ struct SGEContextImmediateD3D11 : public SGEContext {
 	void clearColor(FrameTarget* target, int index, const float rgba[4]) final;
 	void clearDepth(FrameTarget* target, float depth) final;
 
-	void executeDrawCall(DrawCall& drawCall,
-	                     FrameTarget* frameTarget,
-	                     const Rect2s* const pViewport = nullptr,
-	                     const Rect2s* const pScissorsRect = nullptr) final;
+	void executeDrawCall(
+	    DrawCall& drawCall,
+	    FrameTarget* frameTarget,
+	    const Rect2s* const pViewport = nullptr,
+	    const Rect2s* const pScissorsRect = nullptr) final;
 
 	void beginQuery(Query* const query) final;
 	void endQuery(Query* const query) final;

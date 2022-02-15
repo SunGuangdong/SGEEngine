@@ -92,7 +92,10 @@ struct SphericalCoord {
 	{
 	}
 
-	bool operator==(SphericalCoord& ref) const { return fromY == ref.fromY && aroundY == ref.aroundY && radius == ref.radius; }
+	bool operator==(SphericalCoord& ref) const
+	{
+		return fromY == ref.fromY && aroundY == ref.aroundY && radius == ref.radius;
+	}
 
 	bool operator!=(SphericalCoord& ref) const { return !(*this == ref); }
 

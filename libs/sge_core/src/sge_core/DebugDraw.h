@@ -24,7 +24,12 @@ struct SGE_CORE_API DebugDraw {
 		void cylinder(const mat4f& world, const int rgba, float height, float radius, int numSides = 3);
 		void basis(const mat4f& world);
 		void grid(
-		    const vec3f& origin, const vec3f& xAxis, const vec3f& zAxis, const int xLines, const int zLines, const int color = 0x000000);
+		    const vec3f& origin,
+		    const vec3f& xAxis,
+		    const vec3f& zAxis,
+		    const int xLines,
+		    const int zLines,
+		    const int color = 0x000000);
 
 
 		const std::vector<GeomGen::PosColorVert>& getVerts() const { return m_verts; }

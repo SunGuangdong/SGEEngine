@@ -4,7 +4,7 @@
 #include <memory>
 
 #if !defined(__EMSCRIPTEN__)
-// clang-format off
+    // clang-format off
 // Clang Format is turned off here as the include order matters.
 #include <GL/glew.h>
 #include <GL/gl.h>
@@ -127,7 +127,10 @@ struct GLViewport {
 	{
 	}
 
-	bool operator==(const GLViewport& other) { return x == other.x && y == other.y && width == other.width && height == other.height; }
+	bool operator==(const GLViewport& other)
+	{
+		return x == other.x && y == other.y && width == other.width && height == other.height;
+	}
 
 	bool operator!=(const GLViewport& other) { return !(*this == other); }
 

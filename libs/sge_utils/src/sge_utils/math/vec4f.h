@@ -167,7 +167,10 @@ struct vec4f {
 	}
 
 	// Operator == and != implemented by direct comparison.
-	bool operator==(const vec4f& v) const { return (data[0] == v[0]) && (data[1] == v[1]) && (data[2] == v[2]) && (data[3] == v[3]); }
+	bool operator==(const vec4f& v) const
+	{
+		return (data[0] == v[0]) && (data[1] == v[1]) && (data[2] == v[2]) && (data[3] == v[3]);
+	}
 
 	bool operator!=(const vec4f& v) const { return !((*this) == v); }
 

@@ -193,13 +193,15 @@ void CollisionShape::create(const CollsionShapeDesc* shapeDescriptors, const int
 				createdShape.shape = new btConeShape(desc.coneRadius, desc.coneHeight);
 			} break;
 			case CollsionShapeDesc::type_convexPoly: {
-				createdShape.shape = new btConvexHullShape((float*)desc.verticesConvexOrTriMesh.data(),
-				                                           int(desc.verticesConvexOrTriMesh.size()), sizeof(vec3f));
+				createdShape.shape = new btConvexHullShape(
+				    (float*)desc.verticesConvexOrTriMesh.data(),
+				    int(desc.verticesConvexOrTriMesh.size()),
+				    sizeof(vec3f));
 
 				// Caution: [CONVEX_HULLS_TRIANGLE_USER_DATA]
 				// The user point here specifies the triangle mesh used
-				// to create the convexhull. Bullet doesn't provide a way to store the triangles inside btConvexHullShape
-				// however these triangles are needed for the navmesh building.
+				// to create the convexhull. Bullet doesn't provide a way to store the triangles inside
+				// btConvexHullShape however these triangles are needed for the navmesh building.
 				createdShape.shape->setUserPointer(&desc);
 			} break;
 			case CollsionShapeDesc::type_triangleMesh: {
@@ -224,7 +226,8 @@ void CollisionShape::create(const CollsionShapeDesc* shapeDescriptors, const int
 
 			} break;
 			case CollsionShapeDesc::type_infinitePlane: {
-				createdShape.shape = new btStaticPlaneShape(toBullet(desc.infinitePlaneNormal), desc.infinitePlaneConst);
+				createdShape.shape =
+				    new btStaticPlaneShape(toBullet(desc.infinitePlaneNormal), desc.infinitePlaneConst);
 			}
 
 			default: {

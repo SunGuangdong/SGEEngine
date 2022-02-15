@@ -129,7 +129,9 @@ AssetTextureMeta loadAssetTextureMeta2(const std::string& baseAssetPath)
 	JsonParser jp;
 	if (!jp.parse(&frs)) {
 		// No info file, just use the defaults.
-		sgeAssert(false && "Parsing the texture info file, that contains additional settings for a texture asset cannot be parsed!");
+		sgeAssert(
+		    false &&
+		    "Parsing the texture info file, that contains additional settings for a texture asset cannot be parsed!");
 		return AssetTextureMeta();
 	}
 
@@ -158,7 +160,9 @@ AssetTextureMeta loadAssetTextureMeta2(const std::string& baseAssetPath)
 	catch (...) {
 	}
 
-	sgeAssert(false && "Parsing the texture info file, that contains additional settings for a texture asset cannot be parsed!");
+	sgeAssert(
+	    false &&
+	    "Parsing the texture info file, that contains additional settings for a texture asset cannot be parsed!");
 	return AssetTextureMeta();
 }
 

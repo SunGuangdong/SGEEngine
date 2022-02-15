@@ -128,12 +128,13 @@ struct SGE_CORE_API ModelMesh {
 	std::string name; ///< The name of the mesh.
 
 	PrimitiveTopology::Enum primitiveTopology = PrimitiveTopology::Unknown;
-	int vbByteOffset = 0;                           ///< 1st vertex byte offset into the vertex buffer
-	int ibByteOffset = 0;                           ///< 1st index byte offse int the index buffer
-	UniformType::Enum ibFmt = UniformType::Unknown; ///< The format the index buffer, if unknown this mesh doesn't use index buffers.
-	int numElements = 0;                            ///< The number of vertices/indices used by this mesh.
-	int numVertices = 0;                            ///< The number of vertices in the mesh.
-	std::vector<VertexDecl> vertexDecl;             ///< The vertex declaration
+	int vbByteOffset = 0; ///< 1st vertex byte offset into the vertex buffer
+	int ibByteOffset = 0; ///< 1st index byte offse int the index buffer
+	UniformType::Enum ibFmt =
+	    UniformType::Unknown; ///< The format the index buffer, if unknown this mesh doesn't use index buffers.
+	int numElements = 0;      ///< The number of vertices/indices used by this mesh.
+	int numVertices = 0;      ///< The number of vertices in the mesh.
+	std::vector<VertexDecl> vertexDecl; ///< The vertex declaration
 
 	int stride = 0;                    ///< The byte size stride of a single vertex.
 	int vbVertexColorOffsetBytes = -1; ///, The byte offset of the vertex color.
@@ -148,16 +149,18 @@ struct SGE_CORE_API ModelMesh {
 	std::vector<char> vertexBufferRaw; ///< The raw data containing all vertices in the vertex buffer,
 	std::vector<char> indexBufferRaw;  ///< The raw data containing all indices in the vertex buffer,
 
-	Box3f aabox; ///< The bounding box around the vertices of the mesh, without any deformation by skinning or anything else.
+	Box3f aabox; ///< The bounding box around the vertices of the mesh, without any deformation by skinning or anything
+	             ///< else.
 
 	///< A list of bones affecting the mesh.
 	std::vector<ModelMeshBone> bones;
 
 	// The member below are available only if @Model::createRenderingResources gets called:
 
-	GpuHandle<Buffer> vertexBuffer;    ///< The vertex buffer to be used for rendering of that mesh.
-	GpuHandle<Buffer> indexBuffer;     ///< The index buffer to be used for rendering of that mesh.
-	bool hasUsableTangetSpace = false; ///< True if uv and all 3 tangent space vectors are available in the vertex declaration.
+	GpuHandle<Buffer> vertexBuffer; ///< The vertex buffer to be used for rendering of that mesh.
+	GpuHandle<Buffer> indexBuffer;  ///< The index buffer to be used for rendering of that mesh.
+	bool hasUsableTangetSpace =
+	    false; ///< True if uv and all 3 tangent space vectors are available in the vertex declaration.
 	VertexDeclIndex vertexDeclIndex = VertexDeclIndex_Null;
 };
 
@@ -179,7 +182,10 @@ struct KeyFrames {
 	std::map<float, quatf> rotationKeyFrames;
 	std::map<float, vec3f> scalingKeyFrames;
 
-	bool hasAnyKeyFrames() const { return !positionKeyFrames.empty() || !rotationKeyFrames.empty() || !scalingKeyFrames.empty(); }
+	bool hasAnyKeyFrames() const
+	{
+		return !positionKeyFrames.empty() || !rotationKeyFrames.empty() || !scalingKeyFrames.empty();
+	}
 
 	void evaluate(transf3d& result, const float t) const;
 };
@@ -228,8 +234,9 @@ struct ModelNode {
 
 	std::vector<MeshAttachment> meshAttachments;
 	std::vector<int> childNodes; ///< The indices of all child nodes.
-	float limbLength = 0.f; ///< If the node seemed to be used for skinning, this is the length of the bone in the interface. 0 otherwise.
-	std::string name;       ///< The name of the node.
+	float limbLength = 0.f;      ///< If the node seemed to be used for skinning, this is the length of the bone in the
+	                             ///< interface. 0 otherwise.
+	std::string name;            ///< The name of the node.
 };
 
 /// @brief Model hold a serialized/deserialized state of our internal 3D model file format,

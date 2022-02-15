@@ -13,7 +13,8 @@ This file provides a way for one part of the software to emit events, while
  // Somewhere somebody subscribes for the event. that somebody needs to
  // store subToken somewhere for as long as they want to listen for this event.
  // If this token get destroyed, the subscribtion will end. Otherwise you can unsubscribe manually with it.
- EventSubscription subToken = eventEmitter.subscribe([](const char* filename) -> void {printf("Yey, an event! %s", filename});
+ EventSubscription subToken = eventEmitter.subscribe([](const char* filename) -> void {printf("Yey, an event! %s",
+filename});
 
  // And later somebody, fires an event, witch will call the lambda above and all other subscribers.
  onFileLoadedEmitter("file1.txt"); // Prints "Yey, an event! file1.txt"

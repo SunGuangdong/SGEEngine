@@ -17,12 +17,13 @@ using namespace sge;
 //-----------------------------------------------------------------------------
 // BasicModelDraw
 //-----------------------------------------------------------------------------
-void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
-                                           const mat4f& projView,
-                                           const mat4f& world,
-                                           const Geometry& geometry,
-                                           const vec4f& shadingColor,
-                                           bool forceNoCulling)
+void ConstantColorWireShader::drawGeometry(
+    const RenderDestination& rdest,
+    const mat4f& projView,
+    const mat4f& world,
+    const Geometry& geometry,
+    const vec4f& shadingColor,
+    bool forceNoCulling)
 {
 	enum : int { OPT_HasVertexSkinning, kNumOptions };
 
@@ -38,7 +39,9 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 		shadingPermut = ShadingProgramPermuator();
 
 		const std::vector<OptionPermuataor::OptionDesc> compileTimeOptions = {
-		    {OPT_HasVertexSkinning, "OPT_HasVertexSkinning", {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
+		    {OPT_HasVertexSkinning,
+		     "OPT_HasVertexSkinning",
+		     {SGE_MACRO_STR(kHasVertexSkinning_No), SGE_MACRO_STR(kHasVertexSkinning_Yes)}},
 		};
 
 		// clang-format off
@@ -53,8 +56,12 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 		// clang-format on
 
 		SGEDevice* const sgedev = rdest.getDevice();
-		shadingPermut->createFromFile(sgedev, "core_shaders/ConstantColor.hlsl", "shader_cache/ConstantColor.shadercache",
-		                              compileTimeOptions, uniformsToCache);
+		shadingPermut->createFromFile(
+		    sgedev,
+		    "core_shaders/ConstantColor.hlsl",
+		    "shader_cache/ConstantColor.shadercache",
+		    compileTimeOptions,
+		    uniformsToCache);
 	}
 
 	if (m_rasterWireframeDepthBias.HasResource() == false) {
@@ -89,7 +96,8 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 	    {OPT_HasVertexSkinning, optHasVertexSkinning},
 	};
 
-	const int iShaderPerm = shadingPermut->getCompileTimeOptionsPerm().computePermutationIndex(optionChoice, SGE_ARRSZ(optionChoice));
+	const int iShaderPerm =
+	    shadingPermut->getCompileTimeOptionsPerm().computePermutationIndex(optionChoice, SGE_ARRSZ(optionChoice));
 	const ShadingProgramPermuator::Permutation& shaderPerm = shadingPermut->getShadersPerPerm()[iShaderPerm];
 
 	DrawCall dc;
@@ -122,7 +130,8 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 	if (optHasVertexSkinning == kHasVertexSkinning_Yes) {
 		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uSkinningBones], (geometry.skinningBoneTransforms)));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
-		uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uSkinningFirstBoneOffsetInTex], (void*)&geometry.firstBoneOffset));
+		uniforms.push_back(
+		    BoundUniform(shaderPerm.uniformLUT[uSkinningFirstBoneOffsetInTex], (void*)&geometry.firstBoneOffset));
 		sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 	}
 
@@ -140,12 +149,13 @@ void ConstantColorWireShader::drawGeometry(const RenderDestination& rdest,
 	rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
 }
 
-void ConstantColorWireShader::draw(const RenderDestination& rdest,
-                                   const mat4f& projView,
-                                   const mat4f& preRoot,
-                                   const EvaluatedModel& evalModel,
-                                   const vec4f& shadingColor,
-                                   bool forceNoCulling)
+void ConstantColorWireShader::draw(
+    const RenderDestination& rdest,
+    const mat4f& projView,
+    const mat4f& preRoot,
+    const EvaluatedModel& evalModel,
+    const vec4f& shadingColor,
+    bool forceNoCulling)
 {
 	for (int iNode = 0; iNode < evalModel.getNumEvalNodes(); ++iNode) {
 		const EvaluatedNode& evalNode = evalModel.getEvalNode(iNode);
@@ -154,7 +164,8 @@ void ConstantColorWireShader::draw(const RenderDestination& rdest,
 		for (int iMesh = 0; iMesh < rawNode->meshAttachments.size(); ++iMesh) {
 			const MeshAttachment& meshAttachment = rawNode->meshAttachments[iMesh];
 			const EvaluatedMesh& evalMesh = evalModel.getEvalMesh(meshAttachment.attachedMeshIndex);
-			mat4f const finalTrasform = (evalMesh.geometry.hasVertexSkinning()) ? preRoot : preRoot * evalNode.evalGlobalTransform;
+			mat4f const finalTrasform =
+			    (evalMesh.geometry.hasVertexSkinning()) ? preRoot : preRoot * evalNode.evalGlobalTransform;
 
 			drawGeometry(rdest, projView, finalTrasform, evalMesh.geometry, shadingColor, forceNoCulling);
 		}

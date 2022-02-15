@@ -90,7 +90,10 @@ struct Box3f {
 		max = vec3f(std::numeric_limits<float>::lowest());
 	}
 
-	bool IsEmpty() const { return min == vec3f(std::numeric_limits<float>::max()) && max == vec3f(std::numeric_limits<float>::lowest()); }
+	bool IsEmpty() const
+	{
+		return min == vec3f(std::numeric_limits<float>::max()) && max == vec3f(std::numeric_limits<float>::lowest());
+	}
 
 	void expand(const vec3f& point)
 	{

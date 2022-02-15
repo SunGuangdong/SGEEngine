@@ -20,7 +20,8 @@ bool VertexMapperGL::create(const ShadingProgram* shadingProgram, const VertexDe
 	m_vertexDeclIndex = vertexDeclIndex;
 
 	// obtain the vertex shader needed attributes
-	const std::vector<VertShaderAttrib>& vertShaderAttribs = ((ShadingProgramGL*)shadingProgram)->getReflection().inputVertices;
+	const std::vector<VertShaderAttrib>& vertShaderAttribs =
+	    ((ShadingProgramGL*)shadingProgram)->getReflection().inputVertices;
 	const std::vector<VertexDecl>& vertexDecl = getDevice()->getVertexDeclFromIndex(vertexDeclIndex);
 
 	bool succeeded = true;
@@ -32,7 +33,8 @@ bool VertexMapperGL::create(const ShadingProgram* shadingProgram, const VertexDe
 			bool doesTypeMatch = (decl.format == attrib.type);
 
 			// The vertex could use an ineger as a packed float4 color, add this as a valid scenario.
-			if (!doesTypeMatch && (attrib.type == UniformType::Float4) && (decl.format == UniformType::Int_RGBA_Unorm_IA)) {
+			if (!doesTypeMatch && (attrib.type == UniformType::Float4) &&
+			    (decl.format == UniformType::Int_RGBA_Unorm_IA)) {
 				doesTypeMatch = true;
 			}
 
@@ -84,7 +86,8 @@ bool VertexMapperGL::isValid() const
 //-----------------------------------------------------------------------
 // ShaderGL
 //-----------------------------------------------------------------------
-CreateShaderResult ShaderGL::createNative(const ShaderType::Enum type, const char* pCode, const char* const UNUSED(entryPoint))
+CreateShaderResult
+    ShaderGL::createNative(const ShaderType::Enum type, const char* pCode, const char* const UNUSED(entryPoint))
 {
 	// Cleanup any previous state.
 	destroy();

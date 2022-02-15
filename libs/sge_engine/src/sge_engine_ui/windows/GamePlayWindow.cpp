@@ -54,12 +54,13 @@ void GamePlayWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(insp
 		// Compute the input state according ot the position of this window.
 		is.setDomainFromPosAndSize(canvasPos, canvasSize);
 
-		is.m_wasActiveWhilePolling =
-		    ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem |
-		                           ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows);
+		is.m_wasActiveWhilePolling = ImGui::IsWindowHovered(
+		    ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem |
+		    ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows);
 
-		const bool isFrameTargetCorrect =
-		    m_frameTarget.IsResourceValid() && m_frameTarget->getWidth() == canvasSize.x && m_frameTarget->getHeight() == canvasSize.y;
+		const bool isFrameTargetCorrect = m_frameTarget.IsResourceValid() &&
+		                                  m_frameTarget->getWidth() == canvasSize.x &&
+		                                  m_frameTarget->getHeight() == canvasSize.y;
 
 		if (isFrameTargetCorrect == false) {
 			if (!m_frameTarget.HasResource()) {
@@ -90,9 +91,10 @@ void GamePlayWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(insp
 		drawSets.gameCamera = gameCamera;
 
 		getCore()->getQuickDraw().drawWired_Clear();
-		getCore()->getQuickDraw().drawWiredAdd_Grid(vec3f(0.f), vec3f::getAxis(0) * 1.f, vec3f::getAxis(2) * 1.f, 10, 10, 0x33FFFFFF);
-		getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(),
-		                                            getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		getCore()->getQuickDraw().drawWiredAdd_Grid(
+		    vec3f(0.f), vec3f::getAxis(0) * 1.f, vec3f::getAxis(2) * 1.f, 10, 10, 0x33FFFFFF);
+		getCore()->getQuickDraw().drawWired_Execute(
+		    drawSets.rdest, drawSets.drawCamera->getProjView(), getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 		// Draw the game world.
 		m_gameDrawer->prepareForNewFrame();
@@ -105,7 +107,8 @@ void GamePlayWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(insp
 		if (kIsTexcoordStyleD3D)
 			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvasSize.x, canvasSize.y));
 		else
-			ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvasSize.x, canvasSize.y), ImVec2(0, 1), ImVec2(1, 0));
+			ImGui::Image(
+			    m_frameTarget->getRenderTarget(0), ImVec2(canvasSize.x, canvasSize.y), ImVec2(0, 1), ImVec2(1, 0));
 
 		// [SGE_EDITOR_MOUSE_CAPTURE_HOTKEY]
 		// Draw a message telling the user that he can capture/uncapture mouse with F2.

@@ -50,10 +50,11 @@ ReflBlock() {
 //------------------------------------------------------------------------------
 // TraitSpriteImageSets
 //------------------------------------------------------------------------------
-mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
-                                                          const ICamera* const drawCamera,
-                                                          const transf3d& nodeToWorldTransform,
-                                                          const mat4f& additionaTransform) const
+mat4f TraitSpriteImageSets::computeObjectToWorldTransform(
+    const Asset& asset,
+    const ICamera* const drawCamera,
+    const transf3d& nodeToWorldTransform,
+    const mat4f& additionaTransform) const
 {
 	vec2f imageSize = vec2f(0.f);
 	bool hasValidImageToRender = false;
@@ -77,7 +78,11 @@ mat4f TraitSpriteImageSets::computeObjectToWorldTransform(const Asset& asset,
 		mat4f objToWorld;
 		if (drawCamera != nullptr) {
 			const mat4f billboardFacingMtx = billboarding_getOrentationMtx(
-			    m_billboarding, nodeToWorldTransform, drawCamera->getCameraPosition(), drawCamera->getView(), defaultFacingAxisZ);
+			    m_billboarding,
+			    nodeToWorldTransform,
+			    drawCamera->getCameraPosition(),
+			    drawCamera->getView(),
+			    defaultFacingAxisZ);
 			objToWorld = billboardFacingMtx * additionaTransform * anchorAlignMtx * localOffsetmtx;
 		}
 		else {
@@ -107,18 +112,19 @@ Box3f TraitSpriteImageSets::computeBBoxOS(const Asset& asset, const mat4f& addit
 	// Transform the verticies of of quad by object-to-node space transfrom and we are done.
 	//
 	// However when there is billboarding the plane is allowed to rotate (based on the type of the bilboarding).
-	// it might be sweeping around an axis (Up only billboarding) or facing the camera (meaning int can rotate freely around its center
-	// point).
-	// In order to compute the bounding box for those cases we take the un-billboarded transformation, obtain its size around that
-	// center point and then use that vector to extend the bounding box in each cardinal direction that the quad could rotate. If we do
-	// not apply the @additionaTransform the point (0,0,0) in quad space is going to lay on the axis that the quad rotates about. So to
-	// compute the bounding box we take the furthest point of the quard form (0,0,0) and extend the initial (without billboarding
-	// bounding box based on it. After that we can safely apply @additionaTransform to move the bounding box in node space safely
-	// together with the plane. Note: it seems that this function is too complicated for what it does. The bounding box doesn't really
+	// it might be sweeping around an axis (Up only billboarding) or facing the camera (meaning int can rotate freely
+	// around its center point). In order to compute the bounding box for those cases we take the un-billboarded
+	// transformation, obtain its size around that center point and then use that vector to extend the bounding box in
+	// each cardinal direction that the quad could rotate. If we do not apply the @additionaTransform the point (0,0,0)
+	// in quad space is going to lay on the axis that the quad rotates about. So to compute the bounding box we take the
+	// furthest point of the quard form (0,0,0) and extend the initial (without billboarding bounding box based on it.
+	// After that we can safely apply @additionaTransform to move the bounding box in node space safely together with
+	// the plane. Note: it seems that this function is too complicated for what it does. The bounding box doesn't really
 	// need to be the smallest fit, just good enough so if it is a problem a simpler function might be written.
 	const transf3d fakeNodeToWorld;
 	const mat4f noAdditionalTransform = mat4f::getIdentity();
-	const mat4f planeTransfromObjectToNode = computeObjectToWorldTransform(asset, nullptr, fakeNodeToWorld, noAdditionalTransform);
+	const mat4f planeTransfromObjectToNode =
+	    computeObjectToWorldTransform(asset, nullptr, fakeNodeToWorld, noAdditionalTransform);
 
 	Box3f bboxOs;
 
@@ -191,12 +197,13 @@ Box3f TraitSprite::getBBoxOS() const
 	Box3f bbox;
 
 	for (const TraitSpriteEntry& image : images) {
-		const AssetIface_SpriteAnim* const spriteIface = image.m_assetProperty.getAssetInterface<AssetIface_SpriteAnim>();
+		const AssetIface_SpriteAnim* const spriteIface =
+		    image.m_assetProperty.getAssetInterface<AssetIface_SpriteAnim>();
 		const AssetIface_Texture2D* const texIface = image.m_assetProperty.getAssetInterface<AssetIface_Texture2D>();
 
 		if (spriteIface || texIface) {
-			return image.imageSettings.computeBBoxOS(*image.m_assetProperty.getAsset().get(),
-			                                         additionalTransform * image.m_additionalTransform);
+			return image.imageSettings.computeBBoxOS(
+			    *image.m_assetProperty.getAsset().get(), additionalTransform * image.m_additionalTransform);
 		}
 		else {
 			// Not implemented or no asset is loaded.
@@ -206,7 +213,8 @@ Box3f TraitSprite::getBBoxOS() const
 	return bbox;
 }
 
-void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems)
+void TraitSprite::getRenderItems(
+    DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems)
 {
 	if (isRenderable == false) {
 		return;
@@ -240,12 +248,16 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 				renderItem.spriteTexture = texture;
 
 				mat4f obj2world = image.imageSettings.computeObjectToWorldTransform(
-				    *asset.get(), drawSets.drawCamera, actor->getTransform(), additionalTransform * image.m_additionalTransform);
+				    *asset.get(),
+				    drawSets.drawCamera,
+				    actor->getTransform(),
+				    additionalTransform * image.m_additionalTransform);
 
 				renderItem.obj2world = obj2world;
 
 				renderItem.zSortingPositionWs = obj2world.c3.xyz();
-				renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent || renderItem.colorTint.w < 0.999f ||
+				renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent ||
+				                               renderItem.colorTint.w < 0.999f ||
 				                               image.imageSettings.forceAlphaBlending;
 			}
 		}
@@ -254,21 +266,27 @@ void TraitSprite::getRenderItems(DrawReason drawReason, const GameDrawSets& draw
 			        getLoadedAssetIface<AssetIface_Texture2D>(spriteIface->getSpriteAnimation().textureAsset)) {
 				// Get the frame of the sprite to be rendered.
 				const SpriteAnimation::Frame* const frame =
-				    spriteIface->getSpriteAnimation().spriteAnimation.getFrameForTime(image.imageSettings.spriteFrameTime);
+				    spriteIface->getSpriteAnimation().spriteAnimation.getFrameForTime(
+				        image.imageSettings.spriteFrameTime);
 				if (frame) {
 					renderItem.spriteTexture = texIfaceSprite->getTexture();
 
 					mat4f obj2world = image.imageSettings.computeObjectToWorldTransform(
-					    *asset.get(), drawSets.drawCamera, actor->getTransform(), additionalTransform * image.m_additionalTransform);
+					    *asset.get(),
+					    drawSets.drawCamera,
+					    actor->getTransform(),
+					    additionalTransform * image.m_additionalTransform);
 					renderItem.obj2world = obj2world;
 
 					// Compute the UVW transform so we get only this frame portion of the texture to be displayed.
 					renderItem.uvwTransform =
 					    mat4f::getTranslation(frame->uvRegion.x, frame->uvRegion.y, 0.f) *
-					    mat4f::getScaling(frame->uvRegion.z - frame->uvRegion.x, frame->uvRegion.w - frame->uvRegion.y, 0.f);
+					    mat4f::getScaling(
+					        frame->uvRegion.z - frame->uvRegion.x, frame->uvRegion.w - frame->uvRegion.y, 0.f);
 
 					renderItem.zSortingPositionWs = obj2world.c3.xyz();
-					renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent || renderItem.colorTint.w < 0.999f ||
+					renderItem.needsAlphaSorting = texIface->getTextureMeta().isSemiTransparent ||
+					                               renderItem.colorTint.w < 0.999f ||
 					                               image.imageSettings.forceAlphaBlending;
 				}
 			}

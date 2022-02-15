@@ -100,7 +100,8 @@ struct vector_map {
 	{
 		debug_verify();
 
-		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key) : std::find(std::begin(keys), std::end(keys), key);
+		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key)
+		                   : std::find(std::begin(keys), std::end(keys), key);
 
 		bool found = TSorted ? itr != std::end(keys) && !(key < *itr) : itr != std::end(keys);
 
@@ -116,7 +117,8 @@ struct vector_map {
 	{
 		debug_verify();
 
-		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key) : std::find(std::begin(keys), std::end(keys), key);
+		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key)
+		                   : std::find(std::begin(keys), std::end(keys), key);
 
 		bool found = TSorted ? itr != std::end(keys) && !(key < *itr) : itr != std::end(keys);
 
@@ -133,7 +135,8 @@ struct vector_map {
 		debug_verify();
 
 		if (TSorted) {
-			auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key) : std::find(std::begin(keys), std::end(keys), key);
+			auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key)
+			                   : std::find(std::begin(keys), std::end(keys), key);
 
 			bool found = TSorted ? itr != std::end(keys) && !(key < *itr) : itr != std::end(keys);
 
@@ -203,7 +206,8 @@ struct vector_map {
 
 	void eraseKey(const K& key)
 	{
-		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key) : std::find(std::begin(keys), std::end(keys), key);
+		auto itr = TSorted ? std::lower_bound(std::begin(keys), std::end(keys), key)
+		                   : std::find(std::begin(keys), std::end(keys), key);
 
 		bool found = TSorted ? itr != std::end(keys) && !(key < *itr) : itr != std::end(keys);
 

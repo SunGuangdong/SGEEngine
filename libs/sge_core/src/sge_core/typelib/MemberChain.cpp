@@ -82,7 +82,8 @@ void MemberChain::forEachMember(void* root, std::function<void(void* root, const
 	forEachMemberInternal(root, *this, lambda);
 }
 
-void MemberChain::forEachMemberInternal(void* root, MemberChain chain, std::function<void(void* root, const MemberChain&)>& lambda)
+void MemberChain::forEachMemberInternal(
+    void* root, MemberChain chain, std::function<void(void* root, const MemberChain&)>& lambda)
 {
 	if (root == nullptr || lambda == nullptr) {
 		sgeAssert(false);

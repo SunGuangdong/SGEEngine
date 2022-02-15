@@ -58,7 +58,9 @@ void ASky::doAttributeEditor(GameInspector* inspector)
 		ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
 		chain.pop();
 	}
-	else if (m_mode == SkyShaderSettings::mode_textureSphericalMapped || m_mode == SkyShaderSettings::mode_textureCubeMapped) {
+	else if (
+	    m_mode == SkyShaderSettings::mode_textureSphericalMapped ||
+	    m_mode == SkyShaderSettings::mode_textureCubeMapped) {
 		chain.add(typeLib().findMember(&ASky::m_textureAssetProp));
 		ProperyEditorUIGen::doMemberUI(*inspector, this, chain);
 		chain.pop();

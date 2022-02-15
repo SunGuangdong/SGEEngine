@@ -17,7 +17,10 @@ struct MultiCurve2D {
 		pointType_bezierHandle1,
 	};
 
-	static bool pointType_isBezierHandle(const PointType pt) { return pt == pointType_bezierHandle0 || pt == pointType_bezierHandle1; }
+	static bool pointType_isBezierHandle(const PointType pt)
+	{
+		return pt == pointType_bezierHandle0 || pt == pointType_bezierHandle1;
+	}
 
 	static bool pointType_isBezierKey(const PointType pt) { return pt == pointType_bezierKey; }
 

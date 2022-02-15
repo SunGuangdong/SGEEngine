@@ -98,7 +98,8 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 		}
 
 		// Retrieve the ShadowMapBuildInfo which tells us the cameras to be used for rendering the shadow map.
-		Optional<ShadowMapBuildInfo> shadowMapBuildInfoOpt = lightDesc.buildShadowMapInfo(light->getTransform(), *gameCameraFrustumWs);
+		Optional<ShadowMapBuildInfo> shadowMapBuildInfoOpt =
+		    lightDesc.buildShadowMapInfo(light->getTransform(), *gameCameraFrustumWs);
 		if (shadowMapBuildInfoOpt.isValid() == false) {
 			continue;
 		}
@@ -130,18 +131,21 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 			// Caution, TODO: On Safari (the web browser) I've read that it needs a color render target.
 			// Keep that in mind when testing and developing.
 			shadowFrameTarget = getCore()->getDevice()->requestResource<FrameTarget>();
-			shadowFrameTarget->create2D(shadowMapWidth, shadowMapHegiht, TextureFormat::Unknown, TextureFormat::D24_UNORM_S8_UINT);
+			shadowFrameTarget->create2D(
+			    shadowMapWidth, shadowMapHegiht, TextureFormat::Unknown, TextureFormat::D24_UNORM_S8_UINT);
 
 			shadowFrameTarget->getDepthStencil()->setDebugName("Light Shadow Map Depth");
 		}
 
 		// Draws the shadow map to the created frame target.
-		const auto drawShadowMapFromCamera = [this, &lsi](const RenderDestination& rendDest, ICamera* gameCamera,
-		                                                  ICamera* drawCamera) -> void {
+		const auto drawShadowMapFromCamera =
+		    [this, &lsi](const RenderDestination& rendDest, ICamera* gameCamera, ICamera* drawCamera) -> void {
 			GameDrawSets drawShadowSets;
 
-			drawShadowSets.gameCamera = gameCamera; // The gameplay camera, form where the player is going to look at the scene.
-			drawShadowSets.drawCamera = drawCamera; // This is the camera that is going to be used for rendering the shadow map.
+			drawShadowSets.gameCamera =
+			    gameCamera; // The gameplay camera, form where the player is going to look at the scene.
+			drawShadowSets.drawCamera =
+			    drawCamera; // This is the camera that is going to be used for rendering the shadow map.
 			drawShadowSets.rdest = rendDest;
 			drawShadowSets.quickDraw = &getCore()->getQuickDraw();
 			drawShadowSets.shadowMapBuildInfo = &lsi.buildInfo;
@@ -165,10 +169,13 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 			viewports[axis_z_neg] = Rect2s(mapSideRes, mapSideRes, 3 * mapSideRes, mapSideRes);
 
 			// Render the scene for each face of the cube map.
-			// TODO: avoid rendering individual faces that would not cast shadow in the visiable area of the game camera.
+			// TODO: avoid rendering individual faces that would not cast shadow in the visiable area of the game
+			// camera.
 			for (int iSignedAxis = 0; iSignedAxis < signedAxis_numElements; ++iSignedAxis) {
-				RenderDestination rdest(getCore()->getDevice()->getContext(), shadowFrameTarget, viewports[iSignedAxis]);
-				drawShadowMapFromCamera(rdest, gameCamera, &shadowMapBuildInfoOpt->pointLightShadowMapCameras[iSignedAxis]);
+				RenderDestination rdest(
+				    getCore()->getDevice()->getContext(), shadowFrameTarget, viewports[iSignedAxis]);
+				drawShadowMapFromCamera(
+				    rdest, gameCamera, &shadowMapBuildInfoOpt->pointLightShadowMapCameras[iSignedAxis]);
 			}
 		}
 		else {
@@ -214,7 +221,8 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 				if (lsi.frameTarget.IsResourceValid()) {
 					shadingLight.shadowMap = lsi.frameTarget->getDepthStencil();
 					shadingLight.shadowMapProjView =
-					    mat4f::getIdentity(); // Not used for points light. They use the near/far projection settings and linear depth maps
+					    mat4f::getIdentity(); // Not used for points light. They use the near/far projection settings
+					                          // and linear depth maps
 				}
 			}
 			else {
@@ -287,7 +295,8 @@ void DefaultGameDrawer::getActorObjectLighting(Actor* actor, ObjectLighting& lig
 	getLightingForLocation(actorBBoxWs, lighting);
 }
 
-void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason)
+void DefaultGameDrawer::getRenderItemsForActor(
+    const GameDrawSets& drawSets, const SelectedItemDirect& item, DrawReason drawReason)
 {
 	Actor* actor = item.gameObject ? item.gameObject->getActor() : nullptr;
 	if (actor == nullptr) {
@@ -304,7 +313,8 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 		trait->getRenderItems(drawReason, m_RIs_geometry);
 	}
 
-	if (TraitRenderGeometry* const trait = getTrait<TraitRenderGeometry>(actor); item.editMode == editMode_actors && trait != nullptr) {
+	if (TraitRenderGeometry* const trait = getTrait<TraitRenderGeometry>(actor);
+	    item.editMode == editMode_actors && trait != nullptr) {
 		trait->getRenderItems(drawReason, m_RIs_geometry);
 	}
 
@@ -312,7 +322,8 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 		trait->getRenderItems(drawReason, drawSets, m_RIs_traitSprite);
 	}
 
-	if (TraitParticlesSimple* const trait = getTrait<TraitParticlesSimple>(actor); item.editMode == editMode_actors && trait != nullptr) {
+	if (TraitParticlesSimple* const trait = getTrait<TraitParticlesSimple>(actor);
+	    item.editMode == editMode_actors && trait != nullptr) {
 		trait->getRenderItems(m_RIs_traitParticles);
 	}
 
@@ -330,8 +341,9 @@ void DefaultGameDrawer::getRenderItemsForActor(const GameDrawSets& drawSets, con
 	const TypeId actorType = actor->getType();
 
 	if (actorType == sgeTypeId(ACamera) || actorType == sgeTypeId(ALight) || actorType == sgeTypeId(ALine) ||
-	    actorType == sgeTypeId(ACRSpline) || actorType == sgeTypeId(ALocator) || actorType == sgeTypeId(AInvisibleRigidObstacle) ||
-	    actorType == sgeTypeId(AInfinitePlaneObstacle) || actorType == sgeTypeId(ANavMesh) || actorType == sgeTypeId(AParticlesSimple)) {
+	    actorType == sgeTypeId(ACRSpline) || actorType == sgeTypeId(ALocator) ||
+	    actorType == sgeTypeId(AInvisibleRigidObstacle) || actorType == sgeTypeId(AInfinitePlaneObstacle) ||
+	    actorType == sgeTypeId(ANavMesh) || actorType == sgeTypeId(AParticlesSimple)) {
 		m_RIs_helpers.push_back(HelperDrawRenderItem(item, drawReason));
 	}
 }
@@ -427,13 +439,15 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 
 	// The opaque items don't need to be sorted in any way for the rendering to appear correct.
 	// However, if we sort them fron-to-back we would reduce the pixel shader overdraw.
-	std::sort(m_RIs_opaque.begin(), m_RIs_opaque.end(),
-	          [](IRenderItem* a, IRenderItem* b) -> bool { return a->zSortingValue < b->zSortingValue; });
+	std::sort(m_RIs_opaque.begin(), m_RIs_opaque.end(), [](IRenderItem* a, IRenderItem* b) -> bool {
+		return a->zSortingValue < b->zSortingValue;
+	});
 
 	// Sort the semi-transparent render items as they need to be draw in back-to-front order
 	// so that the alpha blending and z-depth could be done correctly.
-	std::sort(m_RIs_alphaSorted.rbegin(), m_RIs_alphaSorted.rend(),
-	          [](IRenderItem* a, IRenderItem* b) -> bool { return a->zSortingValue < b->zSortingValue; });
+	std::sort(m_RIs_alphaSorted.rbegin(), m_RIs_alphaSorted.rend(), [](IRenderItem* a, IRenderItem* b) -> bool {
+		return a->zSortingValue < b->zSortingValue;
+	});
 
 	// Draw the render items.
 	auto drawRenderItems = [&](std::vector<IRenderItem*>& renderItems) -> void {
@@ -461,7 +475,8 @@ void DefaultGameDrawer::drawCurrentRenderItems(const GameDrawSets& drawSets, Dra
 				drawRenderItem_TraitParticlesProgrammable(*riTraitParticlesProgrammable, drawSets, lighting);
 			}
 			else if (auto riHelper = dynamic_cast<HelperDrawRenderItem*>(riRaw)) {
-				drawHelperActor(riHelper->item.gameObject->getActor(), drawSets, riHelper->item.editMode, 0, lighting, drawReason);
+				drawHelperActor(
+				    riHelper->item.gameObject->getActor(), drawSets, riHelper->item.editMode, 0, lighting, drawReason);
 			}
 			else {
 				sgeAssert(false && "Render Item does not have a drawing implementation");
@@ -515,7 +530,8 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 	if (getWorld()->inspector && getWorld()->inspector->m_physicsDebugDrawEnabled) {
 		drawSets.rdest.sgecon->clearDepth(drawSets.rdest.frameTarget, 1.f);
 
-		getWorld()->m_physicsDebugDraw.preDebugDraw(drawSets.drawCamera->getProjView(), drawSets.quickDraw, drawSets.rdest);
+		getWorld()->m_physicsDebugDraw.preDebugDraw(
+		    drawSets.drawCamera->getProjView(), drawSets.quickDraw, drawSets.rdest);
 		getWorld()->physicsWorld.dynamicsWorld->debugDrawWorld();
 		getWorld()->m_physicsDebugDraw.postDebugDraw();
 	}
@@ -575,10 +591,8 @@ void DefaultGameDrawer::drawSky(const GameDrawSets& drawSets, const DrawReason d
 	}
 }
 
-void DefaultGameDrawer::drawRenderItem_Geometry(GeometryRenderItem& ri,
-                                                const GameDrawSets& drawSets,
-                                                const ObjectLighting& lighting,
-                                                DrawReason const drawReason)
+void DefaultGameDrawer::drawRenderItem_Geometry(
+    GeometryRenderItem& ri, const GameDrawSets& drawSets, const ObjectLighting& lighting, DrawReason const drawReason)
 {
 	if (ri.geometry == nullptr || ri.pMtlData == nullptr) {
 		return;
@@ -587,22 +601,42 @@ void DefaultGameDrawer::drawRenderItem_Geometry(GeometryRenderItem& ri,
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {
-		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), ri.worldTransform, *ri.geometry,
-		                                   getSelectionTintColor(drawReason), false);
+		m_constantColorShader.drawGeometry(
+		    drawSets.rdest,
+		    drawSets.drawCamera->getProjView(),
+		    ri.worldTransform,
+		    *ri.geometry,
+		    getSelectionTintColor(drawReason),
+		    false);
 	}
 	else if (drawReason == drawReason_gameplayShadow) {
-		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), ri.worldTransform,
-		                                *drawSets.shadowMapBuildInfo, *ri.geometry, /* ri.mtl.diffuseTexture*/ nullptr, false);
+		m_shadowMapBuilder.drawGeometry(
+		    drawSets.rdest,
+		    camPos,
+		    drawSets.drawCamera->getProjView(),
+		    ri.worldTransform,
+		    *drawSets.shadowMapBuildInfo,
+		    *ri.geometry,
+		    /* ri.mtl.diffuseTexture*/ nullptr,
+		    false);
 	}
 	else {
-		drawGeometry(drawSets.rdest, *drawSets.drawCamera, ri.worldTransform, lighting, *ri.geometry, ri.pMtlData, InstanceDrawMods());
+		drawGeometry(
+		    drawSets.rdest,
+		    *drawSets.drawCamera,
+		    ri.worldTransform,
+		    lighting,
+		    *ri.geometry,
+		    ri.pMtlData,
+		    InstanceDrawMods());
 	}
 }
 
-void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& ri,
-                                                   const GameDrawSets& drawSets,
-                                                   const ObjectLighting& lighting,
-                                                   DrawReason const drawReason)
+void DefaultGameDrawer::drawRenderItem_TraitSprite(
+    const TraitSpriteRenderItem& ri,
+    const GameDrawSets& drawSets,
+    const ObjectLighting& lighting,
+    DrawReason const drawReason)
 {
 	if (ri.spriteTexture == nullptr) {
 		return;
@@ -613,13 +647,25 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 	Geometry texPlaneGeom = m_texturedPlaneDraw.getGeometry(drawSets.rdest.getDevice());
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {
-		m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), ri.obj2world, texPlaneGeom,
-		                                   getSelectionTintColor(drawReason), true);
+		m_constantColorShader.drawGeometry(
+		    drawSets.rdest,
+		    drawSets.drawCamera->getProjView(),
+		    ri.obj2world,
+		    texPlaneGeom,
+		    getSelectionTintColor(drawReason),
+		    true);
 	}
 	else if (drawReason == drawReason_gameplayShadow) {
 		// Shadow maps.
-		m_shadowMapBuilder.drawGeometry(drawSets.rdest, camPos, drawSets.drawCamera->getProjView(), ri.obj2world,
-		                                *drawSets.shadowMapBuildInfo, texPlaneGeom, ri.spriteTexture, ri.forceNoCulling);
+		m_shadowMapBuilder.drawGeometry(
+		    drawSets.rdest,
+		    camPos,
+		    drawSets.drawCamera->getProjView(),
+		    ri.obj2world,
+		    *drawSets.shadowMapBuildInfo,
+		    texPlaneGeom,
+		    ri.spriteTexture,
+		    ri.forceNoCulling);
 	}
 	else {
 		// Gameplay shaded.
@@ -632,13 +678,19 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(const TraitSpriteRenderItem& 
 		texPlaneMtl.forceNoLighting = ri.forceNoLighting;
 		texPlaneMtl.forceNoLighting = ri.forceNoCulling;
 
-		drawGeometry(drawSets.rdest, *drawSets.drawCamera, ri.obj2world, lighting, texPlaneGeom, &texPlaneMtl, InstanceDrawMods());
+		drawGeometry(
+		    drawSets.rdest,
+		    *drawSets.drawCamera,
+		    ri.obj2world,
+		    lighting,
+		    texPlaneGeom,
+		    &texPlaneMtl,
+		    InstanceDrawMods());
 	}
 }
 
-void DefaultGameDrawer::drawRenderItem_TraitViewportIcon(TraitViewportIconRenderItem& ri,
-                                                         const GameDrawSets& drawSets,
-                                                         const DrawReason& drawReason)
+void DefaultGameDrawer::drawRenderItem_TraitViewportIcon(
+    TraitViewportIconRenderItem& ri, const GameDrawSets& drawSets, const DrawReason& drawReason)
 {
 	if (Texture* iconTex = ri.traitIcon->getIconTexture()) {
 		vec4f tintColor = vec4f(1.f);
@@ -653,10 +705,11 @@ void DefaultGameDrawer::drawRenderItem_TraitViewportIcon(TraitViewportIconRender
 	}
 };
 
-void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimpleRenderItem& ri,
-                                                            const GameDrawSets& drawSets,
-                                                            DrawReason drawReason,
-                                                            const ObjectLighting& lighting)
+void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
+    TraitParticlesSimpleRenderItem& ri,
+    const GameDrawSets& drawSets,
+    DrawReason drawReason,
+    const ObjectLighting& lighting)
 {
 	TraitParticlesSimple* ttParticles = ri.traitParticles;
 	const vec3f camPos = drawSets.drawCamera->getCameraPosition();
@@ -671,7 +724,14 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 				ParticleGroupState::SpriteRendData* srd =
 				    pstate.computeSpriteRenderData(*drawSets.rdest.sgecon, pdesc, *drawSets.drawCamera);
 				if (srd != nullptr) {
-					drawGeometry(drawSets.rdest, *drawSets.drawCamera, n2w, lighting, srd->geometry, &srd->material, InstanceDrawMods());
+					drawGeometry(
+					    drawSets.rdest,
+					    *drawSets.drawCamera,
+					    n2w,
+					    lighting,
+					    srd->geometry,
+					    &srd->material,
+					    InstanceDrawMods());
 				}
 			}
 		}
@@ -682,7 +742,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 		qdraw->drawWired_Clear();
 
 		Actor* ownerActor = dynamic_cast<Actor*>(ri.traitParticles->getObject());
-		bool hasPreviewGroup = ttParticles->m_uiSelectedGroup >= 0 && ttParticles->m_uiSelectedGroup < ttParticles->m_pgroups.size();
+		bool hasPreviewGroup =
+		    ttParticles->m_uiSelectedGroup >= 0 && ttParticles->m_uiSelectedGroup < ttParticles->m_pgroups.size();
 
 		if (hasPreviewGroup) {
 			ParticleGroupDesc& pgdesc = ttParticles->m_pgroups[ttParticles->m_uiSelectedGroup];
@@ -691,8 +752,10 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 
 			switch (pgdesc.birthShape.shapeType) {
 				case birthShape_sphere: {
-					qdraw->drawWiredAdd_Sphere(n2w * mat4f::getTranslation(pgdesc.birthShape.sphere.sphereCenter), 0x00ff00ff,
-					                           pgdesc.birthShape.sphere.sphereRadius);
+					qdraw->drawWiredAdd_Sphere(
+					    n2w * mat4f::getTranslation(pgdesc.birthShape.sphere.sphereCenter),
+					    0x00ff00ff,
+					    pgdesc.birthShape.sphere.sphereRadius);
 				} break;
 				case birthShape_plane: {
 					vec3f planeOrigin = mat_mul_pos(n2w, pgdesc.birthShape.plane.planePosition);
@@ -710,11 +773,16 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 				case birthShape_line: {
 				} break;
 				case birthShape_circle: {
-					mat4f circleTform = n2w * mat4f::getTRS(pgdesc.birthShape.circle.circlePosition,
-					                                        pgdesc.birthShape.circle.circleRotation.toQuaternion(), vec3f(1.f));
+					mat4f circleTform = n2w * mat4f::getTRS(
+					                              pgdesc.birthShape.circle.circlePosition,
+					                              pgdesc.birthShape.circle.circleRotation.toQuaternion(),
+					                              vec3f(1.f));
 
-					qdraw->drawWiredAdd_EllipseXZ(circleTform, pgdesc.birthShape.circle.circleRadius, pgdesc.birthShape.circle.circleRadius,
-					                              0xffff0000);
+					qdraw->drawWiredAdd_EllipseXZ(
+					    circleTform,
+					    pgdesc.birthShape.circle.circleRadius,
+					    pgdesc.birthShape.circle.circleRadius,
+					    0xffff0000);
 				} break;
 			}
 
@@ -738,11 +806,15 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 						mat4f n2wSphere = n2w;
 
 						vec3f arrowEnds[] = {
-						    vec3f(1.732f, 1.732f, 1.732f),   vec3f(1.732f, -1.732f, 1.732f),
-						    vec3f(-1.732f, 1.732f, 1.732f),  vec3f(-1.732f, -1.732f, 1.732f),
+						    vec3f(1.732f, 1.732f, 1.732f),
+						    vec3f(1.732f, -1.732f, 1.732f),
+						    vec3f(-1.732f, 1.732f, 1.732f),
+						    vec3f(-1.732f, -1.732f, 1.732f),
 
-						    vec3f(1.732f, 1.732f, -1.732f),  vec3f(1.732f, -1.732f, -1.732f),
-						    vec3f(-1.732f, 1.732f, -1.732f), vec3f(-1.732f, -1.732f, -1.732f),
+						    vec3f(1.732f, 1.732f, -1.732f),
+						    vec3f(1.732f, -1.732f, -1.732f),
+						    vec3f(-1.732f, 1.732f, -1.732f),
+						    vec3f(-1.732f, -1.732f, -1.732f),
 						};
 
 						for (vec3f& v : arrowEnds) {
@@ -776,9 +848,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(TraitParticlesSimple
 	}
 }
 
-void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticlesProgrammableRenderItem& ri,
-                                                                  const GameDrawSets& drawSets,
-                                                                  const ObjectLighting& lighting)
+void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(
+    TraitParticlesProgrammableRenderItem& ri, const GameDrawSets& drawSets, const ObjectLighting& lighting)
 {
 	TraitParticlesProgrammable* particlesTrait = ri.traitParticles;
 
@@ -793,30 +864,43 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesProgrammable(TraitParticles
 
 		if (isAssetLoaded(pgrp->spriteTexture, assetIface_model3d)) {
 			for (const TraitParticlesProgrammable::ParticleGroup::ParticleData& particle : pgrp->allParticles) {
-				mat4f particleTForm =
-				    mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) * mat4f::getScaling(particle.scale);
+				mat4f particleTForm = mat4f::getTranslation(particle.position) * mat4f::getRotationQuat(particle.spin) *
+				                      mat4f::getScaling(particle.scale);
 
-				drawEvalModel(drawSets.rdest, *drawSets.drawCamera, particleTForm, lighting,
-				              getLoadedAssetIface<AssetIface_Model3D>(pgrp->spriteTexture)->getStaticEval(), InstanceDrawMods());
+				drawEvalModel(
+				    drawSets.rdest,
+				    *drawSets.drawCamera,
+				    particleTForm,
+				    lighting,
+				    getLoadedAssetIface<AssetIface_Model3D>(pgrp->spriteTexture)->getStaticEval(),
+				    InstanceDrawMods());
 			}
 		}
 		else {
 			if (m_partRendDataGen.generate(*pgrp, *drawSets.rdest.sgecon, *drawSets.drawCamera, n2w)) {
 				const mat4f identity = mat4f::getIdentity();
-				drawGeometry(drawSets.rdest, *drawSets.drawCamera, identity, lighting, m_partRendDataGen.geometry,
-				             &m_partRendDataGen.material, InstanceDrawMods());
+				drawGeometry(
+				    drawSets.rdest,
+				    *drawSets.drawCamera,
+				    identity,
+				    lighting,
+				    m_partRendDataGen.geometry,
+				    &m_partRendDataGen.material,
+				    InstanceDrawMods());
 			}
 		}
 	}
 }
 
-void DefaultGameDrawer::drawHelperActor_drawANavMesh(ANavMesh& navMesh,
-                                                     const GameDrawSets& drawSets,
-                                                     const ObjectLighting& UNUSED(lighting),
-                                                     const DrawReason drawReason,
-                                                     const vec4f wireframeColor)
+void DefaultGameDrawer::drawHelperActor_drawANavMesh(
+    ANavMesh& navMesh,
+    const GameDrawSets& drawSets,
+    const ObjectLighting& UNUSED(lighting),
+    const DrawReason drawReason,
+    const vec4f wireframeColor)
 {
-	// Draw the bounding box of the nav-mesh. This box basically shows where is the area where the nav-mesh is going to be built.
+	// Draw the bounding box of the nav-mesh. This box basically shows where is the area where the nav-mesh is going to
+	// be built.
 	if (drawReason_IsEditOrSelectionTool(drawReason)) {
 		drawSets.quickDraw->drawWiredAdd_Box(navMesh.getTransformMtx(), colorToIntRgba(wireframeColor));
 		drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
@@ -830,8 +914,8 @@ void DefaultGameDrawer::drawHelperActor_drawANavMesh(ANavMesh& navMesh,
 		drawSets.quickDraw->drawWired_Clear();
 		// A small value that we add to each vertex (in world space) so that the contruction and nav-mesh
 		// geometry does not end-up z-fighting in the viewport.
-		// The proper solution would be an actual depth bias, but since this is an editor only (and used usuually only for debug)
-		// this is a good enough solution.
+		// The proper solution would be an actual depth bias, but since this is an editor only (and used usuually only
+		// for debug) this is a good enough solution.
 		const vec3f fightingPositionBias = -drawSets.drawCamera->getCameraLookDir() * 0.001f;
 
 		for (size_t iTri = 0; iTri < navMesh.m_debugDrawNavMeshTriListWs.size() / 3; ++iTri) {
@@ -854,17 +938,21 @@ void DefaultGameDrawer::drawHelperActor_drawANavMesh(ANavMesh& navMesh,
 			drawSets.quickDraw->drawWiredAdd_triangle(a, b, c, buildMeshColorInt);
 		}
 
-		drawSets.quickDraw->drawSolid_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), false,
-		                                      getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		drawSets.quickDraw->drawSolid_Execute(
+		    drawSets.rdest,
+		    drawSets.drawCamera->getProjView(),
+		    false,
+		    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 	}
 }
 
-void DefaultGameDrawer::drawHelperActor_drawAParticlesSimple(AParticlesSimple& particles,
-                                                             const GameDrawSets& drawSets,
-                                                             const ObjectLighting& UNUSED(lighting),
-                                                             [[maybe_unused]] const DrawReason drawReason,
-                                                             const vec4f wireframeColor)
+void DefaultGameDrawer::drawHelperActor_drawAParticlesSimple(
+    AParticlesSimple& particles,
+    const GameDrawSets& drawSets,
+    const ObjectLighting& UNUSED(lighting),
+    [[maybe_unused]] const DrawReason drawReason,
+    const vec4f wireframeColor)
 {
 	QuickDraw* quickDraw = drawSets.quickDraw;
 	quickDraw->drawWiredAdd_EllipseXZ(particles.getTransformMtx(), 10.f, 10.f, colorToIntRgba(wireframeColor));
@@ -872,12 +960,13 @@ void DefaultGameDrawer::drawHelperActor_drawAParticlesSimple(AParticlesSimple& p
 }
 
 
-void DefaultGameDrawer::drawHelperActor(Actor* actor,
-                                        const GameDrawSets& drawSets,
-                                        EditMode const editMode,
-                                        int const itemIndex,
-                                        const ObjectLighting& lighting,
-                                        DrawReason const drawReason)
+void DefaultGameDrawer::drawHelperActor(
+    Actor* actor,
+    const GameDrawSets& drawSets,
+    EditMode const editMode,
+    int const itemIndex,
+    const ObjectLighting& lighting,
+    DrawReason const drawReason)
 {
 	TypeId actorType = actor->getType();
 
@@ -888,8 +977,8 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 	vec4f selectionTint = getSelectionTintColor(drawReason);
 	const uint32 wireframeColorInt = colorToIntRgba(selectionTint);
 
-	// If we are rendering the actor to visualize a selection, show a wireframe representation specifying how the light is oriented, or its
-	// area of effect.
+	// If we are rendering the actor to visualize a selection, show a wireframe representation specifying how the light
+	// is oriented, or its area of effect.
 	if (actorType == sgeTypeId(ALight) && drawReason_IsVisualizeSelection(drawReason)) {
 		if (editMode == editMode_actors) {
 			drawSets.quickDraw->drawWired_Clear();
@@ -904,13 +993,19 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 			else if (lightDesc.type == light_directional) {
 				const float arrowLength = maxOf(lightDesc.intensity * 10.f, 1.f);
 				drawSets.quickDraw->drawWiredAdd_Arrow(
-				    actor->getTransform().p, actor->getTransform().p + light->getLightDirection() * arrowLength, wireframeColorInt);
+				    actor->getTransform().p,
+				    actor->getTransform().p + light->getLightDirection() * arrowLength,
+				    wireframeColorInt);
 			}
 			else if (lightDesc.type == light_spot) {
 				const float coneHeight = maxOf(lightDesc.range, 2.f);
 				const float coneRadius = tanf(lightDesc.spotLightAngle) * coneHeight;
-				drawSets.quickDraw->drawWiredAdd_ConeBottomAligned(actor->getTransformMtx() * mat4f::getRotationX(deg2rad(-90.f)),
-				                                                   wireframeColorInt, coneHeight, coneRadius, 6);
+				drawSets.quickDraw->drawWiredAdd_ConeBottomAligned(
+				    actor->getTransformMtx() * mat4f::getRotationX(deg2rad(-90.f)),
+				    wireframeColorInt,
+				    coneHeight,
+				    coneRadius,
+				    6);
 			}
 
 			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
@@ -921,12 +1016,23 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 
 		if (simpleObstacle->geometry.hasData()) {
 			if (drawReason_IsVisualizeSelection(drawReason)) {
-				m_constantColorShader.drawGeometry(drawSets.rdest, drawSets.drawCamera->getProjView(), simpleObstacle->getTransformMtx(),
-				                                   simpleObstacle->geometry, selectionTint, false);
+				m_constantColorShader.drawGeometry(
+				    drawSets.rdest,
+				    drawSets.drawCamera->getProjView(),
+				    simpleObstacle->getTransformMtx(),
+				    simpleObstacle->geometry,
+				    selectionTint,
+				    false);
 			}
 			else {
-				drawGeometry(drawSets.rdest, *drawSets.drawCamera, simpleObstacle->getTransformMtx(), lighting, simpleObstacle->geometry,
-				             &simpleObstacle->material, InstanceDrawMods());
+				drawGeometry(
+				    drawSets.rdest,
+				    *drawSets.drawCamera,
+				    simpleObstacle->getTransformMtx(),
+				    lighting,
+				    simpleObstacle->geometry,
+				    &simpleObstacle->material,
+				    InstanceDrawMods());
 			}
 		}
 	}
@@ -935,7 +1041,8 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 			if (const TraitCamera* const traitCamera = getTrait<TraitCamera>(actor)) {
 				const auto intersectPlanes = [](const Plane& p0, const Plane& p1, const Plane& p2) -> vec3f {
 					// http://www.ambrsoft.com/TrigoCalc/Plan3D/3PlanesIntersection_.htm
-					float const det = -triple(p0.norm(), p1.norm(), p2.norm()); // Caution: I'm not sure about that minus...
+					float const det =
+					    -triple(p0.norm(), p1.norm(), p2.norm()); // Caution: I'm not sure about that minus...
 
 					float const x = triple(p0.v4.wyz(), p1.v4.wyz(), p2.v4.wyz()) / det;
 					float const y = triple(p0.v4.xwz(), p1.v4.xwz(), p2.v4.xwz()) / det;
@@ -948,11 +1055,15 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 				const Frustum* const f = ifaceCamera->getFrustumWS();
 				if (f) {
 					const vec3f frustumVerts[8] = {
-					    intersectPlanes(f->t, f->r, f->n), intersectPlanes(f->t, f->l, f->n),
-					    intersectPlanes(f->b, f->l, f->n), intersectPlanes(f->b, f->r, f->n),
+					    intersectPlanes(f->t, f->r, f->n),
+					    intersectPlanes(f->t, f->l, f->n),
+					    intersectPlanes(f->b, f->l, f->n),
+					    intersectPlanes(f->b, f->r, f->n),
 
-					    intersectPlanes(f->t, f->r, f->f), intersectPlanes(f->t, f->l, f->f),
-					    intersectPlanes(f->b, f->l, f->f), intersectPlanes(f->b, f->r, f->f),
+					    intersectPlanes(f->t, f->r, f->f),
+					    intersectPlanes(f->t, f->l, f->f),
+					    intersectPlanes(f->b, f->l, f->f),
+					    intersectPlanes(f->b, f->r, f->f),
 					};
 
 					const vec3f lines[] = {
@@ -1030,8 +1141,11 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 			mat4f const tr = spline->getTransformMtx();
 
 			getCore()->getQuickDraw().drawWired_Clear();
-			getCore()->getQuickDraw().drawWiredAdd_Sphere(tr * mat4f::getTranslation(spline->points[itemIndex]),
-			                                              isVisualizingSelection ? wireframeColorInt : 0xFFFFFFFF, 0.2f, 3);
+			getCore()->getQuickDraw().drawWiredAdd_Sphere(
+			    tr * mat4f::getTranslation(spline->points[itemIndex]),
+			    isVisualizingSelection ? wireframeColorInt : 0xFFFFFFFF,
+			    0.2f,
+			    3);
 			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
 	}
@@ -1062,17 +1176,22 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 			for (int t = 0; t < spline->getNumPoints(); t++) {
 				vec3f worldPos = mat_mul_pos(tr, spline->points[t]);
 				if (t == 0)
-					getCore()->getQuickDraw().drawWiredAdd_Box(mat4f::getTRS(worldPos, quatf::getIdentity(), vec3f(pointScale)), color);
+					getCore()->getQuickDraw().drawWiredAdd_Box(
+					    mat4f::getTRS(worldPos, quatf::getIdentity(), vec3f(pointScale)), color);
 				else
-					getCore()->getQuickDraw().drawWiredAdd_Sphere(mat4f::getTranslation(worldPos), color, pointScale, 3);
+					getCore()->getQuickDraw().drawWiredAdd_Sphere(
+					    mat4f::getTranslation(worldPos), color, pointScale, 3);
 			}
 
 			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
 		else if (editMode == editMode_points) {
 			getCore()->getQuickDraw().drawWired_Clear();
-			getCore()->getQuickDraw().drawWiredAdd_Sphere(tr * mat4f::getTranslation(spline->points[itemIndex]),
-			                                              isVisualizingSelection ? wireframeColorInt : 0xFFFFFFFF, pointScale, 3);
+			getCore()->getQuickDraw().drawWiredAdd_Sphere(
+			    tr * mat4f::getTranslation(spline->points[itemIndex]),
+			    isVisualizingSelection ? wireframeColorInt : 0xFFFFFFFF,
+			    pointScale,
+			    3);
 			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
 	}
@@ -1104,12 +1223,12 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 
 						if (boneDirVectorWs.lengthSqr() > 1e-6f) {
 							boneLength = boneDirVectorWs.length();
-							quatf rotationWs =
-							    quatf::fromNormalizedVectors(vec3f(1.f, 0.f, 0.f), boneDirVectorWs.normalized0(), vec3f(0.f, 0.f, 1.f));
+							quatf rotationWs = quatf::fromNormalizedVectors(
+							    vec3f(1.f, 0.f, 0.f), boneDirVectorWs.normalized0(), vec3f(0.f, 0.f, 1.f));
 							vec3f translWs = boneFromWs;
 							mat4f visualBoneTransformWs = mat4f::getTRS(translWs, rotationWs, vec3f(1.f));
-							drawSets.quickDraw->drawWiredAdd_Bone(visualBoneTransformWs, boneDirVectorWs.length(), bone->boneLength,
-							                                      selectionTint);
+							drawSets.quickDraw->drawWiredAdd_Bone(
+							    visualBoneTransformWs, boneDirVectorWs.length(), bone->boneLength, selectionTint);
 						}
 					}
 				}
@@ -1126,8 +1245,11 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 
 			// Dreaw the location of the bone.
 			drawSets.quickDraw->drawWiredAdd_Sphere(bone->getTransformMtx(), wireframeColorInt, boneLength / 12.f, 6);
-			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr,
-			                                      getCore()->getGraphicsResources().DSS_always_noTest);
+			drawSets.quickDraw->drawWired_Execute(
+			    drawSets.rdest,
+			    drawSets.drawCamera->getProjView(),
+			    nullptr,
+			    getCore()->getGraphicsResources().DSS_always_noTest);
 		}
 	}
 	else if ((actorType == sgeTypeId(AInvisibleRigidObstacle)) && drawReason_IsEditOrSelectionTool(drawReason)) {
@@ -1143,10 +1265,10 @@ void DefaultGameDrawer::drawHelperActor(Actor* actor,
 			const float scale = plane->displayScale * plane->getTransform().s.componentMaxAbs();
 
 			drawSets.quickDraw->drawWired_Clear();
-			drawSets.quickDraw->drawWiredAdd_Arrow(actor->getPosition(), actor->getPosition() + actor->getDirY() * scale,
-			                                       wireframeColorInt);
-			drawSets.quickDraw->drawWiredAdd_Grid(actor->getPosition(), actor->getDirX() * scale, actor->getDirZ() * scale, 1, 1,
-			                                      wireframeColorInt);
+			drawSets.quickDraw->drawWiredAdd_Arrow(
+			    actor->getPosition(), actor->getPosition() + actor->getDirY() * scale, wireframeColorInt);
+			drawSets.quickDraw->drawWiredAdd_Grid(
+			    actor->getPosition(), actor->getDirX() * scale, actor->getDirZ() * scale, 1, 1, wireframeColorInt);
 			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
 	}

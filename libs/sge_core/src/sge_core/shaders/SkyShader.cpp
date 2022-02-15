@@ -15,7 +15,8 @@ struct SkyShaderCBufferParams {
 	int skyShaderMode;
 };
 
-void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f view, const mat4f proj, const SkyShaderSettings& sets)
+void SkyShader::draw(
+    const RenderDestination& rdest, const vec3f&, const mat4f view, const mat4f proj, const SkyShaderSettings& sets)
 {
 	SGEDevice* const sgedev = rdest.getDevice();
 
@@ -39,8 +40,13 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 
 		ShadingProgramPermuator tempPermutator;
 
-		if (tempPermutator.createFromFile(sgedev, "core_shaders/SkyGradient.hlsl", "shader_cache/SkyShader.shadercache", compileTimeOptions,
-		                                  uniformsToCache, &includedFilesByShaders)) {
+		if (tempPermutator.createFromFile(
+		        sgedev,
+		        "core_shaders/SkyGradient.hlsl",
+		        "shader_cache/SkyShader.shadercache",
+		        compileTimeOptions,
+		        uniformsToCache,
+		        &includedFilesByShaders)) {
 			shadingPermut = std::move(tempPermutator);
 		}
 		else {
@@ -70,7 +76,8 @@ void SkyShader::draw(const RenderDestination& rdest, const vec3f&, const mat4f v
 	if (!m_fullScreenQuadVB.IsResourceValid()) {
 		m_fullScreenQuadVB = getCore()->getDevice()->requestResource<Buffer>();
 		m_fullScreenQuadNumVerts = GeomGen::ndcQuad3DUV(m_fullScreenQuadVB);
-		VertexDecl vdecl[] = {VertexDecl(0, "a_position", UniformType::Float3, 0), VertexDecl(0, "a_uv", UniformType::Float3, 0)};
+		VertexDecl vdecl[] = {
+		    VertexDecl(0, "a_position", UniformType::Float3, 0), VertexDecl(0, "a_uv", UniformType::Float3, 0)};
 		m_fullScreenQuadDeclIdx = getCore()->getDevice()->getVertexDeclIndex(vdecl, SGE_ARRSZ(vdecl));
 	}
 

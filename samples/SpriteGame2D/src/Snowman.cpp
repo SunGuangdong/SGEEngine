@@ -171,9 +171,11 @@ struct Snowman : public Actor {
 			}
 
 			// Handle jumping.
-			const bool jumpBtnPressed = u.is.IsKeyPressed(Key_Space) || u.is.getXInputDevice(0).isBtnPressed(GamepadState::btn_a) ||
+			const bool jumpBtnPressed = u.is.IsKeyPressed(Key_Space) ||
+			                            u.is.getXInputDevice(0).isBtnPressed(GamepadState::btn_a) ||
 			                            u.is.hasTouchJustPresedUV(vec2f(0.5f, 0.f), vec2f(1.f, 1.f));
-			const bool jumpBtnReleased = u.is.IsKeyReleased(Key_Space) || u.is.getXInputDevice(0).isBtnReleased(GamepadState::btn_a) ||
+			const bool jumpBtnReleased = u.is.IsKeyReleased(Key_Space) ||
+			                             u.is.getXInputDevice(0).isBtnReleased(GamepadState::btn_a) ||
 			                             u.is.hasTouchJustReleasedUV(vec2f(0.5f, 0.f), vec2f(1.f, 1.f));
 
 			// If the jump button is pressed apply the high jump velocity.

@@ -12,7 +12,8 @@ namespace sge {
 //-----------------------------------------------------------------------
 // ShaderD3D11
 //-----------------------------------------------------------------------
-CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint)
+CreateShaderResult
+    ShaderD3D11::createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint)
 {
 	destroy();
 
@@ -24,18 +25,25 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	// Just an interestiong flag to be remembered -> D3DCOMPILE_PACK_MATRIX_ROW_MAJOR
 	// const DWORD compileFlags = 0;
 	const DWORD compileFlags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
-	// const DWORD compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0; // For exrternal shader debugging in RenderDoc or PIX
-	// and so on.
+	// const DWORD compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_OPTIMIZATION_LEVEL0; // For exrternal shader debugging
+	// in RenderDoc or PIX and so on.
 
 	// Compile the shader.
 	TComPtr<ID3D10Blob> compilationErrorBlob;
 	Timer t;
 
-	const HRESULT compilatonResult = D3DCompile(pCode, strlen(pCode), NULL, NULL, NULL, entryPoint,
-	                                            getDevice<SGEDeviceD3D11>()->D3D11_GetWorkingShaderModel(type).c_str(), // shader model
-	                                            compileFlags,                                                           // flags1
-	                                            0,                                                                      // flags2
-	                                            &m_compiledBlob, &compilationErrorBlob);
+	const HRESULT compilatonResult = D3DCompile(
+	    pCode,
+	    strlen(pCode),
+	    NULL,
+	    NULL,
+	    NULL,
+	    entryPoint,
+	    getDevice<SGEDeviceD3D11>()->D3D11_GetWorkingShaderModel(type).c_str(), // shader model
+	    compileFlags,                                                           // flags1
+	    0,                                                                      // flags2
+	    &m_compiledBlob,
+	    &compilationErrorBlob);
 	t.tick();
 
 	if (FAILED(compilatonResult)) {
@@ -51,12 +59,18 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 	HRESULT createShaderResult = E_FAIL;
 
 	if (type == ShaderType::VertexShader) {
-		createShaderResult = d3ddev->CreateVertexShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
-		                                                (ID3D11VertexShader**)&m_dx11Shader);
+		createShaderResult = d3ddev->CreateVertexShader(
+		    m_compiledBlob->GetBufferPointer(),
+		    m_compiledBlob->GetBufferSize(),
+		    NULL,
+		    (ID3D11VertexShader**)&m_dx11Shader);
 	}
 	else if (type == ShaderType::PixelShader) {
-		createShaderResult = d3ddev->CreatePixelShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
-		                                               (ID3D11PixelShader**)&m_dx11Shader);
+		createShaderResult = d3ddev->CreatePixelShader(
+		    m_compiledBlob->GetBufferPointer(),
+		    m_compiledBlob->GetBufferSize(),
+		    NULL,
+		    (ID3D11PixelShader**)&m_dx11Shader);
 	}
 	else {
 		// Unknown shader type.
@@ -69,8 +83,11 @@ CreateShaderResult ShaderD3D11::createNative(const ShaderType::Enum type, const 
 
 	// Finally obtain the shader reflation...
 	TComPtr<ID3D11ShaderReflection> d3dRefl;
-	const HRESULT reflResult =
-	    D3DReflect(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&d3dRefl);
+	const HRESULT reflResult = D3DReflect(
+	    m_compiledBlob->GetBufferPointer(),
+	    m_compiledBlob->GetBufferSize(),
+	    IID_ID3D11ShaderReflection,
+	    (void**)&d3dRefl);
 
 	if (FAILED(reflResult) || (d3dRefl == NULL)) {
 		destroy();
@@ -94,12 +111,18 @@ CreateShaderResult ShaderD3D11::createFromNativeBytecode(const ShaderType::Enum 
 	memcpy(m_compiledBlob->GetBufferPointer(), nativeBytecode.data(), nativeBytecode.size());
 
 	if (type == ShaderType::VertexShader) {
-		createShaderResult = d3ddev->CreateVertexShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
-		                                                (ID3D11VertexShader**)&m_dx11Shader);
+		createShaderResult = d3ddev->CreateVertexShader(
+		    m_compiledBlob->GetBufferPointer(),
+		    m_compiledBlob->GetBufferSize(),
+		    NULL,
+		    (ID3D11VertexShader**)&m_dx11Shader);
 	}
 	else if (type == ShaderType::PixelShader) {
-		createShaderResult = d3ddev->CreatePixelShader(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), NULL,
-		                                               (ID3D11PixelShader**)&m_dx11Shader);
+		createShaderResult = d3ddev->CreatePixelShader(
+		    m_compiledBlob->GetBufferPointer(),
+		    m_compiledBlob->GetBufferSize(),
+		    NULL,
+		    (ID3D11PixelShader**)&m_dx11Shader);
 	}
 	else {
 		// Unknown shader type.
@@ -112,8 +135,11 @@ CreateShaderResult ShaderD3D11::createFromNativeBytecode(const ShaderType::Enum 
 
 	// Finally obtain the shader reflation...
 	TComPtr<ID3D11ShaderReflection> d3dRefl;
-	const HRESULT reflResult =
-	    D3DReflect(m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), IID_ID3D11ShaderReflection, (void**)&d3dRefl);
+	const HRESULT reflResult = D3DReflect(
+	    m_compiledBlob->GetBufferPointer(),
+	    m_compiledBlob->GetBufferSize(),
+	    IID_ID3D11ShaderReflection,
+	    (void**)&d3dRefl);
 
 	if (FAILED(reflResult) || (d3dRefl == NULL)) {
 		destroy();
@@ -169,7 +195,9 @@ ID3D11InputLayout* ShaderD3D11::D3D11_GetInputLayoutForVertexDeclIndex(const Ver
 	const HRESULT hr = getDevice<SGEDeviceD3D11>()->D3D11_GetDevice()->CreateInputLayout(
 	    d3d11InputDesc.data(),       // D3D11_INPUT_ELEMENT_DESC[]
 	    (UINT)d3d11InputDesc.size(), // Num D3D11_INPUT_ELEMENT_DESC
-	    m_compiledBlob->GetBufferPointer(), m_compiledBlob->GetBufferSize(), &inputLayout);
+	    m_compiledBlob->GetBufferPointer(),
+	    m_compiledBlob->GetBufferSize(),
+	    &inputLayout);
 
 	sgeAssert(SUCCEEDED(hr));
 

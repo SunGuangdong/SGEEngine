@@ -16,19 +16,21 @@ struct SGE_CORE_API ConstantColorWireShader {
   public:
 	ConstantColorWireShader() = default;
 
-	void draw(const RenderDestination& rdest,
-	          const mat4f& projView,
-	          const mat4f& preRoot,
-	          const EvaluatedModel& model,
-	          const vec4f& shadingColor,
-	          bool forceNoCulling);
+	void draw(
+	    const RenderDestination& rdest,
+	    const mat4f& projView,
+	    const mat4f& preRoot,
+	    const EvaluatedModel& model,
+	    const vec4f& shadingColor,
+	    bool forceNoCulling);
 
-	void drawGeometry(const RenderDestination& rdest,
-	                  const mat4f& projView,
-	                  const mat4f& world,
-	                  const Geometry& geometry,
-	                  const vec4f& shadingColor,
-	                  bool forceNoCulling);
+	void drawGeometry(
+	    const RenderDestination& rdest,
+	    const mat4f& projView,
+	    const mat4f& world,
+	    const Geometry& geometry,
+	    const vec4f& shadingColor,
+	    bool forceNoCulling);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermut;

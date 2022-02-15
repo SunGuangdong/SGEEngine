@@ -5,13 +5,14 @@
 
 namespace sge {
 
-void FABRIKSolver(const int numPoints,
-                  vec3f inoutPoints[],
-                  const float linkLengths[],
-                  const vec3f& endAffector,
-                  const vec3f* pPole,
-                  int maxIterations,
-                  float earlyExitDelta)
+void FABRIKSolver(
+    const int numPoints,
+    vec3f inoutPoints[],
+    const float linkLengths[],
+    const vec3f& endAffector,
+    const vec3f* pPole,
+    int maxIterations,
+    float earlyExitDelta)
 {
 	sgeAssert(numPoints >= 2);
 	sgeAssert(linkLengths != nullptr);
@@ -79,7 +80,8 @@ void FABRIKSolver(const int numPoints,
 				angle = -angle;
 			}
 
-			const vec3f pt = quat_mul_pos(quatf::getAxisAngle(planeNormal, angle), (inoutPoints[t] - planePosition)) + planePosition;
+			const vec3f pt =
+			    quat_mul_pos(quatf::getAxisAngle(planeNormal, angle), (inoutPoints[t] - planePosition)) + planePosition;
 			inoutPoints[t] = pt;
 		}
 	}

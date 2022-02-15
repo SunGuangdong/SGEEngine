@@ -46,7 +46,8 @@ GLenum Map_GetGLNative(const Map::Enum map)
 //------------------------------------------------------------------------------
 // TextureFormat
 //------------------------------------------------------------------------------
-void TextureFormat_GetGLNative(const TextureFormat::Enum format, GLint& glInternalFormat, GLenum& glFormat, GLenum& glType)
+void TextureFormat_GetGLNative(
+    const TextureFormat::Enum format, GLint& glInternalFormat, GLenum& glFormat, GLenum& glType)
 {
 	glInternalFormat = glFormat = glType = GL_NONE;
 

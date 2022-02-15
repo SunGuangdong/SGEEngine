@@ -207,8 +207,14 @@ void AIKNode::update(const GameUpdateSets& u)
 		targetPosWs = speedLerp(current, targetPosWs, nonInstantFollowSpeed * u.dt);
 	}
 
-	FABRIKSolver(int(solverPositionWs.size()), solverPositionWs.data(), linksLengthWs.data(), targetPosWs,
-	             aPole ? &aPole->getPosition() : nullptr, maxIterations, earlyExitDelta);
+	FABRIKSolver(
+	    int(solverPositionWs.size()),
+	    solverPositionWs.data(),
+	    linksLengthWs.data(),
+	    targetPosWs,
+	    aPole ? &aPole->getPosition() : nullptr,
+	    maxIterations,
+	    earlyExitDelta);
 
 	// Move the bones.
 	for (int iBone = 1; iBone < tempChainActors.size(); ++iBone) {

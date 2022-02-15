@@ -31,7 +31,8 @@ static bool promptForModel(AssetPtr& asset)
 //--------------------------------------------------------------------------
 // ModelPreviewWidget
 //--------------------------------------------------------------------------
-void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize)
+void ModelPreviewWidget::doWidget(
+    SGEContext* const sgecon, const InputState& is, EvaluatedModel& m_eval, Optional<vec2f> widgetSize)
 {
 	if (m_frameTarget.IsResourceValid() == false) {
 		m_frameTarget = sgecon->getDevice()->requestResource<FrameTarget>();
@@ -65,8 +66,13 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	float ratio = (float)m_frameTarget->getWidth() / (float)m_frameTarget->getHeight();
 
 	mat4f lookAt = camera.GetViewMatrix();
-	mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(45.f), ratio, 0.1f, 10000.f, 0.f,
-	                                        kIsTexcoordStyleD3D); // The Y flip for OpenGL is done by the modelviewer.
+	mat4f proj = mat4f::getPerspectiveFovRH(
+	    deg2rad(45.f),
+	    ratio,
+	    0.1f,
+	    10000.f,
+	    0.f,
+	    kIsTexcoordStyleD3D); // The Y flip for OpenGL is done by the modelviewer.
 
 	sgecon->clearColor(m_frameTarget, 0, vec4f(0.f).data);
 	sgecon->clearDepth(m_frameTarget, 1.f);
@@ -79,13 +85,15 @@ void ModelPreviewWidget::doWidget(SGEContext* const sgecon, const InputState& is
 	debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
 	RawCamera rawCamera = RawCamera(camera.eyePosition(), lookAt, proj);
-	drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting::makeAmbientLightOnly(), m_eval, InstanceDrawMods());
+	drawEvalModel(
+	    rdest, rawCamera, mat4f::getIdentity(), ObjectLighting::makeAmbientLightOnly(), m_eval, InstanceDrawMods());
 
 	if (kIsTexcoordStyleD3D) {
 		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y));
 	}
 	else {
-		ImGui::Image(m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y), ImVec2(0, 1), ImVec2(1, 0));
+		ImGui::Image(
+		    m_frameTarget->getRenderTarget(0), ImVec2(canvas_size.x, canvas_size.y), ImVec2(0, 1), ImVec2(1, 0));
 	}
 
 	if (ImGui::IsItemHovered()) {
@@ -161,7 +169,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 								m_evalAnimator.trackAddAmim(nextTrackIndex, srcModel, iAnim);
 
 								AnimationDisplayInfo animInfo;
-								animInfo.name = m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath();
+								animInfo.name =
+								    m_eval.m_model->animationAt(iAnim)->animationName + " @ " + animSrcModel->getPath();
 								animInfo.duration = srcModel->animationAt(iAnim)->durationSec;
 
 								previewAnimationsInfo.push_back(animInfo);
@@ -174,7 +183,9 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			}
 
 			if (ImGui::IsItemHovered()) {
-				ImGui::SetTooltip("You can apply animations for other models to this one, as long as they have identical node hierarchy.");
+				ImGui::SetTooltip(
+				    "You can apply animations for other models to this one, as long as they have identical node "
+				    "hierarchy.");
 			}
 		}
 
@@ -191,7 +202,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 
 			if (m_evalAnimator.getNumTacks() > 0) {
 				static std::string none = "None";
-				const std::string& previewAnimName = playingTrackId >= 0 ? previewAnimationsInfo[playingTrackId].name : none;
+				const std::string& previewAnimName =
+				    playingTrackId >= 0 ? previewAnimationsInfo[playingTrackId].name : none;
 
 				ImGui::SliderFloat("Time", &animationTime, 0.f, previewAnimationsInfo[playingTrackId].duration);
 
@@ -236,8 +248,13 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			float ratio = (float)m_frameTarget->getWidth() / (float)m_frameTarget->getHeight();
 
 			mat4f lookAt = camera.GetViewMatrix();
-			mat4f proj = mat4f::getPerspectiveFovRH(deg2rad(45.f), ratio, 0.1f, 10000.f, 0.f,
-			                                        kIsTexcoordStyleD3D); // The Y flip for OpenGL is done by the modelviewer.
+			mat4f proj = mat4f::getPerspectiveFovRH(
+			    deg2rad(45.f),
+			    ratio,
+			    0.1f,
+			    10000.f,
+			    0.f,
+			    kIsTexcoordStyleD3D); // The Y flip for OpenGL is done by the modelviewer.
 
 			sgecon->clearColor(m_frameTarget, 0, vec4f(0.f).data);
 			sgecon->clearDepth(m_frameTarget, 1.f);
@@ -255,8 +272,12 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 			ImGui::InvisibleButton("TextureCanvasIB", canvas_size);
 
 			if (ImGui::IsItemHovered()) {
-				camera.update(is.IsKeyDown(Key_LAlt), is.IsKeyDown(Key_MouseLeft), is.IsKeyDown(Key_MouseMiddle),
-				              is.IsKeyDown(Key_MouseRight), is.GetCursorPos());
+				camera.update(
+				    is.IsKeyDown(Key_LAlt),
+				    is.IsKeyDown(Key_MouseLeft),
+				    is.IsKeyDown(Key_MouseMiddle),
+				    is.IsKeyDown(Key_MouseRight),
+				    is.GetCursorPos());
 			}
 
 			ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -285,7 +306,10 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 
 		if (ImGui::CollapsingHeader(ICON_FK_FILM " Animations", ImGuiTreeNodeFlags_DefaultOpen)) {
 			for (int iAnim = 0; iAnim < model->numAnimations(); ++iAnim) {
-				ImGui::Text("\t%s duration=%f", model->animationAt(iAnim)->animationName.c_str(), model->animationAt(iAnim)->durationSec);
+				ImGui::Text(
+				    "\t%s duration=%f",
+				    model->animationAt(iAnim)->animationName.c_str(),
+				    model->animationAt(iAnim)->durationSec);
 			}
 		}
 

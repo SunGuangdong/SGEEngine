@@ -33,18 +33,25 @@ GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args)
 	// Recompute the interaction mask only if we are not currently interacting with the gizmo.
 	if (m_interaction.mask == 0) {
 		float const distance2camera = distance(m_initialTranslation, args.rayWS.pos);
-		m_displayScale = args.customScale != 0.f ? args.customScale * m_sizeMultiplier : distance2camera * m_sizeMultiplier;
+		m_displayScale =
+		    args.customScale != 0.f ? args.customScale * m_sizeMultiplier : distance2camera * m_sizeMultiplier;
 	}
 
 	// The quads on each plane [0] -> origin, [1] e1, [2], e2
-	const vec3f xy_quad[3] = {m_initialTranslation + m_displayScale * kQuadOffset * (m_axes[0] + m_axes[1]),
-	                          m_axes[0] * kQuatLength * m_displayScale, m_axes[1] * kQuatLength * m_displayScale};
+	const vec3f xy_quad[3] = {
+	    m_initialTranslation + m_displayScale * kQuadOffset * (m_axes[0] + m_axes[1]),
+	    m_axes[0] * kQuatLength * m_displayScale,
+	    m_axes[1] * kQuatLength * m_displayScale};
 
-	const vec3f yz_quad[3] = {m_initialTranslation + m_displayScale * kQuadOffset * (m_axes[1] + m_axes[2]),
-	                          m_axes[1] * kQuatLength * m_displayScale, m_axes[2] * kQuatLength * m_displayScale};
+	const vec3f yz_quad[3] = {
+	    m_initialTranslation + m_displayScale * kQuadOffset * (m_axes[1] + m_axes[2]),
+	    m_axes[1] * kQuatLength * m_displayScale,
+	    m_axes[2] * kQuatLength * m_displayScale};
 
-	const vec3f xz_quad[3] = {m_initialTranslation + m_displayScale * kQuadOffset * (m_axes[0] + m_axes[2]),
-	                          m_axes[0] * kQuatLength * m_displayScale, m_axes[2] * kQuatLength * m_displayScale};
+	const vec3f xz_quad[3] = {
+	    m_initialTranslation + m_displayScale * kQuadOffset * (m_axes[0] + m_axes[2]),
+	    m_axes[0] * kQuatLength * m_displayScale,
+	    m_axes[2] * kQuatLength * m_displayScale};
 
 	const float axisHitRadius = 0.03f * m_displayScale;
 
@@ -77,12 +84,24 @@ GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args)
 	}
 
 	float lerp;
-	const float ditanceX = getRaySegmentDistance(args.rayWS.pos, args.rayWS.dir, vec3f(m_initialTranslation),
-	                                             m_initialTranslation + m_axes[0] * m_displayScale, &lerp);
-	const float ditanceY = getRaySegmentDistance(args.rayWS.pos, args.rayWS.dir, vec3f(m_initialTranslation),
-	                                             m_initialTranslation + m_axes[1] * m_displayScale, &lerp);
-	const float ditanceZ = getRaySegmentDistance(args.rayWS.pos, args.rayWS.dir, vec3f(m_initialTranslation),
-	                                             m_initialTranslation + m_axes[2] * m_displayScale, &lerp);
+	const float ditanceX = getRaySegmentDistance(
+	    args.rayWS.pos,
+	    args.rayWS.dir,
+	    vec3f(m_initialTranslation),
+	    m_initialTranslation + m_axes[0] * m_displayScale,
+	    &lerp);
+	const float ditanceY = getRaySegmentDistance(
+	    args.rayWS.pos,
+	    args.rayWS.dir,
+	    vec3f(m_initialTranslation),
+	    m_initialTranslation + m_axes[1] * m_displayScale,
+	    &lerp);
+	const float ditanceZ = getRaySegmentDistance(
+	    args.rayWS.pos,
+	    args.rayWS.dir,
+	    vec3f(m_initialTranslation),
+	    m_initialTranslation + m_axes[2] * m_displayScale,
+	    &lerp);
 	if (t == FLT_MAX && ditanceX <= axisHitRadius) {
 		m_hover.x = 1;
 		t = lerp;
@@ -120,19 +139,23 @@ GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args)
 		else if (m_interaction.only_xz())
 			plane.setNormal(m_axes[1]);
 		else if (m_interaction.only_x()) {
-			plane.setNormal(fabsf(dot(m_axes[1], args.rayWS.dir)) > fabsf(dot(m_axes[2], args.rayWS.dir)) ? m_axes[1] : m_axes[2]);
+			plane.setNormal(
+			    fabsf(dot(m_axes[1], args.rayWS.dir)) > fabsf(dot(m_axes[2], args.rayWS.dir)) ? m_axes[1] : m_axes[2]);
 		}
 		else if (m_interaction.only_y()) {
-			plane.setNormal(fabsf(dot(m_axes[0], args.rayWS.dir)) > fabsf(dot(m_axes[2], args.rayWS.dir)) ? m_axes[0] : m_axes[2]);
+			plane.setNormal(
+			    fabsf(dot(m_axes[0], args.rayWS.dir)) > fabsf(dot(m_axes[2], args.rayWS.dir)) ? m_axes[0] : m_axes[2]);
 		}
 		else if (m_interaction.only_z()) {
-			plane.setNormal(fabsf(dot(m_axes[0], args.rayWS.dir)) > fabsf(dot(m_axes[1], args.rayWS.dir)) ? m_axes[0] : m_axes[1]);
+			plane.setNormal(
+			    fabsf(dot(m_axes[0], args.rayWS.dir)) > fabsf(dot(m_axes[1], args.rayWS.dir)) ? m_axes[0] : m_axes[1]);
 		}
 
 		plane.setDistance(-dot(plane.norm(), m_initialTranslation));
 
 		// Intersect the rays with the plane.
-		float const tStart = -(plane.d() + dot(m_interactionStartRayWS.pos, plane.norm())) / dot(plane.norm(), m_interactionStartRayWS.dir);
+		float const tStart = -(plane.d() + dot(m_interactionStartRayWS.pos, plane.norm())) /
+		                     dot(plane.norm(), m_interactionStartRayWS.dir);
 		float const tNow = -(plane.d() + dot(args.rayWS.pos, plane.norm())) / dot(plane.norm(), args.rayWS.dir);
 
 		vec3f const ptIntersectStart = m_interactionStartRayWS.Sample(tStart);
@@ -155,18 +178,21 @@ GizmoInteractResult Gizmo3DTranslation::interact(const GizmoInteractArgs& args)
 
 		if (m_interaction.x) {
 			m_editedTranslation += m_axes[0] * xDiff;
-			m_editedTranslation.x =
-			    args.snapSets ? args.snapSets->applySnappingTranslation(m_editedTranslation.x, 0) : m_editedTranslation.x;
+			m_editedTranslation.x = args.snapSets //
+			                            ? args.snapSets->applySnappingTranslation(m_editedTranslation.x, 0)
+			                            : m_editedTranslation.x;
 		}
 		if (m_interaction.y) {
 			m_editedTranslation += m_axes[1] * yDiff;
-			m_editedTranslation.y =
-			    args.snapSets ? args.snapSets->applySnappingTranslation(m_editedTranslation.y, 1) : m_editedTranslation.y;
+			m_editedTranslation.y = args.snapSets //
+			                            ? args.snapSets->applySnappingTranslation(m_editedTranslation.y, 1)
+			                            : m_editedTranslation.y;
 		}
 		if (m_interaction.z) {
 			m_editedTranslation += m_axes[2] * zDiff;
-			m_editedTranslation.z =
-			    args.snapSets ? args.snapSets->applySnappingTranslation(m_editedTranslation.z, 2) : m_editedTranslation.z;
+			m_editedTranslation.z = args.snapSets //
+			                            ? args.snapSets->applySnappingTranslation(m_editedTranslation.z, 2)
+			                            : m_editedTranslation.z;
 		}
 
 		return GizmoInteractResult(false, false);
@@ -200,7 +226,8 @@ GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args)
 	// If we do for example the translation wont feel natural.
 	if (m_interaction.is_none()) {
 		float const distance2camera = distance(m_initialTranslation, args.rayWS.pos);
-		m_displayScale = args.customScale != 0.f ? args.customScale * m_sizeMultiplier : distance2camera * m_sizeMultiplier;
+		m_displayScale =
+		    args.customScale != 0.f ? args.customScale * m_sizeMultiplier : distance2camera * m_sizeMultiplier;
 	}
 
 	// NOTE: we assume that rayWS.pos is the camera position.
@@ -278,8 +305,8 @@ GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args)
 		const vec3f planeAxis = normalized((gizmoTransf * vec4f::getAxis(interactionAxisIdx)).xyz());
 		m_intersectionPlane = Plane::FromPosAndDir(m_initialTranslation, planeAxis);
 
-		const float t =
-		    -(m_intersectionPlane.d() + dot(args.rayWS.pos, m_intersectionPlane.norm())) / dot(m_intersectionPlane.norm(), args.rayWS.dir);
+		const float t = -(m_intersectionPlane.d() + dot(args.rayWS.pos, m_intersectionPlane.norm())) /
+		                dot(m_intersectionPlane.norm(), args.rayWS.dir);
 		m_interactionStartHitWS = args.rayWS.pos + t * args.rayWS.dir;
 
 		return GizmoInteractResult(false, false);
@@ -287,8 +314,8 @@ GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args)
 
 	if (args.is->IsKeyDown(Key_MouseLeft) && args.is->wasActiveWhilePolling() && !m_interaction.is_none()) {
 		// Pick an intersection plane and compute the intersection.
-		const float t =
-		    -(m_intersectionPlane.d() + dot(args.rayWS.pos, m_intersectionPlane.norm())) / dot(m_intersectionPlane.norm(), args.rayWS.dir);
+		const float t = -(m_intersectionPlane.d() + dot(args.rayWS.pos, m_intersectionPlane.norm())) /
+		                dot(m_intersectionPlane.norm(), args.rayWS.dir);
 		const vec3f intersectionPoint = args.rayWS.pos + args.rayWS.dir * t;
 
 		const vec3f baseDir = normalized(m_interactionStartHitWS - m_initialTranslation);
@@ -302,8 +329,8 @@ GizmoInteractResult Gizmo3DRotation::interact(const GizmoInteractArgs& args)
 
 		// Snapping.
 		if (args.snapSets && args.snapSets->rotationSnapping != 0.f) {
-			// Normalize the angle because if the we are going to make a jump between positive to negavtive angle (or vice versa)
-			// we will skip the 0 inbetween because of float->int conversion.
+			// Normalize the angle because if the we are going to make a jump between positive to negavtive angle (or
+			// vice versa) we will skip the 0 inbetween because of float->int conversion.
 			angle = normalizeAngle(angle);
 			float const n = roundf(angle / args.snapSets->rotationSnapping);
 			angle = n * args.snapSets->rotationSnapping;
@@ -343,7 +370,8 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args)
 	// If we do for example the translation wont feel natural.
 	if (m_interaction.mask == 0) {
 		float const distance2camera = distance(m_initialTranslation, args.rayWS.pos);
-		m_displayScale = args.customScale != 0.f ? args.customScale * m_sizeMultiplier : distance2camera * m_sizeMultiplier;
+		m_displayScale =
+		    args.customScale != 0.f ? args.customScale * m_sizeMultiplier : distance2camera * m_sizeMultiplier;
 	}
 
 	// NOTE: we assume that rayWS.pos is the camera position.
@@ -362,11 +390,15 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args)
 		return IntersectRayTriangle(ray, tr0) != FLT_MAX || IntersectRayTriangle(ray, tr1) != FLT_MAX;
 	};
 
-	const vec3f triScaleAll0[3] = {vec3f(0.f), kTrapezoidStart * vec3f::getAxis(1), kTrapezoidStart * vec3f::getAxis(2)};
-	const vec3f triScaleAll1[3] = {vec3f(0.f), kTrapezoidStart * vec3f::getAxis(0), kTrapezoidStart * vec3f::getAxis(2)};
-	const vec3f triScaleAll2[3] = {vec3f(0.f), kTrapezoidStart * vec3f::getAxis(0), kTrapezoidStart * vec3f::getAxis(1)};
+	const vec3f triScaleAll0[3] = {
+	    vec3f(0.f), kTrapezoidStart * vec3f::getAxis(1), kTrapezoidStart * vec3f::getAxis(2)};
+	const vec3f triScaleAll1[3] = {
+	    vec3f(0.f), kTrapezoidStart * vec3f::getAxis(0), kTrapezoidStart * vec3f::getAxis(2)};
+	const vec3f triScaleAll2[3] = {
+	    vec3f(0.f), kTrapezoidStart * vec3f::getAxis(0), kTrapezoidStart * vec3f::getAxis(1)};
 
-	bool bCollisionAllScale = IntersectRayTriangle(ray, triScaleAll0) != FLT_MAX || IntersectRayTriangle(ray, triScaleAll1) != FLT_MAX ||
+	bool bCollisionAllScale = IntersectRayTriangle(ray, triScaleAll0) != FLT_MAX ||
+	                          IntersectRayTriangle(ray, triScaleAll1) != FLT_MAX ||
 	                          IntersectRayTriangle(ray, triScaleAll2) != FLT_MAX;
 
 	m_hover.mask = 0;
@@ -430,8 +462,8 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args)
 		m_interactionPlane.setDistance(-dot(m_interactionPlane.norm(), m_initialTranslation));
 
 		// Intersec the ray with the plane.
-		float const t =
-		    -(m_interactionPlane.d() + dot(args.rayWS.pos, m_interactionPlane.norm())) / dot(m_interactionPlane.norm(), args.rayWS.dir);
+		float const t = -(m_interactionPlane.d() + dot(args.rayWS.pos, m_interactionPlane.norm())) /
+		                dot(m_interactionPlane.norm(), args.rayWS.dir);
 		vec3f const ptIntersect = args.rayWS.pos + t * args.rayWS.dir;
 
 		m_interactionStartHitWS = ptIntersect;
@@ -448,8 +480,8 @@ GizmoInteractResult Gizmo3DScale::interact(const GizmoInteractArgs& args)
 			numInteractingAxes += 1;
 
 
-		float const t =
-		    -(m_interactionPlane.d() + dot(args.rayWS.pos, m_interactionPlane.norm())) / dot(m_interactionPlane.norm(), args.rayWS.dir);
+		float const t = -(m_interactionPlane.d() + dot(args.rayWS.pos, m_interactionPlane.norm())) /
+		                dot(m_interactionPlane.norm(), args.rayWS.dir);
 		vec3f const ptIntersect = args.rayWS.pos + t * args.rayWS.dir;
 		vec3f n = ptIntersect - m_initialTranslation;
 		vec3f i = m_interactionStartHitWS - m_initialTranslation;
@@ -534,7 +566,9 @@ void Gizmo3DScaleVolume::reset(const transf3d& transform, const Box3f& bboxOs)
 
 GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args)
 {
-	handleRadiusWs = getInitialBBoxOS().getTransformed(getEditedTrasform().getSelfNoRotation().toMatrix()).size().componentMinAbs() * 0.2f;
+	handleRadiusWs =
+	    getInitialBBoxOS().getTransformed(getEditedTrasform().getSelfNoRotation().toMatrix()).size().componentMinAbs() *
+	    0.2f;
 
 	// The display scale is not used for this gizmo as it is tied to the size of the bounding box.
 	m_displayScale = 1.f;
@@ -589,24 +623,28 @@ GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args)
 		// from the ray casted by the mouse the the handle ray.
 		// the resulting point will be used as the new position of the modified face.
 		float nearestT = 0.f;
-		getRaySegmentDistance(args.rayWS.pos, args.rayWS.dir, planePosWs, planePosWs + faceNormalWs * 1000.f, &nearestT);
+		getRaySegmentDistance(
+		    args.rayWS.pos, args.rayWS.dir, planePosWs, planePosWs + faceNormalWs * 1000.f, &nearestT);
 		const vec3f hitPointOnPlaneWs = args.rayWS.Sample(nearestT);
 
-		const vec3f pointOnFaceNormalWs = planePosWs + faceNormalWs * projectPointOnLine(planePosWs, faceNormalWs, hitPointOnPlaneWs);
+		const vec3f pointOnFaceNormalWs =
+		    planePosWs + faceNormalWs * projectPointOnLine(planePosWs, faceNormalWs, hitPointOnPlaneWs);
 		const vec3f pointOnFaceNormalOs = mat_mul_pos(m_initalTransform.toMatrix().inverse(), pointOnFaceNormalWs);
 
 		// Compute the new scaling needed. Note that we ignore the rotation of the object.
-		// this is simply done because it is easier to compute the scaling (no axes as swapped or in akward angles that we would need to
-		// compansate to) and Box3f represents (as the name suggests) axis-aligned bounding.
+		// this is simply done because it is easier to compute the scaling (no axes as swapped or in akward angles that
+		// we would need to compansate to) and Box3f represents (as the name suggests) axis-aligned bounding.
 		const transf3d initalTrNoRot = m_initalTransform.getSelfNoRotation();
 		const Box3f initBoxWSNoRot = m_initalBboxOs.getTransformed(initalTrNoRot.toMatrix());
 
 		const vec3f pointOnFaceNormalWsNoRot = mat_mul_pos(initalTrNoRot.toMatrix(), pointOnFaceNormalOs);
 
 		// Compute the new location (along the picked axis in world-space-with-no-rotation).
-		float faceNewPosWsNoRot = dot(pointOnFaceNormalWsNoRot, vec3f(fabsf(faceNormalOS.x), fabsf(faceNormalOS.y), fabsf(faceNormalOS.z)));
+		float faceNewPosWsNoRot =
+		    dot(pointOnFaceNormalWsNoRot, vec3f(fabsf(faceNormalOS.x), fabsf(faceNormalOS.y), fabsf(faceNormalOS.z)));
 		if (args.snapSets) {
-			faceNewPosWsNoRot = args.snapSets->applySnappingTranslation(faceNewPosWsNoRot, m_interaction.getSingleInteractionAxis());
+			faceNewPosWsNoRot =
+			    args.snapSets->applySnappingTranslation(faceNewPosWsNoRot, m_interaction.getSingleInteractionAxis());
 		}
 
 		// Move the face of the box.
@@ -618,12 +656,13 @@ GizmoInteractResult Gizmo3DScaleVolume::interact(const GizmoInteractArgs& args)
 
 		// Compute the new translation, because we want to move only the selected face of the bounding box while,
 		// maintaining the position of the opposite face of the box. We need to also introduce translation.
-		// The translation is basically "where should the origin of the bbox in object space (which is (0,0,0)) should be after scaling.
-		// We take where, as a fraction, that origin lies in the box, and the using this fraction compute it relative to the newly scaled
-		// box.
+		// The translation is basically "where should the origin of the bbox in object space (which is (0,0,0)) should
+		// be after scaling. We take where, as a fraction, that origin lies in the box, and the using this fraction
+		// compute it relative to the newly scaled box.
 		const vec3f originFrac = (vec3f(0.f) - m_initalBboxOs.min) / m_initalBboxOs.size();
 		const vec3f newOriginWsNoRot = editedBoxWsNoRot.size() * originFrac + editedBoxWsNoRot.min;
-		const vec3f newOriginWs = quat_mul_pos(m_initalTransform.r, newOriginWsNoRot - m_initalTransform.p) + m_initalTransform.p;
+		const vec3f newOriginWs =
+		    quat_mul_pos(m_initalTransform.r, newOriginWsNoRot - m_initalTransform.p) + m_initalTransform.p;
 
 		m_editedTransform = m_initalTransform;
 		m_editedTransform.p = newOriginWs;

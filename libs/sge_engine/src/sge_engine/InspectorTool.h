@@ -23,8 +23,11 @@ struct SGE_ENGINE_API IInspectorTool {
 	virtual ~IInspectorTool() = default;
 
 	virtual void onSetActive(GameInspector* UNUSED(inspector)) {}
-	virtual InspectorToolResult
-	    updateTool(GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets) = 0;
+	virtual InspectorToolResult updateTool(
+	    GameInspector* const inspector,
+	    bool isAllowedToTakeInput,
+	    const InputState& is,
+	    const GameDrawSets& drawSets) = 0;
 	virtual void onCancel(GameInspector* inspector) = 0;
 
 	virtual void onUI(GameInspector* UNUSED(inspector)) {}

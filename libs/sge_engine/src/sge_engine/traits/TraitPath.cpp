@@ -35,12 +35,13 @@ ReflBlock() {
 }
 // clang-format on
 
-PathLengthFollow::State PathLengthFollow::compute(const float pathLength,
-                                                  const float dt,
-                                                  GameWorld* const world,
-                                                  const Settings& settings,
-                                                  const State& prevState,
-                                                  const int recursionDepth)
+PathLengthFollow::State PathLengthFollow::compute(
+    const float pathLength,
+    const float dt,
+    GameWorld* const world,
+    const Settings& settings,
+    const State& prevState,
+    const int recursionDepth)
 {
 	const int kMaxRecursions = 3;
 
@@ -161,7 +162,8 @@ ReflBlock() {
 }
 // clang-format on
 
-Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const world, const Settings& settings, const State& prevState)
+Optional<PathFollow::State>
+    PathFollow::compute(const float dt, GameWorld* const world, const Settings& settings, const State& prevState)
 {
 	TraitPath3D* const path = getTrait<TraitPath3D>(world->getActorById(settings.pathId));
 
@@ -169,7 +171,8 @@ Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const
 		return NullOptional();
 	}
 
-	PathLengthFollow::Settings plSettings = {settings.isReversed, settings.speed, settings.restingTime, settings.bounceType};
+	PathLengthFollow::Settings plSettings = {
+	    settings.isReversed, settings.speed, settings.restingTime, settings.bounceType};
 
 	PathLengthFollow::State plPrevState = {
 	    prevState.timeLeftToRest,
@@ -178,10 +181,15 @@ Optional<PathFollow::State> PathFollow::compute(const float dt, GameWorld* const
 	    prevState.speedIsPositive,
 	};
 
-	const PathLengthFollow::State newState = PathLengthFollow::compute(path->getTotalLength(), dt, world, plSettings, plPrevState);
+	const PathLengthFollow::State newState =
+	    PathLengthFollow::compute(path->getTotalLength(), dt, world, plSettings, plPrevState);
 
-	State resultState = {newState.timeLeftToRest, newState.distanceAlongPath, newState.evalDistanceAlongPath, newState.speedIsPositive,
-	                     vec3f(0.f)};
+	State resultState = {
+	    newState.timeLeftToRest,
+	    newState.distanceAlongPath,
+	    newState.evalDistanceAlongPath,
+	    newState.speedIsPositive,
+	    vec3f(0.f)};
 
 	if (path->evaluateAtDistance(&resultState.ptWs, nullptr, resultState.evalDistanceAlongPath)) {
 		mat4f const logicTransformMtx = path->getActor()->getTransformMtx();

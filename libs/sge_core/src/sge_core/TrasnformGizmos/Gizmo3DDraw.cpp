@@ -6,7 +6,11 @@
 namespace sge {
 
 // A set of colors used to specify how the gizmo is drawn.
-enum GizmoColors : unsigned { Gizmo_ActiveColor = 0xC000FFFF, Gizmo_ActiveTransp = 0xC0000000, Gizmo_BaseTransp = 0xB0000000 };
+enum GizmoColors : unsigned {
+	Gizmo_ActiveColor = 0xC000FFFF,
+	Gizmo_ActiveTransp = 0xC0000000,
+	Gizmo_BaseTransp = 0xB0000000
+};
 
 
 void drawGizmo(const RenderDestination& rdest, const Gizmo3D& gizmo, const mat4f& projView)
@@ -27,7 +31,8 @@ void drawGizmo(const RenderDestination& rdest, const Gizmo3D& gizmo, const mat4f
 
 void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslation& gizmo, const mat4f& projView)
 {
-	const mat4f world = mat4f::getTranslation(gizmo.getEditedTranslation()) * mat4f::getScaling(gizmo.getDisplayScale());
+	const mat4f world =
+	    mat4f::getTranslation(gizmo.getEditedTranslation()) * mat4f::getScaling(gizmo.getDisplayScale());
 	const mat4f pvw = projView * world;
 
 	const vec3f* const axes = gizmo.getAxes();
@@ -69,14 +74,24 @@ void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslati
 	const float quadOffset = Gizmo3DTranslation::kQuadOffset;
 	const float quadLength = Gizmo3DTranslation::kQuatLength;
 
-	addQuad(axes[1] * quadOffset + axes[2] * quadOffset, axes[1] * quadLength, axes[2] * quadLength,
-	        actionMask.only_yz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x0000ff);
-	addQuad(axes[0] * quadOffset + axes[2] * quadOffset, axes[0] * quadLength, axes[2] * quadLength,
-	        actionMask.only_xz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x00ff00);
-	addQuad(axes[0] * quadOffset + axes[1] * quadOffset, axes[0] * quadLength, axes[1] * quadLength,
-	        actionMask.only_xy() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0xff0000);
+	addQuad(
+	    axes[1] * quadOffset + axes[2] * quadOffset,
+	    axes[1] * quadLength,
+	    axes[2] * quadLength,
+	    actionMask.only_yz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x0000ff);
+	addQuad(
+	    axes[0] * quadOffset + axes[2] * quadOffset,
+	    axes[0] * quadLength,
+	    axes[2] * quadLength,
+	    actionMask.only_xz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x00ff00);
+	addQuad(
+	    axes[0] * quadOffset + axes[1] * quadOffset,
+	    axes[0] * quadLength,
+	    axes[1] * quadLength,
+	    actionMask.only_xy() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0xff0000);
 
-	getCore()->getQuickDraw().drawSolid_Execute(rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	getCore()->getQuickDraw().drawSolid_Execute(
+	    rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	return;
 }
@@ -85,7 +100,8 @@ void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslati
 void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gizmo, const mat4f& projView)
 {
 	mat4f const rotation = mat4f::getRotationQuat(gizmo.getEditedRotation());
-	mat4f const world = mat4f::getTranslation(gizmo.getInitialTranslation()) * rotation * mat4f::getScaling(gizmo.getDisplayScale());
+	mat4f const world =
+	    mat4f::getTranslation(gizmo.getInitialTranslation()) * rotation * mat4f::getScaling(gizmo.getDisplayScale());
 	mat4f const pvw = projView * world;
 
 	vec3f const lookDirWS = (gizmo.getInitialTranslation() - gizmo.getLastInteractionEyePosition()).normalized0();
@@ -113,7 +129,8 @@ void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gi
 			prevVert = circleVert;
 		}
 
-		getCore()->getQuickDraw().drawSolid_Execute(rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		getCore()->getQuickDraw().drawSolid_Execute(
+		    rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 
 	// Draw the wires.
@@ -152,15 +169,19 @@ void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gi
 
 void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, const mat4f& projView)
 {
-	const mat4f world = mat4f::getTRS(gizmo.getInitialTranslation(), gizmo.getInitalRotation(), vec3f(gizmo.getDisplayScale()));
+	const mat4f world =
+	    mat4f::getTRS(gizmo.getInitialTranslation(), gizmo.getInitalRotation(), vec3f(gizmo.getDisplayScale()));
 	const mat4f pvw = projView * world;
 
 	const GizmoActionMask actionMask = gizmo.getActionMask();
 
 	// Draw the lines for scaling along given axis.
-	getCore()->getQuickDraw().drawWiredAdd_Line(vec3f(0.f), vec3f::getAxis(0), actionMask.only_x() ? 0xff00ffff : 0xff0000ff);
-	getCore()->getQuickDraw().drawWiredAdd_Line(vec3f(0.f), vec3f::getAxis(1), actionMask.only_y() ? 0xff00ffff : 0xff00ff00);
-	getCore()->getQuickDraw().drawWiredAdd_Line(vec3f(0.f), vec3f::getAxis(2), actionMask.only_z() ? 0xff00ffff : 0xffff0000);
+	getCore()->getQuickDraw().drawWiredAdd_Line(
+	    vec3f(0.f), vec3f::getAxis(0), actionMask.only_x() ? 0xff00ffff : 0xff0000ff);
+	getCore()->getQuickDraw().drawWiredAdd_Line(
+	    vec3f(0.f), vec3f::getAxis(1), actionMask.only_y() ? 0xff00ffff : 0xff00ff00);
+	getCore()->getQuickDraw().drawWiredAdd_Line(
+	    vec3f(0.f), vec3f::getAxis(2), actionMask.only_z() ? 0xff00ffff : 0xffff0000);
 
 	getCore()->getQuickDraw().drawWired_Execute(rdest, pvw, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
@@ -173,19 +194,32 @@ void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, c
 		getCore()->getQuickDraw().drawSolidAdd_Triangle(ax1 * inner, ax1 * outter, ax0 * inner, color);
 	};
 
-	addTrapezoid(vec3f::getAxis(0), vec3f::getAxis(1), actionMask.only_xy() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0xff0000);
-	addTrapezoid(vec3f::getAxis(1), vec3f::getAxis(2), actionMask.only_yz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x0000ff);
-	addTrapezoid(vec3f::getAxis(0), vec3f::getAxis(2), actionMask.only_xz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x00ff00);
+	addTrapezoid(
+	    vec3f::getAxis(0), vec3f::getAxis(1), actionMask.only_xy() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0xff0000);
+	addTrapezoid(
+	    vec3f::getAxis(1), vec3f::getAxis(2), actionMask.only_yz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x0000ff);
+	addTrapezoid(
+	    vec3f::getAxis(0), vec3f::getAxis(2), actionMask.only_xz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x00ff00);
 
 	// Add the central triangles for drawing the scale all axes triangles.
-	getCore()->getQuickDraw().drawSolidAdd_Triangle(vec3f(0.f), 0.22f * vec3f::getAxis(1), 0.22f * vec3f::getAxis(2),
-	                                                actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00eeee : Gizmo_BaseTransp + 0xeeeeee);
-	getCore()->getQuickDraw().drawSolidAdd_Triangle(vec3f(0.f), 0.22f * vec3f::getAxis(0), 0.22f * vec3f::getAxis(2),
-	                                                actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00cccc : Gizmo_BaseTransp + 0xcccccc);
-	getCore()->getQuickDraw().drawSolidAdd_Triangle(vec3f(0.f), 0.22f * vec3f::getAxis(0), 0.22f * vec3f::getAxis(1),
-	                                                actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00bbbb : Gizmo_BaseTransp + 0xbbbbbb);
+	getCore()->getQuickDraw().drawSolidAdd_Triangle(
+	    vec3f(0.f),
+	    0.22f * vec3f::getAxis(1),
+	    0.22f * vec3f::getAxis(2),
+	    actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00eeee : Gizmo_BaseTransp + 0xeeeeee);
+	getCore()->getQuickDraw().drawSolidAdd_Triangle(
+	    vec3f(0.f),
+	    0.22f * vec3f::getAxis(0),
+	    0.22f * vec3f::getAxis(2),
+	    actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00cccc : Gizmo_BaseTransp + 0xcccccc);
+	getCore()->getQuickDraw().drawSolidAdd_Triangle(
+	    vec3f(0.f),
+	    0.22f * vec3f::getAxis(0),
+	    0.22f * vec3f::getAxis(1),
+	    actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00bbbb : Gizmo_BaseTransp + 0xbbbbbb);
 
-	getCore()->getQuickDraw().drawSolid_Execute(rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	getCore()->getQuickDraw().drawSolid_Execute(
+	    rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
 void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolume& gizmo, const mat4f& projView)
@@ -204,7 +238,12 @@ void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolu
 	const GizmoActionMask actionMask = gizmo.getActionMask();
 
 	unsigned int axisColors[signedAxis_numElements] = {
-	    0xff0000ff, 0xff00ff00, 0xffff0000, 0xff000066, 0xff006600, 0xff660000,
+	    0xff0000ff,
+	    0xff00ff00,
+	    0xffff0000,
+	    0xff000066,
+	    0xff006600,
+	    0xff660000,
 	};
 
 	unsigned int activeColor = 0xff00ffff;
@@ -217,9 +256,10 @@ void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolu
 		const vec3f e1 = quat_mul_pos(gizmo.getInitialTransform().r, vec3f::getAxis((iAxis + 1) % 3)) * handleSizeWS;
 		const vec3f e2 = quat_mul_pos(gizmo.getInitialTransform().r, vec3f::getAxis((iAxis + 2) % 3)) * handleSizeWS;
 
-		getCore()->getQuickDraw().drawSolidAdd_QuadCentered(handlePosWs, e1, e2,
-		                                                    actionMask.hasOnly(SignedAxis(iAxis)) ? activeColor : axisColors[iAxis]);
-		getCore()->getQuickDraw().drawSolid_Execute(rdest, projView, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		getCore()->getQuickDraw().drawSolidAdd_QuadCentered(
+		    handlePosWs, e1, e2, actionMask.hasOnly(SignedAxis(iAxis)) ? activeColor : axisColors[iAxis]);
+		getCore()->getQuickDraw().drawSolid_Execute(
+		    rdest, projView, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 
 	getCore()->getQuickDraw().drawWiredAdd_Box(os2ws, gizmo.getInitialBBoxOS(), 0xffffffff);

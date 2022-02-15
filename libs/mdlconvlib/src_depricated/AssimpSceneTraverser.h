@@ -21,7 +21,11 @@ namespace sge {
 // AssimpSceneParser
 //---------------------------------------------------------------------
 struct AssimpSceneParser {
-	void parse(Model* result, const aiScene* scene, const ModelParseSettings& settings, std::vector<std::string>* pReferencedTextures);
+	void parse(
+	    Model* result,
+	    const aiScene* scene,
+	    const ModelParseSettings& settings,
+	    std::vector<std::string>* pReferencedTextures);
 
   private:
 	// The ASSIMP scene parsing has been broken down in few ORDERED steps:

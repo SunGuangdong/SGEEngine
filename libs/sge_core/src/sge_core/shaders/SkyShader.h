@@ -26,7 +26,11 @@ struct SkyShaderSettings {
 
 struct SGE_CORE_API SkyShader {
 	void draw(
-	    const RenderDestination& rdest, const vec3f& cameraPosition, const mat4f view, const mat4f proj, const SkyShaderSettings& sets);
+	    const RenderDestination& rdest,
+	    const vec3f& cameraPosition,
+	    const mat4f view,
+	    const mat4f proj,
+	    const SkyShaderSettings& sets);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermut;

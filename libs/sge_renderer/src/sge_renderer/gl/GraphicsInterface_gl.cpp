@@ -70,19 +70,20 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc)
 		return false;
 	}
 
-	int attribs[] = {WGL_CONTEXT_MAJOR_VERSION_ARB,
-	                 3,
-	                 WGL_CONTEXT_MINOR_VERSION_ARB,
-	                 2,
-	                 WGL_CONTEXT_PROFILE_MASK_ARB,
-	                 WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+	int attribs[] = {
+	    WGL_CONTEXT_MAJOR_VERSION_ARB,
+	    3,
+	    WGL_CONTEXT_MINOR_VERSION_ARB,
+	    2,
+	    WGL_CONTEXT_PROFILE_MASK_ARB,
+	    WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 	#ifdef SGE_USE_DEBUG
 	//	WGL_CONTEXT_FLAGS_ARB,  WGL_CONTEXT_DEBUG_BIT_ARB,
 	#else
-	                 WGL_CONTEXT_FLAGS_ARB,
-	                 0,
+	    WGL_CONTEXT_FLAGS_ARB,
+	    0,
 	#endif
-	                 0};
+	    0};
 
 	HGLRC hrc = wglCreateContextAttribsARB(hdc, 0, attribs);
 	// HGLRC hrc = wglCreateContext(hdc);
@@ -142,7 +143,8 @@ void SGEDeviceImpl::resizeBackBuffer(int width, int height)
 {
 	m_windowFrameTargetDesc.width = width;
 	m_windowFrameTargetDesc.height = height;
-	m_screenTarget.as<FrameTargetGL>()->GL_CreateWindowFrameTarget(m_windowFrameTargetDesc.width, m_windowFrameTargetDesc.height);
+	m_screenTarget.as<FrameTargetGL>()->GL_CreateWindowFrameTarget(
+	    m_windowFrameTargetDesc.width, m_windowFrameTargetDesc.height);
 }
 
 void SGEDeviceImpl::setVsync(const bool enabled)
@@ -283,8 +285,16 @@ void SGEContextImmediate::updateTextureData(Texture* texture, const TextureData&
 		TextureFormat_GetGLNative(textureGl->getDesc().format, glInternalFormat, glFormat, glType);
 		glPixelStorei(GL_PACK_ALIGNMENT, 1);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glTexImage2D(GL_TEXTURE_2D, 0, glInternalFormat, textureGl->getDesc().texture2D.width, textureGl->getDesc().texture2D.height, 0,
-		             glFormat, glType, texData.data);
+		glTexImage2D(
+		    GL_TEXTURE_2D,
+		    0,
+		    glInternalFormat,
+		    textureGl->getDesc().texture2D.width,
+		    textureGl->getDesc().texture2D.height,
+		    0,
+		    glFormat,
+		    glType,
+		    texData.data);
 		DumpAllGLErrors();
 	}
 }
@@ -371,10 +381,8 @@ void SGEContextImmediate::unMap(Buffer* buffer)
 	DumpAllGLErrors();
 }
 
-void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
-                                          FrameTarget* frameTarget,
-                                          const Rect2s* const pViewport,
-                                          const Rect2s* const pScissorsRect)
+void SGEContextImmediate::executeDrawCall(
+    DrawCall& drawCall, FrameTarget* frameTarget, const Rect2s* const pViewport, const Rect2s* const pScissorsRect)
 {
 	StateGroup* const stateGroup = drawCall.m_pStateGroup;
 
@@ -385,7 +393,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 
 	// Vertex attributes and vertex buffers.
 	sgeAssert(stateGroup->m_shadingProg);
-	VertexMapperGL* const vertMapper = ((ShadingProgramGL*)stateGroup->m_shadingProg)->GetVertexMapper(stateGroup->m_vertDeclIndex);
+	VertexMapperGL* const vertMapper =
+	    ((ShadingProgramGL*)stateGroup->m_shadingProg)->GetVertexMapper(stateGroup->m_vertDeclIndex);
 
 	sgeAssert(vertMapper);
 	{
@@ -396,7 +405,8 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 			GLboolean attibNormalized;
 			UniformType_ToGLUniformType(glAttribLayout[t].type, attrbType, attribAirty, attibNormalized);
 
-			GLuint const buffer = ((BufferGL*)(stateGroup->m_vertexBuffers[glAttribLayout[t].bufferSlot]))->GL_GetResource();
+			GLuint const buffer =
+			    ((BufferGL*)(stateGroup->m_vertexBuffers[glAttribLayout[t].bufferSlot]))->GL_GetResource();
 			GLuint const byteOffset = glAttribLayout[t].byteOffset;
 			GLuint const stride = stateGroup->m_vbStrides[glAttribLayout[t].bufferSlot];
 
@@ -407,8 +417,15 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 				drawIndexedBaseVertexAdditionOffset = drawCall.m_drawExec.IndexedCall().startVertex * stride;
 			}
 
-			glcon->SetVertexAttribSlotState(buffer != 0, glAttribLayout[t].index, buffer, attribAirty, attrbType, attibNormalized, stride,
-			                                byteOffset + drawIndexedBaseVertexAdditionOffset);
+			glcon->SetVertexAttribSlotState(
+			    buffer != 0,
+			    glAttribLayout[t].index,
+			    buffer,
+			    attribAirty,
+			    attrbType,
+			    attibNormalized,
+			    stride,
+			    byteOffset + drawIndexedBaseVertexAdditionOffset);
 		}
 	}
 
@@ -457,15 +474,18 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 				glUniform4fv(binding.bindLocation.bindLocation, binding.bindLocation.glArraySize, (float*)boundData);
 			} break;
 			case UniformType::Float4x4: {
-				glUniformMatrix4fv(binding.bindLocation.bindLocation, binding.bindLocation.glArraySize, GL_FALSE, (float*)boundData);
+				glUniformMatrix4fv(
+				    binding.bindLocation.bindLocation, binding.bindLocation.glArraySize, GL_FALSE, (float*)boundData);
 			} break;
 			case UniformType::Float3x3: {
-				glUniformMatrix3fv(binding.bindLocation.bindLocation, binding.bindLocation.glArraySize, GL_FALSE, (float*)boundData);
+				glUniformMatrix3fv(
+				    binding.bindLocation.bindLocation, binding.bindLocation.glArraySize, GL_FALSE, (float*)boundData);
 			} break;
 			// Uniform blocks.
 			case UniformType::ConstantBuffer: {
 				sgeAssert(binding.bindLocation.glArraySize == 1);
-				glcon->BindUniformBuffer(binding.bindLocation.bindLocation, ((BufferGL*)(binding.buffer))->GL_GetResource());
+				glcon->BindUniformBuffer(
+				    binding.bindLocation.bindLocation, ((BufferGL*)(binding.buffer))->GL_GetResource());
 			} break;
 
 			// Textures.
@@ -559,8 +579,9 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 		// TODO:
 		// TODO:
 		// TODO: THERE SHOULD BE NOT INTERNAL FLIPPING OF THE UP AXIS !!!
-		// I'm not sure how to handle the differences of the rendering APIs in therms of texcoord and frame buffer origin.
-		// I've tried "flipping" the viewport and the scissors rect, it did not scale well (AGAIN I FORGOT TO WRITE WHY...)
+		// I'm not sure how to handle the differences of the rendering APIs in therms of texcoord and frame buffer
+		// origin. I've tried "flipping" the viewport and the scissors rect, it did not scale well (AGAIN I FORGOT TO
+		// WRITE WHY...)
 		if (pScissorsRect != nullptr) {
 			const bool flipY = ((FrameTargetGL*)frameTarget)->GL_IsWindowFrameBufferWrapper();
 
@@ -613,17 +634,23 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 		//	(void*)(drawCall.m_drawExec.IndexedCall().startIndex*ibFmtSizeBytes),
 		//	drawCall.m_drawExec.IndexedCall().startVertex);
 
-		glcon->DrawElements(PrimitiveTopology_GetGLNative(stateGroup->m_primTopology), drawCall.m_drawExec.IndexedCall().numIndices, glType,
-		                    (GLvoid*)(std::ptrdiff_t(drawCall.m_drawExec.IndexedCall().startIndex * ibFmtSizeBytes)),
-		                    drawCall.m_drawExec.IndexedCall().numInstances);
+		glcon->DrawElements(
+		    PrimitiveTopology_GetGLNative(stateGroup->m_primTopology),
+		    drawCall.m_drawExec.IndexedCall().numIndices,
+		    glType,
+		    (GLvoid*)(std::ptrdiff_t(drawCall.m_drawExec.IndexedCall().startIndex * ibFmtSizeBytes)),
+		    drawCall.m_drawExec.IndexedCall().numInstances);
 
-		numPrimitivesDrawn +=
-		    PrimitiveTopology::GetNumPrimitivesByPoints(stateGroup->m_primTopology, drawCall.m_drawExec.IndexedCall().numIndices) *
-		    drawCall.m_drawExec.IndexedCall().numInstances;
+		numPrimitivesDrawn += PrimitiveTopology::GetNumPrimitivesByPoints(
+		                          stateGroup->m_primTopology, drawCall.m_drawExec.IndexedCall().numIndices) *
+		                      drawCall.m_drawExec.IndexedCall().numInstances;
 	}
 	else {
-		glcon->DrawArrays(PrimitiveTopology_GetGLNative(stateGroup->m_primTopology), drawCall.m_drawExec.LinearCall().startVert,
-		                  drawCall.m_drawExec.LinearCall().numVerts, drawCall.m_drawExec.LinearCall().numInstances);
+		glcon->DrawArrays(
+		    PrimitiveTopology_GetGLNative(stateGroup->m_primTopology),
+		    drawCall.m_drawExec.LinearCall().startVert,
+		    drawCall.m_drawExec.LinearCall().numVerts,
+		    drawCall.m_drawExec.LinearCall().numInstances);
 
 		numPrimitivesDrawn += drawCall.m_drawExec.LinearCall().numInstances * drawCall.m_drawExec.LinearCall().numVerts;
 	}
@@ -633,13 +660,14 @@ void SGEContextImmediate::executeDrawCall(DrawCall& drawCall,
 }
 
 #if !defined(__EMSCRIPTEN__)
-void glDebugOutput(GLenum source,
-                   GLenum type,
-                   unsigned int id,
-                   GLenum severity,
-                   GLsizei UNUSED(length),
-                   const char* message,
-                   const void* UNUSED(userParam))
+void glDebugOutput(
+    GLenum source,
+    GLenum type,
+    unsigned int id,
+    GLenum severity,
+    GLsizei UNUSED(length),
+    const char* message,
+    const void* UNUSED(userParam))
 {
 	// ignore non-significant error/warning codes
 	// if(id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
@@ -774,8 +802,10 @@ RAIResource* SGEDeviceImpl::requestResource(const ResourceType::Enum resourceTyp
 RasterizerState* SGEDeviceImpl::requestRasterizerState(const RasterDesc& desc)
 {
 	// Search if the resource exists.
-	auto itr = std::find_if(rasterizerStateCache.begin(), rasterizerStateCache.end(),
-	                        [&desc](const RasterizerState* state) -> bool { return state->getDesc() == desc; });
+	auto itr = std::find_if(
+	    rasterizerStateCache.begin(), rasterizerStateCache.end(), [&desc](const RasterizerState* state) -> bool {
+		    return state->getDesc() == desc;
+	    });
 
 	if (itr != std::end(rasterizerStateCache)) {
 		return *itr;
@@ -797,8 +827,10 @@ RasterizerState* SGEDeviceImpl::requestRasterizerState(const RasterDesc& desc)
 DepthStencilState* SGEDeviceImpl::requestDepthStencilState(const DepthStencilDesc& desc)
 {
 	// Search if the resource exists.
-	auto itr = std::find_if(depthStencilStateCache.begin(), depthStencilStateCache.end(),
-	                        [&desc](const DepthStencilState* state) -> bool { return state->getDesc() == desc; });
+	auto itr = std::find_if(
+	    depthStencilStateCache.begin(), depthStencilStateCache.end(), [&desc](const DepthStencilState* state) -> bool {
+		    return state->getDesc() == desc;
+	    });
 
 	if (itr != std::end(depthStencilStateCache)) {
 		return *itr;
@@ -819,8 +851,9 @@ DepthStencilState* SGEDeviceImpl::requestDepthStencilState(const DepthStencilDes
 BlendState* SGEDeviceImpl::requestBlendState(const BlendStateDesc& desc)
 {
 	// Search if the resource exists.
-	auto itr = std::find_if(blendStateCache.begin(), blendStateCache.end(),
-	                        [&desc](const BlendState* state) -> bool { return state->getDesc() == desc; });
+	auto itr = std::find_if(blendStateCache.begin(), blendStateCache.end(), [&desc](const BlendState* state) -> bool {
+		return state->getDesc() == desc;
+	});
 
 	if (itr != std::end(blendStateCache)) {
 		return *itr;

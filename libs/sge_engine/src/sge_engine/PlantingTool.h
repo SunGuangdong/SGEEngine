@@ -20,10 +20,11 @@ struct SGE_ENGINE_API PlantingTool : public IInspectorTool {
 
 	void onSetActive(GameInspector* const inspector) override final;
 	void onUI(GameInspector* inspector) override final;
-	InspectorToolResult updateTool(GameInspector* const inspector,
-	                               bool isAllowedToTakeInput,
-	                               const InputState& is,
-	                               const GameDrawSets& drawSets) override final;
+	InspectorToolResult updateTool(
+	    GameInspector* const inspector,
+	    bool isAllowedToTakeInput,
+	    const InputState& is,
+	    const GameDrawSets& drawSets) override final;
 	void onCancel(GameInspector* inspector) override final;
 
 	void drawOverlay(const GameDrawSets& drawSets) override final;

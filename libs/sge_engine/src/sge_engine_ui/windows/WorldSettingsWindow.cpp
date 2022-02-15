@@ -11,7 +11,8 @@
 #include "sge_utils/text/format.h"
 
 namespace sge {
-void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+void WorldSettingsWindow::update(
+    SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
@@ -92,7 +93,8 @@ void WorldSettingsWindow::update(SGEContext* const UNUSED(sgecon), struct GameIn
 		if (ImGui::CollapsingHeader(ICON_FK_CUBES " Physics")) {
 			ImGuiEx::IndentGuard indentCollapsHeaderCotent;
 			ImGuiEx::Label("Number of Physics Steps per Frame");
-			ImGui::DragInt("##SPFPhysics", &world->m_physicsSimNumSubSteps, 0.1f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
+			ImGui::DragInt(
+			    "##SPFPhysics", &world->m_physicsSimNumSubSteps, 0.1f, 1, 100, "%d", ImGuiSliderFlags_AlwaysClamp);
 
 			ImGuiEx::Label("Default Gravity");
 			if (ImGui::DragFloat3("##gravityDrag", world->m_defaultGravity.data)) {

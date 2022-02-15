@@ -173,7 +173,8 @@ void TraitModel::getRenderItems(DrawReason drawReason, std::vector<GeometryRende
 						GeometryRenderItem ri;
 						ri.geometry = &meshInst.geometry;
 						ri.pMtlData = imtlData;
-						ri.worldTransform = actor2world * modelSets.m_additionalTransform * meshInst.modelSpaceTransform;
+						ri.worldTransform =
+						    actor2world * modelSets.m_additionalTransform * meshInst.modelSpaceTransform;
 						ri.bboxWs = meshInst.modelSpaceBBox.getTransformed(ri.worldTransform);
 
 						ri.zSortingPositionWs = mat_mul_pos(ri.worldTransform, meshInst.modelSpaceBBox.center());
@@ -241,7 +242,8 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 
 				// Material overrides interface.
 				// TODO: Add undo/redo command history.
-				AssetIface_Model3D* loadedModelIface = modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
+				AssetIface_Model3D* loadedModelIface =
+				    modelSets.m_assetProperty.getAssetInterface<AssetIface_Model3D>();
 				if (loadedModelIface) {
 					// Now do the UI for each available material slot.
 					modelSets.mtlOverrides.resize(loadedModelIface->getModel3D()->numMaterials());
@@ -257,10 +259,12 @@ void editUI_for_TraitModel(GameInspector& inspector, GameObject* actor, MemberCh
 							AssetPtr currentAsset = std::dynamic_pointer_cast<Asset>(modelSets.mtlOverrides[iMtl]);
 
 							if (currentAsset == nullptr) {
-								ImGui::Text(ICON_FK_EXCLAMATION_TRIANGLE " %s has non-asset attached!", mtl->name.c_str());
+								ImGui::Text(
+								    ICON_FK_EXCLAMATION_TRIANGLE " %s has non-asset attached!", mtl->name.c_str());
 							}
 							if (assetPicker(mtl->name.c_str(), currentAsset, getCore()->getAssetLib(), types, 1)) {
-								modelSets.mtlOverrides[iMtl] = std::dynamic_pointer_cast<AssetIface_Material>(currentAsset);
+								modelSets.mtlOverrides[iMtl] =
+								    std::dynamic_pointer_cast<AssetIface_Material>(currentAsset);
 							}
 						}
 					}

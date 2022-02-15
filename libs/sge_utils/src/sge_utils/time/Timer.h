@@ -28,7 +28,8 @@ struct Timer {
 	// Returns the current time since the application start in seconds.
 	static float now_seconds()
 	{
-		return std::chrono::duration_cast<std::chrono::microseconds>(clock::now() - application_start_time).count() * 1e-6f;
+		return std::chrono::duration_cast<std::chrono::microseconds>(clock::now() - application_start_time).count() *
+		       1e-6f;
 	}
 
 	static float currentPointTimeSeconds()

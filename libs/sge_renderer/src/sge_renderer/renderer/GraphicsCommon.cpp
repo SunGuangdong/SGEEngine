@@ -362,8 +362,9 @@ std::vector<VertexDecl> VertexDecl::NormalizeDecl(const VertexDecl* pDecl, const
 //-------------------------------------------------------------------
 bool BlendDesc::operator==(const BlendDesc& other) const
 {
-	return enabled == other.enabled && srcBlend == other.srcBlend && destBlend == other.destBlend && blendOp == other.blendOp &&
-	       alphaSrcBlend == other.alphaSrcBlend && alphaDestBlend == other.alphaDestBlend && alphaBlendOp == other.alphaBlendOp;
+	return enabled == other.enabled && srcBlend == other.srcBlend && destBlend == other.destBlend &&
+	       blendOp == other.blendOp && alphaSrcBlend == other.alphaSrcBlend && alphaDestBlend == other.alphaDestBlend &&
+	       alphaBlendOp == other.alphaBlendOp;
 }
 
 bool BlendDesc::operator!=(const BlendDesc& other) const

@@ -40,10 +40,11 @@ struct BindLocation {
 	}
 
 #ifdef SGE_RENDERER_D3D11
-	BindLocation(ShaderType::Enum shaderFreq,
-	             short bindLocation,
-	             short const uniformType,
-	             short const texArraySize_or_numericUniformSizeBytes = 0)
+	BindLocation(
+	    ShaderType::Enum shaderFreq,
+	    short bindLocation,
+	    short const uniformType,
+	    short const texArraySize_or_numericUniformSizeBytes = 0)
 	{
 		raw = 0;
 		this->shaderFreq = short(shaderFreq);
@@ -159,8 +160,9 @@ struct TextureRefl {
 	int d3d11_bindingSlot = -1;
 #elif defined(SGE_RENDERER_GL)
 	int gl_bindLocation = -1;
-	int gl_bindUnit = 0;               // should be used this way: "GL_TEXTURE0 + gl_bindUnit"
-	unsigned int gl_textureTarget = 0; // Reqired target of the texture, see GLUniformTypeToTextureType for more details.
+	int gl_bindUnit = 0; // should be used this way: "GL_TEXTURE0 + gl_bindUnit"
+	unsigned int gl_textureTarget =
+	    0; // Reqired target of the texture, see GLUniformTypeToTextureType for more details.
 #endif
 	int arraySize = 0; // This value must be > 0 in order for the reflection to be valid.
 	UniformType::Enum textureType = UniformType::Unknown;

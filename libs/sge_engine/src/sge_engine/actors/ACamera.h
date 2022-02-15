@@ -29,7 +29,8 @@ struct PerspectiveCameraSettings {
 				w = h * aspect;
 			}
 
-			return mat4f::getOrthoRH(-w, w, h + heightShift, -h + heightShift, nearPlane, farPlane, kIsTexcoordStyleD3D);
+			return mat4f::getOrthoRH(
+			    -w, w, h + heightShift, -h + heightShift, nearPlane, farPlane, kIsTexcoordStyleD3D);
 		}
 
 		return mat4f::getPerspectiveFovRH(fov, aspect, nearPlane, farPlane, heightShift, kIsTexcoordStyleD3D);

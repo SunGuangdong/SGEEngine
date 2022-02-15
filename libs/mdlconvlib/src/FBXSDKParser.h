@@ -22,22 +22,24 @@ bool InitializeFBXSDK();
 struct FBXSDKParser {
 	/// Prases the input FBX scene and produces a ready to save SGE model.
 	/// For more details see the comments @sgeImportFBXFileFn @sgeImportFBXFileAsMultipleFn, this is called by them.
-	/// @param [in] enforcedRootNode is the node to be used as a root node insted of the actual one, if null, the regular root is going to
-	/// be used.
+	/// @param [in] enforcedRootNode is the node to be used as a root node insted of the actual one, if null, the
+	/// regular root is going to be used.
 	/// @param [in] materialsPrefix is needed when additional assets should get imported alongside the model.
 	///             These are materials for example. Usually passing the fbx file filename is enough.
-	bool parse(Model* result,
-	           ModelImportAdditionalResult& additionalResult,
-	           std::string& materialsPrefix,
-	           fbxsdk::FbxScene* scene,
-	           FbxNode* enforcedRootNode,
-	           const ModelParseSettings& parseSettings);
+	bool parse(
+	    Model* result,
+	    ModelImportAdditionalResult& additionalResult,
+	    std::string& materialsPrefix,
+	    fbxsdk::FbxScene* scene,
+	    FbxNode* enforcedRootNode,
+	    const ModelParseSettings& parseSettings);
 
   private:
 	/// Step 1:
 	/// Find the nodes that need to be imported their models/materials that
 	/// needs to be parsed because they are attached to the node.
-	/// in the result model we only allocate the nodes, but we do not actually fill their data (child nodes, attachments and so on).
+	/// in the result model we only allocate the nodes, but we do not actually fill their data (child nodes, attachments
+	/// and so on).
 	int discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode);
 
 	/// Step 2:

@@ -81,8 +81,8 @@ JsonValue* SimpleTriplanarMtl::toJson(JsonValueBuffer& jvb, const char* localDir
 	jMaterial->setMember("ignoreTranslation", jvb(ignoreTranslation));
 
 
-	auto setMemberFromTexIface = [&jvb, &jMaterial, &localDir](const char* memberName,
-	                                                           std::shared_ptr<AssetIface_Texture2D>& texIface) -> void {
+	auto setMemberFromTexIface =
+	    [&jvb, &jMaterial, &localDir](const char* memberName, std::shared_ptr<AssetIface_Texture2D>& texIface) -> void {
 		sgeAssert(memberName);
 		if (texIface) {
 			AssetPtr asset = std::dynamic_pointer_cast<Asset>(texIface);
@@ -129,19 +129,19 @@ bool SimpleTriplanarMtl::fromJson(const JsonValue* jMaterial, const char* localD
 	}
 
 	if (const JsonValue* jTex = jMaterial->getMember("texDiffuseX")) {
-		texDiffuseX =
-		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
+		texDiffuseX = std::dynamic_pointer_cast<AssetIface_Texture2D>(
+		    getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 	if (const JsonValue* jTex = jMaterial->getMember("texDiffuseY")) {
-		texDiffuseY =
-		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
+		texDiffuseY = std::dynamic_pointer_cast<AssetIface_Texture2D>(
+		    getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 
 	if (const JsonValue* jTex = jMaterial->getMember("texDiffuseZ")) {
-		texDiffuseZ =
-		    std::dynamic_pointer_cast<AssetIface_Texture2D>(getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
+		texDiffuseZ = std::dynamic_pointer_cast<AssetIface_Texture2D>(
+		    getCore()->getAssetLib()->getAssetFromFile(jTex->GetString(), localDir));
 	}
 
 

@@ -99,7 +99,8 @@ struct AKnight : public Actor {
 
 		// Move the attached sword to the parm of the actor.
 		if (palmMeshNodeIndex >= 0) {
-			ttModel.m_models[1].m_additionalTransform = ttModel.m_models[0].m_additionalTransform * bones[palmMeshNodeIndex];
+			ttModel.m_models[1].m_additionalTransform =
+			    ttModel.m_models[0].m_additionalTransform * bones[palmMeshNodeIndex];
 		}
 
 		// Set the skinning for the character model.

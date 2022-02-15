@@ -250,7 +250,8 @@ void GameInspector::deleteSelection(bool const deleteHierarchyUnderSelectedObjec
 			Actor* actor = dynamic_cast<Actor*>(itr.first);
 			InspectorCmd* cmd = nullptr;
 			if (actor) {
-				cmd = actor->generateDeleteItemCmd(this, itr.second.data(), itr.second.size(), deleteHierarchyUnderSelectedObjects);
+				cmd = actor->generateDeleteItemCmd(
+				    this, itr.second.data(), itr.second.size(), deleteHierarchyUnderSelectedObjects);
 			}
 			else {
 				CmdObjectDeletion* cmdDel = new CmdObjectDeletion;

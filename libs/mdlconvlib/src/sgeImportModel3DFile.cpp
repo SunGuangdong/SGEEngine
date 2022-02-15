@@ -39,7 +39,8 @@ enum : unsigned {
 	// clang-format on
 };
 
-bool withAssimp_sgeImportModel3DFile(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
+bool withAssimp_sgeImportModel3DFile(
+    sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
 {
 	Assimp::Importer importer;
 	const aiScene* asmpScene = importer.ReadFile(fbxFilename, sgeAssimpImportFlags);
@@ -54,13 +55,13 @@ bool withAssimp_sgeImportModel3DFile(sge::Model& result, ModelImportAdditionalRe
 	std::string materialsAssetsNamePrefix = extractFileNameNoExt(fbxFilename);
 
 	AssimpImporter ourAssimpImporter;
-	bool success = ourAssimpImporter.parse(&result, additionalResult, materialsAssetsNamePrefix, asmpScene, nullptr, mps);
+	bool success =
+	    ourAssimpImporter.parse(&result, additionalResult, materialsAssetsNamePrefix, asmpScene, nullptr, mps);
 	return success;
 }
 
-bool withAssimp_sgeImportModel3DFileAsMultiple(std::vector<MultiModelImportResult>& result,
-                                               ModelImportAdditionalResult& additionalResult,
-                                               const char* fbxFilename)
+bool withAssimp_sgeImportModel3DFileAsMultiple(
+    std::vector<MultiModelImportResult>& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
 {
 	Assimp::Importer importer;
 	const aiScene* asmpScene = importer.ReadFile(fbxFilename, sgeAssimpImportFlags);
@@ -82,13 +83,14 @@ bool withAssimp_sgeImportModel3DFileAsMultiple(std::vector<MultiModelImportResul
 		const aiNode* asmpChildNode = asmpScene->mRootNode->mChildren[iChild];
 
 		AssimpImporter ourAssimpImporter;
-		bool success =
-		    ourAssimpImporter.parse(&result[iChild].importedModel, additionalResult, materialsAssetsNamePrefix, asmpScene, nullptr, mps);
+		bool success = ourAssimpImporter.parse(
+		    &result[iChild].importedModel, additionalResult, materialsAssetsNamePrefix, asmpScene, nullptr, mps);
 
 		if (success) {
 			// Append the name of the node in the result.
 			const std::string newExt = string_format("%s.mdl", asmpChildNode->mName.C_Str());
-			const std::string newOutName = extractFileNameWithExt(replaceExtension(fbxFilename, newExt.c_str()).c_str());
+			const std::string newOutName =
+			    extractFileNameWithExt(replaceExtension(fbxFilename, newExt.c_str()).c_str());
 
 			result[iChild].propsedFilename = newOutName;
 		}
@@ -104,7 +106,8 @@ bool withAssimp_sgeImportModel3DFileAsMultiple(std::vector<MultiModelImportResul
 // FBX SDK Import
 //-----------------------------------------------------------------------
 #ifdef SGE_FBX_SDK_AVAILABLE
-bool withFbxSdk_sgeImportModel3DFile(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
+bool withFbxSdk_sgeImportModel3DFile(
+    sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
 {
 	static fbxsdk::FbxManager* const fbxMngr = fbxsdk::FbxManager::Create();
 	FbxImporter* const fbxImporter = FbxImporter::Create(fbxMngr, ""); // todo: do we need a name here?
@@ -133,9 +136,8 @@ bool withFbxSdk_sgeImportModel3DFile(sge::Model& result, ModelImportAdditionalRe
 	return true;
 }
 
-bool withFbxSdk_sgeImportModel3DFileAsMultiple(std::vector<MultiModelImportResult>& result,
-                                               ModelImportAdditionalResult& additionalResult,
-                                               const char* fbxFilename)
+bool withFbxSdk_sgeImportModel3DFileAsMultiple(
+    std::vector<MultiModelImportResult>& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
 {
 	static fbxsdk::FbxManager* const fbxMngr = fbxsdk::FbxManager::Create();
 	FbxImporter* const fbxImporter = FbxImporter::Create(fbxMngr, ""); // todo: do we need a name here?
@@ -171,7 +173,8 @@ bool withFbxSdk_sgeImportModel3DFileAsMultiple(std::vector<MultiModelImportResul
 
 		FBXSDKParser fbxsdkParser;
 
-		if (fbxsdkParser.parse(&result[t].importedModel, additionalResult, materialsAssetsNamePrefix, fbxScene, fbxChild, mps)) {
+		if (fbxsdkParser.parse(
+		        &result[t].importedModel, additionalResult, materialsAssetsNamePrefix, fbxScene, fbxChild, mps)) {
 			result[t].propsedFilename = newOutName;
 		}
 		else {
@@ -187,7 +190,8 @@ bool withFbxSdk_sgeImportModel3DFileAsMultiple(std::vector<MultiModelImportResul
 // The DLL exported public functions for exporting.
 //-----------------------------------------------------------------------
 extern "C" {
-SGE_MDLCONVLIB_API bool sgeImportModel3DFile(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
+SGE_MDLCONVLIB_API bool
+    sgeImportModel3DFile(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
 {
 	// Ensure that the typedef we provide in the header matches the actual function type.
 	static_assert(std::is_same<decltype(&sgeImportModel3DFile), sgeImportModel3DFileFn>::value);
@@ -204,9 +208,8 @@ SGE_MDLCONVLIB_API bool sgeImportModel3DFile(sge::Model& result, ModelImportAddi
 	return withAssimp_sgeImportModel3DFile(result, additionalResult, fbxFilename);
 }
 
-SGE_MDLCONVLIB_API bool sgeImportModel3DFileAsMultiple(std::vector<MultiModelImportResult>& result,
-                                                       ModelImportAdditionalResult& additionalResult,
-                                                       const char* fbxFilename)
+SGE_MDLCONVLIB_API bool sgeImportModel3DFileAsMultiple(
+    std::vector<MultiModelImportResult>& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename)
 {
 	// Ensure that the typedef we provide in the header matches the actual function type.
 	static_assert(std::is_same<decltype(&sgeImportModel3DFileAsMultiple), sgeImportModel3DFileAsMultipleFn>::value);

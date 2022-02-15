@@ -14,7 +14,8 @@ void ResourceUsage_D3D11_Native(ResourceUsage::Enum type, D3D11_USAGE& usage, UI
 
 D3D11_MAP Map_D3D11_Native(const Map::Enum map);
 
-void TextureFormat_D3D11_Native(const TextureFormat::Enum format, DXGI_FORMAT& srv, DXGI_FORMAT& dsv, DXGI_FORMAT& typeless);
+void TextureFormat_D3D11_Native(
+    const TextureFormat::Enum format, DXGI_FORMAT& srv, DXGI_FORMAT& dsv, DXGI_FORMAT& typeless);
 
 D3D11_SUBRESOURCE_DATA TextureData_D3D11_Native(const TextureData& texData);
 

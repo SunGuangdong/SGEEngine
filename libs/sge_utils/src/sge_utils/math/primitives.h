@@ -244,7 +244,8 @@ inline float getLineDistance(const vec3f& o1, const vec3f& d1, const vec3f& o2, 
 }
 
 // https://en.wikipedia.org/wiki/Skew_lines
-inline float getRaySegmentDistance(const vec3f& o1, const vec3f& d1, const vec3f& a, const vec3f& b, float* pRayLerp = nullptr)
+inline float
+    getRaySegmentDistance(const vec3f& o1, const vec3f& d1, const vec3f& a, const vec3f& b, float* pRayLerp = nullptr)
 {
 	const vec3f d2 = b - a;
 

@@ -17,7 +17,8 @@ struct TextureD3D11 : public Texture {
 	// arrayElem0(mip0, mip1, mip2, ...)
 	// arrayElem1(mip0, mip1, mip2, ...)
 	// arrayElem2(mip0, mip1, mip2, ...)
-	bool create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc samplerDesc = SamplerDesc()) final;
+	bool create(
+	    const TextureDesc& desc, const TextureData initalData[], const SamplerDesc samplerDesc = SamplerDesc()) final;
 
 	virtual void destroy() final;
 	virtual bool isValid() const final;
@@ -39,7 +40,8 @@ struct TextureD3D11 : public Texture {
 	//[TODO] add DSV get form Texture3D TextureCube ect..
 	ID3D11DepthStencilView* D3D11_GetDSV(const TargetDesc& targetDesc);
 
-	bool D3D11_WrapOverD3D11TextureResource(SGEDevice* pDevice, ID3D11Texture2D* d3d11Texture2D, const TextureDesc& desc);
+	bool D3D11_WrapOverD3D11TextureResource(
+	    SGEDevice* pDevice, ID3D11Texture2D* d3d11Texture2D, const TextureDesc& desc);
 
   private:
 	TextureDesc m_desc;

@@ -226,8 +226,8 @@ inline bool doesOverlap1D(const T& min0, const T& max0, const T& min1, const T& 
 	return minOf(max0, max1) > maxOf(min0, min1);
 }
 
-/// Returns in @outMin and @outMax the overlapping segment of the two input segments defined by (@min0, @max0) and (@min1, @max1).
-/// if @outMin > @outMax then there is no overlap.
+/// Returns in @outMin and @outMax the overlapping segment of the two input segments defined by (@min0, @max0) and
+/// (@min1, @max1). if @outMin > @outMax then there is no overlap.
 template <typename T>
 inline void overlapSegment1D(const T& min0, const T& max0, const T& min1, const T& max1, T& outMin, T& outMax)
 {

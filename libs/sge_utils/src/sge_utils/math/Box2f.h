@@ -74,7 +74,10 @@ struct Box2f {
 		max = vec2f(std::numeric_limits<float>::lowest());
 	}
 
-	bool IsEmpty() const { return min == vec2f(std::numeric_limits<float>::max()) && max == vec2f(std::numeric_limits<float>::lowest()); }
+	bool IsEmpty() const
+	{
+		return min == vec2f(std::numeric_limits<float>::max()) && max == vec2f(std::numeric_limits<float>::lowest());
+	}
 
 	void expand(const vec2f& point)
 	{
@@ -108,8 +111,8 @@ struct Box2f {
 
 	bool isInside(const vec2f& point) const
 	{
-		bool res =
-		    point.data[0] >= min.data[0] && point.data[0] <= max.data[0] && point.data[1] >= min.data[1] && point.data[1] <= max.data[1];
+		bool res = point.data[0] >= min.data[0] && point.data[0] <= max.data[0] && point.data[1] >= min.data[1] &&
+		           point.data[1] <= max.data[1];
 
 		return res;
 	}

@@ -139,10 +139,8 @@ bool DebugFont::Create(SGEDevice* sgedev, const char* const ttfFilename, float h
 	return false;
 }
 
-bool DebugFont::createFromFileData(SGEDevice* sgedev,
-                                   const unsigned char* const ttfFileData,
-                                   size_t UNUSED(ttfFileDataSizeBytes),
-                                   float heightPixels)
+bool DebugFont::createFromFileData(
+    SGEDevice* sgedev, const unsigned char* const ttfFileData, size_t UNUSED(ttfFileDataSizeBytes), float heightPixels)
 {
 	// Cache the font height.
 	height = heightPixels;
@@ -154,8 +152,16 @@ bool DebugFont::createFromFileData(SGEDevice* sgedev,
 
 	// [TODO] Find a way to pass a correct value for the "offset" argument
 	// currently this is wrong and may crash!
-	if (stbtt_BakeFontBitmap((unsigned char*)ttfFileData, 0, (float)heightPixels, textureData.data(), kTextureDim, kTextureDim, 0, 255,
-	                         cdata) < 0) {
+	if (stbtt_BakeFontBitmap(
+	        (unsigned char*)ttfFileData,
+	        0,
+	        (float)heightPixels,
+	        textureData.data(),
+	        kTextureDim,
+	        kTextureDim,
+	        0,
+	        255,
+	        cdata) < 0) {
 		Destroy();
 		return false;
 	}
@@ -323,8 +329,8 @@ void QuickDraw::initalize2DDrawResources(SGEContext* context)
 
 	// Create the vertex buffer for the text rendering.
 	m_textDrawing.vb = sgedev->requestResource<Buffer>();
-	const BufferDesc vbdText =
-	    BufferDesc::GetDefaultVertexBuffer(2048 * 6 * sizeof(Vertex2D), ResourceUsage::Dynamic); // 256 characters cache.
+	const BufferDesc vbdText = BufferDesc::GetDefaultVertexBuffer(
+	    2048 * 6 * sizeof(Vertex2D), ResourceUsage::Dynamic); // 256 characters cache.
 	m_textDrawing.vb->create(vbdText, NULL);
 
 	// Create the shading programs.
@@ -336,7 +342,8 @@ void QuickDraw::initalize2DDrawResources(SGEContext* context)
 	m_effect2DTextured->createFromCustomHLSL(effect2DTexturedCode.c_str(), effect2DTexturedCode.c_str());
 
 	m_effect2DText = sgedev->requestResource<ShadingProgram>();
-	const std::string effect2DTextCode = std::string("#define COLOR_TEXTURE\n#define COLOR_TEXTURE_TEXT_MODE\n") + EFFECT_2D_UBERSHADER;
+	const std::string effect2DTextCode =
+	    std::string("#define COLOR_TEXTURE\n#define COLOR_TEXTURE_TEXT_MODE\n") + EFFECT_2D_UBERSHADER;
 	m_effect2DText->createFromCustomHLSL(effect2DTextCode.c_str(), effect2DTextCode.c_str());
 
 	rsDefault = sgedev->requestResource<RasterizerState>();
@@ -382,7 +389,8 @@ void QuickDraw::initalize3DDrawResources(SGEContext* context)
 	m_effect3DVertexColored->createFromCustomHLSL(EFFECT_3D_VERTEX_COLOR, EFFECT_3D_VERTEX_COLOR);
 
 	m_vb3d = sgedev->requestResource<Buffer>();
-	m_vb3d->create(BufferDesc::GetDefaultVertexBuffer(VB_MAX_TRI_CNT * 3 * sizeof(vec3f), ResourceUsage::Dynamic), NULL);
+	m_vb3d->create(
+	    BufferDesc::GetDefaultVertexBuffer(VB_MAX_TRI_CNT * 3 * sizeof(vec3f), ResourceUsage::Dynamic), NULL);
 
 	m_vbSphere = sgedev->requestResource<Buffer>();
 	m_vbSphereNumPoints = GeomGen::sphere(m_vbSphere, 32, 32);
@@ -394,11 +402,13 @@ void QuickDraw::initalize3DDrawResources(SGEContext* context)
 	const int wiredVertexBufferSizeBytes = 65534 * sizeof(GeomGen::PosColorVert); // Around 1MB.
 
 	m_vbWiredGeometry = sgedev->requestResource<Buffer>();
-	const BufferDesc vbdWiredGeom = BufferDesc::GetDefaultVertexBuffer(wiredVertexBufferSizeBytes, ResourceUsage::Dynamic);
+	const BufferDesc vbdWiredGeom =
+	    BufferDesc::GetDefaultVertexBuffer(wiredVertexBufferSizeBytes, ResourceUsage::Dynamic);
 	m_vbWiredGeometry->create(vbdWiredGeom, NULL);
 
 	m_vbSolidColorGeometry = sgedev->requestResource<Buffer>();
-	const BufferDesc vbdSolidGeom = BufferDesc::GetDefaultVertexBuffer(wiredVertexBufferSizeBytes, ResourceUsage::Dynamic);
+	const BufferDesc vbdSolidGeom =
+	    BufferDesc::GetDefaultVertexBuffer(wiredVertexBufferSizeBytes, ResourceUsage::Dynamic);
 	m_vbSolidColorGeometry->create(vbdSolidGeom, NULL);
 
 	// Vertex Declaration
@@ -413,22 +423,31 @@ void QuickDraw::initalize3DDrawResources(SGEContext* context)
 	    {0, "a_color", UniformType::Int_RGBA_Unorm_IA, 12},
 	};
 
-	vertexDeclIndex_pos3d_rgba_int = sgedev->getVertexDeclIndex(vtxDecl_pos3d_rgba_int, SGE_ARRSZ(vtxDecl_pos3d_rgba_int));
+	vertexDeclIndex_pos3d_rgba_int =
+	    sgedev->getVertexDeclIndex(vtxDecl_pos3d_rgba_int, SGE_ARRSZ(vtxDecl_pos3d_rgba_int));
 }
 
-void QuickDraw::drawRect(const RenderDestination& rdest, const Box2f& boxPixels, const vec4f& rgba, BlendState* blendState)
+void QuickDraw::drawRect(
+    const RenderDestination& rdest, const Box2f& boxPixels, const vec4f& rgba, BlendState* blendState)
 {
 	const vec2f boxSize = boxPixels.size();
 	drawRect(rdest, boxPixels.min.x, boxPixels.min.y, boxSize.x, boxSize.y, rgba, blendState);
 }
 
 void QuickDraw::drawRect(
-    const RenderDestination& rdest, float xPixels, float yPixels, float width, float height, const vec4f& rgba, BlendState* blendState)
+    const RenderDestination& rdest,
+    float xPixels,
+    float yPixels,
+    float width,
+    float height,
+    const vec4f& rgba,
+    BlendState* blendState)
 {
 	const mat4f sizeScaling = mat4f::getScaling(width / 2.f, height / 2.f, 1.f);
 	const mat4f transl = mat4f::getTranslation(xPixels + width / 2.f, yPixels + height / 2.f, 0.f);
 	const mat4f world = transl * sizeScaling;
-	const mat4f ortho = mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
+	const mat4f ortho =
+	    mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
 	const mat4f transf = ortho * world;
 	float alphaMult = 1.f;
 
@@ -462,7 +481,8 @@ void QuickDraw::drawTriLeft(
 	const mat4f sizeScaling = mat4f::getScaling(size.x / 2.f, size.y / 2.f, 1.f);
 	const mat4f transl = mat4f::getTranslation(boxPixels.min.x + size.x / 2.f, boxPixels.min.y + size.y / 2.f, 0.f);
 	const mat4f world = transl * mat4f::getRotationZ(rotation) * sizeScaling;
-	const mat4f ortho = mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
+	const mat4f ortho =
+	    mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
 	const mat4f transf = ortho * world;
 	float alphaMult = 1.f;
 
@@ -488,16 +508,17 @@ void QuickDraw::drawTriLeft(
 	rdest.executeDrawCall(dc);
 }
 
-void QuickDraw::drawRectTexture(const RenderDestination& rdest,
-                                float xPixels,
-                                float yPixels,
-                                float width,
-                                float height,
-                                Texture* texture,
-                                BlendState* blendState,
-                                vec2f topUV,
-                                vec2f bottomUV,
-                                float alphaMult)
+void QuickDraw::drawRectTexture(
+    const RenderDestination& rdest,
+    float xPixels,
+    float yPixels,
+    float width,
+    float height,
+    Texture* texture,
+    BlendState* blendState,
+    vec2f topUV,
+    vec2f bottomUV,
+    float alphaMult)
 {
 	if (texture && !texture->isValid()) {
 		return;
@@ -508,7 +529,8 @@ void QuickDraw::drawRectTexture(const RenderDestination& rdest,
 	const mat4f sizeScaling = mat4f::getScaling(width / 2.f, height / 2.f, 1.f);
 	const mat4f transl = mat4f::getTranslation(xPixels + width / 2.f, yPixels + height / 2.f, 0.f);
 	const mat4f world = transl * sizeScaling;
-	const mat4f ortho = mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
+	const mat4f ortho =
+	    mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
 	const mat4f transf = ortho * world;
 
 	stateGroup.setRenderState(rsDefault, dssLessEqual, blendState);
@@ -534,27 +556,30 @@ void QuickDraw::drawRectTexture(const RenderDestination& rdest,
 	rdest.sgecon->executeDrawCall(dc, rdest.frameTarget, &rdest.viewport);
 }
 
-void QuickDraw::drawRectTexture(const RenderDestination& rdest,
-                                const Box2f& boxPixels,
-                                Texture* texture,
-                                BlendState* blendState,
-                                vec2f topUV,
-                                vec2f bottomUV,
-                                float alphaMult)
+void QuickDraw::drawRectTexture(
+    const RenderDestination& rdest,
+    const Box2f& boxPixels,
+    Texture* texture,
+    BlendState* blendState,
+    vec2f topUV,
+    vec2f bottomUV,
+    float alphaMult)
 {
 	vec2f size = boxPixels.size();
-	drawRectTexture(rdest, boxPixels.min.x, boxPixels.min.y, size.x, size.y, texture, blendState, topUV, bottomUV, alphaMult);
+	drawRectTexture(
+	    rdest, boxPixels.min.x, boxPixels.min.y, size.x, size.y, texture, blendState, topUV, bottomUV, alphaMult);
 }
 
-void QuickDraw::drawTexture(const RenderDestination& rdest,
-                            float xPixels,
-                            float yPixels,
-                            float width,
-                            Texture* texture,
-                            BlendState* blendState,
-                            vec2f topUV,
-                            vec2f bottomUV,
-                            float alphaMult)
+void QuickDraw::drawTexture(
+    const RenderDestination& rdest,
+    float xPixels,
+    float yPixels,
+    float width,
+    Texture* texture,
+    BlendState* blendState,
+    vec2f topUV,
+    vec2f bottomUV,
+    float alphaMult)
 {
 	if (!texture || !texture->isValid()) {
 		return;
@@ -576,13 +601,14 @@ void QuickDraw::drawTexture(const RenderDestination& rdest,
 	drawRectTexture(rdest, xPixels, yPixels, width, height, texture, blendState, topUV, bottomUV, alphaMult);
 }
 
-void QuickDraw::drawTextLazy(const RenderDestination& rdest,
-                             DebugFont& font,
-                             vec2f posPixels,
-                             const vec4f& rgba,
-                             const char* text,
-                             float height,
-                             const Rect2s* scissors)
+void QuickDraw::drawTextLazy(
+    const RenderDestination& rdest,
+    DebugFont& font,
+    vec2f posPixels,
+    const vec4f& rgba,
+    const char* text,
+    float height,
+    const Rect2s* scissors)
 {
 	float alphaMult = 1.f;
 
@@ -594,7 +620,8 @@ void QuickDraw::drawTextLazy(const RenderDestination& rdest,
 	stateGroup.setVBDeclIndex(vertexDeclIndex_pos2d_uv);
 	stateGroup.setPrimitiveTopology(PrimitiveTopology::TriangleList);
 
-	const mat4f ortho = mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
+	const mat4f ortho =
+	    mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
 
 	const float textureWidth = (float)font.texture->getDesc().texture2D.width;
 	const float textureHeight = (float)font.texture->getDesc().texture2D.height;
@@ -632,11 +659,13 @@ void QuickDraw::drawTextLazy(const RenderDestination& rdest,
 
 			const mat4f transf = ortho * world;
 
-			const vec4f uvRegion(cdata.x0 / textureWidth, cdata.y0 / textureHeight, cdata.x1 / textureWidth, cdata.y1 / textureHeight);
+			const vec4f uvRegion(
+			    cdata.x0 / textureWidth, cdata.y0 / textureHeight, cdata.x1 / textureWidth, cdata.y1 / textureHeight);
 
 			const ShadingProgramRefl& refl = stateGroup.m_shadingProg->getReflection();
 			BoundUniform uniforms[] = {
-			    BoundUniform(refl.numericUnforms.findUniform("projViewWorld", ShaderType::VertexShader), (void*)&transf),
+			    BoundUniform(
+			        refl.numericUnforms.findUniform("projViewWorld", ShaderType::VertexShader), (void*)&transf),
 			    BoundUniform(refl.numericUnforms.findUniform("uvRegion", ShaderType::PixelShader), (void*)&uvRegion),
 			    BoundUniform(refl.numericUnforms.findUniform("colorText", ShaderType::PixelShader), (void*)&rgba),
 			    BoundUniform(refl.numericUnforms.findUniform("alphaMult", ShaderType::PixelShader), (void*)&alphaMult),
@@ -776,7 +805,8 @@ void QuickDraw::drawWiredAdd_Cylinder(const mat4f& world, const uint32 rgba, flo
 	GeomGen::wiredCylinder(m_wireframeVerts, world, rgba, height, radius, numSides, GeomGen::center);
 }
 
-void QuickDraw::drawWiredAdd_ConeBottomAligned(const mat4f& world, const uint32 rgba, float height, float radius, int numSides)
+void QuickDraw::drawWiredAdd_ConeBottomAligned(
+    const mat4f& world, const uint32 rgba, float height, float radius, int numSides)
 {
 	GeomGen::wiredCone(m_wireframeVerts, world, rgba, height, radius, numSides, GeomGen::Bottom);
 }
@@ -861,7 +891,8 @@ void QuickDraw::drawWired_Clear()
 	m_wireframeVerts.clear();
 }
 
-void QuickDraw::drawWired_Execute(const RenderDestination& rdest, const mat4f& projView, BlendState* blendState, DepthStencilState* dss)
+void QuickDraw::drawWired_Execute(
+    const RenderDestination& rdest, const mat4f& projView, BlendState* blendState, DepthStencilState* dss)
 {
 	if (m_wireframeVerts.size() == 0) {
 		return;
@@ -883,9 +914,11 @@ void QuickDraw::drawWired_Execute(const RenderDestination& rdest, const mat4f& p
 	const uint32 vbSizeVerts = uint32(m_vbWiredGeometry->getDesc().sizeBytes) / (sizeof(GeomGen::PosColorVert));
 
 	while (m_wireframeVerts.size()) {
-		const uint32 numVertsToCopy = (m_wireframeVerts.size() > vbSizeVerts) ? vbSizeVerts : uint32(m_wireframeVerts.size());
+		const uint32 numVertsToCopy =
+		    (m_wireframeVerts.size() > vbSizeVerts) ? vbSizeVerts : uint32(m_wireframeVerts.size());
 
-		GeomGen::PosColorVert* const vbdata = (GeomGen::PosColorVert*)rdest.sgecon->map(m_vbWiredGeometry, Map::WriteDiscard);
+		GeomGen::PosColorVert* const vbdata =
+		    (GeomGen::PosColorVert*)rdest.sgecon->map(m_vbWiredGeometry, Map::WriteDiscard);
 		std::copy(m_wireframeVerts.begin(), m_wireframeVerts.begin() + numVertsToCopy, vbdata);
 		rdest.sgecon->unMap(m_vbWiredGeometry);
 
@@ -916,12 +949,14 @@ void QuickDraw::drawSolidAdd_Quad(const vec3f& origin, const vec3f& ex, const ve
 	drawSolidAdd_Triangle(origin + ey, origin + ex, origin + ex + ey, rgba);
 }
 
-void QuickDraw::drawSolidAdd_QuadCentered(const vec3f& center, const vec3f& exHalf, const vec3f& eyHalf, const uint32 rgba)
+void QuickDraw::drawSolidAdd_QuadCentered(
+    const vec3f& center, const vec3f& exHalf, const vec3f& eyHalf, const uint32 rgba)
 {
 	drawSolidAdd_Quad(center - exHalf - eyHalf, 2.f * exHalf, 2.f * eyHalf, rgba);
 }
 
-void QuickDraw::drawSolid_Execute(const RenderDestination& rdest, const mat4f& projViewWorld, bool shouldUseCulling, BlendState* blendState)
+void QuickDraw::drawSolid_Execute(
+    const RenderDestination& rdest, const mat4f& projViewWorld, bool shouldUseCulling, BlendState* blendState)
 {
 	if (m_solidColorVerts.size() == 0) {
 		return;
@@ -943,15 +978,18 @@ void QuickDraw::drawSolid_Execute(const RenderDestination& rdest, const mat4f& p
 
 	// CAUTION: clamp the actual size to something multiple of 3
 	// as we are going to draw triangles and the loop below assumes it.
-	const unsigned vbSizeVerts = ((uint32(m_vbSolidColorGeometry->getDesc().sizeBytes) / (sizeof(GeomGen::PosColorVert))) / 3) * 3;
+	const unsigned vbSizeVerts =
+	    ((uint32(m_vbSolidColorGeometry->getDesc().sizeBytes) / (sizeof(GeomGen::PosColorVert))) / 3) * 3;
 	sgeAssert(vbSizeVerts % 3 == 0);
 
 	while (m_solidColorVerts.size()) {
-		const unsigned numVertsToCopy = (m_solidColorVerts.size() > vbSizeVerts) ? vbSizeVerts : uint32(m_solidColorVerts.size());
+		const unsigned numVertsToCopy =
+		    (m_solidColorVerts.size() > vbSizeVerts) ? vbSizeVerts : uint32(m_solidColorVerts.size());
 
 		sgeAssert(numVertsToCopy % 3 == 0);
 
-		GeomGen::PosColorVert* const vbdata = (GeomGen::PosColorVert*)rdest.sgecon->map(m_vbSolidColorGeometry, Map::WriteDiscard);
+		GeomGen::PosColorVert* const vbdata =
+		    (GeomGen::PosColorVert*)rdest.sgecon->map(m_vbSolidColorGeometry, Map::WriteDiscard);
 		std::copy(m_solidColorVerts.begin(), m_solidColorVerts.begin() + numVertsToCopy, vbdata);
 		rdest.sgecon->unMap(m_vbSolidColorGeometry);
 

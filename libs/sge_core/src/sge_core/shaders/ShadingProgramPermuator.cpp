@@ -8,12 +8,13 @@
 
 namespace sge {
 
-bool ShadingProgramPermuator::createFromFile(SGEDevice* sgedev,
-                                             const char* const filename,
-                                             std::string precompiledCacheFilePrefix,
-                                             const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
-                                             const std::vector<Unform>& uniformsToCacheInLUT,
-                                             std::set<std::string>* outIncludedFiles)
+bool ShadingProgramPermuator::createFromFile(
+    SGEDevice* sgedev,
+    const char* const filename,
+    std::string precompiledCacheFilePrefix,
+    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
+    const std::vector<Unform>& uniformsToCacheInLUT,
+    std::set<std::string>* outIncludedFiles)
 {
 	*this = ShadingProgramPermuator();
 
@@ -25,34 +26,48 @@ bool ShadingProgramPermuator::createFromFile(SGEDevice* sgedev,
 
 		dependantFilesForShaderCachemaking.insert(filename);
 
-		return createInternal(sgedev, fileContents.data(), filename, precompiledCacheFilePrefix, compileTimeOptions, uniformsToCacheInLUT,
-		                      outIncludedFiles);
+		return createInternal(
+		    sgedev,
+		    fileContents.data(),
+		    filename,
+		    precompiledCacheFilePrefix,
+		    compileTimeOptions,
+		    uniformsToCacheInLUT,
+		    outIncludedFiles);
 	}
 
 	return false;
 }
 
-bool ShadingProgramPermuator::create(SGEDevice* sgedev,
-                                     const char* const shaderCode,
-                                     const char* const shaderCodeFileName,
-                                     std::string precompiledCacheFilePrefix,
-                                     const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
-                                     const std::vector<Unform>& uniformsToCacheInLUT,
-                                     std::set<std::string>* outIncludedFiles)
+bool ShadingProgramPermuator::create(
+    SGEDevice* sgedev,
+    const char* const shaderCode,
+    const char* const shaderCodeFileName,
+    std::string precompiledCacheFilePrefix,
+    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
+    const std::vector<Unform>& uniformsToCacheInLUT,
+    std::set<std::string>* outIncludedFiles)
 {
 	*this = ShadingProgramPermuator();
 
-	return createInternal(sgedev, shaderCode, shaderCodeFileName, precompiledCacheFilePrefix, compileTimeOptions, uniformsToCacheInLUT,
-	                      outIncludedFiles);
+	return createInternal(
+	    sgedev,
+	    shaderCode,
+	    shaderCodeFileName,
+	    precompiledCacheFilePrefix,
+	    compileTimeOptions,
+	    uniformsToCacheInLUT,
+	    outIncludedFiles);
 }
 
-bool ShadingProgramPermuator::createInternal(SGEDevice* sgedev,
-                                             const char* const shaderCode,
-                                             const char* const shaderCodeFileName,
-                                             std::string precompiledCacheFilePrefix,
-                                             const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
-                                             const std::vector<Unform>& uniformsToCacheInLUT,
-                                             std::set<std::string>* outIncludedFiles)
+bool ShadingProgramPermuator::createInternal(
+    SGEDevice* sgedev,
+    const char* const shaderCode,
+    const char* const shaderCodeFileName,
+    std::string precompiledCacheFilePrefix,
+    const std::vector<OptionPermuataor::OptionDesc>& compileTimeOptions,
+    const std::vector<Unform>& uniformsToCacheInLUT,
+    std::set<std::string>* outIncludedFiles)
 {
 	// Verify the safety indices.
 	for (int t = 0; t < uniformsToCacheInLUT.size(); ++t) {
@@ -112,7 +127,8 @@ bool ShadingProgramPermuator::createInternal(SGEDevice* sgedev,
 	}
 	else {
 		if (!precompiledCacheFilePrefix.empty()) {
-			sgeLogWarn("For %s no valid cache file is found. The shaders are going to be compiled.", shaderCodeFileName);
+			sgeLogWarn(
+			    "For %s no valid cache file is found. The shaders are going to be compiled.", shaderCodeFileName);
 		}
 
 		// No cache compile for real.
@@ -135,8 +151,9 @@ bool ShadingProgramPermuator::createInternal(SGEDevice* sgedev,
 			shaderCodeFull.append(shaderCode, shaderCodeSize);
 
 			// Compile the program and if succeeded, grab a reflection and cache the requested uniform locations.
-			const CreateShaderResult programCreateResult = perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
-			    shaderCodeFull.c_str(), shaderCodeFull.c_str(), &dependantFilesForShaderCachemaking);
+			const CreateShaderResult programCreateResult =
+			    perPermutationShadingProg[iPerm].shadingProgram->createFromCustomHLSL(
+			        shaderCodeFull.c_str(), shaderCodeFull.c_str(), &dependantFilesForShaderCachemaking);
 
 			if (programCreateResult.succeeded == false) {
 				sgeLogError("Shader Compilation Failed:\n%s", programCreateResult.errors.c_str());
@@ -150,7 +167,8 @@ bool ShadingProgramPermuator::createInternal(SGEDevice* sgedev,
 		const ShadingProgramRefl& refl = perPermutationShadingProg[iPerm].shadingProgram->getReflection();
 		perPermutationShadingProg[iPerm].uniformLUT.reserve(uniformsToCacheInLUT.size());
 		for (int t = 0; t < uniformsToCacheInLUT.size(); ++t) {
-			BindLocation bindLoc = refl.findUniform(uniformsToCacheInLUT[t].uniformName, uniformsToCacheInLUT[t].shaderStage);
+			BindLocation bindLoc =
+			    refl.findUniform(uniformsToCacheInLUT[t].uniformName, uniformsToCacheInLUT[t].shaderStage);
 			perPermutationShadingProg[iPerm].uniformLUT.push_back(bindLoc);
 		}
 	}

@@ -12,7 +12,8 @@ GLenum ResourceUsage_GetGLNative(const ResourceUsage::Enum type);
 GLenum Map_GetGLNative(const Map::Enum map);
 #endif
 
-void TextureFormat_GetGLNative(const TextureFormat::Enum format, GLint& glInternalFormat, GLenum& glFormat, GLenum& glType);
+void TextureFormat_GetGLNative(
+    const TextureFormat::Enum format, GLint& glInternalFormat, GLenum& glFormat, GLenum& glType);
 
 GLenum TextureDesc_GetGLNativeTextureTartget(const TextureDesc& desc);
 

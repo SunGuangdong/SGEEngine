@@ -16,7 +16,8 @@
 
 namespace sge {
 
-void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+void OutlinerWindow::update(
+    SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
 {
 	const ImVec4 kPrimarySelectionColor(0.f, 1.f, 0.f, 1.f);
 
@@ -58,7 +59,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 		dropTargetRectForWindow.Min = ImGui::GetWindowPos() + ImGui::GetWindowContentRegionMin();
 		dropTargetRectForWindow.Max = ImGui::GetWindowPos() + ImGui::GetWindowContentRegionMax();
 
-		std::function<void(GameObject*, bool)> addChildObjects = [&](const GameObject* currentEntity, bool shouldIgnoreFiler) -> void {
+		std::function<void(GameObject*, bool)> addChildObjects = [&](const GameObject* currentEntity,
+		                                                             bool shouldIgnoreFiler) -> void {
 			if (currentEntity == nullptr) {
 				sgeAssert(false);
 				return;
@@ -77,7 +79,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 
 			if (passesFilter) {
 				bool isCurrrentNodePrimarySelection = false;
-				bool isCurrentNodeSelected = inspector->isSelected(currentEntity->getId(), &isCurrrentNodePrimarySelection);
+				bool isCurrentNodeSelected =
+				    inspector->isSelected(currentEntity->getId(), &isCurrrentNodePrimarySelection);
 				if (isCurrentNodeSelected) {
 					treeNodeFlags |= ImGuiTreeNodeFlags_Selected;
 				}
@@ -92,7 +95,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 				}
 				ImGui::SameLine();
 
-				void* const treeNodeId = (void*)size_t(currentEntity->getId().id + 1); // Avoid having id 0 in the outliner
+				void* const treeNodeId =
+				    (void*)size_t(currentEntity->getId().id + 1); // Avoid having id 0 in the outliner
 
 				if (isCurrrentNodePrimarySelection) {
 					ImGui::PushStyleColor(ImGuiCol_Text, kPrimarySelectionColor);
@@ -100,7 +104,8 @@ void OutlinerWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspect
 
 				bool isTreeNodeOpen = false;
 				if (m_displayObjectIds) {
-					std::string treeNodeName = string_format("%s [%d]", currentEntity->getDisplayNameCStr(), currentEntity->getId().id);
+					std::string treeNodeName =
+					    string_format("%s [%d]", currentEntity->getDisplayNameCStr(), currentEntity->getId().id);
 					isTreeNodeOpen = ImGui::TreeNodeEx(treeNodeId, treeNodeFlags, treeNodeName.c_str());
 				}
 				else {

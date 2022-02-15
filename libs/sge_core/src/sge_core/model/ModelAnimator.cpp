@@ -60,7 +60,8 @@ void ModelAnimator::trackAddAmim(int trackId, Model* srcModel, int animIndexInSr
 
 void ModelAnimator::trackAddAmimPath(int trackId, const char* modelAssetPath, int animIndexInSrcModel)
 {
-	std::shared_ptr<AssetIface_Model3D> mdlIface = getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
+	std::shared_ptr<AssetIface_Model3D> mdlIface =
+	    getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
 	if (mdlIface) {
 		trackAddAmim(trackId, mdlIface->getModel3D(), animIndexInSrcModel);
 	}
@@ -68,7 +69,8 @@ void ModelAnimator::trackAddAmimPath(int trackId, const char* modelAssetPath, in
 
 void ModelAnimator::trackAddAmimPath(int trackId, const char* modelAssetPath, const char* animNameInModel)
 {
-	std::shared_ptr<AssetIface_Model3D> mdlIface = getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
+	std::shared_ptr<AssetIface_Model3D> mdlIface =
+	    getCore()->getAssetLib()->getLoadedAssetIface<AssetIface_Model3D>(modelAssetPath);
 	if (mdlIface) {
 		int animIndex = mdlIface->getModel3D()->getAnimationIndexByName(animNameInModel);
 		trackAddAmim(trackId, mdlIface->getModel3D(), animIndex);
@@ -159,7 +161,8 @@ void ModelAnimator::advanceAnimation(const float dt)
 		const AnimationTrack& trackInfo = m_tracks[playback.trackId];
 
 		const AnimationModelSrc& animationSrc = trackInfo.animationSources[playback.trackAnimationIndex];
-		const Model& animationSourceModel = (animationSrc.modelAnimSouce != nullptr) ? *animationSrc.modelAnimSouce : *m_modelToAnimate;
+		const Model& animationSourceModel =
+		    (animationSrc.modelAnimSouce != nullptr) ? *animationSrc.modelAnimSouce : *m_modelToAnimate;
 		const ModelAnimation* const animInfo = animationSourceModel.animationAt(animationSrc.animIndexInAnimSource);
 
 		if (animInfo == nullptr) {
@@ -184,7 +187,8 @@ void ModelAnimator::advanceAnimation(const float dt)
 
 			switch (trackInfo.transition) {
 				case trackTransition_loop: {
-					playback.timeInAnimation = playback.timeInAnimation - animInfo->durationSec * (float)signedRepeatCnt;
+					playback.timeInAnimation =
+					    playback.timeInAnimation - animInfo->durationSec * (float)signedRepeatCnt;
 					playback.trackAnimationIndex = 0; // TODO: randomize the animation.
 				} break;
 				case trackTransition_stop: {
@@ -278,7 +282,8 @@ void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int ou
 
 	// If no tracks are playing then just use the static state.
 	if (m_playbacks.size() == 0) {
-		std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode, const mat4f& parentGlobalTform) -> void {
+		std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode,
+		                                                                 const mat4f& parentGlobalTform) -> void {
 			ModelNode* rawNode = m_modelToAnimate->nodeAt(iNode);
 			mat4f ownGlobalTransform = parentGlobalTform * rawNode->staticLocalTransform.toMatrix();
 
@@ -308,8 +313,10 @@ void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int ou
 		const AnimationTrack& track = m_tracks[playback.trackId];
 		const AnimationModelSrc& animSrc = track.animationSources[playback.trackAnimationIndex];
 
-		const Model& animationSourceModel = (animSrc.modelAnimSouce != nullptr) ? *animSrc.modelAnimSouce : *m_modelToAnimate;
-		const ModelAnimation* const animationSourceAnimation = animationSourceModel.animationAt(animSrc.animIndexInAnimSource);
+		const Model& animationSourceModel =
+		    (animSrc.modelAnimSouce != nullptr) ? *animSrc.modelAnimSouce : *m_modelToAnimate;
+		const ModelAnimation* const animationSourceAnimation =
+		    animationSourceModel.animationAt(animSrc.animIndexInAnimSource);
 
 		const float evalTime = playback.timeInAnimation;
 
@@ -330,7 +337,8 @@ void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int ou
 			if (donorNodeIndex >= 0) {
 				if (animationSourceAnimation != nullptr) {
 					nodeLocalTransform = animationSourceModel.nodeAt(donorNodeIndex)->staticLocalTransform;
-					animationSourceAnimation->modifyTransformWithKeyFrames(nodeLocalTransform, donorNodeIndex, evalTime);
+					animationSourceAnimation->modifyTransformWithKeyFrames(
+					    nodeLocalTransform, donorNodeIndex, evalTime);
 				}
 			}
 			else {
@@ -350,8 +358,9 @@ void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int ou
 	// Evaluate the node global transform by traversing the node hierarchy using the
 	// local transform computed above.
 	std::function<void(mat4f*, Model*, int, mat4f)> traverseGlobalTransform;
-	traverseGlobalTransform = [&traverseGlobalTransform](mat4f* outNodeTransforms, Model* model, int iNode,
-	                                                     const mat4f& parentTransfrom) -> void {
+	traverseGlobalTransform =
+	    [&traverseGlobalTransform](
+	        mat4f* outNodeTransforms, Model* model, int iNode, const mat4f& parentTransfrom) -> void {
 		mat4f currNodeGlobalTransform = parentTransfrom * outNodeTransforms[iNode];
 		outNodeTransforms[iNode] = currNodeGlobalTransform;
 		for (const int childNodeIndex : model->nodeAt(iNode)->childNodes) {
@@ -359,7 +368,8 @@ void ModelAnimator::computeModleNodesTrasnforms(mat4f* outNodeTransforms, int ou
 		}
 	};
 
-	traverseGlobalTransform(outNodeTransforms, m_modelToAnimate, m_modelToAnimate->getRootNodeIndex(), mat4f::getIdentity());
+	traverseGlobalTransform(
+	    outNodeTransforms, m_modelToAnimate, m_modelToAnimate->getRootNodeIndex(), mat4f::getIdentity());
 }
 
 } // namespace sge

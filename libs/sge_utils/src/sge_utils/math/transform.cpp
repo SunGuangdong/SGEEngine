@@ -11,8 +11,10 @@ transf3d transf3d::fromMatrixMultWithScaling(const mat4f& AMtx, const mat4f& BMt
 	mat4f m = (AMtx * BMtx);
 	m = m.removedScaling();
 
-	const vec3f targetScalingSigns(targetScaling.x >= 0.f ? +1.f : -1.f, targetScaling.y >= 0.f ? +1.f : -1.f,
-	                               targetScaling.z >= 0.f ? +1.f : -1.f);
+	const vec3f targetScalingSigns(
+	    targetScaling.x >= 0.f ? +1.f : -1.f,
+	    targetScaling.y >= 0.f ? +1.f : -1.f,
+	    targetScaling.z >= 0.f ? +1.f : -1.f);
 
 	// apply negative scale back to axes
 	m.data[0].setXyz(m.data[0].xyz() * targetScalingSigns.x);

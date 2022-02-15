@@ -17,13 +17,14 @@ namespace sge {
 struct SGE_CORE_API SimpleTriplanarMtlGeomDrawer : public IGeometryDrawer {
 	SimpleTriplanarMtlGeomDrawer() = default;
 
-	virtual void drawGeometry(const RenderDestination& rdest,
-	                          const ICamera& camera,
-	                          const mat4f& geomWorldTransfrom,
-	                          const ObjectLighting& lighting,
-	                          const Geometry& geometry,
-	                          const IMaterialData* mtlDataBase,
-	                          const InstanceDrawMods& instDrawMods) override;
+	virtual void drawGeometry(
+	    const RenderDestination& rdest,
+	    const ICamera& camera,
+	    const mat4f& geomWorldTransfrom,
+	    const ObjectLighting& lighting,
+	    const Geometry& geometry,
+	    const IMaterialData* mtlDataBase,
+	    const InstanceDrawMods& instDrawMods) override;
 
 
   private:

@@ -29,15 +29,17 @@ struct TraitSpriteImageSets {
 	/// that faces +X and has corners (0,0,0) and (0,1,1), So it appears as described by this structure:
 	/// its size, orientation (billboarding), aligment and so on.
 	/// @param [in] asset is the asset that is going to be attached to the plane. it needs to be a texture or a sprite.
-	/// @param [in] drawCamera the camera that is going to be used for rendering. If null the billboarding effect will be missing.
-	/// @param [in] nodeToWorldTransform the transform that indicates the location of the object(for example, could be the transform
-	/// of an actor).
+	/// @param [in] drawCamera the camera that is going to be used for rendering. If null the billboarding effect will
+	/// be missing.
+	/// @param [in] nodeToWorldTransform the transform that indicates the location of the object(for example, could be
+	/// the transform of an actor).
 	/// @param [in] additionaTransform an additional transform to be applied before before all other transforms.
 	/// @return the matrix to be used as object-to-world transform form the quad described above.
-	mat4f computeObjectToWorldTransform(const Asset& asset,
-	                                    const ICamera* const drawCamera,
-	                                    const transf3d& nodeToWorldTransform,
-	                                    const mat4f& additionaTransform) const;
+	mat4f computeObjectToWorldTransform(
+	    const Asset& asset,
+	    const ICamera* const drawCamera,
+	    const transf3d& nodeToWorldTransform,
+	    const mat4f& additionaTransform) const;
 
 	Box3f computeBBoxOS(const Asset& asset, const mat4f& additionaTransform) const;
 
@@ -117,7 +119,8 @@ struct SGE_ENGINE_API TraitSprite : public Trait {
 	Box3f getBBoxOS() const;
 
 	/// Generates the list of render items for this trait.
-	void getRenderItems(DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
+	void getRenderItems(
+	    DrawReason drawReason, const GameDrawSets& drawSets, std::vector<TraitSpriteRenderItem>& renderItems);
 
   private:
 	bool updateAssetProperty()

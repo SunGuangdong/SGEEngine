@@ -23,10 +23,11 @@ enum class MeshPacking {
 struct ModelParseSettings {
 	ModelParseSettings() = default;
 
-	ModelParseSettings(bool const shouldExportAnimations,
-	                   MeshPacking const meshPacking,
-	                   std::string fileDirectroy,
-	                   IAssetRelocationPolicy* const pRelocaionPolicy)
+	ModelParseSettings(
+	    bool const shouldExportAnimations,
+	    MeshPacking const meshPacking,
+	    std::string fileDirectroy,
+	    IAssetRelocationPolicy* const pRelocaionPolicy)
 	    : shouldExportAnimations(shouldExportAnimations)
 	    , meshPacking(meshPacking)
 	    , fileDirectroy(fileDirectroy)

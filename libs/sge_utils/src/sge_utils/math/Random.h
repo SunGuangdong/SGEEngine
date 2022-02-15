@@ -49,7 +49,10 @@ struct Random {
 
 	float nextInRange(float min, float max) const { return min + next01() * (max - min); }
 
-	vec3f nextPoint3D(const vec3f& size) const { return vec3f(nextInRange(size[0]), nextInRange(size[1]), nextInRange(size[2])); }
+	vec3f nextPoint3D(const vec3f& size) const
+	{
+		return vec3f(nextInRange(size[0]), nextInRange(size[1]), nextInRange(size[2]));
+	}
 
   private:
 	mutable std::mt19937 m_generator;

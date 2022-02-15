@@ -41,8 +41,14 @@ bool Frustum::is8PointConvexHullOutside(const vec3f points[8]) const
 bool Frustum::isBoxOutside(const Box3f& aabbWs) const
 {
 	const vec3f points[8] = {
-	    aabbWs.getPoint(0), aabbWs.getPoint(1), aabbWs.getPoint(2), aabbWs.getPoint(3),
-	    aabbWs.getPoint(4), aabbWs.getPoint(5), aabbWs.getPoint(6), aabbWs.getPoint(7),
+	    aabbWs.getPoint(0),
+	    aabbWs.getPoint(1),
+	    aabbWs.getPoint(2),
+	    aabbWs.getPoint(3),
+	    aabbWs.getPoint(4),
+	    aabbWs.getPoint(5),
+	    aabbWs.getPoint(6),
+	    aabbWs.getPoint(7),
 	};
 
 	const bool result = is8PointConvexHullOutside(points);

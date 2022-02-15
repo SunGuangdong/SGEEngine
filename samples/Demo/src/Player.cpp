@@ -84,8 +84,8 @@ struct Player : public Actor {
 
 			transf3d cameraTransform = cameraActor->getTransform();
 			cameraTransform.p = getTransform().p + cameraOffset;
-			// cameraTransform.r = quatf::getAxisAngle(vec3f::axis_x(), -deg2rad(30.f)) * quatf::getAxisAngle(vec3f::axis_y(),
-			// deg2rad(90.f));
+			// cameraTransform.r = quatf::getAxisAngle(vec3f::axis_x(), -deg2rad(30.f)) *
+			// quatf::getAxisAngle(vec3f::axis_y(), deg2rad(90.f));
 			cameraTransform.r = rotationQuat * cameraTransform.r;
 			cameraActor->setTransform(cameraTransform);
 
@@ -119,7 +119,8 @@ struct Player : public Actor {
 		}
 
 		if (u.is.IsKeyReleased(Key_Space) || u.is.getXInputDevice(0).isBtnReleased(GamepadState::btn_a)) {
-			ttRigidbody.getRigidBody()->applyLinearVelocity(vec3f(0.f, 15.f * jumpButtonHeldTime / kMaxJumpHeldTime + 1.f, 0.f));
+			ttRigidbody.getRigidBody()->applyLinearVelocity(
+			    vec3f(0.f, 15.f * jumpButtonHeldTime / kMaxJumpHeldTime + 1.f, 0.f));
 			jumpButtonHeldTime = 0.f;
 		}
 
@@ -127,9 +128,10 @@ struct Player : public Actor {
 
 		float squash = wobbleAmplitude;
 
-		ttModel.m_models[0].m_additionalTransform = mat4f::getRotationQuat(getTransform().r.inverse()) *
-		                                            mat4f::getTranslation(0.f, -0.5f, 0.f) * mat4f::getSquashyScalingY(squash) *
-		                                            mat4f::getTranslation(0.f, 0.5f, 0.f) * mat4f::getRotationQuat(getTransform().r);
+		ttModel.m_models[0].m_additionalTransform =
+		    mat4f::getRotationQuat(getTransform().r.inverse()) * mat4f::getTranslation(0.f, -0.5f, 0.f) *
+		    mat4f::getSquashyScalingY(squash) * mat4f::getTranslation(0.f, 0.5f, 0.f) *
+		    mat4f::getRotationQuat(getTransform().r);
 	}
 };
 

@@ -40,7 +40,8 @@ struct SGE_CORE_API LightDesc {
 	LightType type = light_point;
 	/// The intensity of the light.
 	float intensity = 1.f;
-	/// The maximum illumination distance, the light will start fadeing into black as the shaded point gets away form the light source.
+	/// The maximum illumination distance, the light will start fadeing into black as the shaded point gets away form
+	/// the light source.
 	float range = 10.f;
 	/// For Spot light only.
 	float spotLightAngle = deg2rad(30.f);

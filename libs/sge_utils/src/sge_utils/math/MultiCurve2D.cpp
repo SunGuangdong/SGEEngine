@@ -298,7 +298,8 @@ bool MultiCurve2D::removePointSafe(const int idx, std::vector<int>& outIndexRema
 		if ((h0 < 0) != (h1 < 0)) {
 			sgeAssert(
 			    false &&
-			    "Both keypoints must be valid or not valid at the same time. They are could be invalid if the key point is the last point");
+			    "Both keypoints must be valid or not valid at the same time. They are could be invalid if the key "
+			    "point is the last point");
 			return false;
 		}
 

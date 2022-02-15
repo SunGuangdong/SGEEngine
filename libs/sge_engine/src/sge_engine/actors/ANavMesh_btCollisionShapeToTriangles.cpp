@@ -11,10 +11,11 @@ void pushIndices(std::vector<int>& outIndices, int a, int b, int c)
 	outIndices.push_back(c);
 }
 
-void btBoxShapeToTriangles(const btBoxShape* const box,
-                           const mat4f& transformNoScaling,
-                           std::vector<vec3f>& outVertices,
-                           std::vector<int>& outIndices)
+void btBoxShapeToTriangles(
+    const btBoxShape* const box,
+    const mat4f& transformNoScaling,
+    std::vector<vec3f>& outVertices,
+    std::vector<int>& outIndices)
 {
 	// Caution:
 	// getHalfExtentsWithMargin obtains the extent with local scaling applied!
@@ -31,7 +32,8 @@ void btBoxShapeToTriangles(const btBoxShape* const box,
 	const vec3f v2pz = vec3f(+extents.x, +extents.y, +extents.z);
 	const vec3f v3pz = vec3f(-extents.x, +extents.y, +extents.z);
 
-	/// This value holds the starting index, in the index buffer, for the vertices we've hadded to describe the box shape.
+	/// This value holds the starting index, in the index buffer, for the vertices we've hadded to describe the box
+	/// shape.
 	const int newIndicesStart = int(outVertices.size());
 
 	outVertices.push_back(mat_mul_pos(transformNoScaling, v0nz));
@@ -108,11 +110,12 @@ void btBoxShapeToTriangles(const btBoxShape* const box,
 }
 
 /// @param numHorizontalSegments is the total number of segments (or vertices in a row) around the cylinder.
-void btCylinderShapeToTriangles(const btCylinderShape* cylinderShape,
-                                const mat4f& transformNoScaling,
-                                std::vector<vec3f>& outVertices,
-                                std::vector<int>& outIndices,
-                                const int numHorizontalSegments = 8)
+void btCylinderShapeToTriangles(
+    const btCylinderShape* cylinderShape,
+    const mat4f& transformNoScaling,
+    std::vector<vec3f>& outVertices,
+    std::vector<int>& outIndices,
+    const int numHorizontalSegments = 8)
 {
 	// Caution:
 	// getHalfExtentsWithMargin obtains the extent with local scaling applied!
@@ -220,12 +223,13 @@ void btCylinderShapeToTriangles(const btCylinderShape* cylinderShape,
 
 /// Create an UV sphere representing the collsiion rigid body with triangles.
 /// Non-uniform scaling is not supported.
-void btSphereShapeToTriangles(const btSphereShape* btSphereShape,
-                              const mat4f& transformNoScaling,
-                              std::vector<vec3f>& outVertices,
-                              std::vector<int>& outIndices,
-                              const int numRings = 6,
-                              const int numHorizontalSegments = 6)
+void btSphereShapeToTriangles(
+    const btSphereShape* btSphereShape,
+    const mat4f& transformNoScaling,
+    std::vector<vec3f>& outVertices,
+    std::vector<int>& outIndices,
+    const int numRings = 6,
+    const int numHorizontalSegments = 6)
 {
 	outVertices.reserve(outVertices.size() + numRings * numHorizontalSegments + 2);
 	outIndices.reserve(outIndices.size() + (numRings - 1) * numHorizontalSegments * 6 + 2 * numHorizontalSegments * 3);
@@ -278,8 +282,10 @@ void btSphereShapeToTriangles(const btSphereShape* btSphereShape,
 			// A reminder that numHorizontalSegments is basically the number of vertices along a single ring.
 			const int i0rb = bottomRing1stVertex + (iSegment + iRing * numHorizontalSegments);
 			const int i0rt = bottomRing1stVertex + (iSegment + (iRing + 1) * numHorizontalSegments);
-			const int i1rb = bottomRing1stVertex + ((iSegment + 1) % numHorizontalSegments + iRing * numHorizontalSegments);
-			const int i1rt = bottomRing1stVertex + ((iSegment + 1) % numHorizontalSegments + (iRing + 1) * numHorizontalSegments);
+			const int i1rb =
+			    bottomRing1stVertex + ((iSegment + 1) % numHorizontalSegments + iRing * numHorizontalSegments);
+			const int i1rt =
+			    bottomRing1stVertex + ((iSegment + 1) % numHorizontalSegments + (iRing + 1) * numHorizontalSegments);
 
 			outIndices.push_back(i0rb);
 			outIndices.push_back(i1rb);
@@ -307,7 +313,8 @@ void btSphereShapeToTriangles(const btSphereShape* btSphereShape,
 	{
 		for (int iSegment = 0; iSegment < numHorizontalSegments; ++iSegment) {
 			const int i0rt = bottomRing1stVertex + iSegment + (numRings - 1) * numHorizontalSegments;
-			const int i1rt = bottomRing1stVertex + (iSegment + 1) % numHorizontalSegments + (numRings - 1) * numHorizontalSegments;
+			const int i1rt =
+			    bottomRing1stVertex + (iSegment + 1) % numHorizontalSegments + (numRings - 1) * numHorizontalSegments;
 
 			outIndices.push_back(topCapVertexIndex);
 			outIndices.push_back(i1rt);
@@ -318,16 +325,18 @@ void btSphereShapeToTriangles(const btSphereShape* btSphereShape,
 
 /// Caution: [CONVEX_HULLS_TRIANGLE_USER_DATA]:
 /// Extracts the customly stored triangle mesh representation from the specified convexHullShape
-bool btConvexHullShapeToTriangles(const btConvexHullShape* const convexHullShape,
-                                  const mat4f& transformNoScaling,
-                                  std::vector<vec3f>& outVertices,
-                                  std::vector<int>& outIndices)
+bool btConvexHullShapeToTriangles(
+    const btConvexHullShape* const convexHullShape,
+    const mat4f& transformNoScaling,
+    std::vector<vec3f>& outVertices,
+    std::vector<int>& outIndices)
 {
 	// Caution [CONVEX_HULLS_TRIANGLE_USER_DATA]:
 	// All convex hulls must have their triangle representation set as a user pointer!
 	const vec3f localScaling = fromBullet(convexHullShape->getLocalScaling());
-	sgeAssert(localScaling.x >= 0.f && localScaling.y >= 0.f && localScaling.z > 0.f &&
-	          "TODO handle negative scaling. The triangle winding must be flipped");
+	sgeAssert(
+	    localScaling.x >= 0.f && localScaling.y >= 0.f && localScaling.z > 0.f &&
+	    "TODO handle negative scaling. The triangle winding must be flipped");
 
 	CollsionShapeDesc* collisionShapeDesc = reinterpret_cast<CollsionShapeDesc*>(convexHullShape->getUserPointer());
 	if (collisionShapeDesc == nullptr) {
@@ -351,10 +360,11 @@ bool btConvexHullShapeToTriangles(const btConvexHullShape* const convexHullShape
 	return true;
 }
 
-bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshShape,
-                                       const mat4f& transformNoScaling,
-                                       std::vector<vec3f>& outVertices,
-                                       std::vector<int>& outIndices)
+bool btBvhTriangleMeshShapeToTriangles(
+    const btBvhTriangleMeshShape* bvhTriMeshShape,
+    const mat4f& transformNoScaling,
+    std::vector<vec3f>& outVertices,
+    std::vector<int>& outIndices)
 {
 	const btStridingMeshInterface* const bulletMeshInterface = bvhTriMeshShape->getMeshInterface();
 
@@ -389,8 +399,8 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 		int numTriangles = 0;
 		btVector3 triangle[3];
 
-		bulletMeshInterface->getLockedReadOnlyVertexIndexBase(&vertexBase, numVerts, type, stride, &indexBase, indexStride, numTriangles,
-		                                                      gfxindextype, part);
+		bulletMeshInterface->getLockedReadOnlyVertexIndexBase(
+		    &vertexBase, numVerts, type, stride, &indexBase, indexStride, numTriangles, gfxindextype, part);
 
 		switch (type) {
 			case PHY_FLOAT: {
@@ -401,14 +411,20 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 						for (int gfxindex = 0; gfxindex < numTriangles; gfxindex++) {
 							unsigned int* tri_indices = (unsigned int*)(indexBase + gfxindex * indexStride);
 							graphicsbase = (float*)(vertexBase + tri_indices[0] * stride);
-							triangle[0].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[0].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (float*)(vertexBase + tri_indices[1] * stride);
-							triangle[1].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[1].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (float*)(vertexBase + tri_indices[2] * stride);
-							triangle[2].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[2].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							processTriangle(triangle);
 						}
 						break;
@@ -417,14 +433,20 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 						for (int gfxindex = 0; gfxindex < numTriangles; gfxindex++) {
 							unsigned short int* tri_indices = (unsigned short int*)(indexBase + gfxindex * indexStride);
 							graphicsbase = (float*)(vertexBase + tri_indices[0] * stride);
-							triangle[0].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[0].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (float*)(vertexBase + tri_indices[1] * stride);
-							triangle[1].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[1].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (float*)(vertexBase + tri_indices[2] * stride);
-							triangle[2].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[2].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							processTriangle(triangle);
 						}
 						break;
@@ -433,14 +455,20 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 						for (int gfxindex = 0; gfxindex < numTriangles; gfxindex++) {
 							unsigned char* tri_indices = (unsigned char*)(indexBase + gfxindex * indexStride);
 							graphicsbase = (float*)(vertexBase + tri_indices[0] * stride);
-							triangle[0].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[0].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (float*)(vertexBase + tri_indices[1] * stride);
-							triangle[1].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[1].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (float*)(vertexBase + tri_indices[2] * stride);
-							triangle[2].setValue(graphicsbase[0] * meshScaling.getX(), graphicsbase[1] * meshScaling.getY(),
-							                     graphicsbase[2] * meshScaling.getZ());
+							triangle[2].setValue(
+							    graphicsbase[0] * meshScaling.getX(),
+							    graphicsbase[1] * meshScaling.getY(),
+							    graphicsbase[2] * meshScaling.getZ());
 							processTriangle(triangle);
 						}
 						break;
@@ -459,17 +487,20 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 						for (int gfxindex = 0; gfxindex < numTriangles; gfxindex++) {
 							unsigned int* tri_indices = (unsigned int*)(indexBase + gfxindex * indexStride);
 							graphicsbase = (double*)(vertexBase + tri_indices[0] * stride);
-							triangle[0].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[0].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (double*)(vertexBase + tri_indices[1] * stride);
-							triangle[1].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[1].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (double*)(vertexBase + tri_indices[2] * stride);
-							triangle[2].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[2].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							processTriangle(triangle);
 						}
 						break;
@@ -478,17 +509,20 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 						for (int gfxindex = 0; gfxindex < numTriangles; gfxindex++) {
 							unsigned short int* tri_indices = (unsigned short int*)(indexBase + gfxindex * indexStride);
 							graphicsbase = (double*)(vertexBase + tri_indices[0] * stride);
-							triangle[0].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[0].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (double*)(vertexBase + tri_indices[1] * stride);
-							triangle[1].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[1].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (double*)(vertexBase + tri_indices[2] * stride);
-							triangle[2].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[2].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							processTriangle(triangle);
 						}
 						break;
@@ -497,17 +531,20 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 						for (int gfxindex = 0; gfxindex < numTriangles; gfxindex++) {
 							unsigned char* tri_indices = (unsigned char*)(indexBase + gfxindex * indexStride);
 							graphicsbase = (double*)(vertexBase + tri_indices[0] * stride);
-							triangle[0].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[0].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (double*)(vertexBase + tri_indices[1] * stride);
-							triangle[1].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[1].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							graphicsbase = (double*)(vertexBase + tri_indices[2] * stride);
-							triangle[2].setValue((btScalar)graphicsbase[0] * meshScaling.getX(),
-							                     (btScalar)graphicsbase[1] * meshScaling.getY(),
-							                     (btScalar)graphicsbase[2] * meshScaling.getZ());
+							triangle[2].setValue(
+							    (btScalar)graphicsbase[0] * meshScaling.getX(),
+							    (btScalar)graphicsbase[1] * meshScaling.getY(),
+							    (btScalar)graphicsbase[2] * meshScaling.getZ());
 							processTriangle(triangle);
 						}
 						break;
@@ -527,16 +564,21 @@ bool btBvhTriangleMeshShapeToTriangles(const btBvhTriangleMeshShape* bvhTriMeshS
 	return true;
 }
 
-void bulletCollisionShapeToTriangles(const btCollisionShape* const collisionShape,
-                                     const btTransform& parentTransform,
-                                     std::vector<vec3f>& outVertices,
-                                     std::vector<int>& outIndices)
+void bulletCollisionShapeToTriangles(
+    const btCollisionShape* const collisionShape,
+    const btTransform& parentTransform,
+    std::vector<vec3f>& outVertices,
+    std::vector<int>& outIndices)
 {
-	const btCompoundShape* const compoundShape = btCollisionShapeCast<btCompoundShape>(collisionShape, COMPOUND_SHAPE_PROXYTYPE);
+	const btCompoundShape* const compoundShape =
+	    btCollisionShapeCast<btCompoundShape>(collisionShape, COMPOUND_SHAPE_PROXYTYPE);
 	const btBoxShape* const boxShape = btCollisionShapeCast<btBoxShape>(collisionShape, BOX_SHAPE_PROXYTYPE);
-	const btSphereShape* const sphereShape = btCollisionShapeCast<btSphereShape>(collisionShape, SPHERE_SHAPE_PROXYTYPE);
-	const btCylinderShape* const cylinderShape = btCollisionShapeCast<btCylinderShape>(collisionShape, CYLINDER_SHAPE_PROXYTYPE);
-	const btConvexHullShape* const convexHullShape = btCollisionShapeCast<btConvexHullShape>(collisionShape, CONVEX_HULL_SHAPE_PROXYTYPE);
+	const btSphereShape* const sphereShape =
+	    btCollisionShapeCast<btSphereShape>(collisionShape, SPHERE_SHAPE_PROXYTYPE);
+	const btCylinderShape* const cylinderShape =
+	    btCollisionShapeCast<btCylinderShape>(collisionShape, CYLINDER_SHAPE_PROXYTYPE);
+	const btConvexHullShape* const convexHullShape =
+	    btCollisionShapeCast<btConvexHullShape>(collisionShape, CONVEX_HULL_SHAPE_PROXYTYPE);
 	const btBvhTriangleMeshShape* const bvhTriMeshShape =
 	    btCollisionShapeCast<btBvhTriangleMeshShape>(collisionShape, TRIANGLE_MESH_SHAPE_PROXYTYPE);
 
@@ -560,13 +602,13 @@ void bulletCollisionShapeToTriangles(const btCollisionShape* const collisionShap
 		btCylinderShapeToTriangles(cylinderShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
 	}
 	else if (convexHullShape) {
-		[[maybe_unused]] bool succeeded =
-		    btConvexHullShapeToTriangles(convexHullShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
+		[[maybe_unused]] bool succeeded = btConvexHullShapeToTriangles(
+		    convexHullShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
 		sgeAssert(succeeded);
 	}
 	else if (bvhTriMeshShape) {
-		[[maybe_unused]] bool succeeded =
-		    btBvhTriangleMeshShapeToTriangles(bvhTriMeshShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
+		[[maybe_unused]] bool succeeded = btBvhTriangleMeshShapeToTriangles(
+		    bvhTriMeshShape, fromBullet(parentTransform).toMatrix(), outVertices, outIndices);
 		sgeAssert(succeeded);
 	}
 	else {

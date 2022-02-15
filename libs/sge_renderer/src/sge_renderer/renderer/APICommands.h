@@ -21,9 +21,15 @@ struct CBufferFiller {
 		size_t offsetBytes = 0;
 	};
 
-	void setFloat4(const unsigned nameStrIdx, const float v[4]) { SetData(nameStrIdx, UniformType::Float4, v, sizeof(float) * 4); }
+	void setFloat4(const unsigned nameStrIdx, const float v[4])
+	{
+		SetData(nameStrIdx, UniformType::Float4, v, sizeof(float) * 4);
+	}
 
-	void setFloat4x4(const unsigned nameStrIdx, const float v[16]) { SetData(nameStrIdx, UniformType::Float4x4, v, sizeof(float) * 16); }
+	void setFloat4x4(const unsigned nameStrIdx, const float v[16])
+	{
+		SetData(nameStrIdx, UniformType::Float4x4, v, sizeof(float) * 16);
+	}
 
 	ValueDesc& getValueDesc(const unsigned nameStrIdx, const UniformType::Enum type);
 	void DeleteValue(const int idx);
@@ -80,7 +86,8 @@ struct DrawExecDesc {
 		m_linear.numInstances = instanceCount;
 	}
 
-	void DrawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVertex, const uint32 instanceCount)
+	void DrawIndexed(
+	    const uint32 numIndices, const uint32 startIndex, const uint32 startVertex, const uint32 instanceCount)
 	{
 		m_type = Type_Indexed;
 
@@ -116,7 +123,8 @@ struct StateGroup {
 	void setRasterizerState(RasterizerState* state) { m_rasterState = state; }
 	void setDepthStencilState(DepthStencilState* state) { m_depthStencilState = state; }
 
-	void setRenderState(RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState = nullptr);
+	void setRenderState(
+	    RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState = nullptr);
 
 	// Bound geometry.
 	Buffer* m_vertexBuffers[GraphicsCaps::kVertexBufferSlotsCount] = {};
@@ -189,7 +197,8 @@ struct DrawCall {
 	void setStateGroup(StateGroup* const stateGroup) { m_pStateGroup = stateGroup; }
 
 	void draw(const uint32 numVerts, const uint32 startVert, const uint32 numInstances = 1);
-	void drawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances = 1);
+	void drawIndexed(
+	    const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances = 1);
 
 #if 0
 	// This functions checks the validity of the bound resources

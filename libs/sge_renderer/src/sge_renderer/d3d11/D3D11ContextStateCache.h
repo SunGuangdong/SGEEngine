@@ -29,7 +29,8 @@ struct D3D11ContextStateCache {
 
 	void SetInputLayout(ID3D11InputLayout* inputLayout);
 
-	void BindVertexBuffers(ID3D11Buffer** ppBuffers, UINT* pStrides, UINT* pOffsetsByte, const UINT numBuffers, const UINT startSlot);
+	void BindVertexBuffers(
+	    ID3D11Buffer** ppBuffers, UINT* pStrides, UINT* pOffsetsByte, const UINT numBuffers, const UINT startSlot);
 
 	void BindIndexBuffer(ID3D11Buffer* buffer, DXGI_FORMAT format, UINT byteOffset);
 
@@ -53,21 +54,20 @@ struct D3D11ContextStateCache {
 	// Searches if any bound SRV matches a value from "resources" and unbinds it.
 	void ResolveBindRTVorDSVHazzard(ID3D11Resource* const* resources, const int numResources);
 
-	void SetRenderTargetsAndDepthStencil(const UINT startSlot,
-	                                     const UINT numRenderTargets,
-	                                     ID3D11RenderTargetView** rtvs,
-	                                     ID3D11DepthStencilView* dsv);
+	void SetRenderTargetsAndDepthStencil(
+	    const UINT startSlot, const UINT numRenderTargets, ID3D11RenderTargetView** rtvs, ID3D11DepthStencilView* dsv);
 
 	void setViewport(const D3D11_VIEWPORT& viewport);
 
 	void BufferUnbind(ID3D11Buffer* const buffer);
 
-	void TextureUnbind(ID3D11ShaderResourceView* const srvs[],
-	                   const int srvCnt,
-	                   ID3D11RenderTargetView* const rtvs[],
-	                   const int rtvCnt,
-	                   ID3D11DepthStencilView* const dsvs[],
-	                   const int dsvCnt);
+	void TextureUnbind(
+	    ID3D11ShaderResourceView* const srvs[],
+	    const int srvCnt,
+	    ID3D11RenderTargetView* const rtvs[],
+	    const int rtvCnt,
+	    ID3D11DepthStencilView* const dsvs[],
+	    const int dsvCnt);
 
 	void InputLayoutUnbind(ID3D11InputLayout* const inputLayout);
 

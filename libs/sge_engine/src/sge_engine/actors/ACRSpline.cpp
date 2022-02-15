@@ -164,10 +164,8 @@ void ACRSpline::computeSegmentsLength()
 	}
 }
 
-InspectorCmd* ACRSpline::generateDeleteItemCmd(GameInspector* inspector,
-                                               const SelectedItem* items,
-                                               int numItems,
-                                               bool ifActorModeShouldDeleteActorsUnder)
+InspectorCmd* ACRSpline::generateDeleteItemCmd(
+    GameInspector* inspector, const SelectedItem* items, int numItems, bool ifActorModeShouldDeleteActorsUnder)
 {
 	if (numItems == 1 && items[0].editMode == editMode_actors) {
 		return Actor::generateDeleteItemCmd(inspector, items, numItems, ifActorModeShouldDeleteActorsUnder);
@@ -184,7 +182,11 @@ InspectorCmd* ACRSpline::generateDeleteItemCmd(GameInspector* inspector,
 }
 
 InspectorCmd* ACRSpline::generateItemSetTransformCmd(
-    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform)
+    GameInspector* inspector,
+    EditMode const mode,
+    int itemIndex,
+    const transf3d& initalTrasform,
+    const transf3d& newTransform)
 {
 	if (mode == editMode_points) {
 		ACRSplineMovePointCmd* cmd = new ACRSplineMovePointCmd;
@@ -198,7 +200,8 @@ InspectorCmd* ACRSpline::generateItemSetTransformCmd(
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void ACRSplineMovePointCmd::setup(ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition)
+void ACRSplineMovePointCmd::setup(
+    ObjectId actorid, int pointIndex, const vec3f& originalPosition, const vec3f& newPosition)
 {
 	m_actorid = actorid;
 	m_pointIndex = pointIndex;

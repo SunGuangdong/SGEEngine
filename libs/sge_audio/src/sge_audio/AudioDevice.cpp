@@ -124,11 +124,16 @@ bool AudioDevice::readFramesFromDecoder(AudioDecoder& decoder, float* output, ui
 
 		ma_uint64 framesReadThisIteration = 0;
 		if (decoder.m_syncState.isLooping) {
-			ma_data_source_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration, &framesReadThisIteration,
-			                               ma_bool32(true));
+			ma_data_source_read_pcm_frames(
+			    &decoder.decoder,
+			    decodingTemp.data(),
+			    framesToReadThisIteration,
+			    &framesReadThisIteration,
+			    ma_bool32(true));
 		}
 		else {
-			framesReadThisIteration = ma_decoder_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration);
+			framesReadThisIteration =
+			    ma_decoder_read_pcm_frames(&decoder.decoder, decodingTemp.data(), framesToReadThisIteration);
 		}
 
 		if (framesReadThisIteration == 0) {
@@ -223,7 +228,8 @@ void AudioDecoder::createDecoder(AudioDataPtr& audioData)
 
 	if (audioData->isEmpty() == false) {
 		ma_decoder_config decoderConfig = ma_decoder_config_init(SAMPLE_FORMAT, CHANNEL_COUNT, SAMPLE_RATE);
-		if (ma_decoder_init_memory(audioData->getData().data(), audioData->getData().size(), &decoderConfig, &decoder) != MA_SUCCESS) {
+		if (ma_decoder_init_memory(
+		        audioData->getData().data(), audioData->getData().size(), &decoderConfig, &decoder) != MA_SUCCESS) {
 			sgeAssertFalse("Failed to initialize AudioDecoder");
 			ma_decoder_uninit(&decoder);
 		}

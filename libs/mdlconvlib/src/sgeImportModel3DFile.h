@@ -53,15 +53,18 @@ struct ModelImportAdditionalResult {
 /// sge_engine uses our own internal 3D model file file format.
 ///
 /// Imports the specified FBX file into our own internal format.
-/// FBX SDK isn't very permissive in it license, as you need a written approval for distributing FBX SDK binaries from Autodesk.
-/// We have our own format so we do not need FBX SDK in the working game. However if we want to import FBX files as assets we still need the
-/// SDK. By having a DLL that can import FBX files the engine could check if the dll is present and invoke FBX SDK without explicity
-/// depending on it at link time. If the SDK is not available we can just say to the engine user that the FBX SDK importer isn't aviable.
+/// FBX SDK isn't very permissive in it license, as you need a written approval for distributing FBX SDK binaries from
+/// Autodesk. We have our own format so we do not need FBX SDK in the working game. However if we want to import FBX
+/// files as assets we still need the SDK. By having a DLL that can import FBX files the engine could check if the dll
+/// is present and invoke FBX SDK without explicity depending on it at link time. If the SDK is not available we can
+/// just say to the engine user that the FBX SDK importer isn't aviable.
 /// @param [out] result stores the imported model.
 /// @param [in] fbxFilename is the filename to be loaded.
-/// @param [out] pOutReferencedTextures A list of referenced textures in the specified filename (used for dependancy tracking).
+/// @param [out] pOutReferencedTextures A list of referenced textures in the specified filename (used for dependancy
+/// tracking).
 /// @return true if the import was successful.
-typedef bool (*sgeImportModel3DFileFn)(sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename);
+typedef bool (*sgeImportModel3DFileFn)(
+    sge::Model& result, ModelImportAdditionalResult& additionalResult, const char* fbxFilename);
 
 /// A structure holding a single (ot of many) imported 3D models.
 /// The structure is used when importing one 3D Scene file (FBX for example) as multiple model files.
@@ -76,15 +79,17 @@ struct MultiModelImportResult {
 
 /// This function provides the option to import a single 3D scene file (FBX for example) as multiple *.mdl files,
 /// by importing each node that is parented to the root node in the scene as a separate model.
-/// This is useful when the artist needs to create for example tileable 3D models or others that share a lot of commonalitices
-/// and it would be easier to work with them if they are in one file.
+/// This is useful when the artist needs to create for example tileable 3D models or others that share a lot of
+/// commonalitices and it would be easier to work with them if they are in one file.
 /// @param [out] result stores a list of all imported models.
 /// @param [in] fbxFilename is the filename to be loaded.
-/// @param [out] pOutReferencedTextures A list of referenced textures in the specified filename (used for dependancy tracking).
+/// @param [out] pOutReferencedTextures A list of referenced textures in the specified filename (used for dependancy
+/// tracking).
 ///              This one contains the materials and textures used across all imported models.
 /// @return true if the import was successful.
-typedef bool (*sgeImportModel3DFileAsMultipleFn)(std::vector<MultiModelImportResult>& result,
-                                                 ModelImportAdditionalResult& additionalResult,
-                                                 const char* fbxFilename);
+typedef bool (*sgeImportModel3DFileAsMultipleFn)(
+    std::vector<MultiModelImportResult>& result,
+    ModelImportAdditionalResult& additionalResult,
+    const char* fbxFilename);
 
 } // extern "C"

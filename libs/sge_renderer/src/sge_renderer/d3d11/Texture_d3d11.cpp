@@ -23,7 +23,9 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 	DXGI_FORMAT d3dFormat = DXGI_FORMAT_UNKNOWN; // the format of the resource, NOT THE VIEW(s)
 
 	if (desc.generateMips) {
-		sgeAssert(desc.textureType == UniformType::Texture2D && "The auto generated mips has been written so far only for 2D textures!");
+		sgeAssert(
+		    desc.textureType == UniformType::Texture2D &&
+		    "The auto generated mips has been written so far only for 2D textures!");
 	}
 
 	switch (desc.usage) {
@@ -59,7 +61,8 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 			d3dUsage = D3D11_USAGE_DEFAULT;
 			d3dBindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
 			d3dCpuAccess = 0;
-			d3dFormat = typeless; //[TODO]maybe this should be typeless when the texture is used for resource, there was a special case for
+			d3dFormat = typeless; //[TODO]maybe this should be typeless when the texture is used for resource, there was
+			                      // a special case for
 			                      // feature level 9?
 		} break;
 
@@ -67,7 +70,8 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 			d3dUsage = D3D11_USAGE_DEFAULT;
 			d3dBindFlags = D3D11_BIND_DEPTH_STENCIL;
 			d3dCpuAccess = 0;
-			d3dFormat = dsv; //[TODO]maybe this should be typeless when the texture is used for resource, there was a special case for
+			d3dFormat = dsv; //[TODO]maybe this should be typeless when the texture is used for resource, there was a
+			                 // special case for
 			                 // feature level 9?
 		} break;
 
@@ -149,13 +153,15 @@ bool TextureD3D11::create(const TextureDesc& desc, const TextureData initalData[
 			d3dSubresData[iData] = TextureData_D3D11_Native(initalData[iData]);
 		}
 
-		hr = d3ddev->CreateTexture2D(&d3dDesc, shouldAutoGenMipMaps ? nullptr : d3dSubresData.data(), (ID3D11Texture2D**)&m_dx11Texture);
+		hr = d3ddev->CreateTexture2D(
+		    &d3dDesc, shouldAutoGenMipMaps ? nullptr : d3dSubresData.data(), (ID3D11Texture2D**)&m_dx11Texture);
 
 		if (shouldAutoGenMipMaps) {
 			ID3D11DeviceContext* context = nullptr;
 			d3ddev->GetImmediateContext(&context);
 			if (context) {
-				context->UpdateSubresource(m_dx11Texture, 0, NULL, d3dSubresData[0].pSysMem, d3dSubresData[0].SysMemPitch, 0);
+				context->UpdateSubresource(
+				    m_dx11Texture, 0, NULL, d3dSubresData[0].pSysMem, d3dSubresData[0].SysMemPitch, 0);
 				context->GenerateMips(D3D11_GetSRV());
 			}
 		}
@@ -357,8 +363,8 @@ ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc)
 		descRT.Texture1DArray.MipSlice = targetDesc.texture1D.mipLevel;
 	}
 	else if (targetDesc.baseTextureType == UniformType::Texture2D) {
-		descRT.ViewDimension =
-		    (m_desc.texture2D.numSamples == 1) ? D3D11_RTV_DIMENSION_TEXTURE2DARRAY : D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+		descRT.ViewDimension = (m_desc.texture2D.numSamples == 1) ? D3D11_RTV_DIMENSION_TEXTURE2DARRAY
+		                                                          : D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
 
 		if (viewDimension == D3D11_RTV_DIMENSION_TEXTURE2DARRAY) {
 			descRT.Texture2DArray.ArraySize = 1;
@@ -371,8 +377,8 @@ ID3D11RenderTargetView* TextureD3D11::D3D11_GetRTV(const TargetDesc& targetDesc)
 		}
 	}
 	else if (targetDesc.baseTextureType == UniformType::TextureCube) {
-		descRT.ViewDimension =
-		    (m_desc.texture2D.numSamples == 1) ? D3D11_RTV_DIMENSION_TEXTURE2DARRAY : D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+		descRT.ViewDimension = (m_desc.texture2D.numSamples == 1) ? D3D11_RTV_DIMENSION_TEXTURE2DARRAY
+		                                                          : D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
 
 		const int faceArrayIdx = signedAxis_toTexCubeFaceIdx_D3D11(targetDesc.textureCube.face);
 
@@ -439,8 +445,8 @@ ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc)
 		descDS.Texture1DArray.MipSlice = targetDesc.texture1D.mipLevel;
 	}
 	else if (targetDesc.baseTextureType == UniformType::Texture2D) {
-		descDS.ViewDimension =
-		    (m_desc.texture2D.numSamples == 1) ? D3D11_DSV_DIMENSION_TEXTURE2DARRAY : D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+		descDS.ViewDimension = (m_desc.texture2D.numSamples == 1) ? D3D11_DSV_DIMENSION_TEXTURE2DARRAY
+		                                                          : D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
 
 		if (viewDimension == D3D11_DSV_DIMENSION_TEXTURE2DARRAY) {
 			descDS.Texture2DArray.ArraySize = 1;
@@ -453,8 +459,8 @@ ID3D11DepthStencilView* TextureD3D11::D3D11_GetDSV(const TargetDesc& targetDesc)
 		}
 	}
 	else if (targetDesc.baseTextureType == UniformType::TextureCube) {
-		descDS.ViewDimension =
-		    (m_desc.texture2D.numSamples == 1) ? D3D11_DSV_DIMENSION_TEXTURE2DARRAY : D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+		descDS.ViewDimension = (m_desc.texture2D.numSamples == 1) ? D3D11_DSV_DIMENSION_TEXTURE2DARRAY
+		                                                          : D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
 
 		const int faceArrayIdx = signedAxis_toTexCubeFaceIdx_D3D11(targetDesc.textureCube.face);
 
@@ -521,7 +527,8 @@ bool TextureD3D11::isValid() const
 }
 
 //---------------------------------------------------------
-bool TextureD3D11::D3D11_WrapOverD3D11TextureResource(SGEDevice* UNUSED(pDevice), ID3D11Texture2D* d3d11Texture2D, const TextureDesc& desc)
+bool TextureD3D11::D3D11_WrapOverD3D11TextureResource(
+    SGEDevice* UNUSED(pDevice), ID3D11Texture2D* d3d11Texture2D, const TextureDesc& desc)
 {
 	// clear the current state
 	destroy();

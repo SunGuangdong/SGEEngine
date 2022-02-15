@@ -291,15 +291,21 @@ struct mat4f {
 	float determinant() const
 	{
 		const float s[6] = {
-		    data[0][0] * data[1][1] - data[1][0] * data[0][1], data[0][0] * data[1][2] - data[1][0] * data[0][2],
-		    data[0][0] * data[1][3] - data[1][0] * data[0][3], data[0][1] * data[1][2] - data[1][1] * data[0][2],
-		    data[0][1] * data[1][3] - data[1][1] * data[0][3], data[0][2] * data[1][3] - data[1][2] * data[0][3],
+		    data[0][0] * data[1][1] - data[1][0] * data[0][1],
+		    data[0][0] * data[1][2] - data[1][0] * data[0][2],
+		    data[0][0] * data[1][3] - data[1][0] * data[0][3],
+		    data[0][1] * data[1][2] - data[1][1] * data[0][2],
+		    data[0][1] * data[1][3] - data[1][1] * data[0][3],
+		    data[0][2] * data[1][3] - data[1][2] * data[0][3],
 		};
 
 		const float c[6] = {
-		    data[2][0] * data[3][1] - data[3][0] * data[2][1], data[2][0] * data[3][2] - data[3][0] * data[2][2],
-		    data[2][0] * data[3][3] - data[3][0] * data[2][3], data[2][1] * data[3][2] - data[3][1] * data[2][2],
-		    data[2][1] * data[3][3] - data[3][1] * data[2][3], data[2][2] * data[3][3] - data[3][2] * data[2][3],
+		    data[2][0] * data[3][1] - data[3][0] * data[2][1],
+		    data[2][0] * data[3][2] - data[3][0] * data[2][2],
+		    data[2][0] * data[3][3] - data[3][0] * data[2][3],
+		    data[2][1] * data[3][2] - data[3][1] * data[2][2],
+		    data[2][1] * data[3][3] - data[3][1] * data[2][3],
+		    data[2][2] * data[3][3] - data[3][2] * data[2][3],
 		};
 
 		const float det = s[0] * c[5] - s[1] * c[4] + s[2] * c[3] + s[3] * c[2] - s[4] * c[1] + s[5] * c[0];
@@ -315,15 +321,21 @@ struct mat4f {
 	mat4f inverse() const
 	{
 		const float s[6] = {
-		    data[0][0] * data[1][1] - data[1][0] * data[0][1], data[0][0] * data[1][2] - data[1][0] * data[0][2],
-		    data[0][0] * data[1][3] - data[1][0] * data[0][3], data[0][1] * data[1][2] - data[1][1] * data[0][2],
-		    data[0][1] * data[1][3] - data[1][1] * data[0][3], data[0][2] * data[1][3] - data[1][2] * data[0][3],
+		    data[0][0] * data[1][1] - data[1][0] * data[0][1],
+		    data[0][0] * data[1][2] - data[1][0] * data[0][2],
+		    data[0][0] * data[1][3] - data[1][0] * data[0][3],
+		    data[0][1] * data[1][2] - data[1][1] * data[0][2],
+		    data[0][1] * data[1][3] - data[1][1] * data[0][3],
+		    data[0][2] * data[1][3] - data[1][2] * data[0][3],
 		};
 
 		const float c[6] = {
-		    data[2][0] * data[3][1] - data[3][0] * data[2][1], data[2][0] * data[3][2] - data[3][0] * data[2][2],
-		    data[2][0] * data[3][3] - data[3][0] * data[2][3], data[2][1] * data[3][2] - data[3][1] * data[2][2],
-		    data[2][1] * data[3][3] - data[3][1] * data[2][3], data[2][2] * data[3][3] - data[3][2] * data[2][3],
+		    data[2][0] * data[3][1] - data[3][0] * data[2][1],
+		    data[2][0] * data[3][2] - data[3][0] * data[2][2],
+		    data[2][0] * data[3][3] - data[3][0] * data[2][3],
+		    data[2][1] * data[3][2] - data[3][1] * data[2][2],
+		    data[2][1] * data[3][3] - data[3][1] * data[2][3],
+		    data[2][2] * data[3][3] - data[3][2] * data[2][3],
 		};
 
 		const float invDet = 1.f / (s[0] * c[5] - s[1] * c[4] + s[2] * c[3] + s[3] * c[2] - s[4] * c[1] + s[5] * c[0]);
@@ -553,7 +565,10 @@ struct mat4f {
 	}
 
 	// Todo: Propery implement this as it is commonly used thing!
-	static mat4f getAxisRotation(const vec3f& axis, const float angle) { return getRotationQuat(quatf::getAxisAngle(axis, angle)); }
+	static mat4f getAxisRotation(const vec3f& axis, const float angle)
+	{
+		return getRotationQuat(quatf::getAxisAngle(axis, angle));
+	}
 
 	// [TODO] Optimize this.
 	static mat4f getTRS(const vec3f& translation, const quatf& rotQuat, const vec3f& scaling)
@@ -565,14 +580,21 @@ struct mat4f {
 	// Orthographic projection
 	//----------------------------------------------------------------
 	static mat4f getOrthoRH(
-	    const float left, const float right, const float top, const float bottom, const float nearZ, const float farZ, const bool d3dStyle)
+	    const float left,
+	    const float right,
+	    const float top,
+	    const float bottom,
+	    const float nearZ,
+	    const float farZ,
+	    const bool d3dStyle)
 	{
 		if (d3dStyle) {
 			mat4f result;
 			result.data[0] = vec4f(2.f / (right - left), 0.f, 0.f, 0.f);
 			result.data[1] = vec4f(0.f, 2.f / (top - bottom), 0.f, 0.f);
 			result.data[2] = vec4f(0.f, 0.f, 1.f / (nearZ - farZ), 0.f);
-			result.data[3] = vec4f((left + right) / (left - right), (top + bottom) / (bottom - top), nearZ / (nearZ - farZ), 1.f);
+			result.data[3] =
+			    vec4f((left + right) / (left - right), (top + bottom) / (bottom - top), nearZ / (nearZ - farZ), 1.f);
 
 			return result;
 		}
@@ -582,8 +604,11 @@ struct mat4f {
 			result.data[0] = vec4f(2.f / (right - left), 0.f, 0.f, 0.f);
 			result.data[1] = vec4f(0.f, 2.f / (top - bottom), 0.f, 0.f);
 			result.data[2] = vec4f(0.f, 0.f, -2.f / (farZ - nearZ), 0.f);
-			result.data[3] =
-			    vec4f(-(right + left) / (right - left), -(top + bottom) / (top - bottom), -(farZ + nearZ) / (farZ - nearZ), 1.f);
+			result.data[3] = vec4f(
+			    -(right + left) / (right - left),
+			    -(top + bottom) / (top - bottom),
+			    -(farZ + nearZ) / (farZ - nearZ),
+			    1.f);
 
 			return result;
 		}
@@ -640,7 +665,8 @@ struct mat4f {
 		return result;
 	}
 
-	static mat4f getPerspectiveOffCenterRH(float left, float right, float bottom, float top, float nearZ, float farZ, const bool d3dStyle)
+	static mat4f getPerspectiveOffCenterRH(
+	    float left, float right, float bottom, float top, float nearZ, float farZ, const bool d3dStyle)
 	{
 		if (d3dStyle)
 			return getPerspectiveOffCenterRH_DirectX(left, right, bottom, top, nearZ, farZ);
@@ -649,7 +675,11 @@ struct mat4f {
 	}
 
 	static mat4f getPerspectiveFovRH_DirectX(
-	    const float verticalFieldOfView, const float ratioWidthByHeight, const float nearZ, const float farZ, const float heightShift)
+	    const float verticalFieldOfView,
+	    const float ratioWidthByHeight,
+	    const float nearZ,
+	    const float farZ,
+	    const float heightShift)
 	{
 		float SinFov;
 		float CosFov;
@@ -658,11 +688,16 @@ struct mat4f {
 		float Height = (SinFov * nearZ) / CosFov;
 		float Width = ratioWidthByHeight * Height;
 
-		return getPerspectiveOffCenterRH_DirectX(-Width, Width, -Height + heightShift, Height + heightShift, nearZ, farZ);
+		return getPerspectiveOffCenterRH_DirectX(
+		    -Width, Width, -Height + heightShift, Height + heightShift, nearZ, farZ);
 	}
 
 	static mat4f getPerspectiveFovRH_OpenGL(
-	    const float verticalFieldOfView, const float ratioWidthByHeight, const float nearZ, const float farZ, const float heightShift)
+	    const float verticalFieldOfView,
+	    const float ratioWidthByHeight,
+	    const float nearZ,
+	    const float farZ,
+	    const float heightShift)
 	{
 		float SinFov;
 		float CosFov;
@@ -671,11 +706,17 @@ struct mat4f {
 		float Height = (SinFov * nearZ) / CosFov;
 		float Width = ratioWidthByHeight * Height;
 
-		return getPerspectiveOffCenterRH_OpenGL(-Width, Width, -Height + heightShift, Height + heightShift, nearZ, farZ);
+		return getPerspectiveOffCenterRH_OpenGL(
+		    -Width, Width, -Height + heightShift, Height + heightShift, nearZ, farZ);
 	}
 
 	static mat4f getPerspectiveFovRH(
-	    const float fov, const float aspect, const float nearZ, const float farZ, const float heightShift, const bool d3dStyle)
+	    const float fov,
+	    const float aspect,
+	    const float nearZ,
+	    const float farZ,
+	    const float heightShift,
+	    const bool d3dStyle)
 	{
 		if (d3dStyle)
 			return getPerspectiveFovRH_DirectX(fov, aspect, nearZ, farZ, heightShift);

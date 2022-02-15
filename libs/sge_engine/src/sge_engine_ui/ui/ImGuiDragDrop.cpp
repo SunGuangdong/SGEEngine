@@ -7,7 +7,8 @@ namespace sge {
 //-----------------------------------------------------
 sge::Optional<std::set<sge::ObjectId>> DragDropPayloadActor::decode(const ImGuiPayload* payload)
 {
-	if (payload && payload->IsDataType("sgedd_actors") && payload->Data != nullptr && payload->DataSize % sizeof(int) == 0) {
+	if (payload && payload->IsDataType("sgedd_actors") && payload->Data != nullptr &&
+	    payload->DataSize % sizeof(int) == 0) {
 		int numActors = payload->DataSize / sizeof(int);
 		std::set<sge::ObjectId> objects;
 
@@ -22,7 +23,8 @@ sge::Optional<std::set<sge::ObjectId>> DragDropPayloadActor::decode(const ImGuiP
 }
 sge::Optional<sge::ObjectId> DragDropPayloadActor::decodeSingle(const ImGuiPayload* payload)
 {
-	if (payload && payload->IsDataType("sgedd_actors") && payload->Data != nullptr && payload->DataSize == sizeof(int)) {
+	if (payload && payload->IsDataType("sgedd_actors") && payload->Data != nullptr &&
+	    payload->DataSize == sizeof(int)) {
 		const int* idRaw = (int*)payload->Data;
 		return sge::ObjectId(*idRaw);
 	}

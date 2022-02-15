@@ -133,7 +133,8 @@ vec3f vec3fFromFbx(const fbxsdk::FbxVector4& fbxVec)
 }
 
 template <class TFBXLayerElement, int TDataArity>
-void readGeometryElement(TFBXLayerElement* const element, int const controlPointIndex, int const vertexIndex, float* const result)
+void readGeometryElement(
+    TFBXLayerElement* const element, int const controlPointIndex, int const vertexIndex, float* const result)
 {
 	fbxsdk::FbxGeometryElement::EMappingMode const mappingMode = element->GetMappingMode();
 	fbxsdk::FbxGeometryElement::EReferenceMode const referenceMode = element->GetReferenceMode();
@@ -189,7 +190,8 @@ void getFbxAnimCurveKeyTimes(fbxsdk::FbxAnimCurve* curve, vector_set<fbxsdk::Fbx
 
 /// Finds all the keyframes times for the speicified fbx property for animation layer @fbxAnimLayer
 /// and stores them in @outTimes.
-void getLayerKeyTimesForProp(fbxsdk::FbxProperty& fbxProp, fbxsdk::FbxAnimLayer* fbxAnimLayer, vector_set<fbxsdk::FbxTime>& outTimes)
+void getLayerKeyTimesForProp(
+    fbxsdk::FbxProperty& fbxProp, fbxsdk::FbxAnimLayer* fbxAnimLayer, vector_set<fbxsdk::FbxTime>& outTimes)
 {
 	// Check for full propery animation (while the whole ration Euler angles set or a quaternion).
 	// Usually exported like that form 3ds Max and Maya.
@@ -207,12 +209,13 @@ void getLayerKeyTimesForProp(fbxsdk::FbxProperty& fbxProp, fbxsdk::FbxAnimLayer*
 //---------------------------------------------------------------
 // FBXSDKParser
 //---------------------------------------------------------------
-bool FBXSDKParser::parse(Model* result,
-                         ModelImportAdditionalResult& additionalResult,
-                         std::string& materialsPrefix,
-                         fbxsdk::FbxScene* scene,
-                         FbxNode* enforcedRootNode,
-                         const ModelParseSettings& parseSettings)
+bool FBXSDKParser::parse(
+    Model* result,
+    ModelImportAdditionalResult& additionalResult,
+    std::string& materialsPrefix,
+    fbxsdk::FbxScene* scene,
+    FbxNode* enforcedRootNode,
+    const ModelParseSettings& parseSettings)
 {
 	try {
 		// Make sure that the FBX SDK is initialized.
@@ -236,7 +239,8 @@ bool FBXSDKParser::parse(Model* result,
 
 		// Discover all the nodes that need to be parsed. Allocate them and store their hierarchy.
 		// This step also dicovers all meshes and materials that need to be imported.
-		fbxsdk::FbxNode* const rootNodeToBeUsed = enforcedRootNode != nullptr ? enforcedRootNode : m_fbxScene->GetRootNode();
+		fbxsdk::FbxNode* const rootNodeToBeUsed =
+		    enforcedRootNode != nullptr ? enforcedRootNode : m_fbxScene->GetRootNode();
 		const int importedRootNodeIndex = discoverNodesRecursive(rootNodeToBeUsed);
 
 		m_model->setRootNodeIndex(importedRootNodeIndex);
@@ -299,9 +303,9 @@ int FBXSDKParser::discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode)
 	node->name = fbxNode->GetName();
 
 	// [FBX_PARSING_NODE_ATTRIBS]
-	// Read the node's attrbiutes. Attributes are something that specifies what the node is and that data does it reference.
-	// It could be if the node is used for a bone some parameters of that bone (for example it's length).
-	// It could be a mesh and/or material.
+	// Read the node's attrbiutes. Attributes are something that specifies what the node is and that data does it
+	// reference. It could be if the node is used for a bone some parameters of that bone (for example it's length). It
+	// could be a mesh and/or material.
 	int const attribCount = fbxNode->GetNodeAttributeCount();
 	for (const int iAttrib : RangeInt(attribCount)) {
 		fbxsdk::FbxNodeAttribute* const fbxNodeAttrib = fbxNode->GetNodeAttributeByIndex(iAttrib);
@@ -319,7 +323,8 @@ int FBXSDKParser::discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode)
 				// Check if the geometry attached to this node should
 				// be used for as collsion geometry and not for rendering.
 				// This is guessed by the prefix in the node name.
-				bool const isCollisionGeometryTriMeshNode = node->name.find("SCConcave_") == 0 || node->name.find("SCTriMesh_") == 0;
+				bool const isCollisionGeometryTriMeshNode =
+				    node->name.find("SCConcave_") == 0 || node->name.find("SCTriMesh_") == 0;
 				bool const isCollisionGeometryConvexNode = node->name.find("SCConvex_") == 0;
 				bool const isCollisionGeometryBoxNode = node->name.find("SCBox_") == 0;
 				bool const isCollisionGeometryCapsuleNode = node->name.find("SCCapsule_") == 0;
@@ -338,7 +343,8 @@ int FBXSDKParser::discoverNodesRecursive(fbxsdk::FbxNode* const fbxNode)
 
 				if (isCollisionGeometryNode) {
 					// A mesh that must be used for collision only.
-					transf3d const globalTransformBindMoment = transf3DFromFbx(fbxNode->EvaluateGlobalTransform(), FbxEuler::eOrderXYZ);
+					transf3d const globalTransformBindMoment =
+					    transf3DFromFbx(fbxNode->EvaluateGlobalTransform(), FbxEuler::eOrderXYZ);
 
 					if (isCollisionGeometryConvexNode) {
 						m_collision_ConvexHullMeshes[fbxMesh].push_back(globalTransformBindMoment);
@@ -438,15 +444,16 @@ void FBXSDKParser::importMaterials()
 		if (propMaya.IsValid()) {
 			// Try to parse this as if it is a Stingray PBS material.
 
-			// Load the specified texture (if exists) in the current material parameter block under the name @outParamName.
-			// Returns true if a texture was assigned.
-			const auto loadTextureFromFbxPropertyByName = [&](const FbxProperty& rootProp, const char* subPropName) -> std::string {
+			// Load the specified texture (if exists) in the current material parameter block under the name
+			// @outParamName. Returns true if a texture was assigned.
+			const auto loadTextureFromFbxPropertyByName = [&](const FbxProperty& rootProp,
+			                                                  const char* subPropName) -> std::string {
 				const FbxProperty prop = rootProp.Find(subPropName);
 				if (prop.IsValid()) {
 					if (const FbxFileTexture* fFileTex = prop.GetSrcObject<FbxFileTexture>()) {
 						const char* const texFilename = fFileTex->GetRelativeFileName();
-						const std::string requestPath =
-						    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
+						const std::string requestPath = m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(
+						    m_parseSettings.fileDirectroy, texFilename);
 
 						if (!requestPath.empty()) {
 							// Add the texture to the list of the files to get copied.
@@ -535,8 +542,8 @@ void FBXSDKParser::importMaterials()
 			fbxsdk::FbxFileTexture* const fFileDiffuseTex = findTextureFromFbxProperty(propDiffuse);
 			if (fFileDiffuseTex) {
 				const char* const texFilename = fFileDiffuseTex->GetRelativeFileName();
-				const std::string requestPath =
-				    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
+				const std::string requestPath = m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(
+				    m_parseSettings.fileDirectroy, texFilename);
 				importedMtlSets.diffuseTextureName = requestPath;
 				m_additionalResult->textureToCopy.insert(requestPath);
 			}
@@ -544,8 +551,8 @@ void FBXSDKParser::importMaterials()
 			fbxsdk::FbxFileTexture* const fFileNormalTex = findTextureFromFbxProperty(propNormal);
 			if (fFileNormalTex) {
 				const char* const texFilename = fFileNormalTex->GetRelativeFileName();
-				const std::string requestPath =
-				    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
+				const std::string requestPath = m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(
+				    m_parseSettings.fileDirectroy, texFilename);
 				importedMtlSets.normalTextureName = requestPath;
 				m_additionalResult->textureToCopy.insert(requestPath);
 			}
@@ -554,8 +561,8 @@ void FBXSDKParser::importMaterials()
 				fbxsdk::FbxFileTexture* const fFileBumpTex = findTextureFromFbxProperty(propBump);
 				if (fFileBumpTex) {
 					const char* const texFilename = fFileBumpTex->GetRelativeFileName();
-					const std::string requestPath =
-					    m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(m_parseSettings.fileDirectroy, texFilename);
+					const std::string requestPath = m_parseSettings.pRelocaionPolicy->whatWillBeTheAssetNameOf(
+					    m_parseSettings.fileDirectroy, texFilename);
 					importedMtlSets.normalTextureName = requestPath;
 					m_additionalResult->textureToCopy.insert(requestPath);
 				}
@@ -589,7 +596,9 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 		FbxAMatrix fbxPivot;
 		fbxMesh->GetPivot(fbxPivot);
 		if (!fbxPivot.IsIdentity()) {
-			printf("Non identity pivot on geometry %s. These are not supported (yet!). Identity will be used!\n", fbxMesh->GetName());
+			printf(
+			    "Non identity pivot on geometry %s. These are not supported (yet!). Identity will be used!\n",
+			    fbxMesh->GetName());
 		}
 	}
 
@@ -740,9 +749,9 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 
 				const int boneNodeIndex = itrFindBoneNode->second;
 
-				// Compute the offset matrix. The offset matrix repsents the location of the bone when it was bound the the mesh.
-				// It is used to transform the vertices to the bones space and apply it's infuence there and then to return it back to the
-				// meshes "object space".
+				// Compute the offset matrix. The offset matrix repsents the location of the bone when it was bound the
+				// the mesh. It is used to transform the vertices to the bones space and apply it's infuence there and
+				// then to return it back to the meshes "object space".
 
 				// auto t = fNodeBone->GetGeometricTranslation(fbxsdk::FbxNode::eSourcePivot);
 				// auto r = fNodeBone->GetGeometricRotation(fbxsdk::FbxNode::eSourcePivot);
@@ -755,7 +764,8 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 				fCluster->GetTransformMatrix(transformMatrix);
 
 				// The transformation of the cluster(joint, bone) at binding time from joint space to world space.
-				// TODO: Geometric transform. The internet applies it here, but it should be stored in the MeshAttachment IMHO.
+				// TODO: Geometric transform. The internet applies it here, but it should be stored in the
+				// MeshAttachment IMHO.
 				fCluster->GetTransformLinkMatrix(transformLinkMatrix);
 				FbxAMatrix const globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix;
 
@@ -798,7 +808,9 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 			const int numControlPoints = fbxMesh->GetControlPointsCount();
 			bool hasVertsWithNoBonesAttached = perControlPointBoneInfluence.size() != numControlPoints;
 			if (clustersCount > 0 && hasVertsWithNoBonesAttached) {
-				printf("Found a skinned mesh with vertices that have no bones infuencing them. A workaround soultion will take place.");
+				printf(
+				    "Found a skinned mesh with vertices that have no bones infuencing them. A workaround soultion will "
+				    "take place.");
 				for (int iCtrlPt = 0; iCtrlPt < numControlPoints; ++iCtrlPt) {
 					if (perControlPointBoneInfluence.count(iCtrlPt) == 0) {
 						// The control point doesn't have any bones infuencing it.
@@ -814,14 +826,18 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 							// The transformation of the mesh at binding time.
 							fCluster->GetTransformMatrix(transformMatrix);
 
-							// The transformation of the cluster(joint, bone) at binding time from joint space to world space.
-							// TODO: Geometric transform. The internet applies it here, but it should be stored in the MeshAttachment IMHO.
+							// The transformation of the cluster(joint, bone) at binding time from joint space to world
+							// space.
+							// TODO: Geometric transform. The internet applies it here, but it should be stored in the
+							// MeshAttachment IMHO.
 							fCluster->GetTransformLinkMatrix(transformLinkMatrix);
-							FbxAMatrix const globalBindposeInverseMatrix = transformLinkMatrix.Inverse() * transformMatrix;
+							FbxAMatrix const globalBindposeInverseMatrix =
+							    transformLinkMatrix.Inverse() * transformMatrix;
 
 							mat4f boneOffseMtx = mat4f::getIdentity();
 							for (int const t : RangeInt(16)) {
-								boneOffseMtx.data[t / 4][t % 4] = (float)(globalBindposeInverseMatrix.mData[t / 4].mData[t % 4]);
+								boneOffseMtx.data[t / 4][t % 4] =
+								    (float)(globalBindposeInverseMatrix.mData[t / 4].mData[t % 4]);
 							}
 
 							const vec3f ctrPointPos = vec3fFromFbx(fbxMesh->GetControlPointAt(iCtrlPt));
@@ -928,7 +944,8 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 	};
 
 	// An asset to check if we computed correctly vertex layout.
-	sgeAssert(stride == mesh.vertexDecl.back().byteOffset + sge::UniformType::GetSizeBytes(mesh.vertexDecl.back().format));
+	sgeAssert(
+	    stride == mesh.vertexDecl.back().byteOffset + sge::UniformType::GetSizeBytes(mesh.vertexDecl.back().format));
 
 	// Get the number of polygons.
 	const int numPolygons = fbxMesh->GetPolygonCount();
@@ -962,34 +979,36 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 			vert2controlPoint_BeforeInterleave[globalVertexIndex] = ctrlPtIndex;
 
 			fbxsdk::FbxVector4 const fbxPosition = fbxMesh->GetControlPointAt(ctrlPtIndex);
-			positions[globalVertexIndex] = vec3f((float)fbxPosition.mData[0], (float)fbxPosition.mData[1], (float)fbxPosition.mData[2]);
+			positions[globalVertexIndex] =
+			    vec3f((float)fbxPosition.mData[0], (float)fbxPosition.mData[1], (float)fbxPosition.mData[2]);
 
 			geomBBoxObjectSpace.expand(positions[globalVertexIndex]);
 
 			// Read the vertex attributes.
 			if (evemVertexColor0) {
-				readGeometryElement<FbxGeometryElementVertexColor, 4>(evemVertexColor0, ctrlPtIndex, globalVertexIndex,
-				                                                      vtxColors[globalVertexIndex].data);
+				readGeometryElement<FbxGeometryElementVertexColor, 4>(
+				    evemVertexColor0, ctrlPtIndex, globalVertexIndex, vtxColors[globalVertexIndex].data);
 			}
 
 			if (elemNormals0) {
-				readGeometryElement<FbxGeometryElementNormal, 3>(elemNormals0, ctrlPtIndex, globalVertexIndex,
-				                                                 normals[globalVertexIndex].data);
+				readGeometryElement<FbxGeometryElementNormal, 3>(
+				    elemNormals0, ctrlPtIndex, globalVertexIndex, normals[globalVertexIndex].data);
 			}
 
 			if (elemTangets0) {
-				readGeometryElement<FbxGeometryElementTangent, 3>(elemTangets0, ctrlPtIndex, globalVertexIndex,
-				                                                  tangents[globalVertexIndex].data);
+				readGeometryElement<FbxGeometryElementTangent, 3>(
+				    elemTangets0, ctrlPtIndex, globalVertexIndex, tangents[globalVertexIndex].data);
 			}
 
 			if (elemBinormal0) {
-				readGeometryElement<FbxGeometryElementBinormal, 3>(elemBinormal0, ctrlPtIndex, globalVertexIndex,
-				                                                   binormals[globalVertexIndex].data);
+				readGeometryElement<FbxGeometryElementBinormal, 3>(
+				    elemBinormal0, ctrlPtIndex, globalVertexIndex, binormals[globalVertexIndex].data);
 			}
 
 			if (elemUV0) {
 				// Convert to DirectX style UVs.
-				readGeometryElement<FbxGeometryElementUV, 2>(elemUV0, ctrlPtIndex, globalVertexIndex, uvs[globalVertexIndex].data);
+				readGeometryElement<FbxGeometryElementUV, 2>(
+				    elemUV0, ctrlPtIndex, globalVertexIndex, uvs[globalVertexIndex].data);
 				uvs[globalVertexIndex].y = 1.f - uvs[globalVertexIndex].y;
 			}
 
@@ -1063,10 +1082,10 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 	// Stores the control point used to for each vertex. This data is needed
 	// when we remove duplicated vertices. Duplicated vertices colud happen in two ways
 	// 1st one is with the code above where we create a flat buffer of all vertices (representing a triangle list).
-	// 2nd one is that the geometry had two or more control points at the same location because the geometry (produced by the artist)
-	// had duplicated faces. In this situation it feel tempting to just ignore that the vertices come from different control points
-	// however when skinning is involved this vertex will end up not being assigned to any bone, this is why we take the source control
-	// point of the vertex when we remove duplicates.
+	// 2nd one is that the geometry had two or more control points at the same location because the geometry (produced
+	// by the artist) had duplicated faces. In this situation it feel tempting to just ignore that the vertices come
+	// from different control points however when skinning is involved this vertex will end up not being assigned to any
+	// bone, this is why we take the source control point of the vertex when we remove duplicates.
 	std::vector<int> perVertexControlPoint;
 	std::vector<std::set<int>> controlPoint2verts(fbxMesh->GetControlPointsCount());
 
@@ -1084,11 +1103,12 @@ void FBXSDKParser::importMeshes_singleMesh(FbxMesh* fbxMesh, int importedMeshInd
 		for (int byteOffset = int(vertexBufferData.size()) - stride; byteOffset >= 0; byteOffset -= stride) {
 			const bool doesDataMatch = memcmp(srcVertexData, &vertexBufferData[byteOffset], stride) == 0;
 			if (doesDataMatch) {
-				const bool doesSourceControlPointMatch =
-				    vert2controlPoint_BeforeInterleave[iSrcVert] == vert2controlPoint_BeforeInterleave[byteOffset / stride];
+				const bool doesSourceControlPointMatch = vert2controlPoint_BeforeInterleave[iSrcVert] ==
+				                                         vert2controlPoint_BeforeInterleave[byteOffset / stride];
 
 				// Sometimes the artists might create duplicated geometry, if so the data will match but not the
-				// control point that generated that vertex. As a result, the bones skinning later will not get applied properly.
+				// control point that generated that vertex. As a result, the bones skinning later will not get applied
+				// properly.
 				if (doesSourceControlPointMatch) {
 					vertexIndexWithSameData = byteOffset / stride;
 					break;
@@ -1168,11 +1188,8 @@ void FBXSDKParser::importNodes_singleNode(FbxNode* fbxNode, int importNodeIndex)
 
 	// http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=files/GUID-10CDD63C-79C1-4F2D-BB28-AD2BE65A02ED.htm,topicNumber=d30e8997
 	// http://docs.autodesk.com/FBX/2014/ENU/FBX-SDK-Documentation/index.html?url=cpp_ref/class_fbx_node.html,topicNumber=cpp_ref_class_fbx_node_html6b73528d-77ae-4781-b04c-da4af82b4a08
-	// (see Pivot Management) From FBX SDK docs: Rotation offset (Roff) Rotation pivot (Rp) Pre-rotation (Rpre) Post-rotation (Rpost)
-	// Scaling offset (Soff)
-	// Scaling pivot (Sp)
-	// Geometric translation (Gt)
-	// Geometric rotation (Gr)
+	// (see Pivot Management) From FBX SDK docs: Rotation offset (Roff) Rotation pivot (Rp) Pre-rotation (Rpre)
+	// Post-rotation (Rpost) Scaling offset (Soff) Scaling pivot (Sp) Geometric translation (Gt) Geometric rotation (Gr)
 	// Geometric scaling (Gs)
 	// World = ParentWorld * T * Roff * Rp * Rpre * R * Rpost * Rp-1 * Soff * Sp * S * Sp-1
 
@@ -1198,9 +1215,9 @@ void FBXSDKParser::importNodes_singleNode(FbxNode* fbxNode, int importNodeIndex)
 	node->staticLocalTransform = transf3DFromFbx(fbxNode->EvaluateLocalTransform(), FbxEuler::eOrderXYZ);
 
 	// [FBX_PARSING_NODE_ATTRIBS]
-	// Read the node's attrbiutes. Attributes are something that specifies what the node is and that data does it reference.
-	// It could be if the node is used for a bone some parameters of that bone (for example it's length).
-	// It could be a mesh and/or material.
+	// Read the node's attrbiutes. Attributes are something that specifies what the node is and that data does it
+	// reference. It could be if the node is used for a bone some parameters of that bone (for example it's length). It
+	// could be a mesh and/or material.
 	int const attribCount = fbxNode->GetNodeAttributeCount();
 	for (const int iAttrib : RangeInt(attribCount)) {
 		fbxsdk::FbxNodeAttribute* const fbxNodeAttrib = fbxNode->GetNodeAttributeByIndex(iAttrib);
@@ -1234,7 +1251,8 @@ void FBXSDKParser::importNodes_singleNode(FbxNode* fbxNode, int importNodeIndex)
 				}
 
 				if (itrFindMeshIndex != m_fbxMesh2MeshIndex.end() && materialIndex >= 0) {
-					node->meshAttachments.push_back(MeshAttachment(itrFindMeshIndex->second, itrFindMaterialIndex->second));
+					node->meshAttachments.push_back(
+					    MeshAttachment(itrFindMeshIndex->second, itrFindMaterialIndex->second));
 				}
 			}
 		}
@@ -1255,7 +1273,8 @@ void FBXSDKParser::importAnimations()
 	using FbxTimeToTransformLut = std::unordered_map<fbxsdk::FbxTime, FbxAMatrix, sge_FbxTime_hasher>;
 	std::unordered_map<fbxsdk::FbxNode*, FbxTimeToTransformLut> perNodeLclTransformLUT;
 
-	const auto getNodeTransform = [&perNodeLclTransformLUT](fbxsdk::FbxNode* fbxNode, const fbxsdk::FbxTime& time) -> FbxAMatrix {
+	const auto getNodeTransform =
+	    [&perNodeLclTransformLUT](fbxsdk::FbxNode* fbxNode, const fbxsdk::FbxTime& time) -> FbxAMatrix {
 		FbxTimeToTransformLut& timeToTransformLUT = perNodeLclTransformLUT[fbxNode];
 
 		// Check if we have cached values for EvaluateLocalTransform at this time.
@@ -1298,9 +1317,9 @@ void FBXSDKParser::importAnimations()
 		// Per node keyframes for this animation. They keyframes are in node local space.
 		std::map<int, KeyFrames> perNodeKeyFrames;
 
-		// Each stack constist of multiple layers. This abstaction is used by the artist in Maya/Max/ect. to separate the different type
-		// of keyframes while animating. This is purely used to keep the animation timeline organized and has no functionally when
-		// playing the animation in code.
+		// Each stack constist of multiple layers. This abstaction is used by the artist in Maya/Max/ect. to separate
+		// the different type of keyframes while animating. This is purely used to keep the animation timeline organized
+		// and has no functionally when playing the animation in code.
 		int const layerCount = fbxAnimStack->GetMemberCount<fbxsdk::FbxAnimLayer>();
 		for (int const iLayer : RangeInt(layerCount)) {
 			fbxsdk::FbxAnimLayer* const fbxAnimLayer = fbxAnimStack->GetMember<fbxsdk::FbxAnimLayer>(iLayer);
@@ -1310,7 +1329,8 @@ void FBXSDKParser::importAnimations()
 				fbxsdk::FbxNode* const fbxNode = itr.first;
 				KeyFrames nodeKeyFrames;
 
-				[[maybe_unused]] fbxsdk::FbxAnimCurveNode* curveNode = fbxNode->LclRotation.GetCurveNode(fbxAnimLayer, false);
+				[[maybe_unused]] fbxsdk::FbxAnimCurveNode* curveNode =
+				    fbxNode->LclRotation.GetCurveNode(fbxAnimLayer, false);
 
 				if (!fbxNode) {
 					sgeAssert(false && "Failed to find nodes for importing their animations.");
@@ -1319,7 +1339,8 @@ void FBXSDKParser::importAnimations()
 
 				// Check if the node's translation is animated.
 				{
-					vector_set<fbxsdk::FbxTime> keyFrameTimesTranslation; // Assumes that vector_set stores the data linear and sorted.
+					vector_set<fbxsdk::FbxTime>
+					    keyFrameTimesTranslation; // Assumes that vector_set stores the data linear and sorted.
 					getLayerKeyTimesForProp(fbxNode->LclTranslation, fbxAnimLayer, keyFrameTimesTranslation);
 					if (!keyFrameTimesTranslation.empty()) {
 						const int keyFramesCount = keyFrameTimesTranslation.size();
@@ -1332,7 +1353,8 @@ void FBXSDKParser::importAnimations()
 
 							// Convert the keyframe to our own format and save it.
 							const float keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
-							vec3f const position = vec3f((float)fbxPos.mData[0], (float)fbxPos.mData[1], (float)fbxPos.mData[2]);
+							vec3f const position =
+							    vec3f((float)fbxPos.mData[0], (float)fbxPos.mData[1], (float)fbxPos.mData[2]);
 
 							nodeKeyFrames.positionKeyFrames[keyTimeSeconds] = position;
 						}
@@ -1341,7 +1363,8 @@ void FBXSDKParser::importAnimations()
 
 				// Check if the node's rotation is animated.
 				{
-					vector_set<fbxsdk::FbxTime> keyFrameTimesRotation; // Assumes that vector_set stores the data linear and sorted.
+					vector_set<fbxsdk::FbxTime>
+					    keyFrameTimesRotation; // Assumes that vector_set stores the data linear and sorted.
 					getLayerKeyTimesForProp(fbxNode->LclRotation, fbxAnimLayer, keyFrameTimesRotation);
 					if (!keyFrameTimesRotation.empty()) {
 						const int keyFramesCount = keyFrameTimesRotation.size();
@@ -1361,7 +1384,8 @@ void FBXSDKParser::importAnimations()
 
 				// Check if the node's scaling is animated.
 				{
-					vector_set<fbxsdk::FbxTime> keyFrameTimesScaling; // Assumes that vector_set stores the data linear and sorted.
+					vector_set<fbxsdk::FbxTime>
+					    keyFrameTimesScaling; // Assumes that vector_set stores the data linear and sorted.
 					getLayerKeyTimesForProp(fbxNode->LclScaling, fbxAnimLayer, keyFrameTimesScaling);
 
 					if (!keyFrameTimesScaling.empty()) {
@@ -1374,7 +1398,8 @@ void FBXSDKParser::importAnimations()
 
 							// Convert the keyframe to our own format and save it.
 							float const keyTimeSeconds = (float)fbxKeyTime.GetSecondDouble() - animationStart;
-							vec3f const scaling = vec3f((float)fScaling.mData[0], (float)fScaling.mData[1], (float)fScaling.mData[2]);
+							vec3f const scaling =
+							    vec3f((float)fScaling.mData[0], (float)fScaling.mData[1], (float)fScaling.mData[2]);
 							nodeKeyFrames.scalingKeyFrames[keyTimeSeconds] = scaling;
 						}
 					}
@@ -1392,7 +1417,8 @@ void FBXSDKParser::importAnimations()
 		// FBX exporters tend to do this for some reason.
 		if (!perNodeKeyFrames.empty()) {
 			const int newAnimIndex = m_model->makeNewAnim();
-			*(m_model->animationAt(newAnimIndex)) = ModelAnimation(animationName, animationDuration, std::move(perNodeKeyFrames));
+			*(m_model->animationAt(newAnimIndex)) =
+			    ModelAnimation(animationName, animationDuration, std::move(perNodeKeyFrames));
 		}
 	}
 }
@@ -1410,12 +1436,14 @@ void FBXSDKParser::importCollisionGeometry()
 			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
-				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
+				mat4f const n2w =
+				    m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
 				for (vec3f& v : verticesWS) {
 					v = mat_mul_pos(n2w, v);
 				}
 
-				m_model->m_convexHulls.emplace_back(ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
+				m_model->m_convexHulls.emplace_back(
+				    ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
 			}
 		}
 		else {
@@ -1434,12 +1462,14 @@ void FBXSDKParser::importCollisionGeometry()
 			for (int const iInstance : RangeInt(int(itrFbxMeshInstantiations.second.size()))) {
 				std::vector<vec3f> verticesWS = collisionMeshObjectSpace.vertices;
 
-				mat4f const n2w = m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
+				mat4f const n2w =
+				    m_collision_transfromCorrection.toMatrix() * itrFbxMeshInstantiations.second[iInstance].toMatrix();
 				for (vec3f& v : verticesWS) {
 					v = mat_mul_pos(n2w, v);
 				}
 
-				m_model->m_concaveHulls.emplace_back(ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
+				m_model->m_concaveHulls.emplace_back(
+				    ModelCollisionMesh{std::move(verticesWS), collisionMeshObjectSpace.indices});
 			}
 		}
 		else {
@@ -1526,7 +1556,8 @@ void FBXSDKParser::importCollisionGeometry()
 		for (int const iInstance : RangeInt(int(itrSphereInstantiations.second.size()))) {
 			transf3d const n2w = m_collision_transfromCorrection * itrSphereInstantiations.second[iInstance];
 
-			m_model->m_collisionSpheres.push_back(Model_CollisionShapeSphere{std::string(fbxMesh->GetNode()->GetName()), n2w, radius});
+			m_model->m_collisionSpheres.push_back(
+			    Model_CollisionShapeSphere{std::string(fbxMesh->GetNode()->GetName()), n2w, radius});
 		}
 	}
 }

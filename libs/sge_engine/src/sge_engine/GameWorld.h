@@ -75,10 +75,10 @@ struct GameUpdateSets {
 	/// @brief Returns true if the game is not paused.
 	bool isPlaying() const { return !isSimulationPaused(); }
 
-	float dt = 0.f; ///< The delta time to be used when updateing.
-	bool isSimPaused =
-	    true;      ///< True if the simulation is paused for any reason (usually we are in the editor and the game is paused there).
-	InputState is; ///< The input state to be used when updateing the scene.
+	float dt = 0.f;          ///< The delta time to be used when updateing.
+	bool isSimPaused = true; ///< True if the simulation is paused for any reason (usually we are in the editor and the
+	                         ///< game is paused there).
+	InputState is;           ///< The input state to be used when updateing the scene.
 };
 
 /// @brief GameWorld is the main class that hold all alocated GameObject (Material, Scripts, Actors and so on),
@@ -123,8 +123,8 @@ struct SGE_ENGINE_API GameWorld {
 
 	/// Permanently deletes the specified object, wthout giving it a chance of recovery.
 	/// Example usage: in gameplay when destroying bullets or killing enemies.
-	/// The object isn't going to be deleted immediatley, instead it is going to get added to a list of object that want to get killed.
-	/// At the begining of the next update() they are going to get deleted.
+	/// The object isn't going to be deleted immediatley, instead it is going to get added to a list of object that want
+	/// to get killed. At the begining of the next update() they are going to get deleted.
 	void objectDelete(const ObjectId& id);
 
 	GameObject* getObjectById(const ObjectId& id);
@@ -147,7 +147,8 @@ struct SGE_ENGINE_API GameWorld {
 	/// Iterates over all playing and awaiting creation game objects.
 	/// @param [in] lambda the lambda-function to get called to get called for each game object.
 	/// The lambda should return true if it wants to get called for the next object.
-	void iterateOverPlayingObjects(const std::function<bool(const GameObject*)>& lambda, bool includeAwaitCreationObject) const;
+	void iterateOverPlayingObjects(
+	    const std::function<bool(const GameObject*)>& lambda, bool includeAwaitCreationObject) const;
 
 	/// @brief Retrieves a list of all playing object of the specified type. May be nullptr.
 	const std::vector<GameObject*>* getObjects(TypeId type) const;
@@ -169,11 +170,11 @@ struct SGE_ENGINE_API GameWorld {
 	/// @param [in] child the id of the child object
 	/// @param [in] newParent the id of the actor that is going to be the parent of @child
 	/// @param [in] doNotAssert - Usually when parenting one object to another, both object should exist.
-	///             if they don't then some error might have occured. However when we do object deletion with command histroy.
-	///             Having multiple deletes in one command might result in objects not being restored yet (as they were added to the
-	///             compound command eariler). In that case we do not assert (and setParentOf will just fail silently). When the missing
-	///             object is resotred it, the command will try to resore the original hierarchy and will succeeded if all objects exist in
-	///             the scene.
+	///             if they don't then some error might have occured. However when we do object deletion with command
+	///             histroy. Having multiple deletes in one command might result in objects not being restored yet (as
+	///             they were added to the compound command eariler). In that case we do not assert (and setParentOf
+	///             will just fail silently). When the missing object is resotred it, the command will try to resore the
+	///             original hierarchy and will succeeded if all objects exist in the scene.
 	bool setParentOf(ObjectId const child, ObjectId const newParent, bool doNotAssert = false);
 
 	/// @brief Retrives the parent object id of the specified object (by its id).
@@ -197,8 +198,8 @@ struct SGE_ENGINE_API GameWorld {
 	///        The values are appended to the list.
 	void getAllChildren(vector_set<ObjectId>& result, ObjectId const parent) const;
 
-	/// @brief Returns a list of all parents (and their parents) of the specified actor (without the specified actor itself)!
-	/// The values are appended to the list.
+	/// @brief Returns a list of all parents (and their parents) of the specified actor (without the specified actor
+	/// itself)! The values are appended to the list.
 	void getAllParents(vector_set<ObjectId>& result, ObjectId actorId) const;
 
 	/// @brief Returns the parent and its parents and all childrens and their childrens of the specified actor.
@@ -208,18 +209,20 @@ struct SGE_ENGINE_API GameWorld {
 	/// @brief Instantients the specified world into the current world.
 	/// @param [in] prefabPath a path the world file to be instantiated.
 	/// @param [in] createHistory pass true if the changes should be added to undo/redo history.
-	void instantiatePrefab(const char* prefabPath,
-	                       bool createHistory,
-	                       bool shouldGenerateNewObjectIds,
-	                       const Optional<transf3d>& offsetWorldSpace);
+	void instantiatePrefab(
+	    const char* prefabPath,
+	    bool createHistory,
+	    bool shouldGenerateNewObjectIds,
+	    const Optional<transf3d>& offsetWorldSpace);
 
 	/// Instantients the specified world into the current world.
 	/// @param [in] prefabPath a path the world file to be instantiated.
 	/// @param [in] createHistory pass true if the changes should be added to undo/redo history.
-	void instantiatePrefabFromJsonString(const char* prefabJson,
-	                                     bool createHistory,
-	                                     bool shouldGenerateNewObjectIds,
-	                                     const Optional<transf3d>& offsetWorldSpace);
+	void instantiatePrefabFromJsonString(
+	    const char* prefabJson,
+	    bool createHistory,
+	    bool shouldGenerateNewObjectIds,
+	    const Optional<transf3d>& offsetWorldSpace);
 
 	/// Instantients the specified prefabWorld into the current world.
 	/// In result new objects will be generated in the current world, however for obvious reasions
@@ -227,20 +230,22 @@ struct SGE_ENGINE_API GameWorld {
 	/// @praam [in] prefabWorld the world to be instantiated in this world.
 	/// @param [in] oblectsToInstantiate if the nullptr, all objects will be instantiated, otherwise
 	///                             only the objects in the specified list will be instantiated/
-	void instantiatePrefab(const GameWorld& prefabWorld,
-	                       bool createHistory,
-	                       bool shouldGenerateNewObjectIds,
-	                       const vector_set<ObjectId>* const pOblectsToInstantiate,
-	                       vector_set<ObjectId>* const newObjectIds = nullptr,
-	                       const Optional<transf3d>& offsetWorldSpace = NullOptional());
+	void instantiatePrefab(
+	    const GameWorld& prefabWorld,
+	    bool createHistory,
+	    bool shouldGenerateNewObjectIds,
+	    const vector_set<ObjectId>* const pOblectsToInstantiate,
+	    vector_set<ObjectId>* const newObjectIds = nullptr,
+	    const Optional<transf3d>& offsetWorldSpace = NullOptional());
 
 	/// Creates a prefab world based on the current world.
 	/// @praam [out] prefabWorld the prefab world that is going to be created.
 	/// @param [in] oblectsToInstantiate if the nullptr, all objects will be instantiated, otherwise
 	///                             only the objects in the specified list will be instantiated in the prefab world.
-	void createPrefab(GameWorld& prefabWorld,
-	                  bool shouldKeepOriginalObjectIds,
-	                  const vector_set<ObjectId>* const pOblectsToInstantiate) const;
+	void createPrefab(
+	    GameWorld& prefabWorld,
+	    bool shouldKeepOriginalObjectIds,
+	    const vector_set<ObjectId>* const pOblectsToInstantiate) const;
 
 	/// @brief Used for giving object unique-ish names. However the GameWorld still supports objects with same name.
 	int getNextNameIndex();

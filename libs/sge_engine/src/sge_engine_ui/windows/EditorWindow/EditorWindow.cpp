@@ -188,8 +188,9 @@ void EditorWindow::switchToInstance(int iInstance)
 void EditorWindow::deleteInstance(int iInstance)
 {
 	if (iInstance >= 0 && iInstance < m_sceneInstances.size()) {
-		std::string message = string_format("Closing scene %s. All unsaved changes will be lost! Do you want to continue closing?",
-		                                    getInstanceData(iInstance)->displayName.c_str());
+		std::string message = string_format(
+		    "Closing scene %s. All unsaved changes will be lost! Do you want to continue closing?",
+		    getInstanceData(iInstance)->displayName.c_str());
 
 		if (DialogYesNo("Closing Scene", message.c_str())) {
 			m_sceneInstances.erase(m_sceneInstances.begin() + iInstance);
@@ -246,13 +247,17 @@ void EditorWindow::newScene(bool UNUSED(forceKeepSameInspector))
 	//}
 }
 
-void EditorWindow::loadWorldFromFile(const char* const filename, const char* overrideWorkingFilename, bool forceKeepSameInspector)
+void EditorWindow::loadWorldFromFile(
+    const char* const filename, const char* overrideWorkingFilename, bool forceKeepSameInspector)
 {
 	std::vector<char> fileContents;
 	if (FileReadStream::readFile(filename, fileContents)) {
 		fileContents.push_back('\0');
-		loadWorldFromJson(fileContents.data(), true, overrideWorkingFilename != nullptr ? overrideWorkingFilename : filename,
-		                  forceKeepSameInspector);
+		loadWorldFromJson(
+		    fileContents.data(),
+		    true,
+		    overrideWorkingFilename != nullptr ? overrideWorkingFilename : filename,
+		    forceKeepSameInspector);
 
 		addReasecentScene(filename);
 
@@ -262,10 +267,8 @@ void EditorWindow::loadWorldFromFile(const char* const filename, const char* ove
 	sgeAssert(false);
 }
 
-void EditorWindow::loadWorldFromJson(const char* const json,
-                                     bool disableAutoSepping,
-                                     const char* const workingFileName,
-                                     bool loadInNewInstance)
+void EditorWindow::loadWorldFromJson(
+    const char* const json, bool disableAutoSepping, const char* const workingFileName, bool loadInNewInstance)
 {
 	if (loadInNewInstance && getActiveInstance() == nullptr) {
 		int iInstance = newEmptyInstance();
@@ -354,14 +357,15 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 {
 	m_timer.tick();
 
-	const ImGuiWindowFlags mainWndFlags =
-	    ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar;
+	const ImGuiWindowFlags mainWndFlags = ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoResize |
+	                                      ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar;
 
 	ImGui::SetNextWindowPos(ImVec2(0.f, 0.f));
 	ImGui::SetNextWindowSize(ImVec2(float(m_nativeWindow.GetClientWidth()), float(m_nativeWindow.GetClientHeight())));
 	ImGui::Begin(m_windowName.c_str(), nullptr, mainWndFlags);
 
-	if (ImGui::BeginTabBar("SGEEdtorTabSceneInstances", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs)) {
+	if (ImGui::BeginTabBar(
+	        "SGEEdtorTabSceneInstances", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_AutoSelectNewTabs)) {
 		int iInstanceToDelete = -1;
 		for (int iInst = 0; iInst < (int)m_sceneInstances.size(); ++iInst) {
 			ImGuiEx::IDGuard idguard(iInst);
@@ -426,7 +430,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 					// In order for the file save dialong to be opned in the default assets/levels directory
 					// the directory must exist.
 					std::filesystem::create_directories("./assets/levels");
-					const std::string filename = FileOpenDialog("Load GameWorld form file...", true, "*.lvl\0*.lvl\0", "./assets/levels");
+					const std::string filename =
+					    FileOpenDialog("Load GameWorld form file...", true, "*.lvl\0*.lvl\0", "./assets/levels");
 
 					if (!filename.empty()) {
 						loadWorldFromFile(filename.c_str(), filename.c_str(), true);
@@ -629,7 +634,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 	// Show the notifications in a small window at the bottom right corner.
 	if (getEngineGlobal()->getNotificationCount() != 0) {
 		const int notificationWndFlags = ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoTitleBar |
-		                                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoFocusOnAppearing;
+		                                 ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove |
+		                                 ImGuiWindowFlags_NoFocusOnAppearing;
 
 		if (ImGui::Begin("SGENotificationWindow", nullptr, notificationWndFlags)) {
 			for (int t = 0; t < getEngineGlobal()->getNotificationCount(); ++t) {
@@ -664,7 +670,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 	};
 
 
-	if (ImGui::BeginChild("Toolbar", ImVec2(0, 48), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar)) {
+	if (ImGui::BeginChild(
+	        "Toolbar", ImVec2(0, 48), true, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoTitleBar)) {
 		if (m_assets.m_assetPlayIcon && getActiveInstance()->getInspector().m_disableAutoStepping) {
 			if (imageButton(m_assets.m_assetPlayIcon))
 				getActiveInstance()->getInspector().m_disableAutoStepping = false;
@@ -753,7 +760,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		ImGui::SameLine();
 
 		if (imageButton(m_assets.m_orthoIcon)) {
-			getActiveInstance()->getWorld().m_editorCamera.isOrthograhpic = !getActiveInstance()->getWorld().m_editorCamera.isOrthograhpic;
+			getActiveInstance()->getWorld().m_editorCamera.isOrthograhpic =
+			    !getActiveInstance()->getWorld().m_editorCamera.isOrthograhpic;
 		}
 		ImGuiEx::TextTooltip("Toggle the orthographic/perspective mode of the preview camera.");
 
@@ -767,7 +775,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		ImGui::SameLine();
 		if (imageButton(m_assets.m_yIcon)) {
 			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.yaw =
-			    deg2rad(90.f) * float(int(getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.yaw / deg2rad(90.f)));
+			    deg2rad(90.f) *
+			    float(int(getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.yaw / deg2rad(90.f)));
 			getActiveInstance()->getWorld().m_editorCamera.m_orbitCamera.pitch = deg2rad(90.f);
 		}
 		ImGuiEx::TextTooltip("Align the preview camera to +Y axis.");
@@ -790,16 +799,18 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				std::map<ACRSpline*, std::vector<int>> tessalateBetweenIndicesCRSpline;
 
 				for (int t = 0; t < getActiveInstance()->getInspector().m_selection.size(); ++t) {
-					ALine* const spline =
-					    getActiveInstance()->getWorld().getActor<ALine>(getActiveInstance()->getInspector().m_selection[t].objectId);
+					ALine* const spline = getActiveInstance()->getWorld().getActor<ALine>(
+					    getActiveInstance()->getInspector().m_selection[t].objectId);
 					if (spline) {
-						tessalateBetweenIndices[spline].push_back(getActiveInstance()->getInspector().m_selection[t].index);
+						tessalateBetweenIndices[spline].push_back(
+						    getActiveInstance()->getInspector().m_selection[t].index);
 					}
 
-					ACRSpline* const crSpline =
-					    getActiveInstance()->getWorld().getActor<ACRSpline>(getActiveInstance()->getInspector().m_selection[t].objectId);
+					ACRSpline* const crSpline = getActiveInstance()->getWorld().getActor<ACRSpline>(
+					    getActiveInstance()->getInspector().m_selection[t].objectId);
 					if (crSpline) {
-						tessalateBetweenIndicesCRSpline[crSpline].push_back(getActiveInstance()->getInspector().m_selection[t].index);
+						tessalateBetweenIndicesCRSpline[crSpline].push_back(
+						    getActiveInstance()->getInspector().m_selection[t].index);
 					}
 				}
 
@@ -857,14 +868,17 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		ImGui::DockBuilderFinish(dockSpaceID);
 	}
 	else {
-		ImGui::DockSpace(dockSpaceID, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_PassthruCentralNode);
+		ImGui::DockSpace(
+		    dockSpaceID, ImVec2(0.f, 0.f), ImGuiDockNodeFlags_None | ImGuiDockNodeFlags_PassthruCentralNode);
 	}
 
 	ImGui::End();
 
-	if (m_isWelcomeWindowOpened && ImGui::Begin("Welcome Window", &m_isWelcomeWindowOpened,
-	                                            ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoTitleBar |
-	                                                ImGuiWindowFlags_AlwaysAutoResize)) {
+	if (m_isWelcomeWindowOpened && ImGui::Begin(
+	                                   "Welcome Window",
+	                                   &m_isWelcomeWindowOpened,
+	                                   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+	                                       ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize)) {
 		ImGui::SetWindowFontScale(2.f);
 		ImGui::TextColored(ImVec4(0.25f, 1.f, 0.63f, 1.f), "Welcome to SGEEditor");
 		ImGui::SetWindowFontScale(1.f);
@@ -883,7 +897,8 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 				loadWorldFromFile(filenameToOpen.c_str(), filenameToOpen.c_str(), false);
 				m_isWelcomeWindowOpened = false;
 
-				// Caution: we need to break the loop here as the loadWorldFromFile() would modify m_rescentOpenedSceneFiles.
+				// Caution: we need to break the loop here as the loadWorldFromFile() would modify
+				// m_rescentOpenedSceneFiles.
 				break;
 			}
 
@@ -914,8 +929,9 @@ void EditorWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(inspec
 		}
 
 		// If the user clicks somewhere outside of the start-up window, close it.
-		const bool isWindowOrItsChildsHovered = ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) ||
-		                                        ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
+		const bool isWindowOrItsChildsHovered =
+		    ImGui::IsWindowHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem) ||
+		    ImGui::IsWindowHovered(ImGuiHoveredFlags_ChildWindows);
 		if (!isWindowOrItsChildsHovered && ImGui::IsMouseClicked(0)) {
 			m_isWelcomeWindowOpened = false;
 		}

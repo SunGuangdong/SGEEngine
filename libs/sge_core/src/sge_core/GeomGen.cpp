@@ -16,9 +16,13 @@ int GeomGen::ndcQuad3DUV(Buffer* resultVertBuffer)
 	};
 
 	Vertex verts[6] = {
-	    {vec3f(-1.f, -1.f, 0.f), vec2f(0.f, 0.f)}, {vec3f(1.f, -1.f, 0.f), vec2f(1.f, 0.f)}, {vec3f(1.f, 1.f, 0.f), vec2f(1.f, 1.f)},
+	    {vec3f(-1.f, -1.f, 0.f), vec2f(0.f, 0.f)},
+	    {vec3f(1.f, -1.f, 0.f), vec2f(1.f, 0.f)},
+	    {vec3f(1.f, 1.f, 0.f), vec2f(1.f, 1.f)},
 
-	    {vec3f(1.f, 1.f, 0.f), vec2f(1.f, 1.f)},   {vec3f(-1.f, 1.f, 0.f), vec2f(0.f, 1.f)}, {vec3f(-1.f, -1.f, 0.f), vec2f(0.f, 0.f)},
+	    {vec3f(1.f, 1.f, 0.f), vec2f(1.f, 1.f)},
+	    {vec3f(-1.f, 1.f, 0.f), vec2f(0.f, 1.f)},
+	    {vec3f(-1.f, -1.f, 0.f), vec2f(0.f, 0.f)},
 	};
 
 	BufferDesc bd = BufferDesc::GetDefaultVertexBuffer(sizeof(verts));
@@ -159,15 +163,19 @@ int GeomGen::cylinder(Buffer* resultVertBuffer, const vec3f position, float heig
 	// Verts for the bottom base of the cylinder.
 	for (int i = 0; i <= numSlices; ++i) {
 		verts.push_back(vec3f(position.x, position.y, position.z));
-		verts.push_back(
-		    vec3f(position.x + (radius * cos(i * sge2Pi / numSlices)), position.y, position.z + (radius * sinf(i * sge2Pi / numSlices))));
+		verts.push_back(vec3f(
+		    position.x + (radius * cos(i * sge2Pi / numSlices)),
+		    position.y,
+		    position.z + (radius * sinf(i * sge2Pi / numSlices))));
 	}
 
 	// Verts for the top base of the cylinder.
 	for (int i = 0; i <= numSlices; ++i) {
 		verts.push_back(vec3f(position.x, position.y, position.z));
-		verts.push_back(vec3f(position.x - (radius * cos(i * sge2Pi / numSlices)), position.y + height,
-		                      position.z + (radius * sinf(i * sge2Pi / numSlices))));
+		verts.push_back(vec3f(
+		    position.x - (radius * cos(i * sge2Pi / numSlices)),
+		    position.y + height,
+		    position.z + (radius * sinf(i * sge2Pi / numSlices))));
 	}
 
 	const BufferDesc bd = BufferDesc::GetDefaultVertexBuffer(verts.size() * sizeof(vec3f));
@@ -261,13 +269,14 @@ void GeomGen::wiredBox(std::vector<PosColorVert>& verts, const Box3f& aabb, cons
 	wiredBox(verts, transf, rgba);
 }
 
-void GeomGen::wiredCapsule(std::vector<PosColorVert>& verts,
-                           const mat4f& transform,
-                           const uint32 rgba,
-                           float height,
-                           float radius,
-                           int numSideDivs,
-                           const Origin origin)
+void GeomGen::wiredCapsule(
+    std::vector<PosColorVert>& verts,
+    const mat4f& transform,
+    const uint32 rgba,
+    float height,
+    float radius,
+    int numSideDivs,
+    const Origin origin)
 {
 	sgeAssert(numSideDivs > 0);
 
@@ -367,7 +376,8 @@ void GeomGen::wiredCapsule(std::vector<PosColorVert>& verts,
 	addVert(base + (-zAxisRadius + yAxisTopCircleLevel));
 }
 
-void GeomGen::wiredSphere(std::vector<PosColorVert>& verts, const mat4f& transform, const uint32 rgba, float radius, int numSideDivs)
+void GeomGen::wiredSphere(
+    std::vector<PosColorVert>& verts, const mat4f& transform, const uint32 rgba, float radius, int numSideDivs)
 {
 	auto addVert = [&](const vec3f& pos) { verts.push_back(PosColorVert(pos, rgba)); };
 
@@ -408,7 +418,13 @@ void GeomGen::wiredSphere(std::vector<PosColorVert>& verts, const mat4f& transfo
 }
 
 void GeomGen::wiredCylinder(
-    std::vector<PosColorVert>& verts, const mat4f& transform, uint32 rgba, float height, float radius, int numSideDivs, const Origin origin)
+    std::vector<PosColorVert>& verts,
+    const mat4f& transform,
+    uint32 rgba,
+    float height,
+    float radius,
+    int numSideDivs,
+    const Origin origin)
 {
 	sgeAssert(numSideDivs > 0.f);
 
@@ -470,7 +486,13 @@ void GeomGen::wiredCylinder(
 }
 
 void GeomGen::wiredCone(
-    std::vector<PosColorVert>& verts, const mat4f& transform, uint32 rgba, float height, float radius, int numSideDivs, const Origin origin)
+    std::vector<PosColorVert>& verts,
+    const mat4f& transform,
+    uint32 rgba,
+    float height,
+    float radius,
+    int numSideDivs,
+    const Origin origin)
 {
 	sgeAssert(numSideDivs > 0.f);
 
@@ -542,7 +564,13 @@ int GeomGen::wiredBasis(std::vector<PosColorVert>& verts, const mat4f& transform
 }
 
 void GeomGen::wiredGrid(
-    std::vector<PosColorVert>& verts, const vec3f& origin, const vec3f& xAxis, const vec3f& zAxis, int xLines, int zLines, int color)
+    std::vector<PosColorVert>& verts,
+    const vec3f& origin,
+    const vec3f& xAxis,
+    const vec3f& zAxis,
+    int xLines,
+    int zLines,
+    int color)
 {
 	// +X
 	verts.push_back(PosColorVert(origin, 0xFF0000FF));

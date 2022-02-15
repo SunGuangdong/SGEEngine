@@ -15,7 +15,8 @@ void CBufferFiller::DeleteValue(const int idx)
 	values.erase(values.begin() + idx);
 }
 
-void CBufferFiller::SetData(const unsigned nameStrIdx, const UniformType::Enum type, const void* data_arg, const int inDataSizeBytes)
+void CBufferFiller::SetData(
+    const unsigned nameStrIdx, const UniformType::Enum type, const void* data_arg, const int inDataSizeBytes)
 {
 	sgeAssert(nameStrIdx != 0);
 
@@ -125,7 +126,8 @@ void StateGroup::setIB(Buffer* pBuffer, const UniformType::Enum format, const ui
 	m_indexBufferByteOffset = byteOffset;
 }
 
-void StateGroup::setRenderState(RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState)
+void StateGroup::setRenderState(
+    RasterizerState* rasterState, DepthStencilState* depthStencilState, BlendState* blendState)
 {
 	m_rasterState = rasterState;
 	m_depthStencilState = depthStencilState;
@@ -139,7 +141,8 @@ void DrawCall::draw(const uint32 numVerts, const uint32 startVert, const uint32 
 }
 
 // draw call with index buffer
-void DrawCall::drawIndexed(const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances)
+void DrawCall::drawIndexed(
+    const uint32 numIndices, const uint32 startIndex, const uint32 startVert, const uint32 numInstances)
 {
 	m_drawExec.DrawIndexed(numIndices, startIndex, startVert, numInstances);
 }

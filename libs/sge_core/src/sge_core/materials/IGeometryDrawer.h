@@ -76,33 +76,36 @@ struct SGE_CORE_API IGeometryDrawer {
 	IGeometryDrawer() = default;
 	virtual ~IGeometryDrawer() = default;
 
-	virtual void drawGeometry(const RenderDestination& rdest,
-	                          const ICamera& camera,
-	                          const mat4f& geomWorldTransfrom,
-	                          const ObjectLighting& lighting,
-	                          const Geometry& geometry,
-	                          const IMaterialData* mtlDataBase,
-	                          const InstanceDrawMods& instDrawMods) = 0;
+	virtual void drawGeometry(
+	    const RenderDestination& rdest,
+	    const ICamera& camera,
+	    const mat4f& geomWorldTransfrom,
+	    const ObjectLighting& lighting,
+	    const Geometry& geometry,
+	    const IMaterialData* mtlDataBase,
+	    const InstanceDrawMods& instDrawMods) = 0;
 };
 
 /// Draw the specified geometry(mesh) with the specified material.
 /// The function will find the correct @IGeometryDrawer automatically for the material.
-SGE_CORE_API void drawGeometry(const RenderDestination& rdest,
-                               const ICamera& camera,
-                               const mat4f& geomWorldTransfrom,
-                               const ObjectLighting& lighting,
-                               const Geometry& geometry,
-                               const IMaterialData* mtlDataBase,
-                               const InstanceDrawMods& instDrawMods);
+SGE_CORE_API void drawGeometry(
+    const RenderDestination& rdest,
+    const ICamera& camera,
+    const mat4f& geomWorldTransfrom,
+    const ObjectLighting& lighting,
+    const Geometry& geometry,
+    const IMaterialData* mtlDataBase,
+    const InstanceDrawMods& instDrawMods);
 
 /// A short function for drawing a evaluated model as it is.
 /// The function will find the correct @IGeometryDrawer automatically for each material.
-SGE_CORE_API void drawEvalModel(const RenderDestination& rdest,
-                                const ICamera& camera,
-                                const mat4f& geomWorldTransfrom,
-                                const ObjectLighting& lighting,
-                                const EvaluatedModel& evalModel,
-                                const InstanceDrawMods& instDrawMods);
+SGE_CORE_API void drawEvalModel(
+    const RenderDestination& rdest,
+    const ICamera& camera,
+    const mat4f& geomWorldTransfrom,
+    const ObjectLighting& lighting,
+    const EvaluatedModel& evalModel,
+    const InstanceDrawMods& instDrawMods);
 
 
 } // namespace sge

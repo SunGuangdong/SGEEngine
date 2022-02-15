@@ -14,7 +14,8 @@ namespace sge {
 //--------------------------------------------------------------------
 //
 //--------------------------------------------------------------------
-void CmdMemberChange::setActorLogicTransform(CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src)
+void CmdMemberChange::setActorLogicTransform(
+    CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src)
 {
 	Actor* const actor = inspector->m_world->getActorById(cmd->m_objectId);
 
@@ -24,7 +25,8 @@ void CmdMemberChange::setActorLogicTransform(CmdMemberChange* cmd, GameInspector
 	}
 }
 
-void CmdMemberChange::setActorLocalTransform(CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src)
+void CmdMemberChange::setActorLocalTransform(
+    CmdMemberChange* cmd, GameInspector* inspector, void* UNUSED(dest), void* src)
 {
 	Actor* const actor = inspector->m_world->getActorById(cmd->m_objectId);
 
@@ -34,7 +36,8 @@ void CmdMemberChange::setActorLocalTransform(CmdMemberChange* cmd, GameInspector
 	}
 }
 
-void CmdMemberChange::setAssetPropertyChange(CmdMemberChange* UNUSED(cmd), GameInspector* UNUSED(inspector), void* dest, void* src)
+void CmdMemberChange::setAssetPropertyChange(
+    CmdMemberChange* UNUSED(cmd), GameInspector* UNUSED(inspector), void* dest, void* src)
 {
 	AssetProperty* destAsset = reinterpret_cast<AssetProperty*>(dest);
 	AssetProperty* srcAsset = reinterpret_cast<AssetProperty*>(src);
@@ -60,11 +63,12 @@ CmdMemberChange::~CmdMemberChange()
 	m_newData.reset();
 }
 
-void CmdMemberChange::setup(ObjectId const objId,
-                            const MemberChain& chain,
-                            const void* originalValue,
-                            const void* newValue,
-                            void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src))
+void CmdMemberChange::setup(
+    ObjectId const objId,
+    const MemberChain& chain,
+    const void* originalValue,
+    const void* newValue,
+    void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src))
 {
 	sgeAssert(!objId.isNull() && originalValue && newValue);
 
@@ -165,7 +169,11 @@ CmdDynamicProperyChanged::~CmdDynamicProperyChanged()
 }
 
 void CmdDynamicProperyChanged::setup(
-    GameObject* obj, const MemberChain& chain, std::string dynamicPropName, const void* originalValue, const void* newValue)
+    GameObject* obj,
+    const MemberChain& chain,
+    std::string dynamicPropName,
+    const void* originalValue,
+    const void* newValue)
 {
 	sgeAssert(obj != nullptr && originalValue && newValue);
 
@@ -380,7 +388,8 @@ GameObject* duplicateGameObjectIncompleate(const GameObject* const srcObject)
 				memberTypeDesc->copyFn(destMemberBytes, srcMemberBytes);
 			}
 			else {
-				sgeLogError("Cannot duplicate game object! Field %s::%s is not copyable!\n", objTypeDesc->name, mfd.name);
+				sgeLogError(
+				    "Cannot duplicate game object! Field %s::%s is not copyable!\n", objTypeDesc->name, mfd.name);
 				sgeAssert(false);
 			}
 		}
@@ -543,7 +552,9 @@ void CmdExistingObjectCreation::setup(GameWorld& world, vector_set<ObjectId> tar
 
 void CmdExistingObjectCreation::apply(GameInspector* UNUSED(inspector))
 {
-	sgeAssert(false && "CmdExistingObjectCreation::apply should never get called, the objects are expected to be already created!");
+	sgeAssert(
+	    false &&
+	    "CmdExistingObjectCreation::apply should never get called, the objects are expected to be already created!");
 }
 
 void CmdExistingObjectCreation::redo(GameInspector* inspector)
@@ -636,7 +647,8 @@ void CmdDuplicateSpecial::apply(GameInspector* inspector)
 		}
 	}
 
-	const std::function<void(GameObject*, MemberChain)> replaceObjectIds = [&](GameObject* dest, MemberChain chain) -> void {
+	const std::function<void(GameObject*, MemberChain)> replaceObjectIds = [&](GameObject* dest,
+	                                                                           MemberChain chain) -> void {
 		const TypeDesc* const typeDesc = chain.getType();
 		if (!typeDesc) {
 			return;

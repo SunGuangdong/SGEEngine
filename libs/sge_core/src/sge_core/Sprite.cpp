@@ -100,8 +100,11 @@ bool SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(SpriteAnimation& out
 			Frame frame;
 			frame.xy = vec2i(x, y);
 			frame.wh = vec2i(w, h);
-			frame.uvRegion =
-			    vec4f(float(x) / fFullSheetWidth, float(y) / fFullSheetHeight, float(w) / fFullSheetWidth, float(h) / fFullSheetHeight);
+			frame.uvRegion = vec4f(
+			    float(x) / fFullSheetWidth,
+			    float(y) / fFullSheetHeight,
+			    float(w) / fFullSheetWidth,
+			    float(h) / fFullSheetHeight);
 			frame.uvRegion.z += frame.uvRegion.x;
 			frame.uvRegion.w += frame.uvRegion.y;
 			frame.frameStart = totalAnimationDuration;
@@ -170,7 +173,8 @@ const SpriteAnimation::Frame* SpriteAnimation::getFrameForTime(float time) const
 }
 
 
-bool SpriteAnimationWithTextures::importSprite(SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib)
+bool SpriteAnimationWithTextures::importSprite(
+    SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib)
 {
 	if (SpriteAnimation::importSprite(outSprite.spriteAnimation, filename)) {
 		outSprite.textureAsset = assetLib.getAssetFromFile(outSprite.spriteAnimation.texturePath.c_str());
@@ -179,9 +183,8 @@ bool SpriteAnimationWithTextures::importSprite(SpriteAnimationWithTextures& outS
 	return false;
 }
 
-bool SpriteAnimationWithTextures::importFromAsepriteSpriteSheetJsonFile(SpriteAnimationWithTextures& outSprite,
-                                                                        const char* const filename,
-                                                                        AssetLibrary& assetLib)
+bool SpriteAnimationWithTextures::importFromAsepriteSpriteSheetJsonFile(
+    SpriteAnimationWithTextures& outSprite, const char* const filename, AssetLibrary& assetLib)
 {
 	if (SpriteAnimation::importFromAsepriteSpriteSheetJsonFile(outSprite.spriteAnimation, filename)) {
 		outSprite.textureAsset = assetLib.getAssetFromFile(outSprite.spriteAnimation.texturePath.c_str());

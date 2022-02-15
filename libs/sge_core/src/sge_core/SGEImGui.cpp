@@ -266,8 +266,8 @@ void SGEImGui::initialize(SGEContext* sgecon_arg, FrameTarget* frameTarget, cons
 	sgeAssert(m_imgui_vertexDeclIdx != VertexDeclIndex_Null);
 
 	// Set the mapping to ImGui default mapping.
-	// sgeAssert(ImGuiKey_Tab == 0); // When implemented ImGuiKey_Tab was the 1st ImGuiKey, update the code if that changes(or just start
-	// from zero...)
+	// sgeAssert(ImGuiKey_Tab == 0); // When implemented ImGuiKey_Tab was the 1st ImGuiKey, update the code if that
+	// changes(or just start from zero...)
 	for (int t = 0; t < ImGuiKey_COUNT; ++t) {
 		io.KeyMap[t] = t;
 	}
@@ -503,17 +503,18 @@ bool SGEImGui::IsItemJustActivated()
 	return !IsItemActiveLastFrame() && ImGui::IsItemActive();
 }
 
-bool SGEImGui::DragFloats(const char* label,
-                          float* floats,
-                          int numFloats,
-                          bool* pJustReleased,
-                          bool* pJustActivated,
-                          float middleClickResetValue,
-                          float v_speed,
-                          float v_min,
-                          float v_max,
-                          const char* display_format,
-                          float power)
+bool SGEImGui::DragFloats(
+    const char* label,
+    float* floats,
+    int numFloats,
+    bool* pJustReleased,
+    bool* pJustActivated,
+    float middleClickResetValue,
+    float v_speed,
+    float v_min,
+    float v_max,
+    const char* display_format,
+    float power)
 {
 	ImGuiWindow* const window = ImGui::GetCurrentWindow();
 	if (window->SkipItems) {
@@ -561,15 +562,16 @@ bool SGEImGui::DragFloats(const char* label,
 	return value_changed;
 }
 
-bool SGEImGui::DragInts(const char* label,
-                        int* ints,
-                        int numInts,
-                        bool* pJustReleased,
-                        bool* pJustActivated,
-                        float v_speed,
-                        int v_min,
-                        int v_max,
-                        const char* display_format)
+bool SGEImGui::DragInts(
+    const char* label,
+    int* ints,
+    int numInts,
+    bool* pJustReleased,
+    bool* pJustActivated,
+    float v_speed,
+    int v_min,
+    int v_max,
+    const char* display_format)
 {
 	ImGuiWindow* window = ImGui::GetCurrentWindow();
 	if (window->SkipItems)
@@ -604,29 +606,47 @@ bool SGEImGui::DragInts(const char* label,
 
 // ColorPicker
 // Note: only access 3 floats if ImGuiColorEditFlags_NoAlpha flag is set.
-// FIXME: we adjust the big color square height based on item width, which may cause a flickering feedback loop (if automatic height makes a
-// vertical scrollbar appears, affecting automatic width..)
+// FIXME: we adjust the big color square height based on item width, which may cause a flickering feedback loop (if
+// automatic height makes a vertical scrollbar appears, affecting automatic width..)
 bool SGEImGui::ColorPicker4(
-    const char* label, float col[4], bool* const pJustReleased, bool* const pJustActivated, ImGuiColorEditFlags flags, const float* ref_col)
+    const char* label,
+    float col[4],
+    bool* const pJustReleased,
+    bool* const pJustActivated,
+    ImGuiColorEditFlags flags,
+    const float* ref_col)
 {
 	const auto RenderArrowsForVerticalBar = [](ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, float bar_w) -> void {
-		const auto RenderArrow = [](ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, ImGuiDir direction, ImU32 col) -> void {
+		const auto RenderArrow =
+		    [](ImDrawList* draw_list, ImVec2 pos, ImVec2 half_sz, ImGuiDir direction, ImU32 col) -> void {
 			switch (direction) {
 				case ImGuiDir_Left:
-					draw_list->AddTriangleFilled(ImVec2(pos.x + half_sz.x, pos.y - half_sz.y), ImVec2(pos.x + half_sz.x, pos.y + half_sz.y),
-					                             pos, col);
+					draw_list->AddTriangleFilled(
+					    ImVec2(pos.x + half_sz.x, pos.y - half_sz.y),
+					    ImVec2(pos.x + half_sz.x, pos.y + half_sz.y),
+					    pos,
+					    col);
 					return;
 				case ImGuiDir_Right:
-					draw_list->AddTriangleFilled(ImVec2(pos.x - half_sz.x, pos.y + half_sz.y), ImVec2(pos.x - half_sz.x, pos.y - half_sz.y),
-					                             pos, col);
+					draw_list->AddTriangleFilled(
+					    ImVec2(pos.x - half_sz.x, pos.y + half_sz.y),
+					    ImVec2(pos.x - half_sz.x, pos.y - half_sz.y),
+					    pos,
+					    col);
 					return;
 				case ImGuiDir_Up:
-					draw_list->AddTriangleFilled(ImVec2(pos.x + half_sz.x, pos.y + half_sz.y), ImVec2(pos.x - half_sz.x, pos.y + half_sz.y),
-					                             pos, col);
+					draw_list->AddTriangleFilled(
+					    ImVec2(pos.x + half_sz.x, pos.y + half_sz.y),
+					    ImVec2(pos.x - half_sz.x, pos.y + half_sz.y),
+					    pos,
+					    col);
 					return;
 				case ImGuiDir_Down:
-					draw_list->AddTriangleFilled(ImVec2(pos.x - half_sz.x, pos.y - half_sz.y), ImVec2(pos.x + half_sz.x, pos.y - half_sz.y),
-					                             pos, col);
+					draw_list->AddTriangleFilled(
+					    ImVec2(pos.x - half_sz.x, pos.y - half_sz.y),
+					    ImVec2(pos.x + half_sz.x, pos.y - half_sz.y),
+					    pos,
+					    col);
 					return;
 				case ImGuiDir_None:
 				case ImGuiDir_COUNT:
@@ -634,10 +654,19 @@ bool SGEImGui::ColorPicker4(
 			}
 		};
 
-		RenderArrow(draw_list, ImVec2(pos.x + half_sz.x + 1, pos.y), ImVec2(half_sz.x + 2, half_sz.y + 1), ImGuiDir_Right, IM_COL32_BLACK);
+		RenderArrow(
+		    draw_list,
+		    ImVec2(pos.x + half_sz.x + 1, pos.y),
+		    ImVec2(half_sz.x + 2, half_sz.y + 1),
+		    ImGuiDir_Right,
+		    IM_COL32_BLACK);
 		RenderArrow(draw_list, ImVec2(pos.x + half_sz.x, pos.y), half_sz, ImGuiDir_Right, IM_COL32_WHITE);
-		RenderArrow(draw_list, ImVec2(pos.x + bar_w - half_sz.x - 1, pos.y), ImVec2(half_sz.x + 2, half_sz.y + 1), ImGuiDir_Left,
-		            IM_COL32_BLACK);
+		RenderArrow(
+		    draw_list,
+		    ImVec2(pos.x + bar_w - half_sz.x - 1, pos.y),
+		    ImVec2(half_sz.x + 2, half_sz.y + 1),
+		    ImGuiDir_Left,
+		    IM_COL32_BLACK);
 		RenderArrow(draw_list, ImVec2(pos.x + bar_w - half_sz.x, pos.y), half_sz, ImGuiDir_Left, IM_COL32_WHITE);
 	};
 
@@ -667,7 +696,8 @@ bool SGEImGui::ColorPicker4(
 
 	// Read stored options
 	if (!(flags & ImGuiColorEditFlags__PickerMask))
-		flags |= ((g.ColorEditOptions & ImGuiColorEditFlags__PickerMask) ? g.ColorEditOptions : ImGuiColorEditFlags__OptionsDefault) &
+		flags |= ((g.ColorEditOptions & ImGuiColorEditFlags__PickerMask) ? g.ColorEditOptions
+		                                                                 : ImGuiColorEditFlags__OptionsDefault) &
 		         ImGuiColorEditFlags__PickerMask;
 	IM_ASSERT(ImIsPowerOfTwo((int)(flags & ImGuiColorEditFlags__PickerMask))); // Check that only 1 is selected
 	if (!(flags & ImGuiColorEditFlags_NoOptions))
@@ -680,7 +710,9 @@ bool SGEImGui::ColorPicker4(
 	float square_sz = GetFrameHeight();
 	float bars_width = square_sz; // Arbitrary smallish width of Hue/Alpha picking bars
 	float sv_picker_size = ImMax(
-	    bars_width * 1, CalcItemWidth() - (alpha_bar ? 2 : 1) * (bars_width + style.ItemInnerSpacing.x)); // Saturation/Value picking box
+	    bars_width * 1,
+	    CalcItemWidth() -
+	        (alpha_bar ? 2 : 1) * (bars_width + style.ItemInnerSpacing.x)); // Saturation/Value picking box
 	float bar0_pos_x = picker_pos.x + sv_picker_size + style.ItemInnerSpacing.x;
 	float bar1_pos_x = bar0_pos_x + bars_width + style.ItemInnerSpacing.x;
 	float bars_triangles_half_sz = (float)(int)(bars_width * 0.20f);
@@ -693,7 +725,8 @@ bool SGEImGui::ColorPicker4(
 	float wheel_r_inner = wheel_r_outer - wheel_thickness;
 	ImVec2 wheel_center(picker_pos.x + (sv_picker_size + bars_width) * 0.5f, picker_pos.y + sv_picker_size * 0.5f);
 
-	// Note: the triangle is displayed rotated with triangle_pa pointing to Hue, but most coordinates stays unrotated for logic.
+	// Note: the triangle is displayed rotated with triangle_pa pointing to Hue, but most coordinates stays unrotated
+	// for logic.
 	float triangle_r = wheel_r_inner - (int)(sv_picker_size * 0.027f);
 	ImVec2 triangle_pa = ImVec2(triangle_r, 0.0f);                            // Hue point.
 	ImVec2 triangle_pb = ImVec2(triangle_r * -0.5f, triangle_r * -0.866025f); // Black point.
@@ -760,17 +793,22 @@ bool SGEImGui::ColorPicker4(
 		ImVec4 col_v4(col[0], col[1], col[2], (flags & ImGuiColorEditFlags_NoAlpha) ? 1.0f : col[3]);
 		if ((flags & ImGuiColorEditFlags_NoLabel))
 			Text("Current");
-		ColorButton("##current", col_v4,
-		            (flags & (ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf |
-		                      ImGuiColorEditFlags_NoTooltip)),
-		            ImVec2(square_sz * 3, square_sz * 2));
+		ColorButton(
+		    "##current",
+		    col_v4,
+		    (flags & (ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_AlphaPreview |
+		              ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip)),
+		    ImVec2(square_sz * 3, square_sz * 2));
 		if (ref_col != NULL) {
 			Text("Original");
-			ImVec4 ref_col_v4(ref_col[0], ref_col[1], ref_col[2], (flags & ImGuiColorEditFlags_NoAlpha) ? 1.0f : ref_col[3]);
-			if (ColorButton("##original", ref_col_v4,
-			                (flags & (ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf |
-			                          ImGuiColorEditFlags_NoTooltip)),
-			                ImVec2(square_sz * 3, square_sz * 2))) {
+			ImVec4 ref_col_v4(
+			    ref_col[0], ref_col[1], ref_col[2], (flags & ImGuiColorEditFlags_NoAlpha) ? 1.0f : ref_col[3]);
+			if (ColorButton(
+			        "##original",
+			        ref_col_v4,
+			        (flags & (ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_AlphaPreview |
+			                  ImGuiColorEditFlags_AlphaPreviewHalf | ImGuiColorEditFlags_NoTooltip)),
+			        ImVec2(square_sz * 3, square_sz * 2))) {
 				memcpy(col, ref_col, components * sizeof(float));
 				value_changed = true;
 			}
@@ -784,15 +822,16 @@ bool SGEImGui::ColorPicker4(
 
 	// Convert back color to RGB
 	if (value_changed_h || value_changed_sv)
-		ColorConvertHSVtoRGB(H >= 1.0f ? H - 10 * 1e-6f : H, S > 0.0f ? S : 10 * 1e-6f, V > 0.0f ? V : 1e-6f, col[0], col[1], col[2]);
+		ColorConvertHSVtoRGB(
+		    H >= 1.0f ? H - 10 * 1e-6f : H, S > 0.0f ? S : 10 * 1e-6f, V > 0.0f ? V : 1e-6f, col[0], col[1], col[2]);
 
 	// R,G,B and H,S,V slider color editor
 	if ((flags & ImGuiColorEditFlags_NoInputs) == 0) {
 		PushItemWidth((alpha_bar ? bar1_pos_x : bar0_pos_x) + bars_width - picker_pos.x);
-		UNUSED(ImGuiColorEditFlags sub_flags_to_forward = ImGuiColorEditFlags__DataTypeMask | ImGuiColorEditFlags_HDR |
-		                                                  ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoOptions |
-		                                                  ImGuiColorEditFlags_NoSmallPreview | ImGuiColorEditFlags_AlphaPreview |
-		                                                  ImGuiColorEditFlags_AlphaPreviewHalf;)
+		UNUSED(ImGuiColorEditFlags sub_flags_to_forward =
+		           ImGuiColorEditFlags__DataTypeMask | ImGuiColorEditFlags_HDR | ImGuiColorEditFlags_NoAlpha |
+		           ImGuiColorEditFlags_NoOptions | ImGuiColorEditFlags_NoSmallPreview |
+		           ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf;)
 		UNUSED(ImGuiColorEditFlags sub_flags = (flags & sub_flags_to_forward) | ImGuiColorEditFlags_NoPicker;)
 		value_changed |= DragFloats("##rgbf", col, 3, pJustReleased, pJustActivated);
 		PopItemWidth();
@@ -815,35 +854,63 @@ bool SGEImGui::ColorPicker4(
 	ImU32 hue_color32 = ColorConvertFloat4ToU32(hue_color_f);
 	ImU32 col32_no_alpha = ColorConvertFloat4ToU32(ImVec4(col[0], col[1], col[2], 1.0f));
 
-	const ImU32 hue_colors[6 + 1] = {IM_COL32(255, 0, 0, 255),   IM_COL32(255, 255, 0, 255), IM_COL32(0, 255, 0, 255),
-	                                 IM_COL32(0, 255, 255, 255), IM_COL32(0, 0, 255, 255),   IM_COL32(255, 0, 255, 255),
-	                                 IM_COL32(255, 0, 0, 255)};
+	const ImU32 hue_colors[6 + 1] = {
+	    IM_COL32(255, 0, 0, 255),
+	    IM_COL32(255, 255, 0, 255),
+	    IM_COL32(0, 255, 0, 255),
+	    IM_COL32(0, 255, 255, 255),
+	    IM_COL32(0, 0, 255, 255),
+	    IM_COL32(255, 0, 255, 255),
+	    IM_COL32(255, 0, 0, 255)};
 	ImVec2 sv_cursor_pos;
 
 	{
 		// Render SV Square
-		draw_list->AddRectFilledMultiColor(picker_pos, picker_pos + ImVec2(sv_picker_size, sv_picker_size), IM_COL32_WHITE, hue_color32,
-		                                   hue_color32, IM_COL32_WHITE);
-		draw_list->AddRectFilledMultiColor(picker_pos, picker_pos + ImVec2(sv_picker_size, sv_picker_size), IM_COL32_BLACK_TRANS,
-		                                   IM_COL32_BLACK_TRANS, IM_COL32_BLACK, IM_COL32_BLACK);
+		draw_list->AddRectFilledMultiColor(
+		    picker_pos,
+		    picker_pos + ImVec2(sv_picker_size, sv_picker_size),
+		    IM_COL32_WHITE,
+		    hue_color32,
+		    hue_color32,
+		    IM_COL32_WHITE);
+		draw_list->AddRectFilledMultiColor(
+		    picker_pos,
+		    picker_pos + ImVec2(sv_picker_size, sv_picker_size),
+		    IM_COL32_BLACK_TRANS,
+		    IM_COL32_BLACK_TRANS,
+		    IM_COL32_BLACK,
+		    IM_COL32_BLACK);
 		RenderFrameBorder(picker_pos, picker_pos + ImVec2(sv_picker_size, sv_picker_size), 0.0f);
-		sv_cursor_pos.x = ImClamp((float)(int)(picker_pos.x + ImSaturate(S) * sv_picker_size + 0.5f), picker_pos.x + 2,
-		                          picker_pos.x + sv_picker_size - 2); // Sneakily prevent the circle to stick out too much
-		sv_cursor_pos.y = ImClamp((float)(int)(picker_pos.y + ImSaturate(1 - V) * sv_picker_size + 0.5f), picker_pos.y + 2,
-		                          picker_pos.y + sv_picker_size - 2);
+		sv_cursor_pos.x = ImClamp(
+		    (float)(int)(picker_pos.x + ImSaturate(S) * sv_picker_size + 0.5f),
+		    picker_pos.x + 2,
+		    picker_pos.x + sv_picker_size - 2); // Sneakily prevent the circle to stick out too much
+		sv_cursor_pos.y = ImClamp(
+		    (float)(int)(picker_pos.y + ImSaturate(1 - V) * sv_picker_size + 0.5f),
+		    picker_pos.y + 2,
+		    picker_pos.y + sv_picker_size - 2);
 
 		// Render Hue Bar
 		for (int i = 0; i < 6; ++i)
-			draw_list->AddRectFilledMultiColor(ImVec2(bar0_pos_x, picker_pos.y + i * (sv_picker_size / 6)),
-			                                   ImVec2(bar0_pos_x + bars_width, picker_pos.y + (i + 1) * (sv_picker_size / 6)),
-			                                   hue_colors[i], hue_colors[i], hue_colors[i + 1], hue_colors[i + 1]);
+			draw_list->AddRectFilledMultiColor(
+			    ImVec2(bar0_pos_x, picker_pos.y + i * (sv_picker_size / 6)),
+			    ImVec2(bar0_pos_x + bars_width, picker_pos.y + (i + 1) * (sv_picker_size / 6)),
+			    hue_colors[i],
+			    hue_colors[i],
+			    hue_colors[i + 1],
+			    hue_colors[i + 1]);
 		float bar0_line_y = (float)(int)(picker_pos.y + H * sv_picker_size + 0.5f);
-		RenderFrameBorder(ImVec2(bar0_pos_x, picker_pos.y), ImVec2(bar0_pos_x + bars_width, picker_pos.y + sv_picker_size), 0.0f);
-		RenderArrowsForVerticalBar(draw_list, ImVec2(bar0_pos_x - 1, bar0_line_y),
-		                           ImVec2(bars_triangles_half_sz + 1, bars_triangles_half_sz), bars_width + 2.0f);
+		RenderFrameBorder(
+		    ImVec2(bar0_pos_x, picker_pos.y), ImVec2(bar0_pos_x + bars_width, picker_pos.y + sv_picker_size), 0.0f);
+		RenderArrowsForVerticalBar(
+		    draw_list,
+		    ImVec2(bar0_pos_x - 1, bar0_line_y),
+		    ImVec2(bars_triangles_half_sz + 1, bars_triangles_half_sz),
+		    bars_width + 2.0f);
 	}
 
-	// Render cursor/preview circle (clamp S/V within 0..1 range because floating points colors may lead HSV values to be out of range)
+	// Render cursor/preview circle (clamp S/V within 0..1 range because floating points colors may lead HSV values to
+	// be out of range)
 	float sv_cursor_rad = value_changed_sv ? 10.0f : 6.0f;
 	draw_list->AddCircleFilled(sv_cursor_pos, sv_cursor_rad, col32_no_alpha, 12);
 	draw_list->AddCircle(sv_cursor_pos, sv_cursor_rad + 1, IM_COL32(128, 128, 128, 255), 12);
@@ -853,14 +920,27 @@ bool SGEImGui::ColorPicker4(
 	if (alpha_bar) {
 		float alpha = ImSaturate(col[3]);
 		ImRect bar1_bb(bar1_pos_x, picker_pos.y, bar1_pos_x + bars_width, picker_pos.y + sv_picker_size);
-		RenderColorRectWithAlphaCheckerboard(ImGui::GetWindowDrawList(), bar1_bb.Min, bar1_bb.Max, IM_COL32(0, 0, 0, 0),
-		                                     bar1_bb.GetWidth() / 2.0f, ImVec2(0.0f, 0.0f));
-		draw_list->AddRectFilledMultiColor(bar1_bb.Min, bar1_bb.Max, col32_no_alpha, col32_no_alpha, col32_no_alpha & ~IM_COL32_A_MASK,
-		                                   col32_no_alpha & ~IM_COL32_A_MASK);
+		RenderColorRectWithAlphaCheckerboard(
+		    ImGui::GetWindowDrawList(),
+		    bar1_bb.Min,
+		    bar1_bb.Max,
+		    IM_COL32(0, 0, 0, 0),
+		    bar1_bb.GetWidth() / 2.0f,
+		    ImVec2(0.0f, 0.0f));
+		draw_list->AddRectFilledMultiColor(
+		    bar1_bb.Min,
+		    bar1_bb.Max,
+		    col32_no_alpha,
+		    col32_no_alpha,
+		    col32_no_alpha & ~IM_COL32_A_MASK,
+		    col32_no_alpha & ~IM_COL32_A_MASK);
 		float bar1_line_y = (float)(int)(picker_pos.y + (1.0f - alpha) * sv_picker_size + 0.5f);
 		RenderFrameBorder(bar1_bb.Min, bar1_bb.Max, 0.0f);
-		RenderArrowsForVerticalBar(draw_list, ImVec2(bar1_pos_x - 1, bar1_line_y),
-		                           ImVec2(bars_triangles_half_sz + 1, bars_triangles_half_sz), bars_width + 2.0f);
+		RenderArrowsForVerticalBar(
+		    draw_list,
+		    ImVec2(bar1_pos_x - 1, bar1_line_y),
+		    ImVec2(bars_triangles_half_sz + 1, bars_triangles_half_sz),
+		    bars_width + 2.0f);
 	}
 
 	EndGroup();
@@ -870,7 +950,12 @@ bool SGEImGui::ColorPicker4(
 }
 
 bool SGEImGui::ColorPicker3(
-    const char* label, float col[3], bool* const pJustPressed, bool* const pJustReleased, ImGuiColorEditFlags flags, const float* ref_col)
+    const char* label,
+    float col[3],
+    bool* const pJustPressed,
+    bool* const pJustReleased,
+    ImGuiColorEditFlags flags,
+    const float* ref_col)
 {
 	using namespace ImGui;
 
@@ -970,7 +1055,8 @@ void EndGroupPanel()
 
 	ImGui::EndGroup();
 
-	// ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(0, 255, 0, 64), 4.0f);
+	// ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), IM_COL32(0, 255, 0,
+	// 64), 4.0f);
 
 	ImGui::EndGroup();
 
@@ -1011,7 +1097,8 @@ void EndGroupPanel()
 				break;
 		}
 
-		ImGui::GetWindowDrawList()->AddRect(frameRect.Min, frameRect.Max, ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), halfFrame.x);
+		ImGui::GetWindowDrawList()->AddRect(
+		    frameRect.Min, frameRect.Max, ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)), halfFrame.x);
 
 		ImGui::PopClipRect();
 	}
@@ -1061,8 +1148,15 @@ void Label(const char* label, bool shouldSetNextItemWidth, float labelWidthPropo
 
 	ImGui::ItemSize(textRect);
 	if (ImGui::ItemAdd(textRect, window->GetID(label))) {
-		ImGui::RenderTextEllipsis(ImGui::GetWindowDrawList(), textRect.Min, textRect.Max, textRect.Max.x, textRect.Max.x, label, nullptr,
-		                          &textSize);
+		ImGui::RenderTextEllipsis(
+		    ImGui::GetWindowDrawList(),
+		    textRect.Min,
+		    textRect.Max,
+		    textRect.Max.x,
+		    textRect.Max.x,
+		    label,
+		    nullptr,
+		    &textSize);
 	}
 
 	// If the space used for the label is too small then the text wouldn't be readable.
@@ -1083,12 +1177,13 @@ void Label(const char* label, bool shouldSetNextItemWidth, float labelWidthPropo
 	}
 }
 
-bool InputText(const char* label,
-               std::string& str,
-               ImGuiInputTextFlags flags,
-               ImGuiInputTextCallback callback,
-               void* user_data,
-               bool acceptOnlyIdentifierStyleText)
+bool InputText(
+    const char* label,
+    std::string& str,
+    ImGuiInputTextFlags flags,
+    ImGuiInputTextCallback callback,
+    void* user_data,
+    bool acceptOnlyIdentifierStyleText)
 {
 	struct InputTextCallback_UserData {
 		std::string* Str;
@@ -1100,7 +1195,8 @@ bool InputText(const char* label,
 		InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
 		if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
 			// Resize string callback
-			// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
+			// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them
+			// back to what we want.
 			std::string* str = user_data->Str;
 			IM_ASSERT(data->Buf == str->c_str());
 			str->resize(data->BufTextLen);
@@ -1117,7 +1213,8 @@ bool InputText(const char* label,
 	auto InputTextCallbackIdentifierFilter = [](ImGuiInputTextCallbackData* data) -> int {
 		InputTextCallback_UserData* user_data = (InputTextCallback_UserData*)data->UserData;
 		if (data->EventFlag == ImGuiInputTextFlags_CallbackCharFilter) {
-			if (data->EventChar <= 255 && (std::isalpha(data->EventChar) || std::isdigit(data->EventChar) || data->EventChar == '_')) {
+			if (data->EventChar <= 255 &&
+			    (std::isalpha(data->EventChar) || std::isdigit(data->EventChar) || data->EventChar == '_')) {
 				return 0;
 			}
 
@@ -1125,7 +1222,8 @@ bool InputText(const char* label,
 		}
 		else if (data->EventFlag == ImGuiInputTextFlags_CallbackResize) {
 			// Resize string callback
-			// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them back to what we want.
+			// If for some reason we refuse the new length (BufTextLen) and/or capacity (BufSize) we need to set them
+			// back to what we want.
 			std::string* str = user_data->Str;
 			IM_ASSERT(data->Buf == str->c_str());
 			str->resize(data->BufTextLen);
@@ -1153,7 +1251,8 @@ bool InputText(const char* label,
 	cb_user_data.ChainCallbackUserData = user_data;
 
 	if (acceptOnlyIdentifierStyleText) {
-		return ImGui::InputText(label, (char*)str.c_str(), str.capacity() + 1, flags, InputTextCallbackIdentifierFilter, &cb_user_data);
+		return ImGui::InputText(
+		    label, (char*)str.c_str(), str.capacity() + 1, flags, InputTextCallbackIdentifierFilter, &cb_user_data);
 	}
 	else {
 		return ImGui::InputText(label, (char*)str.c_str(), str.capacity() + 1, flags, InputTextCallback, &cb_user_data);

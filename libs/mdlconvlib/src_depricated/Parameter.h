@@ -42,7 +42,12 @@ struct SGE_CORE_API ParameterType {
 	static const Info& info(const Enum e)
 	{
 		static const Info info[] = {
-		    {"Float", 4}, {"Float2", 8}, {"Float3", 12}, {"Float4", 16}, {"Quaternion", 16}, {"String", 0},
+		    {"Float", 4},
+		    {"Float2", 8},
+		    {"Float3", 12},
+		    {"Float4", 16},
+		    {"Quaternion", 16},
+		    {"String", 0},
 		};
 
 		return info[(int)e];
@@ -156,9 +161,10 @@ class SGE_CORE_API ParameterBlock {
 	// Searches for a parameter with a given name and returns it.
 	// if the parameter was not found and 'typeIfMissing' is != DontCreate
 	// a new parameter will be created with that type!
-	Parameter* FindParameter(const char* const name,
-	                         const ParameterType::Enum typeIfMissing = ParameterType::DontCreate,
-	                         const void* staticValue = NULL);
+	Parameter* FindParameter(
+	    const char* const name,
+	    const ParameterType::Enum typeIfMissing = ParameterType::DontCreate,
+	    const void* staticValue = NULL);
 	const Parameter* FindParameter(const char* const name) const;
 
 	// All that std::move madness here cuold be pretty benefitial here?

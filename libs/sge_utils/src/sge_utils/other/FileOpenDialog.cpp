@@ -1,5 +1,5 @@
 #ifdef WIN32
-    // clang-format off
+// clang-format off
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <Windows.h>
@@ -42,7 +42,8 @@ bool DialogYesNo(const char* caption, const char* message)
 #endif
 }
 
-std::string FileOpenDialog(const std::string& prompt, bool fileMustExists, const char* fileFilter, const char* initialDir)
+std::string
+    FileOpenDialog(const std::string& prompt, bool fileMustExists, const char* fileFilter, const char* initialDir)
 {
 #ifdef WIN32
 	static std::mutex mtx;
@@ -99,7 +100,8 @@ std::string FileOpenDialog(const std::string& prompt, bool fileMustExists, const
 #endif
 }
 
-std::string FileSaveDialog(const std::string& prompt, const char* fileFilter, const char* defaultExtension, const char* initialDir)
+std::string FileSaveDialog(
+    const std::string& prompt, const char* fileFilter, const char* defaultExtension, const char* initialDir)
 {
 #ifdef WIN32
 	static std::mutex mtx;
@@ -132,7 +134,8 @@ std::string FileSaveDialog(const std::string& prompt, const char* fileFilter, co
 
 	return std::string(buffer);
 #elif !defined(__EMSCRIPTEN__)
-	const std::string cmd = string_format("zenity --file-selection --save --confirm-overwrite --text=\"%s\"", prompt.c_str());
+	const std::string cmd =
+	    string_format("zenity --file-selection --save --confirm-overwrite --text=\"%s\"", prompt.c_str());
 
 	char pickedPathCStr[1024] = {0};
 	FILE* const fPipe = popen(cmd.c_str(), "r");

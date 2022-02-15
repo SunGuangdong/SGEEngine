@@ -68,7 +68,8 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	Box2f getBBoxPixels() const
 	{
 		Box2f parentBBoxSS = getParentBBoxSS();
-		const Box2f bboxSS = m_position.getBBoxPixels(parentBBoxSS, getParentContentOrigin().toPixels(parentBBoxSS.size()), m_size);
+		const Box2f bboxSS =
+		    m_position.getBBoxPixels(parentBBoxSS, getParentContentOrigin().toPixels(parentBBoxSS.size()), m_size);
 		return bboxSS;
 	}
 
@@ -241,8 +242,10 @@ struct SGE_CORE_API ImageWidget final : public IWidget {
 		setSize(size);
 	}
 
-	static std::shared_ptr<ImageWidget> create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture);
-	static std::shared_ptr<ImageWidget> createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture);
+	static std::shared_ptr<ImageWidget>
+	    create(UIContext& owningContext, Pos position, Unit width, GpuHandle<Texture> texture);
+	static std::shared_ptr<ImageWidget>
+	    createByHeight(UIContext& owningContext, Pos position, Unit height, GpuHandle<Texture> texture);
 	virtual void draw(const UIDrawSets& drawSets) override;
 
   private:
@@ -261,7 +264,8 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 		setSize(size);
 	}
 
-	static std::shared_ptr<ButtonWidget> create(UIContext& owningContext, Pos position, Size size, const char* const text = nullptr);
+	static std::shared_ptr<ButtonWidget>
+	    create(UIContext& owningContext, Pos position, Size size, const char* const text = nullptr);
 	static std::shared_ptr<ButtonWidget>
 	    createImageWidth(UIContext& owningContext, Pos position, Size size, const char* const text = nullptr);
 
@@ -307,8 +311,12 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 		}
 	}
 
-	/// @brief Adds a function to get called when the button has been released (cursor over the widget) or when interacted with the gamepad.
-	[[nodiscard]] EventSubscription subscribe_onRelease(std::function<void()> fn) { return m_onReleaseListeners.subscribe(std::move(fn)); }
+	/// @brief Adds a function to get called when the button has been released (cursor over the widget) or when
+	/// interacted with the gamepad.
+	[[nodiscard]] EventSubscription subscribe_onRelease(std::function<void()> fn)
+	{
+		return m_onReleaseListeners.subscribe(std::move(fn));
+	}
 
   private:
 	EventEmitter<> m_onReleaseListeners;
@@ -368,7 +376,8 @@ struct SGE_CORE_API Checkbox final : public IWidget {
 		setSize(size);
 	}
 
-	static std::shared_ptr<Checkbox> create(UIContext& owningContext, Pos position, Size size, const char* const text, bool isOn);
+	static std::shared_ptr<Checkbox>
+	    create(UIContext& owningContext, Pos position, Size size, const char* const text, bool isOn);
 
 	bool isGamepadTargetable() override { return true; }
 

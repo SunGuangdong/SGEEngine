@@ -52,7 +52,11 @@ float4 psMain(VS_OUTPUT IN) : COLOR {
 namespace sge {
 
 void TexturedPlaneDraw::draw(
-    const RenderDestination& rdest, const mat4f& projViewWorld, Texture* texture, const vec4f& tint, const vec4f uvRegion)
+    const RenderDestination& rdest,
+    const mat4f& projViewWorld,
+    Texture* texture,
+    const vec4f& tint,
+    const vec4f uvRegion)
 {
 	initialize(rdest.getDevice());
 
@@ -60,8 +64,10 @@ void TexturedPlaneDraw::draw(
 	m_stateGroup.setPrimitiveTopology(PrimitiveTopology::TriangleList);
 	m_stateGroup.setVBDeclIndex(m_vertexDecl);
 	m_stateGroup.setVB(0, m_vertexBuffer, 0, sizeof(Vertex));
-	m_stateGroup.setRenderState(getCore()->getGraphicsResources().RS_noCulling, getCore()->getGraphicsResources().DSS_default_lessEqual,
-	                            getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	m_stateGroup.setRenderState(
+	    getCore()->getGraphicsResources().RS_noCulling,
+	    getCore()->getGraphicsResources().DSS_default_lessEqual,
+	    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	BoundUniform uniforms[] = {
 	    BoundUniform(m_texDiffuse_bindLoc, texture),
@@ -128,8 +134,22 @@ Geometry TexturedPlaneDraw::getGeometry(SGEDevice* sgedev)
 {
 	initialize(sgedev);
 
-	Geometry geom(m_vertexBuffer.GetPtr(), nullptr, nullptr, -1, m_vertexDecl, false, true, true, false, PrimitiveTopology::TriangleList, 0,
-	              0, sizeof(Vertex), UniformType::Unknown, 6);
+	Geometry geom(
+	    m_vertexBuffer.GetPtr(),
+	    nullptr,
+	    nullptr,
+	    -1,
+	    m_vertexDecl,
+	    false,
+	    true,
+	    true,
+	    false,
+	    PrimitiveTopology::TriangleList,
+	    0,
+	    0,
+	    sizeof(Vertex),
+	    UniformType::Unknown,
+	    6);
 
 	return geom;
 }

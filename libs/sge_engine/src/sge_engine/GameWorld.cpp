@@ -82,7 +82,8 @@ Actor* GameWorld::getActorByName(const char* name)
 	return obj ? obj->getActor() : nullptr;
 }
 
-void GameWorld::iterateOverPlayingObjects(const std::function<bool(GameObject*)>& lambda, bool includeAwaitCreationObject)
+void GameWorld::iterateOverPlayingObjects(
+    const std::function<bool(GameObject*)>& lambda, bool includeAwaitCreationObject)
 {
 	// Caution:
 	// If you do any changes here to them in the const method equivalednt!
@@ -118,7 +119,8 @@ void GameWorld::iterateOverPlayingObjects(const std::function<bool(GameObject*)>
 	}
 }
 
-void GameWorld::iterateOverPlayingObjects(const std::function<bool(const GameObject*)>& lambda, bool includeAwaitCreationObject) const
+void GameWorld::iterateOverPlayingObjects(
+    const std::function<bool(const GameObject*)>& lambda, bool includeAwaitCreationObject) const
 {
 	// Caution:
 	// If you do any changes here do them in the non-const method equivalent!
@@ -200,7 +202,8 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 		// Initialize the object.
 		ObjectId const newObjectId = specificId.isNull() ? getNewId() : specificId;
 		std::string displayName =
-		    (name != nullptr) ? name : std::string(typeLib().find(type)->name) + string_format("_%d", getNextNameIndex());
+		    (name != nullptr) ? name
+		                      : std::string(typeLib().find(type)->name) + string_format("_%d", getNextNameIndex());
 
 		object->private_GameWorld_performInitialization(this, newObjectId, type, std::move(displayName));
 		object->create();
@@ -219,7 +222,8 @@ GameObject* GameWorld::allocObject(TypeId const type, ObjectId const specificId,
 	}
 	else {
 		sgeAssertFalse(
-		    "It seems that you are trying to allocate an GameObject of incompte type or a type that is not registerered to the typelib(). "
+		    "It seems that you are trying to allocate an GameObject of incompte type or a type that is not "
+		    "registerered to the typelib(). "
 		    "Check if you've correctly overriden all virtual methods and that you have a reflection for this type,");
 	}
 
@@ -362,7 +366,9 @@ void GameWorld::update(const GameUpdateSets& updateSets)
 
 					// Now remove it form the object id loop up table.
 					const auto& itrInIdLUT = m_gameObjectByIdLUT.find(object->getId());
-					sgeAssert(itrInIdLUT != m_gameObjectByIdLUT.end() && "It is expected that the object id is in this list.");
+					sgeAssert(
+					    itrInIdLUT != m_gameObjectByIdLUT.end() &&
+					    "It is expected that the object id is in this list.");
 					if (itrInIdLUT != m_gameObjectByIdLUT.end()) {
 						m_gameObjectByIdLUT.erase(itrInIdLUT);
 					}
@@ -617,10 +623,11 @@ void GameWorld::getAllRelativesOf(vector_set<ObjectId>& result, ObjectId actorId
 	}
 }
 
-void sge::GameWorld::instantiatePrefab(const char* prefabPath,
-                                       bool createHistory,
-                                       bool shouldGenerateNewObjectIds,
-                                       const Optional<transf3d>& offsetWorldSpace)
+void sge::GameWorld::instantiatePrefab(
+    const char* prefabPath,
+    bool createHistory,
+    bool shouldGenerateNewObjectIds,
+    const Optional<transf3d>& offsetWorldSpace)
 {
 	GameWorld prefabWorld;
 	if (loadGameWorldFromFile(&prefabWorld, prefabPath)) {
@@ -631,10 +638,11 @@ void sge::GameWorld::instantiatePrefab(const char* prefabPath,
 /// Instantients the specified world into the current world.
 /// @param [in] prefabPath a path the world file to be instantiated.
 /// @param [in] createHistory pass true if the changes should be added to undo/redo history.
-void GameWorld::instantiatePrefabFromJsonString(const char* prefabJson,
-                                                bool createHistory,
-                                                bool shouldGenerateNewObjectIds,
-                                                const Optional<transf3d>& offsetWorldSpace)
+void GameWorld::instantiatePrefabFromJsonString(
+    const char* prefabJson,
+    bool createHistory,
+    bool shouldGenerateNewObjectIds,
+    const Optional<transf3d>& offsetWorldSpace)
 {
 	GameWorld prefabWorld;
 	bool succeeded = loadGameWorldFromString(&prefabWorld, prefabJson);
@@ -647,12 +655,13 @@ void GameWorld::instantiatePrefabFromJsonString(const char* prefabJson,
 	}
 }
 
-void sge::GameWorld::instantiatePrefab(const GameWorld& prefabWorld,
-                                       bool createHistory,
-                                       bool shouldGenerateNewObjectIds,
-                                       const vector_set<ObjectId>* const pOblectsToInstantiate,
-                                       vector_set<ObjectId>* const newObjectIds,
-                                       const Optional<transf3d>& offsetWorldSpace)
+void sge::GameWorld::instantiatePrefab(
+    const GameWorld& prefabWorld,
+    bool createHistory,
+    bool shouldGenerateNewObjectIds,
+    const vector_set<ObjectId>* const pOblectsToInstantiate,
+    vector_set<ObjectId>* const newObjectIds,
+    const Optional<transf3d>& offsetWorldSpace)
 {
 	std::vector<GameObject*> createdObjects;
 	std::unordered_map<ObjectId, ObjectId> oldToNew;
@@ -794,9 +803,10 @@ void sge::GameWorld::instantiatePrefab(const GameWorld& prefabWorld,
 	}
 }
 
-void GameWorld::createPrefab(GameWorld& prefabWorld,
-                             bool shouldKeepOriginalObjectIds,
-                             const vector_set<ObjectId>* const pOblectsToInstantiate) const
+void GameWorld::createPrefab(
+    GameWorld& prefabWorld,
+    bool shouldKeepOriginalObjectIds,
+    const vector_set<ObjectId>* const pOblectsToInstantiate) const
 {
 	prefabWorld.clear();
 	prefabWorld.create();

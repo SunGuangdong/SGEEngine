@@ -59,40 +59,44 @@ struct SGE_CORE_API GeomGen {
 	// Generates a 3D wired capsule in RH Y-up.
 	// Adds the vertices to the global array for wire geometry - verts.
 	// Vertices: Line List of [ PosColorVert ]
-	static void wiredCapsule(std::vector<PosColorVert>& verts,
-	                         const mat4f& transform,
-	                         const uint32 rgba,
-	                         float height,
-	                         float radius,
-	                         int numSideDivs,
-	                         const Origin origin);
+	static void wiredCapsule(
+	    std::vector<PosColorVert>& verts,
+	    const mat4f& transform,
+	    const uint32 rgba,
+	    float height,
+	    float radius,
+	    int numSideDivs,
+	    const Origin origin);
 
 	// Generates a 3D wired sphere in RH Y-up.
 	// Adds the vertices to the global array for wire geometry - verts.
 	// Vertices: Line List of [ PosColorVert ]
-	static void wiredSphere(std::vector<PosColorVert>& verts, const mat4f& transform, const uint32 rgba, float radius, int numSides);
+	static void wiredSphere(
+	    std::vector<PosColorVert>& verts, const mat4f& transform, const uint32 rgba, float radius, int numSides);
 
 	// Generates a 3D wired cylinder in RH Y-up.
 	// Adds the vertices to the global array for wire geometry - verts.
 	// Vertices: Line List of [ PosColorVert ]
-	static void wiredCylinder(std::vector<PosColorVert>& verts,
-	                          const mat4f& transform,
-	                          const uint32 rgba,
-	                          float height,
-	                          float radius,
-	                          int numSides,
-	                          const Origin origin);
+	static void wiredCylinder(
+	    std::vector<PosColorVert>& verts,
+	    const mat4f& transform,
+	    const uint32 rgba,
+	    float height,
+	    float radius,
+	    int numSides,
+	    const Origin origin);
 
 	// Generates a 3D wired cone in RH Y-up.
 	// Adds the vertices to the global array for wire geometry - verts.
 	// Vertices: Line List of [ PosColorVert ]
-	static void wiredCone(std::vector<PosColorVert>& verts,
-	                      const mat4f& transform,
-	                      const uint32 rgba,
-	                      float height,
-	                      float radius,
-	                      int numSides,
-	                      const Origin origin);
+	static void wiredCone(
+	    std::vector<PosColorVert>& verts,
+	    const mat4f& transform,
+	    const uint32 rgba,
+	    float height,
+	    float radius,
+	    int numSides,
+	    const Origin origin);
 
 	// Generates a 3D wired(edges only) basis.
 	// Vertices Line List of [ PosColorVert ]
@@ -100,16 +104,18 @@ struct SGE_CORE_API GeomGen {
 
 	// Generates
 	//
-	static void wiredGrid(std::vector<PosColorVert>& verts,
-	                      const vec3f& origin,
-	                      const vec3f& xAxis,
-	                      const vec3f& zAxis,
-	                      const int xLinesCnt,
-	                      const int zLinesCnt,
-	                      int color = 0x000000);
+	static void wiredGrid(
+	    std::vector<PosColorVert>& verts,
+	    const vec3f& origin,
+	    const vec3f& xAxis,
+	    const vec3f& zAxis,
+	    const int xLinesCnt,
+	    const int zLinesCnt,
+	    int color = 0x000000);
 
 	// Generates an Immutable R8G8B8A8_UNORM checker texture texture, starting with black.
-	static void createChecker(Texture* texture, const int size, const int checkSize, const SamplerDesc& prefferedSampler);
+	static void
+	    createChecker(Texture* texture, const int size, const int checkSize, const SamplerDesc& prefferedSampler);
 };
 
 } // namespace sge

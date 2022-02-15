@@ -14,14 +14,15 @@ struct ShadowMapBuildInfo;
 struct SGE_CORE_API FWDBuildShadowMapShader {
 	FWDBuildShadowMapShader() = default;
 
-	void drawGeometry(const RenderDestination& rdest,
-	                  const vec3f& camPos,
-	                  const mat4f& projView,
-	                  const mat4f& world,
-	                  const ShadowMapBuildInfo& shadowMapBuildInfo,
-	                  const Geometry& geometry,
-	                  const Texture* diffuseTexForAlphaMask,
-	                  const bool forceNoCulling);
+	void drawGeometry(
+	    const RenderDestination& rdest,
+	    const vec3f& camPos,
+	    const mat4f& projView,
+	    const mat4f& world,
+	    const ShadowMapBuildInfo& shadowMapBuildInfo,
+	    const Geometry& geometry,
+	    const Texture* diffuseTexForAlphaMask,
+	    const bool forceNoCulling);
 
   private:
 	Optional<ShadingProgramPermuator> shadingPermutFWDBuildShadowMaps;

@@ -52,7 +52,8 @@ struct SGE_ENGINE_API ModelEntry {
 	ChangeIndex changeIndex;
 
 	bool isRenderable = true;
-	bool ignoreActorTransform = false; ///< true, when the actor transform should be ignored when rendering the 3D model.
+	bool ignoreActorTransform =
+	    false; ///< true, when the actor transform should be ignored when rendering the 3D model.
 	AssetProperty m_assetProperty;
 	mat4f m_additionalTransform = mat4f::getIdentity();
 	std::vector<std::shared_ptr<AssetIface_Material>> mtlOverrides;
@@ -73,9 +74,9 @@ struct SGE_ENGINE_API ModelEntry {
 ///
 ///    Lets say that you have a actor that is some collectable, a coin from Super Mario.
 ///    That coin 3D model is never going to change, you know that the game object is only going to use
-///    that one specfic 3D model that you can set in @Actor::create method with @TraitModel::setModel() and forget about it.
-///    You do not need any upadates on it, nor you want to be able to change the 3D model from the Property Editor Window.
-///    In this situation you just add the trait, set the model and you are done.
+///    that one specfic 3D model that you can set in @Actor::create method with @TraitModel::setModel() and forget about
+///    it. You do not need any upadates on it, nor you want to be able to change the 3D model from the Property Editor
+///    Window. In this situation you just add the trait, set the model and you are done.
 ///
 ///    The situation where the 3D model might change is for example with some Decore.
 ///    Lets say that your 3D artist has prepared a grass and bush models that you want to scatter around the level.
@@ -111,9 +112,10 @@ struct SGE_ENGINE_API TraitModel : public Trait {
 	bool updateAssetProperties();
 
   public:
-	std::vector<ModelEntry> m_models;          ///< A list of all models in their settings to rendered by the trait.
-	bool isRenderable = true;                  ///< True if the whole trait is renderable.
-	bool uiDontOfferResizingModelCount = true; ///< if true the interface will not offer adding/removing more models to the trait.
+	std::vector<ModelEntry> m_models; ///< A list of all models in their settings to rendered by the trait.
+	bool isRenderable = true;         ///< True if the whole trait is renderable.
+	bool uiDontOfferResizingModelCount =
+	    true; ///< if true the interface will not offer adding/removing more models to the trait.
 	bool forceNoShadows = false;
 };
 

@@ -49,8 +49,8 @@ void PlantingTool::onUI(GameInspector* UNUSED(inspector))
 	ImGui::Checkbox("Rotate Objects", &shouldRotateObjects);
 }
 
-InspectorToolResult
-    PlantingTool::updateTool(GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
+InspectorToolResult PlantingTool::updateTool(
+    GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
 {
 	InspectorToolResult result;
 
@@ -152,10 +152,12 @@ InspectorToolResult
 
 	// Apply the snapping form the transform tool.
 	if (inspector->m_transformTool.m_useSnapSettings) {
-		primaryActorNewTransf.p = inspector->m_transformTool.m_snapSettings.applySnappingTranslation(primaryActorNewTransf.p);
+		primaryActorNewTransf.p =
+		    inspector->m_transformTool.m_snapSettings.applySnappingTranslation(primaryActorNewTransf.p);
 	}
 
-	const transf3d diffTrasform = primaryActorNewTransf * actorsToPlantOriginalTrasnforms.begin().value().inverseSimple();
+	const transf3d diffTrasform =
+	    primaryActorNewTransf * actorsToPlantOriginalTrasnforms.begin().value().inverseSimple();
 	transf3d diffTrasformNoRotation = diffTrasform;
 	diffTrasformNoRotation.r = quatf::getIdentity();
 

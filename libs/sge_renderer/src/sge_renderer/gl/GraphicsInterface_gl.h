@@ -63,7 +63,10 @@ struct SGEDeviceImpl : public SGEDevice {
 
 	VertexDeclIndex getVertexDeclIndex(const VertexDecl* const declElems, const int declElemsCount) final;
 	const std::vector<VertexDecl>& getVertexDeclFromIndex(const VertexDeclIndex index) const final;
-	const std::map<std::vector<VertexDecl>, VertexDeclIndex>& getVertexDeclMap() const final { return m_vertexDeclIndexMap; }
+	const std::map<std::vector<VertexDecl>, VertexDeclIndex>& getVertexDeclMap() const final
+	{
+		return m_vertexDeclIndexMap;
+	}
 
 	GLContextStateCache* GL_GetContextStateCache() { return &m_gl_contextStateCache; }
 
@@ -112,7 +115,10 @@ struct SGEContextGL : public SGEContext {
 	SGEDeviceImpl* getDeviceImpl() { return m_device; }
 	void SetSGEDevice(SGEDevice* device) { m_device = static_cast<SGEDeviceImpl*>(device); }
 
-	GLContextStateCache* GL_GetContextStateCache() { return static_cast<SGEDeviceImpl*>(m_device)->GL_GetContextStateCache(); }
+	GLContextStateCache* GL_GetContextStateCache()
+	{
+		return static_cast<SGEDeviceImpl*>(m_device)->GL_GetContextStateCache();
+	}
 
   protected:
 	SGEDeviceImpl* m_device;
@@ -133,10 +139,11 @@ struct SGEContextImmediate : public SGEContextGL {
 	void* map(Buffer* buffer, const Map::Enum map) final;
 	void unMap(Buffer* buffer) final;
 
-	void executeDrawCall(DrawCall& drawCall,
-	                     FrameTarget* frameTarget,
-	                     const Rect2s* const pViewport = nullptr,
-	                     const Rect2s* const pScissorsRect = nullptr) final;
+	void executeDrawCall(
+	    DrawCall& drawCall,
+	    FrameTarget* frameTarget,
+	    const Rect2s* const pViewport = nullptr,
+	    const Rect2s* const pScissorsRect = nullptr) final;
 
 	void beginQuery(Query* const query) final;
 	void endQuery(Query* const query) final;

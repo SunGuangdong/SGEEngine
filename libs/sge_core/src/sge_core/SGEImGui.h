@@ -39,41 +39,45 @@ struct SGE_CORE_API SGEImGui {
 	static bool IsItemJustReleased();
 	static bool IsItemJustActivated();
 
-	static bool DragFloats(const char* label,
-	                       float* floats,
-	                       int numFloats,
-	                       bool* pJustReleased = nullptr,
-	                       bool* pJustActivated = nullptr,
-	                       float middleClickResetValue = 0.f,
-	                       float v_speed = 1.0f,
-	                       float v_min = 0.0f,
-	                       float v_max = 0.0f,
-	                       const char* display_format = "%.3f",
-	                       float power = 1.0f);
+	static bool DragFloats(
+	    const char* label,
+	    float* floats,
+	    int numFloats,
+	    bool* pJustReleased = nullptr,
+	    bool* pJustActivated = nullptr,
+	    float middleClickResetValue = 0.f,
+	    float v_speed = 1.0f,
+	    float v_min = 0.0f,
+	    float v_max = 0.0f,
+	    const char* display_format = "%.3f",
+	    float power = 1.0f);
 
-	static bool DragInts(const char* label,
-	                     int* ints,
-	                     int numInts,
-	                     bool* pJustReleased = nullptr,
-	                     bool* pJustActivated = nullptr,
-	                     float v_speed = 1.f,
-	                     int v_min = 0.0f,
-	                     int v_max = 0.0f,
-	                     const char* display_format = "%.0f");
+	static bool DragInts(
+	    const char* label,
+	    int* ints,
+	    int numInts,
+	    bool* pJustReleased = nullptr,
+	    bool* pJustActivated = nullptr,
+	    float v_speed = 1.f,
+	    int v_min = 0.0f,
+	    int v_max = 0.0f,
+	    const char* display_format = "%.0f");
 
-	static bool ColorPicker4(const char* label,
-	                         float col[4],
-	                         bool* const pJustReleased,
-	                         bool* const pJustActivated,
-	                         ImGuiColorEditFlags flags = 0,
-	                         const float* ref_col = nullptr);
+	static bool ColorPicker4(
+	    const char* label,
+	    float col[4],
+	    bool* const pJustReleased,
+	    bool* const pJustActivated,
+	    ImGuiColorEditFlags flags = 0,
+	    const float* ref_col = nullptr);
 
-	static bool ColorPicker3(const char* label,
-	                         float col[3],
-	                         bool* const pJustReleased,
-	                         bool* const pJustActivated,
-	                         ImGuiColorEditFlags flags = 0,
-	                         const float* ref_col = nullptr);
+	static bool ColorPicker3(
+	    const char* label,
+	    float col[3],
+	    bool* const pJustReleased,
+	    bool* const pJustActivated,
+	    ImGuiColorEditFlags flags = 0,
+	    const float* ref_col = nullptr);
 
   private:
 	static StateGroup stateGroup;
@@ -178,12 +182,13 @@ struct IndentGuard {
 SGE_CORE_API void BeginGroupPanel(const char* name, const ImVec2 size = ImVec2(-1.f, -1.f));
 SGE_CORE_API void EndGroupPanel();
 SGE_CORE_API void Label(const char* label, bool shouldSetNextItemWidth = true, float labelWidthProportion = 0.3f);
-SGE_CORE_API bool InputText(const char* label,
-                            std::string& str,
-                            ImGuiInputTextFlags flags = 0,
-                            ImGuiInputTextCallback callback = nullptr,
-                            void* user_data = nullptr,
-                            bool acceptOnlyIdentifierStyleText = false);
+SGE_CORE_API bool InputText(
+    const char* label,
+    std::string& str,
+    ImGuiInputTextFlags flags = 0,
+    ImGuiInputTextCallback callback = nullptr,
+    void* user_data = nullptr,
+    bool acceptOnlyIdentifierStyleText = false);
 
 /// @brief Create a tooltip if the previous item was hovered.
 SGE_CORE_API void TextTooltip(const char* const text);

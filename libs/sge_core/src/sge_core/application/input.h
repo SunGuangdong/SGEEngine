@@ -168,16 +168,18 @@ struct SGE_CORE_API InputState {
 	InputState();
 
 	/// When the input state is going to get passed to some sub-system. For example the Gameplay Window in the SGEEditor
-	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a fullscreen
-	/// application.
-	/// This function sets the region of that domain in client space starting form (0,0) to the desireded size.
+	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a
+	/// fullscreen application. This function sets the region of that domain in client space starting form (0,0) to the
+	/// desireded size.
 	void setDomainSpaceFromSize(const vec2f& size) { m_domain = Box2f(vec2f(0.f), vec2f(size.x - 1.f, size.y - 1.f)); }
 
 	/// When the input state is going to get passed to some sub-system. For example the Gameplay Window in the SGEEditor
-	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a fullscreen
-	/// application.
-	/// This function sets the region of that domain in client to the one specified.
-	void setDomainFromPosAndSize(const vec2f& pos, const vec2f& size) { m_domain = Box2f(pos, pos + vec2f(size.x - 1.f, size.y - 1.f)); }
+	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a
+	/// fullscreen application. This function sets the region of that domain in client to the one specified.
+	void setDomainFromPosAndSize(const vec2f& pos, const vec2f& size)
+	{
+		m_domain = Box2f(pos, pos + vec2f(size.x - 1.f, size.y - 1.f));
+	}
 
 	/// @brief Converts the specified client space point to domain space.
 	vec2f clientToDomain(const vec2f& ptClient) const { return ptClient - m_domain.min; }
@@ -206,7 +208,8 @@ struct SGE_CORE_API InputState {
 	TouchInput& findOrCreateTouchById(const int64 touchId);
 	const TouchInput* getTouchById(const int64 touchId) const;
 
-	// Moves the current input state into previous. Allowing us to detmine changes to the input, like just pressed/released buttons.
+	// Moves the current input state into previous. Allowing us to detmine changes to the input, like just
+	// pressed/released buttons.
 	void Advance();
 
 	void setCursorPos(const vec2f& c);
@@ -230,7 +233,10 @@ struct SGE_CORE_API InputState {
 
 	bool IsKeyDown(Key key) const { return (bool)(m_keyStates[key] & 1); }
 	bool IsKeyUp(Key key) const { return !(bool)(m_keyStates[key] & 1); }
-	bool IsKeyPressed(Key key) const { return (m_keyStates[key] & 3) == 1; } // Returns true if the target key was just pressed.
+	bool IsKeyPressed(Key key) const
+	{
+		return (m_keyStates[key] & 3) == 1;
+	} // Returns true if the target key was just pressed.
 	bool IsKeyReleased(Key key) const { return (m_keyStates[key] & 3) == 2; }
 	bool isKeyCombo(Key k0, Key k1) const { return (IsKeyDown(k0) && IsKeyReleased(k1)); }
 
@@ -249,8 +255,8 @@ struct SGE_CORE_API InputState {
 
   public:
 	/// When the input state is going to get passed to some sub-system. For example the Gameplay Window in the SGEEditor
-	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a fullscreen
-	/// application.
+	/// we need to be able to simulate mouse clicks, touches and so on to be as if the the game was running alone in a
+	/// fullscreen application.
 	/// @m_domain specifies where the "sub window" is and how big it is, so we can convert coordinates to it.
 	Box2f m_domain;
 
@@ -259,11 +265,13 @@ struct SGE_CORE_API InputState {
 	bool m_wasActiveWhilePolling = false;
 	/// True if there were any inputs made form mouse or keyboard this poll.
 	bool m_hadkeyboardOrMouseInputThisPoll = false;
-	/// True if the cursor was relative (hidden and not stopping at edges to prosduce motion events). Suitable for FPS games.
+	/// True if the cursor was relative (hidden and not stopping at edges to prosduce motion events). Suitable for FPS
+	/// games.
 	bool m_isCursorRelative = false;
 	/// The position of the cursor in client space in pixels.
 	vec2f m_cursorClient = vec2f(0.f);
-	/// The motion of the cursor. Domain space has the same pixel scale as client space so the values could be used for both.
+	/// The motion of the cursor. Domain space has the same pixel scale as client space so the values could be used for
+	/// both.
 	vec2f m_cursorMotion = vec2f(0.f);
 	/// The amount of mouse wheel ticks this poll.
 	int m_wheelCount = 0;

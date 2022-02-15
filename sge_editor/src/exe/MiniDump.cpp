@@ -1,7 +1,7 @@
 #include "MiniDump.h"
 
 #if WIN32
-    // clang-format off
+// clang-format off
 // The include order here matters.
 #include <Windows.h>
 #include <DbgHelp.h>
@@ -10,7 +10,8 @@
 
 void sgeCreateMiniDump(EXCEPTION_POINTERS* pep)
 {
-	HANDLE hFile = CreateFile(_T("minidump.dmp"), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(
+	    _T("minidump.dmp"), GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if ((hFile != NULL) && (hFile != INVALID_HANDLE_VALUE)) {
 		// Create the minidump.
 		MINIDUMP_EXCEPTION_INFORMATION mdei;
@@ -21,7 +22,8 @@ void sgeCreateMiniDump(EXCEPTION_POINTERS* pep)
 
 		MINIDUMP_TYPE mdt = MiniDumpNormal;
 
-		[[maybe_unused]] BOOL rv = MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, mdt, (pep != 0) ? &mdei : 0, 0, 0);
+		[[maybe_unused]] BOOL rv =
+		    MiniDumpWriteDump(GetCurrentProcess(), GetCurrentProcessId(), hFile, mdt, (pep != 0) ? &mdei : 0, 0, 0);
 
 		// Close the file
 

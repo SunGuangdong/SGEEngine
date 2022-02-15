@@ -38,10 +38,11 @@ struct SGE_ENGINE_API TransformTool : IInspectorTool {
 	std::vector<PerControlledItemData> perItemData;
 
 	void onSetActive(GameInspector* const inspector) override final;
-	InspectorToolResult updateTool(GameInspector* const inspector,
-	                               bool isAllowedToTakeInput,
-	                               const InputState& is,
-	                               const GameDrawSets& drawSets) override final;
+	InspectorToolResult updateTool(
+	    GameInspector* const inspector,
+	    bool isAllowedToTakeInput,
+	    const InputState& is,
+	    const GameDrawSets& drawSets) override final;
 	void onCancel(GameInspector* inspector) override final;
 
 	void onUI(GameInspector* inspector) override final;
@@ -55,7 +56,12 @@ struct SGE_ENGINE_API TransformTool : IInspectorTool {
 	// This is the function that must get called right before you start using the gizmo.
 	void prepareForEditing();
 
-	bool interact(const InputState& is, const vec3f& rayOrigin, const vec3f rayDir, const float customScale, bool* hasClickedAway);
+	bool interact(
+	    const InputState& is,
+	    const vec3f& rayOrigin,
+	    const vec3f rayDir,
+	    const float customScale,
+	    bool* hasClickedAway);
 };
 
 

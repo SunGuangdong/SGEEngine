@@ -20,7 +20,8 @@ void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib)
 			mesh->vertexBuffer->create(vbd, mesh->vertexBufferRaw.data());
 
 			if (getModelLoadSetting().assetDir.empty()) {
-				mesh->vertexBuffer->setDebugName(string_format("Vertex Buffer for %s model", getModelLoadSetting().assetDir.c_str()));
+				mesh->vertexBuffer->setDebugName(
+				    string_format("Vertex Buffer for %s model", getModelLoadSetting().assetDir.c_str()));
 			}
 			else {
 				mesh->vertexBuffer->setDebugName(string_format("Vertex Buffer from a model"));
@@ -37,7 +38,8 @@ void Model::prepareForRendering(SGEDevice& sgedev, AssetLibrary& assetLib)
 				mesh->indexBuffer->create(ibd, mesh->indexBufferRaw.data());
 
 				if (getModelLoadSetting().assetDir.empty()) {
-					mesh->indexBuffer->setDebugName(string_format("Index Buffer for %s model", getModelLoadSetting().assetDir.c_str()));
+					mesh->indexBuffer->setDebugName(
+					    string_format("Index Buffer for %s model", getModelLoadSetting().assetDir.c_str()));
 				}
 				else {
 					mesh->indexBuffer->setDebugName(string_format("Index Buffer from a model"));
@@ -57,8 +59,8 @@ void Model::loadMaterials(AssetLibrary& assetLib)
 		const ModelMaterial* const rawMaterial = materialAt(iMaterial);
 
 		if (!rawMaterial->assetForThisMaterial.empty()) {
-			m_loadedMaterial[iMaterial] = assetLib.getLoadedAssetIface<AssetIface_Material>(rawMaterial->assetForThisMaterial.c_str(),
-			                                                                                getModelLoadSetting().assetDir.c_str());
+			m_loadedMaterial[iMaterial] = assetLib.getLoadedAssetIface<AssetIface_Material>(
+			    rawMaterial->assetForThisMaterial.c_str(), getModelLoadSetting().assetDir.c_str());
 		}
 		else {
 			// Legacy material import where the materials weren't a separate asset.
@@ -72,14 +74,14 @@ void Model::loadMaterials(AssetLibrary& assetLib)
 			evalMtl->alphaMultiplier = rawMaterial->oldInplaceMtl.alphaMultiplier;
 
 			// Metallic map.
-			evalMtl->texDiffuse = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.diffuseTextureName.c_str(),
-			                                                                         getModelLoadSetting().assetDir.c_str());
+			evalMtl->texDiffuse = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(
+			    rawMaterial->oldInplaceMtl.diffuseTextureName.c_str(), getModelLoadSetting().assetDir.c_str());
 			evalMtl->texMetallic = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(
 			    rawMaterial->oldInplaceMtl.metallicTextureName.c_str(), getModelLoadSetting().assetDir.c_str());
 			evalMtl->texRoughness = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(
 			    rawMaterial->oldInplaceMtl.roughnessTextureName.c_str(), getModelLoadSetting().assetDir.c_str());
-			evalMtl->texNormalMap = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(rawMaterial->oldInplaceMtl.normalTextureName.c_str(),
-			                                                                           getModelLoadSetting().assetDir.c_str());
+			evalMtl->texNormalMap = assetLib.getLoadedAssetIface<AssetIface_Texture2D>(
+			    rawMaterial->oldInplaceMtl.normalTextureName.c_str(), getModelLoadSetting().assetDir.c_str());
 
 			std::shared_ptr<AssetIface_Material_Simple> mtlProvider = std::make_shared<AssetIface_Material_Simple>();
 			mtlProvider->mtl = std::move(evalMtl);

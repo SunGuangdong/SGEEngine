@@ -11,10 +11,11 @@ SGE_NO_WARN_END
 
 namespace sge {
 
-bool computePenerationRecorverVectorFromManifold(btVector3& recoveryVector,
-                                                 const btPersistentManifold* persistManifold,
-                                                 const btCollisionObject* collisionObject,
-                                                 float maxPenetrationDepth)
+bool computePenerationRecorverVectorFromManifold(
+    btVector3& recoveryVector,
+    const btPersistentManifold* persistManifold,
+    const btCollisionObject* collisionObject,
+    float maxPenetrationDepth)
 {
 	bool hadPenetration = false;
 	recoveryVector = btVector3(0.f, 0.f, 0.f);
@@ -37,17 +38,18 @@ bool computePenerationRecorverVectorFromManifold(btVector3& recoveryVector,
 	return hadPenetration;
 }
 
-bool recoverFromPenetrationVector(btVector3& recoveryVector,
-                                  btCollisionWorld* collisionWorld,
-                                  btPairCachingGhostObject* ghostObj,
-                                  btManifoldArray& tempManifoldArray,
-                                  float maxPenetrationDepth)
+bool recoverFromPenetrationVector(
+    btVector3& recoveryVector,
+    btCollisionWorld* collisionWorld,
+    btPairCachingGhostObject* ghostObj,
+    btManifoldArray& tempManifoldArray,
+    float maxPenetrationDepth)
 {
 	bool hadPenetration = false;
 	recoveryVector = btVector3(0.f, 0.f, 0.f);
 
-	collisionWorld->getDispatcher()->dispatchAllCollisionPairs(ghostObj->getOverlappingPairCache(), collisionWorld->getDispatchInfo(),
-	                                                           collisionWorld->getDispatcher());
+	collisionWorld->getDispatcher()->dispatchAllCollisionPairs(
+	    ghostObj->getOverlappingPairCache(), collisionWorld->getDispatchInfo(), collisionWorld->getDispatcher());
 
 	// Here we must refresh the overlapping paircache as the penetrating movement itself or the
 	// previous recovery iteration might have used setWorldTransform and pushed us into an object
@@ -65,10 +67,11 @@ bool recoverFromPenetrationVector(btVector3& recoveryVector,
 
 	btVector3 minAabb, maxAabb;
 	collisionShape->getAabb(ghostObj->getWorldTransform(), minAabb, maxAabb);
-	collisionWorld->getBroadphase()->setAabb(ghostObj->getBroadphaseHandle(), minAabb, maxAabb, collisionWorld->getDispatcher());
+	collisionWorld->getBroadphase()->setAabb(
+	    ghostObj->getBroadphaseHandle(), minAabb, maxAabb, collisionWorld->getDispatcher());
 
-	collisionWorld->getDispatcher()->dispatchAllCollisionPairs(ghostObj->getOverlappingPairCache(), collisionWorld->getDispatchInfo(),
-	                                                           collisionWorld->getDispatcher());
+	collisionWorld->getDispatcher()->dispatchAllCollisionPairs(
+	    ghostObj->getOverlappingPairCache(), collisionWorld->getDispatchInfo(), collisionWorld->getDispatcher());
 
 	for (int i = 0; i < ghostObj->getOverlappingPairCache()->getNumOverlappingPairs(); i++) {
 		// Clear the manifold array.
@@ -83,8 +86,10 @@ bool recoverFromPenetrationVector(btVector3& recoveryVector,
 		//	continue;
 
 		// Check if the objects should collide according the bullet collision filtering.
-		bool collides = (obj0->getBroadphaseHandle()->m_collisionFilterGroup & obj1->getBroadphaseHandle()->m_collisionFilterMask) != 0;
-		collides = collides && (obj1->getBroadphaseHandle()->m_collisionFilterGroup & obj0->getBroadphaseHandle()->m_collisionFilterMask);
+		bool collides = (obj0->getBroadphaseHandle()->m_collisionFilterGroup &
+		                 obj1->getBroadphaseHandle()->m_collisionFilterMask) != 0;
+		collides = collides && (obj1->getBroadphaseHandle()->m_collisionFilterGroup &
+		                        obj0->getBroadphaseHandle()->m_collisionFilterMask);
 		if (!collides) {
 			continue;
 		}
@@ -102,8 +107,8 @@ bool recoverFromPenetrationVector(btVector3& recoveryVector,
 			}
 
 			btVector3 recoveryForThisManifold;
-			bool hadPenetrationWithManifold =
-			    computePenerationRecorverVectorFromManifold(recoveryForThisManifold, persistManifold, ghostObj, maxPenetrationDepth);
+			bool hadPenetrationWithManifold = computePenerationRecorverVectorFromManifold(
+			    recoveryForThisManifold, persistManifold, ghostObj, maxPenetrationDepth);
 			if (hadPenetrationWithManifold) {
 				recoveryVector += recoveryForThisManifold;
 				hadPenetration = true;
@@ -124,7 +129,8 @@ struct FindContactCallback : public btManifoldResult {
 	{
 	}
 
-	void FindContactCallback::addContactPoint(const btVector3& normalOnBInWorld, const btVector3& pointInWorldOnB, btScalar depth)
+	void FindContactCallback::addContactPoint(
+	    const btVector3& normalOnBInWorld, const btVector3& pointInWorldOnB, btScalar depth)
 	{
 		if (m_penetration_distance > depth) {
 			const bool isSwapped = m_manifoldPtr->getBody0() != m_body0Wrap->getCollisionObject();
@@ -144,10 +150,11 @@ struct FindContactCallback : public btManifoldResult {
 	int m_other_compound_shape_index = 0;
 };
 
-bool recoverFromPenetrationVector(btVector3& recoveryVector,
-                                  btCollisionWorld* collisionWorld,
-                                  btCollisionObject* colObj,
-                                  float UNUSED(maxPenetrationDepth))
+bool recoverFromPenetrationVector(
+    btVector3& recoveryVector,
+    btCollisionWorld* collisionWorld,
+    btCollisionObject* colObj,
+    float UNUSED(maxPenetrationDepth))
 {
 	recoveryVector = btVector3(0.f, 0.f, 0.f);
 	bool hadPenetration = false;
@@ -170,10 +177,12 @@ bool recoverFromPenetrationVector(btVector3& recoveryVector,
 		if (otherCo == colObj) {
 			continue;
 		}
-		btCollisionObjectWrapper obB(nullptr, otherCo->getCollisionShape(), otherCo, otherCo->getWorldTransform(), -1, -1);
+		btCollisionObjectWrapper obB(
+		    nullptr, otherCo->getCollisionShape(), otherCo, otherCo->getWorldTransform(), -1, -1);
 
 		// Find the collision algorithm that computes the actual penetration depth.
-		btCollisionAlgorithm* algorithm = collisionWorld->getDispatcher()->findAlgorithm(&obA, &obB, nullptr, BT_CONTACT_POINT_ALGORITHMS);
+		btCollisionAlgorithm* algorithm =
+		    collisionWorld->getDispatcher()->findAlgorithm(&obA, &obB, nullptr, BT_CONTACT_POINT_ALGORITHMS);
 		if (algorithm) {
 			FindContactCallback manifold(&obA, &obB);
 			algorithm->processCollision(&obA, &obB, collisionWorld->getDispatchInfo(), &manifold);

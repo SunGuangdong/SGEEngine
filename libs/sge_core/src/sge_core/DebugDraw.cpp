@@ -112,7 +112,8 @@ void DebugDraw::initialze(SGEDevice* sgedev)
 	    {0, "a_color", UniformType::Int_RGBA_Unorm_IA, 12},
 	};
 
-	m_vertexDeclIndex_pos3d_rgba_int = sgedev->getVertexDeclIndex(vtxDecl_pos3d_rgba_int, SGE_ARRSZ(vtxDecl_pos3d_rgba_int));
+	m_vertexDeclIndex_pos3d_rgba_int =
+	    sgedev->getVertexDeclIndex(vtxDecl_pos3d_rgba_int, SGE_ARRSZ(vtxDecl_pos3d_rgba_int));
 	;
 
 	//
@@ -147,8 +148,10 @@ void DebugDraw::drawWieredCommand(const RenderDestination& rdest, const mat4f& p
 
 	// Set-up the draw call
 	BoundUniform uniforms[] = {
-	    BoundUniform(m_shaderSolidVertexColor->getReflection().numericUnforms.findUniform("projViewWorld", ShaderType::VertexShader),
-	                 (void*)&projView),
+	    BoundUniform(
+	        m_shaderSolidVertexColor->getReflection().numericUnforms.findUniform(
+	            "projViewWorld", ShaderType::VertexShader),
+	        (void*)&projView),
 	};
 
 	m_stateGroup.setProgram(m_shaderSolidVertexColor);
@@ -167,7 +170,8 @@ void DebugDraw::drawWieredCommand(const RenderDestination& rdest, const mat4f& p
 		int const totalUnprocessedVertices = int(verts.size()) - idxUnprocessed;
 		int const numVertsToProcess = std::min(maxVertsCntInCall, totalUnprocessedVertices);
 
-		GeomGen::PosColorVert* const vbdata = (GeomGen::PosColorVert*)rdest.sgecon->map(m_vertexBuffer, Map::WriteDiscard);
+		GeomGen::PosColorVert* const vbdata =
+		    (GeomGen::PosColorVert*)rdest.sgecon->map(m_vertexBuffer, Map::WriteDiscard);
 		std::copy(verts.begin() + idxUnprocessed, verts.begin() + idxUnprocessed + numVertsToProcess, vbdata);
 		rdest.sgecon->unMap(m_vertexBuffer);
 

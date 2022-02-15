@@ -111,13 +111,18 @@ struct SGE_ENGINE_API ALine : public Actor {
 		}
 	}
 
-	InspectorCmd* generateDeleteItemCmd(GameInspector* inspector,
-	                                    const SelectedItem* items,
-	                                    int numItems,
-	                                    bool ifActorModeShouldDeleteActorsUnder) final;
+	InspectorCmd* generateDeleteItemCmd(
+	    GameInspector* inspector,
+	    const SelectedItem* items,
+	    int numItems,
+	    bool ifActorModeShouldDeleteActorsUnder) final;
 
 	InspectorCmd* generateItemSetTransformCmd(
-	    GameInspector* inspector, EditMode const mode, int itemIndex, const transf3d& initalTrasform, const transf3d& newTransform) final;
+	    GameInspector* inspector,
+	    EditMode const mode,
+	    int itemIndex,
+	    const transf3d& initalTrasform,
+	    const transf3d& newTransform) final;
 };
 
 //--------------------------------------------------------------------
@@ -161,7 +166,8 @@ struct SGE_ENGINE_API ASplineAddPoints : public InspectorCmd {
 //--------------------------------------------------------------------
 struct SGE_ENGINE_API ASplineDeletePoints : public InspectorCmd {
 	ObjectId m_actorid;
-	std::vector<int> m_indicesToDelete; // The indices of the points that are going to be deleted. MUST BE SORTED in GREATER TO SMALLER.
+	std::vector<int> m_indicesToDelete; // The indices of the points that are going to be deleted. MUST BE SORTED in
+	                                    // GREATER TO SMALLER.
 	std::vector<vec3f> m_originalSplinePoints;
 
 	// Point indices as currently taken from the game inspector.

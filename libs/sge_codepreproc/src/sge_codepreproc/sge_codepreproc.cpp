@@ -18,12 +18,13 @@ struct UserData {
 	std::unordered_map<std::string, std::vector<char>>& includeFiles;
 };
 
-std::string preprocessCode(const char* code,
-                           const char* const codeFilename,
-                           const char* const* macros,
-                           const int numMacros,
-                           const std::string& includeDir,
-                           std::set<std::string>* outIncludedFiles)
+std::string preprocessCode(
+    const char* code,
+    const char* const codeFilename,
+    const char* const* macros,
+    const int numMacros,
+    const std::string& includeDir,
+    std::set<std::string>* outIncludedFiles)
 {
 	if (isStringEmpty(code) || isStringEmpty(codeFilename)) {
 		return false;
@@ -60,7 +61,8 @@ std::string preprocessCode(const char* code,
 	UserData udata = {code, codeFilename, includeDir, includeFiles};
 
 	// loadFileFn will get get called by mcpp when it needs to include a file.
-	const auto loadFileFn = [](const char* filename, const char** out_contents, size_t* out_contents_size, void* user_data) -> int {
+	const auto loadFileFn =
+	    [](const char* filename, const char** out_contents, size_t* out_contents_size, void* user_data) -> int {
 		UserData& udata = *static_cast<UserData*>(user_data);
 
 		if (strcmp(filename, udata.codeFilename) == 0) {
@@ -115,8 +117,8 @@ std::string preprocessCode(const char* code,
 	char* colpilationErrors = nullptr;
 
 	// Run the preprocessor.
-	[[maybe_unused]] int const res =
-	    sge_mcpp_preprocess(&compilationResult, &colpilationErrors, argsCFormat.data(), int(argsCFormat.size()), loadFileFn, &udata);
+	[[maybe_unused]] int const res = sge_mcpp_preprocess(
+	    &compilationResult, &colpilationErrors, argsCFormat.data(), int(argsCFormat.size()), loadFileFn, &udata);
 	std::string result = compilationResult ? compilationResult : "";
 
 	if (outIncludedFiles != nullptr) {
@@ -128,11 +130,12 @@ std::string preprocessCode(const char* code,
 	return result;
 }
 
-std::string preprocessCodeFromFile(const char* const codeFilename,
-                                   const char* const* macros,
-                                   const int numMacros,
-                                   const std::string& includeDir,
-                                   std::set<std::string>* outIncludedFiles)
+std::string preprocessCodeFromFile(
+    const char* const codeFilename,
+    const char* const* macros,
+    const int numMacros,
+    const std::string& includeDir,
+    std::set<std::string>* outIncludedFiles)
 {
 	std::string code;
 	FileReadStream::readTextFile(codeFilename, code);

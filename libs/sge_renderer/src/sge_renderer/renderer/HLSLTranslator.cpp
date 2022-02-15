@@ -13,12 +13,13 @@
 
 namespace sge {
 
-bool translateHLSL(const char* const pCode,
-                   const ShadingLanguage::Enum shadingLanguage,
-                   const ShaderType::Enum shaderType,
-                   std::string& result,
-                   std::string& compilationErrors,
-                   std::set<std::string>* outIncludedFiles)
+bool translateHLSL(
+    const char* const pCode,
+    const ShadingLanguage::Enum shadingLanguage,
+    const ShaderType::Enum shaderType,
+    std::string& result,
+    std::string& compilationErrors,
+    std::set<std::string>* outIncludedFiles)
 {
 	M4::g_hlslParserErrors.clear();
 
@@ -48,8 +49,8 @@ bool translateHLSL(const char* const pCode,
 	}
 
 	if (shadingLanguage == ShadingLanguage::GLSL) {
-		auto target =
-		    shaderType == ShaderType::VertexShader ? M4::GLSLGenerator::Target_VertexShader : M4::GLSLGenerator::Target_FragmentShader;
+		auto target = shaderType == ShaderType::VertexShader ? M4::GLSLGenerator::Target_VertexShader
+		                                                     : M4::GLSLGenerator::Target_FragmentShader;
 		auto mainFnName = shaderType == ShaderType::VertexShader ? "vsMain" : "psMain";
 
 		M4::GLSLGenerator gen;
@@ -64,8 +65,8 @@ bool translateHLSL(const char* const pCode,
 		result = gen.GetResult();
 	}
 	else if (shadingLanguage == ShadingLanguage::HLSL) {
-		auto target =
-		    shaderType == ShaderType::VertexShader ? M4::HLSLGenerator::Target_VertexShader : M4::HLSLGenerator::Target_PixelShader;
+		auto target = shaderType == ShaderType::VertexShader ? M4::HLSLGenerator::Target_VertexShader
+		                                                     : M4::HLSLGenerator::Target_PixelShader;
 		auto mainFnName = shaderType == ShaderType::VertexShader ? "vsMain" : "psMain";
 
 		M4::HLSLGenerator gen;

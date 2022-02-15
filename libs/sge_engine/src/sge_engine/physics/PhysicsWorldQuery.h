@@ -55,8 +55,11 @@ namespace PhysicsWorldQuery {
 		std::vector<const btBroadphaseProxy*> proxies;
 	};
 
-	SGE_ENGINE_API void
-	    rayTest(PhysicsWorld& physWorld, const vec3f& from, const vec3f& to, std::function<void(btDynamicsWorld::LocalRayResult&)> cb);
+	SGE_ENGINE_API void rayTest(
+	    PhysicsWorld& physWorld,
+	    const vec3f& from,
+	    const vec3f& to,
+	    std::function<void(btDynamicsWorld::LocalRayResult&)> cb);
 
 	/// A callback for finding all potential collisions with thhe specified box.
 	/// @param cb a callback to be called. You can use BoxTestCallback for quick results.
@@ -71,20 +74,26 @@ struct SGE_ENGINE_API RayResultCollisionObject : public btDynamicsWorld::RayResu
 
 	RayResultCollisionObject() = default;
 
-	RayResultCollisionObject(const Actor* const igonreActor, const vec3f& rayFromWorld, const vec3f& rayToWorld, FilterFnType filterFn)
+	RayResultCollisionObject(
+	    const Actor* const igonreActor, const vec3f& rayFromWorld, const vec3f& rayToWorld, FilterFnType filterFn)
 	{
 		setup(igonreActor, toBullet(rayFromWorld), toBullet(rayToWorld), filterFn);
 	}
 
-	RayResultCollisionObject(const Actor* const igonreActor,
-	                         const btVector3& rayFromWorld,
-	                         const btVector3& rayToWorld,
-	                         FilterFnType filterFn)
+	RayResultCollisionObject(
+	    const Actor* const igonreActor,
+	    const btVector3& rayFromWorld,
+	    const btVector3& rayToWorld,
+	    FilterFnType filterFn)
 	{
 		setup(igonreActor, rayFromWorld, rayToWorld, filterFn);
 	}
 
-	void setup(const Actor* const igonreActor, const btVector3& rayFromWorld, const btVector3& rayToWorld, FilterFnType filterFn)
+	void setup(
+	    const Actor* const igonreActor,
+	    const btVector3& rayFromWorld,
+	    const btVector3& rayToWorld,
+	    FilterFnType filterFn)
 	{
 		m_ignoreActor = igonreActor;
 		m_rayFromWorld = rayFromWorld;
@@ -134,10 +143,11 @@ struct SGE_ENGINE_API RayResultActor final : public btDynamicsWorld::RayResultCa
 		setup(igonreActor, rayFromWorld, rayToWorld);
 	}
 
-	void setup(const Actor* const igonreActor,
-	           const btVector3& rayFromWorld,
-	           const btVector3& rayToWorld,
-	           std::function<bool(const Actor*)> customFilter = nullptr);
+	void setup(
+	    const Actor* const igonreActor,
+	    const btVector3& rayFromWorld,
+	    const btVector3& rayToWorld,
+	    std::function<bool(const Actor*)> customFilter = nullptr);
 
 	btScalar addSingleResult(btDynamicsWorld::LocalRayResult& rayResult, bool normalInWorldSpace) override;
 

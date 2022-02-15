@@ -128,7 +128,8 @@ bool RigidBodyConfigurator::apply(Actor& actor, bool addToWorldNow) const
 				std::vector<CollsionShapeDesc> collisionShapes;
 				addCollisionShapeBasedOnTraitModel(collisionShapes, *traitModel);
 
-				traitRb->getRigidBody()->create(&actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
+				traitRb->getRigidBody()->create(
+				    &actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
 				traitRb->getRigidBody()->setTransformAndScaling(actor.getTransform(), true);
 
 				if (addToWorldNow) {
@@ -147,7 +148,8 @@ bool RigidBodyConfigurator::apply(Actor& actor, bool addToWorldNow) const
 			if (modelIface) {
 				std::vector<CollsionShapeDesc> collisionShapes;
 				addCollisionShapeBasedOnModel(collisionShapes, modelIface->getStaticEval());
-				traitRb->getRigidBody()->create(&actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
+				traitRb->getRigidBody()->create(
+				    &actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
 			}
 		} break;
 		case shapeSource_fromModelRenderGeometry: {
@@ -156,7 +158,8 @@ bool RigidBodyConfigurator::apply(Actor& actor, bool addToWorldNow) const
 			if (modelIface) {
 				std::vector<CollsionShapeDesc> collisionShapes;
 				addCollisionShapeBasedOnModelRenderGeom(collisionShapes, modelIface->getStaticEval());
-				traitRb->getRigidBody()->create(&actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
+				traitRb->getRigidBody()->create(
+				    &actor, collisionShapes.data(), int(collisionShapes.size()), mass, false);
 			}
 		} break;
 		default: {
@@ -224,7 +227,8 @@ void edit_CollisionShapeDesc(GameInspector& inspector, GameObject* gameObject, M
 
 void edit_RigidBodyPropertiesConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain)
 {
-	RigidBodyPropertiesConfigurator& rbpc = *reinterpret_cast<RigidBodyPropertiesConfigurator*>(chain.follow(gameObject));
+	RigidBodyPropertiesConfigurator& rbpc =
+	    *reinterpret_cast<RigidBodyPropertiesConfigurator*>(chain.follow(gameObject));
 
 	auto doMemberUIFn = [&](const MemberDesc* const md) -> void {
 		if (md) {

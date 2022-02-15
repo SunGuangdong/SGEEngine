@@ -44,25 +44,31 @@ struct SGE_ENGINE_API CmdMemberChange : public InspectorCmd {
 	CmdMemberChange() = default;
 	~CmdMemberChange();
 
-	void setup(ObjectId const objId,
-	           const MemberChain& chain,
-	           const void* originalValue,
-	           const void* newValue,
-	           void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src));
+	void setup(
+	    ObjectId const objId,
+	    const MemberChain& chain,
+	    const void* originalValue,
+	    const void* newValue,
+	    void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src));
 
-	void setup(GameObject* actor,
-	           const MemberChain& chain,
-	           const void* originalValue,
-	           const void* newValue,
-	           void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src))
+	void setup(
+	    GameObject* actor,
+	    const MemberChain& chain,
+	    const void* originalValue,
+	    const void* newValue,
+	    void (*customCopyFn)(CmdMemberChange* cmd, GameInspector* inspector, void* dest, void* src))
 	{
 		if_checked(actor) { setup(actor->getId(), chain, originalValue, newValue, customCopyFn); }
 	}
 
 	void setupLogicTransformChange(Actor& actor, const transf3d& initalTransform, const transf3d& newTransform)
 	{
-		setup(&actor, MemberChain(typeLib().findMember(&Actor::m_logicTransform)), &initalTransform, &newTransform,
-		      &setActorLogicTransform);
+		setup(
+		    &actor,
+		    MemberChain(typeLib().findMember(&Actor::m_logicTransform)),
+		    &initalTransform,
+		    &newTransform,
+		    &setActorLogicTransform);
 	}
 
 	void setupLogicTransformChange(Actor& actor, const transf3d& newTransform)
@@ -78,11 +84,13 @@ struct SGE_ENGINE_API CmdMemberChange : public InspectorCmd {
 
   public:
 	ObjectId m_objectId;
-	MemberChain m_chainToDynamicProp; // A path starting from the actor that will lead us to the member that we are going to change.
-	void (*m_customCopyFn)(CmdMemberChange* cmd,
-	                       GameInspector* inspector,
-	                       void* dest,
-	                       void* src) = nullptr; // if specified a custom copy function
+	MemberChain m_chainToDynamicProp; // A path starting from the actor that will lead us to the member that we are
+	                                  // going to change.
+	void (*m_customCopyFn)(
+	    CmdMemberChange* cmd,
+	    GameInspector* inspector,
+	    void* dest,
+	    void* src) = nullptr; // if specified a custom copy function
 
 	std::unique_ptr<char[]> m_orginaldata;
 	std::unique_ptr<char[]> m_newData;
@@ -95,7 +103,12 @@ struct SGE_ENGINE_API CmdDynamicProperyChanged : public InspectorCmd {
 	CmdDynamicProperyChanged() = default;
 	~CmdDynamicProperyChanged();
 
-	void setup(GameObject* obj, const MemberChain& chain, std::string dynamicPropName, const void* originalValue, const void* newValue);
+	void setup(
+	    GameObject* obj,
+	    const MemberChain& chain,
+	    std::string dynamicPropName,
+	    const void* originalValue,
+	    const void* newValue);
 
 	void apply(GameInspector* inspector) final;
 	void redo(GameInspector* inspector) final { apply(inspector); }

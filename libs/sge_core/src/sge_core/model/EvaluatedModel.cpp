@@ -26,7 +26,8 @@ void EvaluatedModel::initialize(Model* model)
 void EvaluatedModel::evaluateStatic()
 {
 	std::vector<mat4f> globalMatrices(m_model->numNodes());
-	std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode, const mat4f& parentGlobalTform) -> void {
+	std::function<void(int, const mat4f&)> evalGlobalTransform = [&](int iNode,
+	                                                                 const mat4f& parentGlobalTform) -> void {
 		ModelNode* rawNode = m_model->nodeAt(iNode);
 		mat4f ownGlobalTransform = parentGlobalTform * rawNode->staticLocalTransform.toMatrix();
 
@@ -107,11 +108,11 @@ bool EvaluatedModel::evaluate_Skinning()
 		int neededTexWidth = 4;
 		int neededTexHeight = int(bonesTransformTexDataForAllMeshes.size());
 
-		TextureData data =
-		    TextureData(bonesTransformTexDataForAllMeshes.data(), sizeof(vec4f) * 4); // 4 pixel of 4 colors represent one matrix.
+		TextureData data = TextureData(
+		    bonesTransformTexDataForAllMeshes.data(), sizeof(vec4f) * 4); // 4 pixel of 4 colors represent one matrix.
 
-		const bool doesBigEnoughTextureExists =
-		    m_skinningBoneTransfsTex.HasResource() && m_skinningBoneTransfsTex->getDesc().texture2D.height >= neededTexHeight;
+		const bool doesBigEnoughTextureExists = m_skinningBoneTransfsTex.HasResource() &&
+		                                        m_skinningBoneTransfsTex->getDesc().texture2D.height >= neededTexHeight;
 
 		SGEContext* const context = getCore()->getDevice()->getContext();
 		if (doesBigEnoughTextureExists == false) {
@@ -144,11 +145,22 @@ bool EvaluatedModel::evaluate_Skinning()
 
 		const int firstBoneOffset = m_perMeshSkinningBonesTransformOFfsetInTex[iMesh];
 
-		evalMesh.geometry =
-		    Geometry(rawMesh.vertexBuffer.GetPtr(), rawMesh.indexBuffer.GetPtr(), m_skinningBoneTransfsTex.GetPtr(), firstBoneOffset,
-		             rawMesh.vertexDeclIndex, rawMesh.vbVertexColorOffsetBytes >= 0, rawMesh.vbUVOffsetBytes >= 0,
-		             rawMesh.vbNormalOffsetBytes >= 0, rawMesh.hasUsableTangetSpace, rawMesh.primitiveTopology, rawMesh.vbByteOffset,
-		             rawMesh.ibByteOffset, rawMesh.stride, rawMesh.ibFmt, rawMesh.numElements);
+		evalMesh.geometry = Geometry(
+		    rawMesh.vertexBuffer.GetPtr(),
+		    rawMesh.indexBuffer.GetPtr(),
+		    m_skinningBoneTransfsTex.GetPtr(),
+		    firstBoneOffset,
+		    rawMesh.vertexDeclIndex,
+		    rawMesh.vbVertexColorOffsetBytes >= 0,
+		    rawMesh.vbUVOffsetBytes >= 0,
+		    rawMesh.vbNormalOffsetBytes >= 0,
+		    rawMesh.hasUsableTangetSpace,
+		    rawMesh.primitiveTopology,
+		    rawMesh.vbByteOffset,
+		    rawMesh.ibByteOffset,
+		    rawMesh.stride,
+		    rawMesh.ibFmt,
+		    rawMesh.numElements);
 	}
 
 
@@ -158,7 +170,8 @@ bool EvaluatedModel::evaluate_Skinning()
 		m_evaluatedNodes[iNode].aabbGlobalSpace.setEmpty();
 		for (const MeshAttachment& att : node->meshAttachments) {
 			ModelMesh* mesh = m_model->meshAt(att.attachedMeshIndex);
-			m_evaluatedNodes[iNode].aabbGlobalSpace.expand(mesh->aabox.getTransformed(m_evaluatedNodes[iNode].evalGlobalTransform));
+			m_evaluatedNodes[iNode].aabbGlobalSpace.expand(
+			    mesh->aabox.getTransformed(m_evaluatedNodes[iNode].evalGlobalTransform));
 			aabox.expand(m_evaluatedNodes[iNode].aabbGlobalSpace);
 		}
 	}
@@ -182,7 +195,8 @@ bool EvaluatedModel::evaluate_getAllGeometries()
 			// Bones are concidered the main source of the trasformation.
 			// when a vertex is infuenced by a bone, it means that the bone needs
 			// to be oriented around that bone, not around the parent node.
-			geomInst.modelSpaceTransform = evalMesh.geometry.hasVertexSkinning() ? mat4f::getIdentity() : evalNode.evalGlobalTransform;
+			geomInst.modelSpaceTransform =
+			    evalMesh.geometry.hasVertexSkinning() ? mat4f::getIdentity() : evalNode.evalGlobalTransform;
 
 			geomInst.geometry = evalMesh.geometry;
 			geomInst.iMaterial = meshAttachment.attachedMaterialIndex;

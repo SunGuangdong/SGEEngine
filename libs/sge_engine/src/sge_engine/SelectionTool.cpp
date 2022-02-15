@@ -32,13 +32,14 @@ void SelectionToolModeActors::drawItem(GameInspector* inspector, int const itemI
 	}
 }
 
-void SelectionToolModeActors::setSelected(GameInspector* inspector,
-                                          int const itemIndex,
-                                          bool isSelected,
-                                          bool promoteToPrimaryIfAlreadySelected,
-                                          bool autoSelectHierarchyUnderActorInActorMode,
-                                          bool autoSelectHierarchyAboveActorInActorMode,
-                                          bool autoSelectAllRelativesInActorMode)
+void SelectionToolModeActors::setSelected(
+    GameInspector* inspector,
+    int const itemIndex,
+    bool isSelected,
+    bool promoteToPrimaryIfAlreadySelected,
+    bool autoSelectHierarchyUnderActorInActorMode,
+    bool autoSelectHierarchyAboveActorInActorMode,
+    bool autoSelectAllRelativesInActorMode)
 {
 	const Actor* const actor = itemIndexToActor(inspector, itemIndex);
 
@@ -143,13 +144,14 @@ void SelectionToolModePoints::drawItem(GameInspector* inspector, int const itemI
 	}
 }
 
-void SelectionToolModePoints::setSelected(GameInspector* inspector,
-                                          int const itemIndex,
-                                          bool isSelected,
-                                          bool promoteToPrimaryIfAlreadySelected,
-                                          bool UNUSED(autoSelectHierarchyUnderActorInActorMode),
-                                          bool UNUSED(autoSelectHierarchyAboveActorInActorMode),
-                                          bool UNUSED(autoSelectAllRelativesInActorMode))
+void SelectionToolModePoints::setSelected(
+    GameInspector* inspector,
+    int const itemIndex,
+    bool isSelected,
+    bool promoteToPrimaryIfAlreadySelected,
+    bool UNUSED(autoSelectHierarchyUnderActorInActorMode),
+    bool UNUSED(autoSelectHierarchyAboveActorInActorMode),
+    bool UNUSED(autoSelectAllRelativesInActorMode))
 {
 	// Primary selections here are ignored.
 	(void)(promoteToPrimaryIfAlreadySelected);
@@ -194,8 +196,8 @@ void SelectionTool::onUI(GameInspector* UNUSED(inspector))
 #endif
 }
 
-InspectorToolResult
-    SelectionTool::updateTool(GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
+InspectorToolResult SelectionTool::updateTool(
+    GameInspector* const inspector, bool isAllowedToTakeInput, const InputState& is, const GameDrawSets& drawSets)
 {
 	InspectorToolResult result;
 
@@ -228,7 +230,8 @@ InspectorToolResult
 		// std::vector<ObjectId> affectedActors;
 		//
 		// Perform the picking for every different type.
-		performPicking(inspector, selectionRectCS, drawSets, is.IsKeyDown(Key::Key_LCtrl), is.IsKeyDown(Key::Key_LShift));
+		performPicking(
+		    inspector, selectionRectCS, drawSets, is.IsKeyDown(Key::Key_LCtrl), is.IsKeyDown(Key::Key_LShift));
 
 		m_isSelecting = false;
 	}
@@ -253,8 +256,14 @@ void SelectionTool::drawOverlay(const GameDrawSets& drawSets)
 		rect.expand(m_lastUpdateCursorPos);
 
 		BlendStateDesc const bsd = BlendStateDesc::GetDefaultBackToFrontAlpha();
-		drawSets.quickDraw->drawRect(drawSets.rdest, rect.min.x, rect.min.y, rect.size().x, rect.size().y, vec4f(0.f, 0.f, 0.f, 0.6f),
-		                             sgedev->requestBlendState(bsd));
+		drawSets.quickDraw->drawRect(
+		    drawSets.rdest,
+		    rect.min.x,
+		    rect.min.y,
+		    rect.size().x,
+		    rect.size().y,
+		    vec4f(0.f, 0.f, 0.f, 0.6f),
+		    sgedev->requestBlendState(bsd));
 	}
 }
 
@@ -319,12 +328,15 @@ void SelectionTool::performPicking(
 	float const b = minPickingNearPlane.y;
 
 	// TODO: Near and far plane of the projection matrix are currently hardcoded.
-	RawCamera pickingCamera(drawSets.drawCamera->getCameraPosition(), drawSets.drawCamera->getView(),
-	                        isOrthographic ? mat4f::getOrthoRH(l, r, b, t, 0.1f, 10000.f, kIsTexcoordStyleD3D)
-	                                       : mat4f::getPerspectiveOffCenterRH(l, r, b, t, 0.1f, 10000.f, kIsTexcoordStyleD3D));
+	RawCamera pickingCamera(
+	    drawSets.drawCamera->getCameraPosition(),
+	    drawSets.drawCamera->getView(),
+	    isOrthographic ? mat4f::getOrthoRH(l, r, b, t, 0.1f, 10000.f, kIsTexcoordStyleD3D)
+	                   : mat4f::getPerspectiveOffCenterRH(l, r, b, t, 0.1f, 10000.f, kIsTexcoordStyleD3D));
 
 	GameDrawSets pickingDrawSets;
-	pickingDrawSets.setup(sgecon, m_renderTarget, drawSets.quickDraw, &pickingCamera, drawSets.gameCamera, drawSets.gameDrawer);
+	pickingDrawSets.setup(
+	    sgecon, m_renderTarget, drawSets.quickDraw, &pickingCamera, drawSets.gameCamera, drawSets.gameDrawer);
 
 	GpuHandle<Query> query = sgecon->getDevice()->requestResource<Query>();
 	query->create(QueryType::NumSamplesPassedDepthStencilTest);
@@ -371,8 +383,14 @@ void SelectionTool::performPicking(
 	}
 
 	for (int const idx : affectedItemIndices) {
-		toolMode->setSelected(inspector, idx, !ctrlDown, singleClickSelection && shiftDown, m_autoSelectAllChildren, m_autoSelectAllParents,
-		                      m_autoSelectAllRelatives);
+		toolMode->setSelected(
+		    inspector,
+		    idx,
+		    !ctrlDown,
+		    singleClickSelection && shiftDown,
+		    m_autoSelectAllChildren,
+		    m_autoSelectAllParents,
+		    m_autoSelectAllRelatives);
 	}
 
 	toolMode->end(inspector);

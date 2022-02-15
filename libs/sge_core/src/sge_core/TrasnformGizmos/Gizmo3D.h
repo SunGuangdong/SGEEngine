@@ -35,7 +35,8 @@ struct SGE_CORE_API GizmoSnapSets {
 
 	vec3f applySnappingTranslation(vec3f v) const
 	{
-		return vec3f(applySnappingTranslation(v.x, 0), applySnappingTranslation(v.y, 1), applySnappingTranslation(v.z, 2));
+		return vec3f(
+		    applySnappingTranslation(v.x, 0), applySnappingTranslation(v.y, 1), applySnappingTranslation(v.z, 2));
 	}
 
 	// Snap at these values, 0 means no snapping.
@@ -50,7 +51,8 @@ struct SGE_CORE_API GizmoSnapSets {
 
 struct SGE_CORE_API GizmoInteractArgs {
 	GizmoInteractArgs() = default;
-	GizmoInteractArgs(const InputState* const is, const GizmoSnapSets* snapSets, const Ray& rayWS, const float customScale)
+	GizmoInteractArgs(
+	    const InputState* const is, const GizmoSnapSets* snapSets, const Ray& rayWS, const float customScale)
 	    : is(is)
 	    , rayWS(rayWS)
 	    , snapSets(snapSets)
@@ -61,7 +63,8 @@ struct SGE_CORE_API GizmoInteractArgs {
 	const InputState* is = nullptr;
 	const GizmoSnapSets* snapSets = nullptr;
 	Ray rayWS;
-	float customScale; // Used to prevent the gizmo from scaling based on the rays origin. Useful for orthographic cameras. Ignored if 0.f
+	float customScale; // Used to prevent the gizmo from scaling based on the rays origin. Useful for orthographic
+	                   // cameras. Ignored if 0.f
 };
 
 
@@ -153,7 +156,8 @@ struct SGE_CORE_API Gizmo3DCommon {
 		m_displayScale = m_sizeMultiplier; // TODO: Not sure if this is necessary.
 	}
 
-	// How big the gizmo shold appear on the screen. Size of 1 means "as big as the screen". 1 is not default as it is just too big.
+	// How big the gizmo shold appear on the screen. Size of 1 means "as big as the screen". 1 is not default as it is
+	// just too big.
 	float m_sizeMultiplier = 0.15f;
 
 	// The total scale that takes into accout the distance to the camera.
@@ -253,8 +257,8 @@ struct SGE_CORE_API Gizmo3DScale : public Gizmo3DCommon {
 
 	vec3f m_editedScaling;
 
-	vec3f m_interactionStartHitWS; // The position of the mouse cursor(in world space) when the gizmo interaction started(the mouse presso
-	                               // on the gizmo).
+	vec3f m_interactionStartHitWS; // The position of the mouse cursor(in world space) when the gizmo interaction
+	                               // started(the mouse presso on the gizmo).
 	vec2f m_interactionStartHitPS; // The position of the mouse cursor when the interaction started in pixels.
 	Plane m_interactionPlane;
 };

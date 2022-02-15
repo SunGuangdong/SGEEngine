@@ -45,13 +45,14 @@ __declspec(align(4)) struct ParamsCbFWDDefaultShading {
 //-----------------------------------------------------------------------------
 // SimpleTriplanarMtlGeomDrawer
 //-----------------------------------------------------------------------------
-void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
-                                                const ICamera& camera,
-                                                const mat4f& geomWorldTransfrom,
-                                                const ObjectLighting& lighting,
-                                                const Geometry& geometry,
-                                                const IMaterialData* mtlDataBase,
-                                                const InstanceDrawMods& UNUSED(instDrawMods))
+void SimpleTriplanarMtlGeomDrawer::drawGeometry(
+    const RenderDestination& rdest,
+    const ICamera& camera,
+    const mat4f& geomWorldTransfrom,
+    const ObjectLighting& lighting,
+    const Geometry& geometry,
+    const IMaterialData* mtlDataBase,
+    const InstanceDrawMods& UNUSED(instDrawMods))
 {
 	const SimpleTriplanarMtlData& mtlData = *dynamic_cast<const SimpleTriplanarMtlData*>(mtlDataBase);
 
@@ -108,8 +109,12 @@ void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 		};
 
 
-		shadingPermutFWDShading->createFromFile(sgedev, "core_shaders/FWDSimpleTriplanar.hlsl",
-		                                        "shader_cache/FWDSimpleTriplanar.shadercache", compileTimeOptions, uniformsToCache);
+		shadingPermutFWDShading->createFromFile(
+		    sgedev,
+		    "core_shaders/FWDSimpleTriplanar.hlsl",
+		    "shader_cache/FWDSimpleTriplanar.shadercache",
+		    compileTimeOptions,
+		    uniformsToCache);
 	}
 
 	const int iShaderPerm = shadingPermutFWDShading->getCompileTimeOptionsPerm().computePermutationIndex(nullptr, 0);
@@ -136,7 +141,8 @@ void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	// This is done to avoid the Shadow Acne artifacts caused by floating point
 	// innacuraties introduced by the depth texture.
 	bool flipCulling = determinant(geomWorldTransfrom) > 0.f;
-	rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
+	rasterState = flipCulling ? getCore()->getGraphicsResources().RS_default
+	                          : getCore()->getGraphicsResources().RS_defaultBackfaceCCW;
 
 	StaticArray<BoundUniform, 64> uniforms;
 
@@ -220,8 +226,10 @@ void SimpleTriplanarMtlGeomDrawer::drawGeometry(const RenderDestination& rdest,
 	paramsCb.uAmbientLightColor = lighting.ambientLightColor;
 	paramsCb.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
 
-	stateGroup.setRenderState(rasterState, getCore()->getGraphicsResources().DSS_default_lessEqual,
-	                          getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	stateGroup.setRenderState(
+	    rasterState,
+	    getCore()->getGraphicsResources().DSS_default_lessEqual,
+	    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	void* paramsMappedData = sgedev->getContext()->map(paramsBuffer, Map::WriteDiscard);
 	memcpy(paramsMappedData, &paramsCb, sizeof(paramsCb));

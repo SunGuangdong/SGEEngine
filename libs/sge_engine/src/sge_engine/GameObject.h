@@ -56,7 +56,8 @@ struct SGE_ENGINE_API GameObject : public NoCopy {
 
 	/// @brief To be called only by @GameWorld. The function sets the common properties of the game object.
 	/// Never call this manually.
-	void private_GameWorld_performInitialization(GameWorld* const world, const ObjectId id, const TypeId typeId, std::string displayName);
+	void private_GameWorld_performInitialization(
+	    GameWorld* const world, const ObjectId id, const TypeId typeId, std::string displayName);
 	bool isActor() const;
 	Actor* getActor();
 	const Actor* getActor() const;
@@ -138,7 +139,8 @@ struct SGE_ENGINE_API GameObject : public NoCopy {
 	void makeDirty() { m_dirtyIndex++; }
 
   public:
-	/// The id of the game object. No other object can have the same id in the current GameWorld that owns that game object.
+	/// The id of the game object. No other object can have the same id in the current GameWorld that owns that game
+	/// object.
 	ObjectId m_id;
 	/// The exact type id of the this GameObject instance..
 	TypeId m_type;
@@ -177,8 +179,14 @@ struct SelectedItem {
 	{
 	}
 
-	bool operator==(const SelectedItem& ref) const { return objectId == ref.objectId && index == ref.index && editMode == ref.editMode; }
-	bool operator<(const SelectedItem& ref) const { return ref.objectId > objectId || ref.index > index || ref.editMode > editMode; }
+	bool operator==(const SelectedItem& ref) const
+	{
+		return objectId == ref.objectId && index == ref.index && editMode == ref.editMode;
+	}
+	bool operator<(const SelectedItem& ref) const
+	{
+		return ref.objectId > objectId || ref.index > index || ref.editMode > editMode;
+	}
 
 	EditMode editMode = editMode_actors; // The mode the item was selected.
 	ObjectId objectId;
@@ -195,8 +203,9 @@ struct SelectedItemDirect {
 
 /// @brief Traits are properties that can be attached to any game object.
 /// These traits are a way to provide a functionally to the rest of the game.
-/// These functionallities migtht be, an engine functionallity - Rigid Bodies, Renderable 3D Models/Sprites, Viewport Icons and others.
-/// They also might represent some gameplay speicifc trait of the object - Health, Inventory, Interactables and others.
+/// These functionallities migtht be, an engine functionallity - Rigid Bodies, Renderable 3D Models/Sprites, Viewport
+/// Icons and others. They also might represent some gameplay speicifc trait of the object - Health, Inventory,
+/// Interactables and others.
 ///
 /// For example if we want to add an interactable trait, that could be used for multiple interactions,
 /// like object that can be picked form the ground, a voicelog object that starts playing if the action

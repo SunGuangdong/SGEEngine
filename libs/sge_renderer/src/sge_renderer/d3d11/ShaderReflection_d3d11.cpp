@@ -54,9 +54,11 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 		}
 
 		TComPtr<ID3D11ShaderReflection> pD3DReflection;
-		[[maybe_unused]] const HRESULT reflResult =
-		    D3DReflect(shader->D3D11_GetByteCode()->GetBufferPointer(), shader->D3D11_GetByteCode()->GetBufferSize(),
-		               IID_ID3D11ShaderReflection, (void**)&pD3DReflection);
+		[[maybe_unused]] const HRESULT reflResult = D3DReflect(
+		    shader->D3D11_GetByteCode()->GetBufferPointer(),
+		    shader->D3D11_GetByteCode()->GetBufferSize(),
+		    IID_ID3D11ShaderReflection,
+		    (void**)&pD3DReflection);
 
 		sgeAssert(SUCCEEDED(reflResult));
 
@@ -141,7 +143,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 
 						numericRefl.d3d11_shaderType = shader->getShaderType();
 						numericRefl.byteOffset_d3d11 = var.offset;
-						numericRefl.sizeBytes_d3d11 = d3dVarDesc.Size; // UniformType::GetSizeBytes(var.type) * std::max(1, var.arraySize);
+						numericRefl.sizeBytes_d3d11 =
+						    d3dVarDesc.Size; // UniformType::GetSizeBytes(var.type) * std::max(1, var.arraySize);
 
 						numericUnforms.add(numericRefl);
 					}
@@ -162,10 +165,10 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 				const bool isArrayElement = openBraceLocation != std::string::npos;
 
 				// Caution:
-				// Direct3D 11 reports each array element as a separate uniform instead of 1 variable with some array size.
-				// In order to have them repored as one uniform in our API we need to unify them together as an array.
-				// If a texture with the same name has already been reported just increase it's array size.
-				// All array elements are going to be consequive
+				// Direct3D 11 reports each array element as a separate uniform instead of 1 variable with some array
+				// size. In order to have them repored as one uniform in our API we need to unify them together as an
+				// array. If a texture with the same name has already been reported just increase it's array size. All
+				// array elements are going to be consequive
 				bool addedToExisting = false;
 				if (isArrayElement) {
 					// Drop the element index from the name of the variable.
@@ -233,8 +236,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 				D3D11_SIGNATURE_PARAMETER_DESC paramDesc;
 				pD3DReflection->GetInputParameterDesc(i, &paramDesc);
 
-				// If we've just started accumulationg a new variable, but we had another one from the previous iteration
-				// store it(if valid) and start accumulating the next one.
+				// If we've just started accumulationg a new variable, but we had another one from the previous
+				// iteration store it(if valid) and start accumulating the next one.
 				if (strcmp(paramDesc.SemanticName, accumSemantic) != 0) {
 					sge_strcpy(accumSemantic, paramDesc.SemanticName);
 
@@ -246,7 +249,8 @@ bool ShadingProgramRefl::create(ShadingProgram* const shadingProgram)
 					// we are starting to accumulate new variable
 					accumPass = 0;
 					char fullSemantic[32]; // combined semantic and semantic index
-					sge_snprintf(fullSemantic, SGE_ARRSZ(fullSemantic), "%s%d", paramDesc.SemanticName, paramDesc.SemanticIndex);
+					sge_snprintf(
+					    fullSemantic, SGE_ARRSZ(fullSemantic), "%s%d", paramDesc.SemanticName, paramDesc.SemanticIndex);
 					accum.name = fullSemantic;
 				}
 

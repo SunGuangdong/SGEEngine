@@ -19,17 +19,20 @@ void editUI_for_Velocity(GameInspector& inspector, GameObject* gameObject, Membe
 	switch (velocity->forceType) {
 		case VelictyForce_directional: {
 			chain.add(sgeFindMember(Velocity, directional));
-			ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+			ProperyEditorUIGen::doMemberUI(
+			    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 			chain.pop();
 		} break;
 		case VelictyForce_towardsPoint: {
 			chain.add(sgeFindMember(Velocity, towardsPoint));
-			ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+			ProperyEditorUIGen::doMemberUI(
+			    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 			chain.pop();
 		} break;
 		case VelictyForce_spherical: {
 			chain.add(sgeFindMember(Velocity, spherical));
-			ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+			ProperyEditorUIGen::doMemberUI(
+			    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 			chain.pop();
 		} break;
 		default:
@@ -143,7 +146,8 @@ void editUI_for_TraitParticlesSimple(GameInspector& inspector, GameObject* gameO
 				if (ImGui::CollapsingHeader(ICON_FK_BIRTHDAY_CAKE " Birth Amount")) {
 					ImGuiEx::IndentGuard indent;
 					chain.add(sgeFindMember(ParticleGroupDesc, birth));
-					ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+					ProperyEditorUIGen::doMemberUI(
+					    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 					chain.pop();
 				}
 
@@ -159,32 +163,32 @@ void editUI_for_TraitParticlesSimple(GameInspector& inspector, GameObject* gameO
 					switch (pdesc.birthShape.shapeType) {
 						case birthShape_sphere: {
 							chain.add(sgeFindMember(BirthShapeDesc, sphere));
-							ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain,
-							                               ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+							ProperyEditorUIGen::doMemberUI(
+							    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 							chain.pop();
 						} break;
 						case birthShape_plane: {
 							chain.add(sgeFindMember(BirthShapeDesc, plane));
-							ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain,
-							                               ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+							ProperyEditorUIGen::doMemberUI(
+							    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 							chain.pop();
 						} break;
 						case birthShape_point: {
 							chain.add(sgeFindMember(BirthShapeDesc, point));
-							ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain,
-							                               ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+							ProperyEditorUIGen::doMemberUI(
+							    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 							chain.pop();
 						} break;
 						case birthShape_line: {
 							chain.add(sgeFindMember(BirthShapeDesc, line));
-							ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain,
-							                               ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+							ProperyEditorUIGen::doMemberUI(
+							    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 							chain.pop();
 						} break;
 						case birthShape_circle: {
 							chain.add(sgeFindMember(BirthShapeDesc, circle));
-							ProperyEditorUIGen::doMemberUI(inspector, gameObject, chain,
-							                               ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
+							ProperyEditorUIGen::doMemberUI(
+							    inspector, gameObject, chain, ProperyEditorUIGen::DoMemberUIFlags_structInNoHeader);
 							chain.pop();
 						} break;
 						default:
@@ -238,7 +242,8 @@ void editUI_for_TraitParticlesSimple(GameInspector& inspector, GameObject* gameO
 SgePluginOnLoad()
 {
 	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(Velocity), editUI_for_Velocity);
-	getEngineGlobal()->addPropertyEditorIUGeneratorForType(sgeTypeId(TraitParticlesSimple), editUI_for_TraitParticlesSimple);
+	getEngineGlobal()->addPropertyEditorIUGeneratorForType(
+	    sgeTypeId(TraitParticlesSimple), editUI_for_TraitParticlesSimple);
 }
 
 } // namespace sge

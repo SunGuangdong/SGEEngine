@@ -174,7 +174,8 @@ void AGhostObject::update(const GameUpdateSets& updateSets)
 	cameraFollowMe.update(*getWorld(), updateSets.dt, getPosition(), rotation);
 }
 
-void CameraFollowMe::update(GameWorld& world, float UNUSED(dt), const vec3f& targetPosition, const vec2f& rotationAroundAndUp)
+void CameraFollowMe::update(
+    GameWorld& world, float UNUSED(dt), const vec3f& targetPosition, const vec2f& rotationAroundAndUp)
 {
 	ACamera* camera = world.getActor<ACamera>(cameraId);
 	if (!camera) {
@@ -234,8 +235,10 @@ void CameraFollowMe::update(GameWorld& world, float UNUSED(dt), const vec3f& tar
 
 		vec3f targetLookDirHorizontal = normalized0(targetLookDir.x0z());
 
-		quatf orientation = quatf::fromNormalizedVectors(defaultCameraLookDir, targetLookDirHorizontal, vec3f(0.f, 1.f, 0.f));
-		orientation = quatf::fromNormalizedVectors(targetLookDirHorizontal, targetLookDir, vec3f(1.f, 0.f, 0.f)) * orientation;
+		quatf orientation =
+		    quatf::fromNormalizedVectors(defaultCameraLookDir, targetLookDirHorizontal, vec3f(0.f, 1.f, 0.f));
+		orientation =
+		    quatf::fromNormalizedVectors(targetLookDirHorizontal, targetLookDir, vec3f(1.f, 0.f, 0.f)) * orientation;
 
 		camera->setPosition(newCameraPosition);
 		camera->setOrientation(orientation);

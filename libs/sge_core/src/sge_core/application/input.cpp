@@ -13,7 +13,8 @@ Optional<vec2f> InputState::hasTouchJustPresedUV(const vec2f& minUV, const vec2f
 {
 	for (const TouchInput& touch : m_touchInputs) {
 		const vec2f touchPosUV = clientToDomainUV(touch.touchPositionPixels);
-		bool isIn = touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
+		bool isIn =
+		    touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
 		if (isIn && touch.isJustPressed) {
 			return touchPosUV;
 		}
@@ -25,7 +26,8 @@ Optional<vec2f> InputState::hasTouchJustReleasedUV(const vec2f& minUV, const vec
 {
 	for (const TouchInput& touch : m_touchInputs) {
 		const vec2f touchPosUV = clientToDomainUV(touch.touchPositionPixels);
-		bool isIn = touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
+		bool isIn =
+		    touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
 		if (isIn && touch.isJustReleased) {
 			return touchPosUV;
 		}
@@ -37,7 +39,8 @@ Optional<vec2f> InputState::hasTouchPressedUV(const vec2f& minUV, const vec2f& m
 {
 	for (const TouchInput& touch : m_touchInputs) {
 		const vec2f touchPosUV = clientToDomainUV(touch.touchPositionPixels);
-		bool isIn = touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
+		bool isIn =
+		    touchPosUV.x >= minUV.x && touchPosUV.y >= minUV.y && touchPosUV.x <= maxUV.x && touchPosUV.y <= maxUV.y;
 		if (isIn && !touch.isJustReleased) {
 			return touchPosUV;
 		}

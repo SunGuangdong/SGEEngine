@@ -85,10 +85,11 @@ void ANavMesh::doAttributeEditor(GameInspector* inspector)
 	}
 }
 
-bool ANavMesh::findPath(std::vector<vec3f>& outPath,
-                        const vec3f& startPos,
-                        const vec3f& targetEndPos,
-                        const vec3f nearestPointSearchHalfDiagonal)
+bool ANavMesh::findPath(
+    std::vector<vec3f>& outPath,
+    const vec3f& startPos,
+    const vec3f& targetEndPos,
+    const vec3f nearestPointSearchHalfDiagonal)
 {
 	const int kMaxPathPolyCount = 256; // TODO: Fine tune this variable.
 
@@ -102,10 +103,12 @@ bool ANavMesh::findPath(std::vector<vec3f>& outPath,
 	dtQueryFilter queryPolyFilter;
 
 	dtPolyRef startPolyRef = 0;
-	m_detourNavMeshQuery->findNearestPoly(startPos.data, nearestPointSearchHalfDiagonal.data, &queryPolyFilter, &startPolyRef, 0);
+	m_detourNavMeshQuery->findNearestPoly(
+	    startPos.data, nearestPointSearchHalfDiagonal.data, &queryPolyFilter, &startPolyRef, 0);
 
 	dtPolyRef endPolyRef = 0;
-	m_detourNavMeshQuery->findNearestPoly(targetEndPos.data, nearestPointSearchHalfDiagonal.data, &queryPolyFilter, &endPolyRef, 0);
+	m_detourNavMeshQuery->findNearestPoly(
+	    targetEndPos.data, nearestPointSearchHalfDiagonal.data, &queryPolyFilter, &endPolyRef, 0);
 
 	if (startPolyRef == 0 || endPolyRef == 0) {
 		return false; // No path could be found.
@@ -113,8 +116,15 @@ bool ANavMesh::findPath(std::vector<vec3f>& outPath,
 
 	dtPolyRef polygonsAlongPath[kMaxPathPolyCount];
 	int numPolygonsAlongPath = 0;
-	m_detourNavMeshQuery->findPath(startPolyRef, endPolyRef, startPos.data, targetEndPos.data, &queryPolyFilter, polygonsAlongPath,
-	                               &numPolygonsAlongPath, SGE_ARRSZ(polygonsAlongPath));
+	m_detourNavMeshQuery->findPath(
+	    startPolyRef,
+	    endPolyRef,
+	    startPos.data,
+	    targetEndPos.data,
+	    &queryPolyFilter,
+	    polygonsAlongPath,
+	    &numPolygonsAlongPath,
+	    SGE_ARRSZ(polygonsAlongPath));
 
 	if (numPolygonsAlongPath > 0) {
 		outPath.resize(kMaxPathPolyCount);
@@ -123,15 +133,24 @@ bool ANavMesh::findPath(std::vector<vec3f>& outPath,
 		// takes you closer to the end point.
 		vec3f acutualEndPos = targetEndPos;
 		if (polygonsAlongPath[numPolygonsAlongPath - 1] != endPolyRef) {
-			m_detourNavMeshQuery->closestPointOnPoly(polygonsAlongPath[numPolygonsAlongPath - 1], targetEndPos.data, acutualEndPos.data, 0);
+			m_detourNavMeshQuery->closestPointOnPoly(
+			    polygonsAlongPath[numPolygonsAlongPath - 1], targetEndPos.data, acutualEndPos.data, 0);
 		}
 
 		int numPointsInPath = 0;
 		const int streightPathOptions = 0;
 		unsigned char straightPathFlags[kMaxPathPolyCount];
-		m_detourNavMeshQuery->findStraightPath(startPos.data, acutualEndPos.data, polygonsAlongPath, numPolygonsAlongPath,
-		                                       (float*)outPath.data(), straightPathFlags, nullptr, &numPointsInPath, kMaxPathPolyCount,
-		                                       streightPathOptions);
+		m_detourNavMeshQuery->findStraightPath(
+		    startPos.data,
+		    acutualEndPos.data,
+		    polygonsAlongPath,
+		    numPolygonsAlongPath,
+		    (float*)outPath.data(),
+		    straightPathFlags,
+		    nullptr,
+		    &numPointsInPath,
+		    kMaxPathPolyCount,
+		    streightPathOptions);
 
 		outPath.resize(numPointsInPath);
 		return true;
@@ -151,8 +170,8 @@ vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end)
 	vec3f nearestPoint;
 	dtQueryFilter queryPolyFilter;
 	dtPolyRef nearestPolyRef;
-	if (!dtStatusSucceed(
-	        m_detourNavMeshQuery->findNearestPoly(start.data, searchBox.data, &queryPolyFilter, &nearestPolyRef, nearestPoint.data))) {
+	if (!dtStatusSucceed(m_detourNavMeshQuery->findNearestPoly(
+	        start.data, searchBox.data, &queryPolyFilter, &nearestPolyRef, nearestPoint.data))) {
 		return start;
 	}
 
@@ -160,8 +179,15 @@ vec3f ANavMesh::moveAlongNavMesh(const vec3f& start, const vec3f& end)
 	int actualVisited = 0;
 
 	vec3f result;
-	if (dtStatusSucceed(m_detourNavMeshQuery->moveAlongSurface(nearestPolyRef, start.data, end.data, &queryPolyFilter, result.data, visited,
-	                                                           &actualVisited, SGE_ARRSZ(visited)))) {
+	if (dtStatusSucceed(m_detourNavMeshQuery->moveAlongSurface(
+	        nearestPolyRef,
+	        start.data,
+	        end.data,
+	        &queryPolyFilter,
+	        result.data,
+	        visited,
+	        &actualVisited,
+	        SGE_ARRSZ(visited)))) {
 		/// The result so far if correct in xz plane but, it is not projected on the navmesh.
 		float height = 0.f;
 		m_detourNavMeshQuery->getPolyHeight(visited[actualVisited - 1], result.data, &height);
@@ -195,7 +221,8 @@ void ANavMesh::build()
 			if (traitRb != nullptr && traitRb->getRigidBody()->isValid()) {
 				const btTransform bodyWorldTransform = traitRb->m_rigidBody.getBulletRigidBody()->getWorldTransform();
 				const btCollisionShape* const shape = traitRb->m_rigidBody.getBulletRigidBody()->getCollisionShape();
-				bulletCollisionShapeToTriangles(shape, bodyWorldTransform, trianglesVerticesWorldSpace, trianglesIndices);
+				bulletCollisionShapeToTriangles(
+				    shape, bodyWorldTransform, trianglesVerticesWorldSpace, trianglesIndices);
 			}
 		}
 	}
@@ -219,11 +246,11 @@ void ANavMesh::build()
 	recastCfg.walkableRadius = (int)ceilf(m_buildSettings.agentRadius / recastCfg.cs);
 	recastCfg.maxEdgeLen = (int)(m_buildSettings.polygonsMaxEdgeLength / recastCfg.cs); // Why does this exists?
 	recastCfg.maxSimplificationError = 1.3f;                                            // What is a good default?
-	recastCfg.minRegionArea = (int)rcSqr(8);                                            // Note: area = size*size // WTF is this?
-	recastCfg.mergeRegionArea = (int)rcSqr(20);                                         // Note: area = size*size // WTF is this?
-	recastCfg.maxVertsPerPoly = (int)6;                                                 // Why does this exists?
-	recastCfg.detailSampleDist = 6.f < 0.9f ? 0 : recastCfg.cs * 6.f;                   // WTF is this?
-	recastCfg.detailSampleMaxError = 1.f;                                               // WTF is this?
+	recastCfg.minRegionArea = (int)rcSqr(8);                          // Note: area = size*size // WTF is this?
+	recastCfg.mergeRegionArea = (int)rcSqr(20);                       // Note: area = size*size // WTF is this?
+	recastCfg.maxVertsPerPoly = (int)6;                               // Why does this exists?
+	recastCfg.detailSampleDist = 6.f < 0.9f ? 0 : recastCfg.cs * 6.f; // WTF is this?
+	recastCfg.detailSampleMaxError = 1.f;                             // WTF is this?
 
 	// Set the area where the navigation will be build.
 	// Here the bounds of the input mesh are used, but the
@@ -242,8 +269,15 @@ void ANavMesh::build()
 	rcHeightfieldWrapper recastHeightFiled;
 	rcContext recastLogging = rcContext(false);
 
-	if (!rcCreateHeightfield(&recastLogging, recastHeightFiled.ref(), recastCfg.width, recastCfg.height, recastCfg.bmin, recastCfg.bmax,
-	                         recastCfg.cs, recastCfg.ch)) {
+	if (!rcCreateHeightfield(
+	        &recastLogging,
+	        recastHeightFiled.ref(),
+	        recastCfg.width,
+	        recastCfg.height,
+	        recastCfg.bmin,
+	        recastCfg.bmax,
+	        recastCfg.cs,
+	        recastCfg.ch)) {
 		sgeAssert(false && "rcCreateHeightfield failed!");
 		clearRecastAndDetourState();
 		return;
@@ -251,13 +285,25 @@ void ANavMesh::build()
 
 	// Mark all walkable triangles.
 	std::vector<unsigned char> recastPerTriangleFlags(numTriangles, 0);
-	rcMarkWalkableTriangles(&recastLogging, recastCfg.walkableSlopeAngle, (float*)trianglesVerticesWorldSpace.data(),
-	                        int(trianglesVerticesWorldSpace.size()), trianglesIndices.data(), numTriangles, recastPerTriangleFlags.data());
+	rcMarkWalkableTriangles(
+	    &recastLogging,
+	    recastCfg.walkableSlopeAngle,
+	    (float*)trianglesVerticesWorldSpace.data(),
+	    int(trianglesVerticesWorldSpace.size()),
+	    trianglesIndices.data(),
+	    numTriangles,
+	    recastPerTriangleFlags.data());
 
 	// Voxelize the triangles.
-	if (!rcRasterizeTriangles(&recastLogging, (float*)trianglesVerticesWorldSpace.data(), int(trianglesVerticesWorldSpace.size()),
-	                          trianglesIndices.data(), recastPerTriangleFlags.data(), numTriangles, recastHeightFiled.ref(),
-	                          recastCfg.walkableClimb)) {
+	if (!rcRasterizeTriangles(
+	        &recastLogging,
+	        (float*)trianglesVerticesWorldSpace.data(),
+	        int(trianglesVerticesWorldSpace.size()),
+	        trianglesIndices.data(),
+	        recastPerTriangleFlags.data(),
+	        numTriangles,
+	        recastHeightFiled.ref(),
+	        recastCfg.walkableClimb)) {
 		sgeAssert(false && "rcRasterizeTriangles failed!");
 		clearRecastAndDetourState();
 		return;
@@ -272,8 +318,12 @@ void ANavMesh::build()
 	rcFilterWalkableLowHeightSpans(&recastLogging, recastCfg.walkableHeight, recastHeightFiled.ref());
 
 	rcCompactHeightfieldWrapper compactHeightField;
-	if (!rcBuildCompactHeightfield(&recastLogging, recastCfg.walkableHeight, recastCfg.walkableClimb, recastHeightFiled.ref(),
-	                               compactHeightField.ref())) {
+	if (!rcBuildCompactHeightfield(
+	        &recastLogging,
+	        recastCfg.walkableHeight,
+	        recastCfg.walkableClimb,
+	        recastHeightFiled.ref(),
+	        compactHeightField.ref())) {
 		sgeAssert(false && "rcBuildCompactHeightfield failed!");
 		clearRecastAndDetourState();
 		return;
@@ -297,15 +347,20 @@ void ANavMesh::build()
 		return;
 	}
 
-	if (!rcBuildRegions(&recastLogging, compactHeightField.ref(), 0, recastCfg.minRegionArea, recastCfg.mergeRegionArea)) {
+	if (!rcBuildRegions(
+	        &recastLogging, compactHeightField.ref(), 0, recastCfg.minRegionArea, recastCfg.mergeRegionArea)) {
 		sgeAssert(false && "rcBuildRegions failed!");
 		clearRecastAndDetourState();
 		return;
 	}
 
 	rcContourSetWrapper contourSet;
-	if (!rcBuildContours(&recastLogging, compactHeightField.ref(), recastCfg.maxSimplificationError, recastCfg.maxEdgeLen,
-	                     contourSet.ref())) {
+	if (!rcBuildContours(
+	        &recastLogging,
+	        compactHeightField.ref(),
+	        recastCfg.maxSimplificationError,
+	        recastCfg.maxEdgeLen,
+	        contourSet.ref())) {
 		sgeAssert(false && "rcBuildContours failed!");
 		clearRecastAndDetourState();
 		return;
@@ -320,8 +375,13 @@ void ANavMesh::build()
 	}
 
 	rcPolyMeshDetailWrapper recastDetailMesh;
-	if (!rcBuildPolyMeshDetail(&recastLogging, m_recastPolyMesh.ref(), compactHeightField.ref(), recastCfg.detailSampleDist,
-	                           recastCfg.detailSampleMaxError, recastDetailMesh.ref())) {
+	if (!rcBuildPolyMeshDetail(
+	        &recastLogging,
+	        m_recastPolyMesh.ref(),
+	        compactHeightField.ref(),
+	        recastCfg.detailSampleDist,
+	        recastCfg.detailSampleMaxError,
+	        recastDetailMesh.ref())) {
 		sgeAssert(false && "rcBuildPolyMeshDetail failed");
 		clearRecastAndDetourState();
 		return;

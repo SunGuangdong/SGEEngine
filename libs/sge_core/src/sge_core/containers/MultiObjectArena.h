@@ -53,8 +53,10 @@ struct MultiObjectArena {
 		else {
 			const TypeDesc* typeDesc = typeLib().find(typeId);
 			if (typeDesc == nullptr) {
-				sgeAssert(false &&
-				          "We cannot find the reflection of that object, and we need it to call its constructors and destructors.");
+				sgeAssert(
+				    false &&
+				    "We cannot find the reflection of that object, and we need it to call its constructors and "
+				    "destructors.");
 				return Handle();
 			}
 

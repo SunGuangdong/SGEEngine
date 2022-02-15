@@ -99,7 +99,8 @@ void TraitScriptSlot_doProperyEditor(GameInspector& inspector, GameObject* const
 									inspector.appendCommand(cmdCompound, false);
 								}
 
-								// If we rach here, the current script passes the requierments no no need to display it agian.
+								// If we rach here, the current script passes the requierments no no need to display it
+								// agian.
 								break;
 							}
 						}

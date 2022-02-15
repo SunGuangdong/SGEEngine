@@ -8,10 +8,11 @@
 
 namespace sge {
 
-void PhysicsWorldQuery::rayTest(PhysicsWorld& physWorld,
-                                const vec3f& from,
-                                const vec3f& to,
-                                std::function<void(btDynamicsWorld::LocalRayResult&)> lambda)
+void PhysicsWorldQuery::rayTest(
+    PhysicsWorld& physWorld,
+    const vec3f& from,
+    const vec3f& to,
+    std::function<void(btDynamicsWorld::LocalRayResult&)> lambda)
 {
 	struct RayCallback : public btDynamicsWorld::RayResultCallback {
 		RayCallback(std::function<void(btDynamicsWorld::LocalRayResult&)>& lambda)
@@ -67,17 +68,19 @@ btScalar RayResultCollisionObject::addSingleResult(btDynamicsWorld::LocalRayResu
 	m_closestHitFraction = rayResult.m_hitFraction;
 	m_collisionObject = rayResult.m_collisionObject;
 
-	m_hitNormalWorld =
-	    (normalInWorldSpace) ? rayResult.m_hitNormalLocal : m_collisionObject->getWorldTransform().getBasis() * rayResult.m_hitNormalLocal;
+	m_hitNormalWorld = (normalInWorldSpace)
+	                     ? rayResult.m_hitNormalLocal
+	                     : m_collisionObject->getWorldTransform().getBasis() * rayResult.m_hitNormalLocal;
 
 	m_hitPointWorld.setInterpolate3(m_rayFromWorld, m_rayToWorld, rayResult.m_hitFraction);
 	return rayResult.m_hitFraction;
 }
 
-void RayResultActor::setup(const Actor* const igonreActor,
-                           const btVector3& rayFromWorld,
-                           const btVector3& rayToWorld,
-                           std::function<bool(const Actor*)> customFilter)
+void RayResultActor::setup(
+    const Actor* const igonreActor,
+    const btVector3& rayFromWorld,
+    const btVector3& rayToWorld,
+    std::function<bool(const Actor*)> customFilter)
 {
 	m_customFilter = customFilter;
 	m_ignoreActor = igonreActor;
@@ -114,8 +117,9 @@ btScalar RayResultActor::addSingleResult(btDynamicsWorld::LocalRayResult& rayRes
 	m_closestHitFraction = rayResult.m_hitFraction;
 	m_collisionObject = rayResult.m_collisionObject;
 
-	m_hitNormalWorld =
-	    (normalInWorldSpace) ? rayResult.m_hitNormalLocal : m_collisionObject->getWorldTransform().getBasis() * rayResult.m_hitNormalLocal;
+	m_hitNormalWorld = (normalInWorldSpace)
+	                     ? rayResult.m_hitNormalLocal
+	                     : m_collisionObject->getWorldTransform().getBasis() * rayResult.m_hitNormalLocal;
 
 	m_hitPointWorld.setInterpolate3(m_rayFromWorld, m_rayToWorld, rayResult.m_hitFraction);
 	return rayResult.m_hitFraction;
@@ -127,7 +131,8 @@ btScalar RayResultActor::addSingleResult(btDynamicsWorld::LocalRayResult& rayRes
 void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* const rootActor)
 {
 	GameWorld& world = *rootActor->getWorld();
-	vector_set<const RigidBody*> processedRigidBodies; // TODO: make this an input to avoid allocating on every frame when it is used.
+	vector_set<const RigidBody*>
+	    processedRigidBodies; // TODO: make this an input to avoid allocating on every frame when it is used.
 
 	std::function<void(const RigidBody*, bool)> processManifolds = [&](const RigidBody* const rbContactsToProcess,
 	                                                                   bool parentIgnoreRotation) -> void {
@@ -173,8 +178,8 @@ void findActorsOnTop(vector_map<Actor*, FindActorsOnTopResult>& result, Actor* c
 				continue;
 			}
 
-			// Check if the rigid body has an actor assigned (it if expected to have if it is wrapped in our RigidBody class).
-			// Notice that the contacted actor here has a dynamic rigid body attached to it!
+			// Check if the rigid body has an actor assigned (it if expected to have if it is wrapped in our RigidBody
+			// class). Notice that the contacted actor here has a dynamic rigid body attached to it!
 			Actor* const contactedActor = contactedRigidBody->actor;
 			if (contactedActor == nullptr) {
 				sgeAssert(false);

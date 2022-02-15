@@ -57,8 +57,9 @@ struct SGE_CORE_API ICore {
 	/// @brief QuickDraw provides an easy way to draw simple shapes, textures and text.
 	virtual QuickDraw& getQuickDraw() = 0;
 
-	/// @brief DebugDraw provides a way for the user to easily draw, from anywhere in code, lines, boxes, arrows and more.
-	/// The idea of this class is to help you visualize a particlar problem - maybe it is forces, collsion geometry, guides and more.
+	/// @brief DebugDraw provides a way for the user to easily draw, from anywhere in code, lines, boxes, arrows and
+	/// more. The idea of this class is to help you visualize a particlar problem - maybe it is forces, collsion
+	/// geometry, guides and more.
 	virtual DebugDraw& getDebugDraw() = 0;
 
 	virtual SGEDevice* getDevice() = 0;

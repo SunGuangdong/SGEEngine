@@ -39,13 +39,14 @@ struct GLContextStateCache {
 
 	struct VertexAttribSlotDesc {
 		// glVertexAttribPointer arguments + the target buffer.
-		VertexAttribSlotDesc(bool a_enabled = false,
-		                     GLuint a_buffer = 0,      // the buffer to be bound as ARRAY BUFFER
-		                     GLuint a_size = 1,        // 0 isn't accepted by standard.
-		                     GLenum a_type = GL_FLOAT, // GL_NONE isn't accepted by standard.
-		                     GLboolean a_normalized = GL_FALSE,
-		                     GLuint a_stride = 0,     // vertex buffer element size.
-		                     GLuint a_byteOffset = 0) // data offset in the buffer stride.
+		VertexAttribSlotDesc(
+		    bool a_enabled = false,
+		    GLuint a_buffer = 0,      // the buffer to be bound as ARRAY BUFFER
+		    GLuint a_size = 1,        // 0 isn't accepted by standard.
+		    GLenum a_type = GL_FLOAT, // GL_NONE isn't accepted by standard.
+		    GLboolean a_normalized = GL_FALSE,
+		    GLuint a_stride = 0,     // vertex buffer element size.
+		    GLuint a_byteOffset = 0) // data offset in the buffer stride.
 		    : isEnabled(a_enabled)
 		    , buffer(a_buffer)
 		    , size(a_size)
@@ -86,8 +87,9 @@ struct GLContextStateCache {
 	}
 
 	// https://www.opengl.org/sdk/docs/man/html/glMapBuffer.xhtml
-	void* MapBuffer(const GLenum target,
-	                const GLenum access // = GL_READ_ONLY, GL_WRITE_ONLY, GL_READ_WRITE
+	void* MapBuffer(
+	    const GLenum target,
+	    const GLenum access // = GL_READ_ONLY, GL_WRITE_ONLY, GL_READ_WRITE
 	);
 
 	void UnmapBuffer(const GLenum target);
@@ -100,17 +102,20 @@ struct GLContextStateCache {
 	//
 	//[NOTE]Just don't use that function
 	//@index - attribute pointer index
-	//@enabled - should vertex attrib be enabled. If false or buffer == 0 then the call to glVertexAttribPointer is bypassed
+	//@enabled - should vertex attrib be enabled. If false or buffer == 0 then the call to glVertexAttribPointer is
+	// bypassed
 	//@attribData - glVertexAttribPointer arguments excluding index
-	// void BindVertexAttribPointer2(const GLuint index, const bool enabled, const VertexAttribPointerData2& attribData);
-	void SetVertexAttribSlotState(const bool bEnabled,
-	                              const GLuint index,
-	                              const GLuint buffer,
-	                              const GLuint size,
-	                              const GLenum type,
-	                              const GLboolean normalized,
-	                              const GLuint stride,
-	                              const GLuint byteOffset);
+	// void BindVertexAttribPointer2(const GLuint index, const bool enabled, const VertexAttribPointerData2&
+	// attribData);
+	void SetVertexAttribSlotState(
+	    const bool bEnabled,
+	    const GLuint index,
+	    const GLuint buffer,
+	    const GLuint size,
+	    const GLenum type,
+	    const GLboolean normalized,
+	    const GLuint stride,
+	    const GLuint byteOffset);
 
 	/// Binds the specified shading program. Basically calls glUseProgram.
 	/// @param program resource id to get bound.
@@ -146,14 +151,16 @@ struct GLContextStateCache {
 	void ApplyBlendState(const BlendDesc& blendDesc);
 
 	// Almost equivalent to "DrawIndexed" in D3D11 (the base vertex location is missing)
-	void DrawElements(const GLenum primTopology,
-	                  const GLuint numIndices,
-	                  const GLenum elemArrayBufferFormat,
-	                  const GLvoid* indices,
-	                  const GLsizei instanceCount = 1);
+	void DrawElements(
+	    const GLenum primTopology,
+	    const GLuint numIndices,
+	    const GLenum elemArrayBufferFormat,
+	    const GLvoid* indices,
+	    const GLsizei instanceCount = 1);
 
 	// equivalent to "Draw" in D3D11
-	void DrawArrays(const GLenum primTopology, const GLuint startVertex, const GLuint numVerts, const GLsizei instanceCount = 1);
+	void DrawArrays(
+	    const GLenum primTopology, const GLuint startVertex, const GLuint numVerts, const GLsizei instanceCount = 1);
 
 	void GenBuffers(const GLsizei numBuffers, GLuint* const buffers);
 	void DeleteBuffers(const GLsizei numBuffers, GLuint* const buffers);

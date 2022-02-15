@@ -112,19 +112,21 @@ struct FrameTarget : RAIResource {
 	ResourceType::Enum getResourceType() const final { return ResourceType::FrameTarget; }
 
 	// Sets render target and depth stencil elements can be NULL.
-	virtual bool create(int numRenderTargets,
-	                    Texture* renderTargets[],
-	                    TargetDesc renderTargetDescs[],
-	                    Texture* depthStencil,
-	                    const TargetDesc& depthTargetDesc) = 0;
+	virtual bool create(
+	    int numRenderTargets,
+	    Texture* renderTargets[],
+	    TargetDesc renderTargetDescs[],
+	    Texture* depthStencil,
+	    const TargetDesc& depthTargetDesc) = 0;
 
 	virtual bool create() = 0;
 
 	// Just a shortcut that makes a single 2D render target and optionally a 2D depth stencil texture.
-	virtual bool create2D(int width,
-	                      int height,
-	                      TextureFormat::Enum renderTargetFmt = TextureFormat::R8G8B8A8_UNORM,
-	                      TextureFormat::Enum depthTextureFmt = TextureFormat::D24_UNORM_S8_UINT) = 0;
+	virtual bool create2D(
+	    int width,
+	    int height,
+	    TextureFormat::Enum renderTargetFmt = TextureFormat::R8G8B8A8_UNORM,
+	    TextureFormat::Enum depthTextureFmt = TextureFormat::D24_UNORM_S8_UINT) = 0;
 
 	virtual void setRenderTarget(const int slot, Texture* texture, const TargetDesc& targetDesc) = 0;
 	virtual void setDepthStencil(Texture* texture, const TargetDesc& targetDesc) = 0;
@@ -142,9 +144,15 @@ struct FrameTarget : RAIResource {
 	Rect2s getViewport() const { return Rect2s(short(getWidth()), short(getHeight())); }
 
 	//
-	bool isSizeEqual(int const width, int const height) { return isValid() && (width == getWidth() && height == getHeight()); }
+	bool isSizeEqual(int const width, int const height)
+	{
+		return isValid() && (width == getWidth() && height == getHeight());
+	}
 
-	bool isSizeEqual(const vec2f& size) { return isValid() && ((int)size.x == getWidth() && (int)size.y == getHeight()); }
+	bool isSizeEqual(const vec2f& size)
+	{
+		return isValid() && ((int)size.x == getWidth() && (int)size.y == getHeight());
+	}
 };
 
 //-----------------------------------------------------------------------
@@ -167,7 +175,8 @@ struct Texture : public RAIResource {
 
 	ResourceType::Enum getResourceType() const final { return ResourceType::Texture; }
 
-	virtual bool create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc sampler = SamplerDesc()) = 0;
+	virtual bool
+	    create(const TextureDesc& desc, const TextureData initalData[], const SamplerDesc sampler = SamplerDesc()) = 0;
 
 	virtual const TextureDesc& getDesc() const = 0;
 	virtual SamplerState* getSamplerState() = 0;
@@ -201,10 +210,12 @@ struct Shader : public RAIResource {
 	ResourceType::Enum getResourceType() const final { return ResourceType::Shader; }
 
 	/// Creates the shader using the native language of the API.
-	virtual CreateShaderResult createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint) = 0;
+	virtual CreateShaderResult
+	    createNative(const ShaderType::Enum type, const char* pCode, const char* const entryPoint) = 0;
 
 	/// Create from naative bytecode
-	virtual CreateShaderResult createFromNativeBytecode(const ShaderType::Enum type, std::vector<char> nativeBytecode) = 0;
+	virtual CreateShaderResult
+	    createFromNativeBytecode(const ShaderType::Enum type, std::vector<char> nativeBytecode) = 0;
 
 	virtual const ShaderType::Enum getShaderType() const = 0;
 
@@ -223,8 +234,8 @@ struct ShadingProgram : public RAIResource {
 	virtual bool create(Shader* vertShdr, Shader* pixelShdr) = 0;
 	virtual CreateShaderResult createFromNativeCode(const char* const pVSCode, const char* const pPSCode) = 0;
 
-	CreateShaderResult
-	    createFromCustomHLSL(const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles = nullptr);
+	CreateShaderResult createFromCustomHLSL(
+	    const char* const pVSCode, const char* const pPSCode, std::set<std::string>* outIncludedFiles = nullptr);
 
 	virtual Shader* getVertexShader() const = 0;
 	virtual Shader* getPixelShader() const = 0;
@@ -328,10 +339,11 @@ struct SGEContext {
 
 	virtual SGEDevice* getDevice() = 0;
 
-	virtual void executeDrawCall(DrawCall& drawCall,
-	                             FrameTarget* frameTarget,
-	                             const Rect2s* const pViewport = nullptr,
-	                             const Rect2s* const pScissorsRect = nullptr) = 0;
+	virtual void executeDrawCall(
+	    DrawCall& drawCall,
+	    FrameTarget* frameTarget,
+	    const Rect2s* const pViewport = nullptr,
+	    const Rect2s* const pScissorsRect = nullptr) = 0;
 
 	// Buffers.
 	virtual void* map(Buffer* buffer, const Map::Enum map) = 0;

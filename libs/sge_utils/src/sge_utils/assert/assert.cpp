@@ -11,7 +11,9 @@ namespace sge {
 int assertAskDisableInternal(const char* const file, const int line, const char* expr)
 {
 	const std::string title = string_format(
-	    "%s %d triggered an assert, Do you want to Disable it?\nNo - Debug\nYes - Disable and Debug\nCancel - Disable and Ignore", file,
+	    "%s %d triggered an assert, Do you want to Disable it?\nNo - Debug\nYes - Disable and Debug\nCancel - Disable "
+	    "and Ignore",
+	    file,
 	    line);
 
 #ifdef WIN32

@@ -78,7 +78,8 @@ void Actor::setOrientation(const quatf& r, bool killVelocity)
 	setTransform(newTr, killVelocity);
 }
 
-void Actor::setTransformEx(const transf3d& newTransform, bool killVelocity, bool recomputeBinding, bool shouldChangeRigidBodyTransform)
+void Actor::setTransformEx(
+    const transf3d& newTransform, bool killVelocity, bool recomputeBinding, bool shouldChangeRigidBodyTransform)
 {
 	transf3d oldTransform = m_logicTransform;
 	m_isTrasformAsMtxValid = false;
@@ -112,7 +113,8 @@ void Actor::setTransformEx(const transf3d& newTransform, bool killVelocity, bool
 		for (int t = 0; t < pAllChildren->size(); ++t) {
 			Actor* const child = getWorld()->getActorById(pAllChildren->data()[t]);
 			if (child) {
-				transf3d childNewTransformWS = transf3d::applyBindingTransform(child->m_bindingToParentTransform, m_logicTransform);
+				transf3d childNewTransformWS =
+				    transf3d::applyBindingTransform(child->m_bindingToParentTransform, m_logicTransform);
 				child->setTransformEx(childNewTransformWS, killVelocity, recomputeBinding, true);
 			}
 		}
@@ -161,10 +163,11 @@ void Actor::setItemTransform(EditMode const mode, int UNUSED(itemIndex), const t
 //--------------------------------------------------------------------
 // Actor edit mode stuff.
 //--------------------------------------------------------------------
-InspectorCmd* Actor::generateDeleteItemCmd(GameInspector* UNUSED(inspector),
-                                           const SelectedItem* items,
-                                           int numItems,
-                                           bool UNUSED(ifActorModeShouldDeleteActorsUnder))
+InspectorCmd* Actor::generateDeleteItemCmd(
+    GameInspector* UNUSED(inspector),
+    const SelectedItem* items,
+    int numItems,
+    bool UNUSED(ifActorModeShouldDeleteActorsUnder))
 {
 	if (numItems == 1 && items[0].editMode == editMode_actors) {
 		CmdObjectDeletion* const cmdDel = new CmdObjectDeletion;
@@ -178,11 +181,12 @@ InspectorCmd* Actor::generateDeleteItemCmd(GameInspector* UNUSED(inspector),
 	return nullptr;
 }
 
-InspectorCmd* Actor::generateItemSetTransformCmd(GameInspector* UNUSED(inspector),
-                                                 EditMode const mode,
-                                                 int UNUSED(itemIndex),
-                                                 const transf3d& initalTrasform,
-                                                 const transf3d& newTransform)
+InspectorCmd* Actor::generateItemSetTransformCmd(
+    GameInspector* UNUSED(inspector),
+    EditMode const mode,
+    int UNUSED(itemIndex),
+    const transf3d& initalTrasform,
+    const transf3d& newTransform)
 {
 	if (mode == editMode_actors) {
 		CmdMemberChange* cmd = new CmdMemberChange;

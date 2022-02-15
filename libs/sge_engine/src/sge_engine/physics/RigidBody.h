@@ -58,7 +58,8 @@ enum RigidBodyFilterMask : ubyte {
 /// User for Static, Dynamic and Ghost (kinematic) objects.
 /// We add our custom information in the user point of the created btCollisionObject,
 /// you can get the RigidBody by calling @fromBullet(btCollisionObject*).
-/// In order to use it you should add it to a physics world and when you are done with it (or you wana delete it) remove it.
+/// In order to use it you should add it to a physics world and when you are done with it (or you wana delete it) remove
+/// it.
 struct SGE_ENGINE_API RigidBody {
 	RigidBody()
 	    : m_motionState(this)
@@ -70,17 +71,22 @@ struct SGE_ENGINE_API RigidBody {
 	void destroy();
 
 	/// @brief Create a rigid body to be used in the PhysicsWorld
-	/// @param actor the actor represented by this RigidBody, may be nullptr. Having actor being linked to a rigid body will automatically
-	/// update the transformation of the assigned actor, thus multiple rigid bodies cannot be associated with the same actor yet.
+	/// @param actor the actor represented by this RigidBody, may be nullptr. Having actor being linked to a rigid body
+	/// will automatically update the transformation of the assigned actor, thus multiple rigid bodies cannot be
+	/// associated with the same actor yet.
 	///        Bodies that ARE NOT assigned to any rigid body are useful for sensors.
-	///        Keep in mind that the rigid body WILL NOT track the lifetime of the actor by itself (@TraitRigidBody does this tracking).
-	/// @param collisionShapeToBeOwned A collision shape to be used for the rigid body. This class will take ownership of the allocated
+	///        Keep in mind that the rigid body WILL NOT track the lifetime of the actor by itself (@TraitRigidBody does
+	///        this tracking).
+	/// @param collisionShapeToBeOwned A collision shape to be used for the rigid body. This class will take ownership
+	/// of the allocated
 	///        (with new) collision shape.
 	/// @param mass The mass of the object. If 0 the object is going to be static or kinematic.
-	/// @param noResponce True if collision with this object should create any new forces. Bullet will still generate contact manifolds.
+	/// @param noResponce True if collision with this object should create any new forces. Bullet will still generate
+	/// contact manifolds.
 	///        Useful for triggers and collectables.
 	void create(Actor* const actor, CollisionShape* collisionShapeToBeOwned, float const mass, bool noResponce);
-	void create(Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce);
+	void create(
+	    Actor* const actor, const CollsionShapeDesc* shapeDesc, int numShapeDescs, float const mass, bool noResponce);
 	void create(Actor* const actor, CollsionShapeDesc desc, float const mass, bool noResponce);
 
 	/// Create a ghost(kinematic) object that doesn't get affected by any forces.
@@ -125,8 +131,8 @@ struct SGE_ENGINE_API RigidBody {
 	/// @brief Retrieves the bounciness of the object.
 	float getBounciness() const;
 
-	/// @brief. Changed the damping of the velocity of the object. The dampling is applied always no matter if the object is in contant with
-	/// something or in air.
+	/// @brief. Changed the damping of the velocity of the object. The dampling is applied always no matter if the
+	/// object is in contant with something or in air.
 	void setDamping(float linearDamping, float angularDamping);
 
 	/// @brief Retrieves the linear and angular damping of the rigid body.
@@ -160,7 +166,10 @@ struct SGE_ENGINE_API RigidBody {
 	void applyLinearVelocity(const vec3f& v);
 
 	/// @brief Retrieves the linear velocity of the rigid body.
-	vec3f getLinearVel() const { return getBulletRigidBody() ? fromBullet(getBulletRigidBody()->getLinearVelocity()) : vec3f(0.f); }
+	vec3f getLinearVel() const
+	{
+		return getBulletRigidBody() ? fromBullet(getBulletRigidBody()->getLinearVelocity()) : vec3f(0.f);
+	}
 
 	/// @brief Forces the velocity for the rigid body to be the specified value.
 	void setLinearVelocity(const vec3f& v);
@@ -268,16 +277,16 @@ inline Actor* getActorFromPhysicsObjectMutable(const btCollisionObject* const co
 }
 
 /// @brief Retieves the other actor participating in the collsion manifold. Useful for sensors and triggers.
-SGE_ENGINE_API const Actor*
-    getOtherActorFromManifold(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx = nullptr);
+SGE_ENGINE_API const Actor* getOtherActorFromManifold(
+    const btPersistentManifold* const manifold, const Actor* const you, int* youIdx = nullptr);
 
 /// @brief Retieves the other actor participating in the collsion manifold. Useful for sensors and triggers.
-SGE_ENGINE_API Actor*
-    getOtherActorFromManifoldMutable(const btPersistentManifold* const manifold, const Actor* const you, int* youIdx = nullptr);
+SGE_ENGINE_API Actor* getOtherActorFromManifoldMutable(
+    const btPersistentManifold* const manifold, const Actor* const you, int* youIdx = nullptr);
 
 /// @brief Retieves the other actor participating in the collsion manifold. Useful for sensors and triggers.
-SGE_ENGINE_API const btCollisionObject*
-    getOtherFromManifold(const btPersistentManifold* const manifold, const btCollisionObject* const you, int* youIdx = nullptr);
+SGE_ENGINE_API const btCollisionObject* getOtherFromManifold(
+    const btPersistentManifold* const manifold, const btCollisionObject* const you, int* youIdx = nullptr);
 
 /// @brief Retieves the other actor participating in the collsion manifold. Useful for sensors and triggers.
 SGE_ENGINE_API const btCollisionObject*
@@ -287,7 +296,8 @@ SGE_ENGINE_API const btCollisionObject*
 SGE_ENGINE_API const Actor*
     getOtherBodyFromManifold(const Actor* const you, const btPersistentManifold* const manifold, int* youIdx = nullptr);
 
-SGE_ENGINE_API const Actor* getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx = nullptr);
+SGE_ENGINE_API const Actor*
+    getOtherActorFromPiar(const Actor* const you, const btBroadphasePair* const pair, int* youIdx = nullptr);
 
 
 

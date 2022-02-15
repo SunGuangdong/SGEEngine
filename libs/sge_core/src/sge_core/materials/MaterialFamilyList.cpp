@@ -4,7 +4,8 @@
 
 namespace sge {
 
-std::unique_ptr<IMaterial> MaterialFamilyLibrary::loadMaterialFromJson(const JsonValue* jMtlRoot, const char* materialDirectory) const
+std::unique_ptr<IMaterial>
+    MaterialFamilyLibrary::loadMaterialFromJson(const JsonValue* jMtlRoot, const char* materialDirectory) const
 {
 	if (jMtlRoot == nullptr) {
 		return std::unique_ptr<IMaterial>();

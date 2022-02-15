@@ -98,7 +98,8 @@ void BufferGL::unMap(SGEContext* UNUSED(sgecon))
 	GLContextStateCache* const glcon = getDevice<SGEDeviceImpl>()->GL_GetContextStateCache();
 
 	glcon->BindBuffer(GL_GetTargetBufferType(), m_glBuffer);
-	glBufferData(GL_GetTargetBufferType(), m_emsc_mapBufferHelper.size(), m_emsc_mapBufferHelper.data(), GL_STATIC_DRAW);
+	glBufferData(
+	    GL_GetTargetBufferType(), m_emsc_mapBufferHelper.size(), m_emsc_mapBufferHelper.data(), GL_STATIC_DRAW);
 #else
 	GLContextStateCache* const glcon = getDevice<SGEDeviceImpl>()->GL_GetContextStateCache();
 	glcon->UnmapBuffer(GL_GetTargetBufferType());

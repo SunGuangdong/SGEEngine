@@ -19,7 +19,8 @@
 
 namespace sge {
 
-void PrefabWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
+void PrefabWindow::update(
+    SGEContext* const UNUSED(sgecon), struct GameInspector* inspector, const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
@@ -90,7 +91,8 @@ void PrefabWindow::update(SGEContext* const UNUSED(sgecon), struct GameInspector
 		if (m_availablePrefabs.isValid() == false) {
 			m_availablePrefabs = std::vector<std::string>();
 			if (std::filesystem::is_directory("assets/prefabs"))
-				for (const std::filesystem::directory_entry& entry : std::filesystem::recursive_directory_iterator("./assets/prefabs")) {
+				for (const std::filesystem::directory_entry& entry :
+				     std::filesystem::recursive_directory_iterator("./assets/prefabs")) {
 					if (entry.path().extension() == ".lvl") {
 						std::string prefabPath = entry.path().generic_u8string().c_str();
 						m_availablePrefabs->emplace_back(std::move(prefabPath));

@@ -9,7 +9,8 @@
 #include "sge_utils/text/format.h"
 
 namespace sge {
-void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is))
+void GameInspectorWindow::update(
+    SGEContext* const UNUSED(sgecon), GameInspector* inspector, const InputState& UNUSED(is))
 {
 	if (isClosed()) {
 		return;
@@ -112,7 +113,8 @@ void GameInspectorWindow::update(SGEContext* const UNUSED(sgecon), GameInspector
 
 			// Display a list of all commands.
 			int curr = 0;
-			ImGui::ListBox("Cmd History", &curr, commandsNamesGetter, &inspector, inspector->m_lastExecutedCommandIdx + 1, 5);
+			ImGui::ListBox(
+			    "Cmd History", &curr, commandsNamesGetter, &inspector, inspector->m_lastExecutedCommandIdx + 1, 5);
 		}
 
 		// Stepping.

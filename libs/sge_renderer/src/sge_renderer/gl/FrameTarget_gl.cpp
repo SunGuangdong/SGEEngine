@@ -14,11 +14,12 @@ bool FrameTargetGL::create()
 	return create(0, nullptr, nullptr, nullptr, TargetDesc());
 }
 
-bool FrameTargetGL::create(int numRenderTargets,
-                           Texture* renderTargets[],
-                           TargetDesc renderTargetDescs[],
-                           Texture* depthStencil,
-                           const TargetDesc& depthTargetDesc)
+bool FrameTargetGL::create(
+    int numRenderTargets,
+    Texture* renderTargets[],
+    TargetDesc renderTargetDescs[],
+    Texture* depthStencil,
+    const TargetDesc& depthTargetDesc)
 {
 	destroy();
 
@@ -36,11 +37,11 @@ bool FrameTargetGL::create(int numRenderTargets,
 		// Initalize the cached widht and height of the all the textures in the frame buffer
 		// and use those as a reference values
 		if (m_frameTargetWidth == -1 && renderTargets[t] != NULL) {
-			// [TODO][FRAME_TARGET_IMPL] Currently only the code for 2D textures at 0 mip level are supproted(that is me just being lazy).
-			// Also parameters like, type, array size, multisampling are missing.
-			// Honestly this is a big mess that somebody has to write at some point...
-			if (renderTargetDescs[t].baseTextureType == UniformType::Texture2D && renderTargetDescs[t].texture2D.mipLevel == 0 &&
-			    renderTargetDescs[t].texture2D.arrayIdx == 0) {
+			// [TODO][FRAME_TARGET_IMPL] Currently only the code for 2D textures at 0 mip level are supproted(that is me
+			// just being lazy). Also parameters like, type, array size, multisampling are missing. Honestly this is a
+			// big mess that somebody has to write at some point...
+			if (renderTargetDescs[t].baseTextureType == UniformType::Texture2D &&
+			    renderTargetDescs[t].texture2D.mipLevel == 0 && renderTargetDescs[t].texture2D.arrayIdx == 0) {
 				m_frameTargetWidth = renderTargets[t]->getDesc().texture2D.width;
 				m_frameTargetHeight = renderTargets[t]->getDesc().texture2D.height;
 			}
@@ -92,8 +93,12 @@ void FrameTargetGL::setRenderTarget(const int slot, Texture* texture, const Targ
 		}
 
 		// The shortcut with glFramebufferTexture3D doesn't work on nVidia.
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + slot, GL_TEXTURE_2D, ((TextureGL*)texture)->GL_GetResource(),
-		                       targetDesc.texture2D.mipLevel);
+		glFramebufferTexture2D(
+		    GL_FRAMEBUFFER,
+		    GL_COLOR_ATTACHMENT0 + slot,
+		    GL_TEXTURE_2D,
+		    ((TextureGL*)texture)->GL_GetResource(),
+		    targetDesc.texture2D.mipLevel);
 
 		DumpAllGLErrors();
 	}
@@ -128,8 +133,12 @@ void FrameTargetGL::setDepthStencil(Texture* texture, const TargetDesc& targetDe
 	if (texToBindDesc.textureType == UniformType::Texture2D) {
 		updateAttachmentsInfo(texture);
 		glcon->BindFBO(m_frameBuffer_gl);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, GL_TEXTURE_2D, ((TextureGL*)texture)->GL_GetResource(),
-		                       targetDesc.texture2D.mipLevel);
+		glFramebufferTexture2D(
+		    GL_FRAMEBUFFER,
+		    attachmentType,
+		    GL_TEXTURE_2D,
+		    ((TextureGL*)texture)->GL_GetResource(),
+		    targetDesc.texture2D.mipLevel);
 		DumpAllGLErrors();
 
 		// Only works on AMD:
@@ -143,8 +152,12 @@ void FrameTargetGL::setDepthStencil(Texture* texture, const TargetDesc& targetDe
 		// Binding a face from a cube texture as a depth-stencil.
 		const GLenum faceGL = signedAxis_toTexCubeFaceIdx_OpenGL(targetDesc.textureCube.face);
 		glcon->BindFBO(m_frameBuffer_gl);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, attachmentType, faceGL, ((TextureGL*)texture)->GL_GetResource(),
-		                       targetDesc.textureCube.mipLevel);
+		glFramebufferTexture2D(
+		    GL_FRAMEBUFFER,
+		    attachmentType,
+		    faceGL,
+		    ((TextureGL*)texture)->GL_GetResource(),
+		    targetDesc.textureCube.mipLevel);
 
 		DumpAllGLErrors();
 	}
@@ -257,7 +270,8 @@ void FrameTargetGL::updateAttachmentsInfo(Texture* texture)
 	}
 }
 
-bool FrameTargetGL::create2D(int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt)
+bool FrameTargetGL::create2D(
+    int width, int height, TextureFormat::Enum renderTargetFmt, TextureFormat::Enum depthTextureFmt)
 {
 	// Render Target texture.
 	GpuHandle<Texture> renderTarget = getDevice()->requestResource<Texture>();
@@ -281,7 +295,12 @@ bool FrameTargetGL::create2D(int width, int height, TextureFormat::Enum renderTa
 
 	// Create the frame target itself.
 	TargetDesc tex2DDesc = TargetDesc::FromTex2D();
-	return create(renderTarget.IsResourceValid() ? 1 : 0, renderTarget.PtrPtr(), &tex2DDesc, depthStencilTexture, TargetDesc::FromTex2D());
+	return create(
+	    renderTarget.IsResourceValid() ? 1 : 0,
+	    renderTarget.PtrPtr(),
+	    &tex2DDesc,
+	    depthStencilTexture,
+	    TargetDesc::FromTex2D());
 }
 
 

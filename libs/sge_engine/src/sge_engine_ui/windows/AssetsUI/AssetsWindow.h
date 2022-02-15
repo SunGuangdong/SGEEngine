@@ -88,8 +88,8 @@ struct SGE_ENGINE_API AssetsWindow : public IImGuiWindow {
 	bool m_isOpened = true;
 	std::string m_windowName;
 
-	/// The path to the currently right clicked object. If the path is empty there is no right clicked object and we should not display the
-	/// right click menu.
+	/// The path to the currently right clicked object. If the path is empty there is no right clicked object and we
+	/// should not display the right click menu.
 	std::filesystem::path m_rightClickedPath;
 
 	// A pointer to the asset that currently has a preview.

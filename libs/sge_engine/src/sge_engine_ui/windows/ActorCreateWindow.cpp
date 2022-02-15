@@ -45,7 +45,8 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* 
 			// Find everything that inherits Actor and add a create function for it.
 			int numItemsShown = 0;
 			const float windowWidth = ImGui::GetContentRegionAvail().x;
-			const int itemsPerRow = maxOf(int((windowWidth) / (kWidgetSize.x + ImGui::GetStyle().ItemSpacing.x * 2.f)), 1);
+			const int itemsPerRow =
+			    maxOf(int((windowWidth) / (kWidgetSize.x + ImGui::GetStyle().ItemSpacing.x * 2.f)), 1);
 
 			for (auto& typePair : typeLib().m_registeredTypes) {
 				if (typePair.second.doesInherits(sgeTypeId(GameObject)) && typePair.second.newFn != nullptr) {
@@ -79,7 +80,8 @@ void ActorCreateWindow::update(SGEContext* const UNUSED(sgecon), GameInspector* 
 						ImGui::SetTooltip(typeDesc->name);
 					}
 
-					// If the text is too long, do not center it below the icon, as it is hard to read the name of the type.
+					// If the text is too long, do not center it below the icon, as it is hard to read the name of the
+					// type.
 					const float typeNameTextWidth = ImGui::CalcTextSize(typeDesc->name).x;
 					if (typeNameTextWidth >= kWidgetSize.x) {
 						indent = 0.f;

@@ -28,7 +28,8 @@ struct AParticlesSimple;
 
 struct LightShadowInfo {
 	ShadowMapBuildInfo buildInfo;
-	// GpuHandle<Texture> pointLightDepthTexture; ///< This could be a single 2D or a Cube texture depending on the light source.
+	// GpuHandle<Texture> pointLightDepthTexture; ///< This could be a single 2D or a Cube texture depending on the
+	// light source.
 	GpuHandle<FrameTarget> frameTarget; ///< Regular frame target for spot and directional lights.
 	bool isCorrectlyUpdated = false;
 };
@@ -52,49 +53,53 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	/// form actors and the actual rendering is done by this function.
 	void drawCurrentRenderItems(const GameDrawSets& drawSets, DrawReason drawReason, bool shouldDrawSky);
 
-	void drawRenderItem_Geometry(GeometryRenderItem& ri,
-	                             const GameDrawSets& drawSets,
-	                             const ObjectLighting& lighting,
-	                             DrawReason const drawReason);
+	void drawRenderItem_Geometry(
+	    GeometryRenderItem& ri,
+	    const GameDrawSets& drawSets,
+	    const ObjectLighting& lighting,
+	    DrawReason const drawReason);
 
-	void drawRenderItem_TraitSprite(const TraitSpriteRenderItem& ri,
-	                                const GameDrawSets& drawSets,
-	                                const ObjectLighting& lighting,
-	                                DrawReason const drawReason);
+	void drawRenderItem_TraitSprite(
+	    const TraitSpriteRenderItem& ri,
+	    const GameDrawSets& drawSets,
+	    const ObjectLighting& lighting,
+	    DrawReason const drawReason);
 
-	void drawRenderItem_TraitViewportIcon(TraitViewportIconRenderItem& viewportIcon,
-	                                      const GameDrawSets& drawSets,
-	                                      const DrawReason& drawReason);
+	void drawRenderItem_TraitViewportIcon(
+	    TraitViewportIconRenderItem& viewportIcon, const GameDrawSets& drawSets, const DrawReason& drawReason);
 
-	void drawRenderItem_TraitParticlesSimple(TraitParticlesSimpleRenderItem& ri,
-	                                         const GameDrawSets& drawSets,
-	                                         DrawReason drawReason,
-	                                         const ObjectLighting& generalMods);
+	void drawRenderItem_TraitParticlesSimple(
+	    TraitParticlesSimpleRenderItem& ri,
+	    const GameDrawSets& drawSets,
+	    DrawReason drawReason,
+	    const ObjectLighting& generalMods);
 
-	void drawRenderItem_TraitParticlesProgrammable(TraitParticlesProgrammableRenderItem& ri,
-	                                               const GameDrawSets& drawSets,
-	                                               const ObjectLighting& lighting);
+	void drawRenderItem_TraitParticlesProgrammable(
+	    TraitParticlesProgrammableRenderItem& ri, const GameDrawSets& drawSets, const ObjectLighting& lighting);
 
 	/// @brief A function usually called as a result of HelperDrawRenderItem.
 	/// intented be used for objects that need to be visible in the editor and not during gameplay.
-	void drawHelperActor(Actor* actor,
-	                     const GameDrawSets& drawSets,
-	                     EditMode const editMode,
-	                     int const itemIndex,
-	                     const ObjectLighting& lighting,
-	                     DrawReason const drawReason);
+	void drawHelperActor(
+	    Actor* actor,
+	    const GameDrawSets& drawSets,
+	    EditMode const editMode,
+	    int const itemIndex,
+	    const ObjectLighting& lighting,
+	    DrawReason const drawReason);
 
-	void drawHelperActor_drawANavMesh(ANavMesh& navMesh,
-	                                  const GameDrawSets& drawSets,
-	                                  const ObjectLighting& lighting,
-	                                  const DrawReason drawReason,
-	                                  const vec4f wireframeColor);
+	void drawHelperActor_drawANavMesh(
+	    ANavMesh& navMesh,
+	    const GameDrawSets& drawSets,
+	    const ObjectLighting& lighting,
+	    const DrawReason drawReason,
+	    const vec4f wireframeColor);
 
-	void drawHelperActor_drawAParticlesSimple(AParticlesSimple& particles,
-	                                          const GameDrawSets& drawSets,
-	                                          const ObjectLighting& lighting,
-	                                          const DrawReason drawReason,
-	                                          const vec4f wireframeColor);
+	void drawHelperActor_drawAParticlesSimple(
+	    AParticlesSimple& particles,
+	    const GameDrawSets& drawSets,
+	    const ObjectLighting& lighting,
+	    const DrawReason drawReason,
+	    const vec4f wireframeColor);
 
   private:
 	/// @brief Returns true if the bounding box of the actor (Actor::getBBoxOs) is in the specified
@@ -134,8 +139,9 @@ struct SGE_ENGINE_API DefaultGameDrawer : public IGameDrawer {
 	/// However in order to save up from alocating them again and again for each frame
 	/// We store the containers here.
 
-	std::vector<IRenderItem*> m_RIs_opaque;      ///< Pointers to all opaque render items. Pointers are not owned.
-	std::vector<IRenderItem*> m_RIs_alphaSorted; ///< Pointers to all semi-transparent render items. Pointers are not owned.
+	std::vector<IRenderItem*> m_RIs_opaque; ///< Pointers to all opaque render items. Pointers are not owned.
+	std::vector<IRenderItem*>
+	    m_RIs_alphaSorted; ///< Pointers to all semi-transparent render items. Pointers are not owned.
 
 	// Render items cache to save up on memory.
 	std::vector<GeometryRenderItem> m_RIs_geometry;

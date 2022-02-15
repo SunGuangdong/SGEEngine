@@ -20,7 +20,8 @@ struct SGE_ENGINE_API TraitRenderGeometry : public Trait {
 	/// @brief A Single geometry to be rendered.
 	/// This structure doesm't own any pointers, all of them need to be managed manually.
 	struct Element {
-		Box3f bboxGeometry; ///< The bounding box of the geometry, with no transformations applied (aka the vertex buffer bbox).
+		Box3f bboxGeometry; ///< The bounding box of the geometry, with no transformations applied (aka the vertex
+		                    ///< buffer bbox).
 		const Geometry* pGeom = nullptr;    ///< The geometry to be rendered. The pointer must be managed manually.
 		IMaterialData* pMtl = nullptr;      ///< The material to be used. The pointer must be managed manually.
 		mat4f tform = mat4f::getIdentity(); ///< See @isTformInWorldSpace.

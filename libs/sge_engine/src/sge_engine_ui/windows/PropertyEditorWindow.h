@@ -30,17 +30,21 @@ namespace ProperyEditorUIGen {
 	/// @param [in, out] gameObject is the owner of the member that we are doing UI for.
 	/// @param [in] chain points to the member (starting form @gameObject) that we are going to generate  UI for.
 	/// @param [in] flags a bitmask made from @DoMemberUIFlags
-	SGE_ENGINE_API void doMemberUI(GameInspector& inspector, GameObject* const gameObject, MemberChain chain, int flags = 0);
+	SGE_ENGINE_API void
+	    doMemberUI(GameInspector& inspector, GameObject* const gameObject, MemberChain chain, int flags = 0);
 
-	SGE_ENGINE_API void editFloat(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
+	SGE_ENGINE_API void
+	    editFloat(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
 	SGE_ENGINE_API void editInt(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
-	SGE_ENGINE_API void editString(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
-	SGE_ENGINE_API void editStringAsAssetPath(GameInspector& inspector,
-	                                          const char* label,
-	                                          GameObject* gameObject,
-	                                          MemberChain chain,
-	                                          const AssetIfaceType possibleAssetIfaceTypes[],
-	                                          const int numPossibleAssetIfaceTypes);
+	SGE_ENGINE_API void
+	    editString(GameInspector& inspector, const char* label, GameObject* gameObject, MemberChain chain);
+	SGE_ENGINE_API void editStringAsAssetPath(
+	    GameInspector& inspector,
+	    const char* label,
+	    GameObject* gameObject,
+	    MemberChain chain,
+	    const AssetIfaceType possibleAssetIfaceTypes[],
+	    const int numPossibleAssetIfaceTypes);
 
 	SGE_ENGINE_API void editDynamicProperties(GameInspector& inspector, GameObject* gameObject, MemberChain chain);
 } // namespace ProperyEditorUIGen

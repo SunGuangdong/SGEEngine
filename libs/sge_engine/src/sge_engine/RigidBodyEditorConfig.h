@@ -41,10 +41,10 @@ struct SGE_ENGINE_API RigidBodyPropertiesConfigurator {
 	bool specifyGravity = false;
 	vec3f gravity = vec3f(0.f, -10.f, 0.f);
 
-	/// @brief If true the editor will not show propeties that affect dynamics (mass, movement restriction, damping and so on).
-	/// The values can still be changed manually via code.
-	/// Useful when we know that the actor we've attached this struct to is going to have a static rigid body and we do not want
-	/// to enable the user to change that without code.
+	/// @brief If true the editor will not show propeties that affect dynamics (mass, movement restriction, damping and
+	/// so on). The values can still be changed manually via code. Useful when we know that the actor we've attached
+	/// this struct to is going to have a static rigid body and we do not want to enable the user to change that without
+	/// code.
 	bool dontShowDynamicProperties = false;
 
   public:
@@ -88,7 +88,8 @@ struct SGE_ENGINE_API RigidBodyConfigurator : public RigidBodyPropertiesConfigur
 };
 
 SGE_ENGINE_API void edit_CollisionShapeDesc(GameInspector& inspector, GameObject* gameObject, MemberChain chain);
-SGE_ENGINE_API void edit_RigidBodyPropertiesConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain);
+SGE_ENGINE_API void
+    edit_RigidBodyPropertiesConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain);
 SGE_ENGINE_API void edit_RigidBodyConfigurator(GameInspector& inspector, GameObject* gameObject, MemberChain chain);
 
 } // namespace sge
