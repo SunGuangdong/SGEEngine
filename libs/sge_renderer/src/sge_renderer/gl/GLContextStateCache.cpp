@@ -472,7 +472,7 @@ void GLContextStateCache::GenTextures(const GLsizei numTextures, GLuint* const t
 
 void GLContextStateCache::DeleteTextures(const GLsizei numTextures, GLuint* const textures)
 {
-	// "Unbind" the texture form the state cache.
+	// "Unbind" the texture from the state cache.
 	for (int iTexture = 0; iTexture < numTextures; ++iTexture) {
 		const GLuint tex = textures[iTexture];
 

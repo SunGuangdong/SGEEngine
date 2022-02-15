@@ -8,7 +8,16 @@
 #include "sge_core/application/input.h"
 #include "sge_utils/math/Box3f.h"
 
+#include "ProggyCleanTTF.h"
+
 namespace sge::gamegui {
+
+void UIContext::create(const vec2i& canvasSize)
+{
+	m_canvasSize = canvasSize;
+	defaultFont.createFromFileData(getCore()->getDevice(), ProggyCleanTTF, SGE_ARRSZ(ProggyCleanTTF), 128.f);
+	m_fontToUse = &defaultFont;
+}
 
 void UIContext::update(const InputState& is, const vec2i& canvasSize, const float dt)
 {

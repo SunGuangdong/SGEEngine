@@ -1,49 +1,62 @@
 #pragma once
 
+#include "GeomGen.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/Box2f.h"
 #include "sge_utils/math/Box3f.h"
 #include "sge_utils/math/mat4f.h"
 #include "sge_utils/math/primitives.h"
 #include "sgecore_api.h"
+
 #include <stb_truetype.h>
-
-#include "GeomGen.h"
-
 #include <string>
 
 namespace sge {
 
-//////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////
 struct SGE_CORE_API DebugFont {
   public:
 	DebugFont() { Destroy(); }
 	~DebugFont() { Destroy(); }
 
-	bool Create(SGEDevice* sgedev, const char* const ttfFilename, float heightPixels);
 	void Destroy();
 
+	bool Create(SGEDevice* sgedev, const char* const ttfFilename, float heightPixels);
+	bool createFromFileData(SGEDevice* sgedev, const unsigned char* const ttfFileData, size_t ttfFileDataSizeBytes, float heightPixels);
+
+	/// Computes the text dimensions around the baseline in (0,0).
+	/// The text is left aligned always.
+	/// The function currently supports only ASCII, should be extended to work with UTF-8 strings.
 	vec2f computeTextDimensions(const char* text, float textHeight) const;
 
 	float getScalingForHeight(float targetHeightPixels) const { return height / targetHeightPixels; }
 
-	GpuHandle<Texture> texture;
-
-	// Every value here is in pixels.
-	// Explanation: https://www.microsoft.com/typography/otspec/TTCH01.htm
-	float height = 0.f; // The height of the baked font.
-	float maxAscent = 0.f;
-	float maxDescent = 0.f;
-	float maxHorizontalAdvance = 0.f;
-
+	/// Every value here is in pixels.
+	/// Explanation: https://www.microsoft.com/typography/otspec/TTCH01.htm
+	///
+	/// But in short, here is the letter 'q':
+	///--------------------------------------
+	///                                    |
+	///----QQQ----------------------       |
+	///   Q   Q    |           |           |
+	///   Q   Q  Ascent      Body          |
+	///   Q   Q    |           |           EM
+	///----QQQQ--------        |           |
+	///       Q  Descent       |           |
+	///       Q---------------------       |
+	///                                    |
+	///--------------------------------------
+	///
+	///  "EM" square typically are those of the full body height of a font
+	/// plus some extra spacing to prevent lines of text
+	/// from colliding when typeset without extra leading.
+	float height = 0.f; // The height of the baked font (EM in the picture above).
+	float maxTopToBaseline = 0.f;
 	stbtt_bakedchar cdata[256];
+	GpuHandle<Texture> texture;
 };
 
-//////////////////////////////////////////////////////////////////////
-//
-//////////////////////////////////////////////////////////////////////
+/// QuickDraw is a wrapper around the rendering API that provides functions
+/// for quicly drawing simple shapes, wireframes, texture, text and so on.
 struct SGE_CORE_API QuickDraw {
 	struct Vertex2D {
 		Vertex2D() = default;

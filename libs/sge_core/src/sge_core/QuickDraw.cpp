@@ -10,6 +10,7 @@
 
 namespace {
 
+
 const char EFFECT_2D_UBERSHADER[] = R"(
 //----------------------------------------
 //
@@ -129,10 +130,20 @@ bool DebugFont::Create(SGEDevice* sgedev, const char* const ttfFilename, float h
 
 	// Read the ttf file data.
 	FileReadStream frs;
-	frs.open(ttfFilename);
-	std::vector<unsigned char> ttfData(frs.remainingBytes());
-	frs.read(ttfData.data(), ttfData.size());
 
+	std::vector<char> data;
+	if (FileReadStream::readFile(ttfFilename, data)) {
+		return createFromFileData(sgedev, (unsigned char*)data.data(), data.size(), heightPixels);
+	}
+
+	return false;
+}
+
+bool DebugFont::createFromFileData(SGEDevice* sgedev,
+                                   const unsigned char* const ttfFileData,
+                                   size_t UNUSED(ttfFileDataSizeBytes),
+                                   float heightPixels)
+{
 	// Cache the font height.
 	height = heightPixels;
 
@@ -143,12 +154,22 @@ bool DebugFont::Create(SGEDevice* sgedev, const char* const ttfFilename, float h
 
 	// [TODO] Find a way to pass a correct value for the "offset" argument
 	// currently this is wrong and may crash!
-	if (stbtt_BakeFontBitmap(ttfData.data(), 0, (float)heightPixels, textureData.data(), kTextureDim, kTextureDim, 0, 255, cdata) < 0) {
+	if (stbtt_BakeFontBitmap((unsigned char*)ttfFileData, 0, (float)heightPixels, textureData.data(), kTextureDim, kTextureDim, 0, 255,
+	                         cdata) < 0) {
 		Destroy();
 		return false;
 	}
 
-	// Create a the texture of the font.
+
+	for (int iCh = 0; iCh < SGE_ARRSZ(cdata); ++iCh) {
+		const stbtt_bakedchar ch = cdata[iCh];
+
+		if (fabsf(ch.yoff) > maxTopToBaseline) {
+			maxTopToBaseline = fabsf(ch.yoff);
+		}
+	}
+
+	// Create a the texture for the font.
 	TextureDesc td;
 	td.textureType = UniformType::Texture2D;
 	td.format = TextureFormat::R8_UNORM;
@@ -317,7 +338,6 @@ void QuickDraw::initalize2DDrawResources(SGEContext* context)
 	m_effect2DText = sgedev->requestResource<ShadingProgram>();
 	const std::string effect2DTextCode = std::string("#define COLOR_TEXTURE\n#define COLOR_TEXTURE_TEXT_MODE\n") + EFFECT_2D_UBERSHADER;
 	m_effect2DText->createFromCustomHLSL(effect2DTextCode.c_str(), effect2DTextCode.c_str());
-
 
 	rsDefault = sgedev->requestResource<RasterizerState>();
 	rsDefault->create(RasterDesc());
