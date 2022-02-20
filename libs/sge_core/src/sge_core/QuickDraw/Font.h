@@ -44,6 +44,7 @@ struct SGE_CORE_API QuickFont {
 	/// from colliding when typeset without extra leading.
 	float height = 0.f; // The height of the baked font (EM in the picture above).
 	float maxTopToBaseline = 0.f;
+	float maxBaselineToBottom = 0.f;
 	stbtt_bakedchar cdata[256];
 	GpuHandle<Texture> texture;
 };

@@ -59,6 +59,11 @@ bool QuickFont::createFromFileData(
 		if (fabsf(ch.yoff) > maxTopToBaseline) {
 			maxTopToBaseline = fabsf(ch.yoff);
 		}
+
+		float baselineToBottom = float(height) - fabsf(ch.yoff);
+		if (baselineToBottom > maxBaselineToBottom) {
+			maxBaselineToBottom = baselineToBottom;
+		}
 	}
 
 	// Create a the texture for the font.

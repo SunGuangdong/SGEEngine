@@ -69,23 +69,144 @@ void TextRenderer::create(SGEContext* sgecon)
 }
 
 Box2f TextRenderer::computeTextMetricsInternal(
-    QuickFont& font, float fontSize, const char* asciiText, std::vector<TextVertex>* outVertices)
+    QuickFont& font,
+    const TextRenderer::TextDisplaySettings& displaySets,
+    const char* asciiText,
+    std::vector<TextVertex>* outVertices)
 {
 	Box2f textBbox;
 
-	const float sizeScaling = (fontSize > 0.f) ? fontSize / (float)font.height : 1.f;
+	const float fontHeight = (displaySets.fontHeight > 0.f) ? displaySets.fontHeight : (float)font.height;
+	const float sizeScaling = fontHeight / (float)font.height;
 
 	const float invTexWidth = 1.f / float(font.texture->getDesc().texture2D.width);
 	const float invTexHeight = 1.f / float(font.texture->getDesc().texture2D.height);
 
-	vec2f nextCharacterPos = vec2f(0.f, 0.f); // Where is the baseline and x position of the next character.
-	while (*asciiText != '\0') {
-		if (*asciiText == '\n') {
-			// Move the cursor to a new line and reset the x position.
-			nextCharacterPos.x = 0.f;
-			nextCharacterPos.y += sizeScaling * font.height;
-			asciiText += 1;
-			continue;
+	int iCurrentLine = 0;
+	float nextCharacterPosX = 0.f; // Where is the baseline and x position of the next character.
+	int currentLine1stVertexIdx = outVertices ? int(outVertices->size()) : 0;
+	const int text1stVertex = currentLine1stVertexIdx;
+
+	Box2f currentLineBBox;
+	while (true) {
+		if (*asciiText == '\n' || *asciiText == '\0') {
+			// We are switcing to a new line, apply the alignement.
+			{
+				switch (displaySets.horizontalAlign) {
+					case horizontalAlign_left: {
+						// nothing to do.
+					} break;
+					case horizontalAlign_middle: {
+						const float halfSizeX = currentLineBBox.size().x * 0.5f;
+						currentLineBBox.move(vec2f(-halfSizeX, 0.f));
+						if (outVertices) {
+							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
+								outVertices->at(iVert).position.x -= halfSizeX;
+							}
+						}
+					} break;
+					case horizontalAlign_right: {
+						const float sizeX = currentLineBBox.size().x;
+						currentLineBBox.move(vec2f(-sizeX, 0.f));
+						if (outVertices) {
+							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
+								outVertices->at(iVert).position.x -= sizeX;
+							}
+						}
+					} break;
+					default:
+						sgeAssert(false);
+				}
+			}
+
+			// Y alignment
+			{
+				switch (displaySets.verticalAlign) {
+					case verticalAlign_top: {
+						const float currentBaselineYPos = float(iCurrentLine) * fontHeight;
+						const float yShiftToAlignment = currentLineBBox.min.y;
+						const float totalMovementToAlign = currentBaselineYPos - yShiftToAlignment;
+
+						currentLineBBox.move(vec2f(0.f, totalMovementToAlign));
+
+						if (outVertices) {
+							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
+								outVertices->at(iVert).position.y += totalMovementToAlign;
+							}
+						}
+					} break;
+					case verticalAlign_baseLine: {
+						const float currentBaselineYPos = float(iCurrentLine) * fontHeight;
+						const float totalMovementToAlign = currentBaselineYPos;
+
+						currentLineBBox.move(vec2f(0.f, totalMovementToAlign));
+
+						if (outVertices && currentBaselineYPos != 0.f) {
+							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
+								outVertices->at(iVert).position.y += totalMovementToAlign;
+							}
+						}
+					} break;
+					case verticalAlign_middle: {
+						const float currentBaselineYPos = float(iCurrentLine) * fontHeight;
+						const float yShiftToAlignment = currentLineBBox.center().y;
+						const float totalMovementToAlign = currentBaselineYPos - yShiftToAlignment;
+
+						currentLineBBox.move(vec2f(0.f, totalMovementToAlign));
+
+						if (outVertices) {
+							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
+								outVertices->at(iVert).position.y += totalMovementToAlign;
+							}
+						}
+
+					} break;
+					case verticalAlign_bottom: {
+						if (!textBbox.IsEmpty()) {
+							// Shift the prevous lines 1 height above to make space for the current line.
+							textBbox.move(vec2f(0.f, -fontHeight));
+						}
+
+						// Shift the current line above, by its "overhang" below the baseline.
+						const float yShiftToAlignment = -currentLineBBox.max.y;
+						currentLineBBox.move(vec2f(0.f, yShiftToAlignment));
+
+						// We shift the vertices the same way we did the bounding box.
+						if (outVertices) {
+							for (int iVert = text1stVertex; iVert < outVertices->size(); ++iVert) {
+								if (iVert >= currentLine1stVertexIdx) {
+									// Shift the prevous lines 1 height above to make space for the current line.
+									outVertices->at(iVert).position.y += yShiftToAlignment;
+								}
+								else {
+									// Move the part of the current line line that is below the baseline upwards.
+									outVertices->at(iVert).position.y -= fontHeight;
+								}
+							}
+						}
+
+
+					} break;
+					default:
+						sgeAssert(false);
+				}
+			}
+
+			// Reset the line X position.
+			nextCharacterPosX = 0.f;
+			currentLine1stVertexIdx = outVertices ? int(outVertices->size()) : 0;
+			textBbox.expand(currentLineBBox);
+			currentLineBBox = Box2f();
+			iCurrentLine += 1;
+
+			if (*asciiText == '\0') {
+				// This is the while(true) exit.
+				break;
+			}
+			else {
+				asciiText += 1;
+				continue;
+			}
 		}
 
 		const stbtt_bakedchar& ch = font.cdata[*asciiText];
@@ -96,16 +217,17 @@ Box2f TextRenderer::computeTextMetricsInternal(
 		characteBox.expand(vec2f(float(ch.x1 - ch.x0), float(ch.y1 - ch.y0)));
 
 		// Shift the bbox so it is aligned to the baseline of 0,0.
+		// ch has xoffs, I'm not sure if it is really needed.
 		characteBox.move(vec2f(0.f, ch.yoff));
 
 		// Now apply the scaling of the font size.
 		characteBox.scale(sizeScaling);
 
 		// Now Move the bounding box to its location in the text.
-		characteBox.move(nextCharacterPos);
+		characteBox.move(vec2f(nextCharacterPosX, 0.f));
 
 		// Accumulate the total bounding box of the whole text.
-		textBbox.expand(characteBox);
+		currentLineBBox.expand(characteBox);
 
 		// Create the verices.
 		if (*asciiText != ' ') {
@@ -140,7 +262,7 @@ Box2f TextRenderer::computeTextMetricsInternal(
 		}
 
 		// Change the next character starting position.
-		nextCharacterPos.x += sizeScaling * ch.xadvance;
+		nextCharacterPosX += sizeScaling * ch.xadvance;
 
 		asciiText++;
 	}
@@ -158,12 +280,28 @@ void TextRenderer::drawText2d(
     const Rect2s* scissors = nullptr)
 {
 	mat4f transform = mat4f::getTranslation(position.x, position.y, 0.f);
-	drawText2d(font, fontSize, asciiText, transform, rdest, colorTint, scissors);
+	drawText2d(font, TextDisplaySettings(fontSize), asciiText, transform, rdest, colorTint, scissors);
+}
+
+/// A shortcut for @drawText2d where you specify the position of the text.
+/// The text is aligned on its baseline, meaning if you pass (0,0) for position it will get
+/// draw on the top left of the screen with most of the text not being visible.
+void TextRenderer::drawText2d(
+    QuickFont& font,
+    const TextRenderer::TextDisplaySettings& displaySets,
+    const char* asciiText,
+    const vec2f& position,
+    const RenderDestination& rdest,
+    vec4f colorTint,
+    const Rect2s* scissors)
+{
+	mat4f transform = mat4f::getTranslation(position.x, position.y, 0.f);
+	drawText2d(font, displaySets, asciiText, transform, rdest, colorTint, scissors);
 }
 
 void TextRenderer::drawText2d(
     QuickFont& font,
-    float fontSize,
+    const TextRenderer::TextDisplaySettings& displaySets,
     const char* asciiText,
     const mat4f& transform,
     const RenderDestination& rdest,
@@ -178,7 +316,7 @@ void TextRenderer::drawText2d(
 	    mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
 
 	vertices.clear();
-	computeTextMetricsInternal(font, fontSize, asciiText, &vertices);
+	computeTextMetricsInternal(font, displaySets, asciiText, &vertices);
 
 	if (vertices.empty()) {
 		return;
