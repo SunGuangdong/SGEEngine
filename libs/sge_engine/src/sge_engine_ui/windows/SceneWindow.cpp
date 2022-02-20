@@ -2,7 +2,7 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/Camera.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
@@ -97,15 +97,15 @@ void SceneWindow::update(
 		drawSets.gameCamera = gameCamera;
 
 		if (world->gridShouldDraw) {
-			drawSets.quickDraw->drawWired_Clear();
-			drawSets.quickDraw->drawWiredAdd_Grid(
+			drawSets.quickDraw->getWire().drawWired_Clear();
+			drawSets.quickDraw->getWire().drawWiredAdd_Grid(
 			    vec3f(0.f),
 			    vec3f::getAxis(0, world->gridSegmentsSpacing),
 			    vec3f::getAxis(2, world->gridSegmentsSpacing),
 			    world->gridNumSegments.x,
 			    world->gridNumSegments.y,
 			    0xFF888888);
-			drawSets.quickDraw->drawWired_Execute(
+			drawSets.quickDraw->getWire().drawWired_Execute(
 			    drawSets.rdest,
 			    drawSets.drawCamera->getProjView(),
 			    getCore()->getGraphicsResources().BS_backToFrontAlpha);

@@ -18,7 +18,7 @@
 #include "EditorWindow.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/application.h"
 #include "sge_core/application/input.h"

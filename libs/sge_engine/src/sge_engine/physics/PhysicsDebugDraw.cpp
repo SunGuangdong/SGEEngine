@@ -1,7 +1,7 @@
 #include "PhysicsDebugDraw.h"
 #include "BulletHelper.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 
 namespace sge {
 
@@ -20,7 +20,7 @@ void BulletPhysicsDebugDraw::postDebugDraw()
 		return;
 	}
 
-	m_quickDraw->drawWired_Execute(cachedRdest, m_projView);
+	m_quickDraw->getWire().drawWired_Execute(cachedRdest, m_projView);
 
 	// Clear the result in order to not debug any strange crashes with invalidated pointers.
 	cachedRdest = RenderDestination();
@@ -40,7 +40,7 @@ void BulletPhysicsDebugDraw::drawLine(const btVector3& from, const btVector3& to
 		rgba |= clamp<int>((int)(color.z() * 255.f), 0, 255) << 16;
 		rgba |= 255 << 24;
 
-		m_quickDraw->drawWiredAdd_Line(fromBullet(from), fromBullet(to), rgba);
+		m_quickDraw->getWire().drawWiredAdd_Line(fromBullet(from), fromBullet(to), rgba);
 	}
 }
 

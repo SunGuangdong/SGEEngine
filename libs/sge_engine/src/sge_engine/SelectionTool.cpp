@@ -2,7 +2,7 @@
 
 #include "Actor.h"
 #include "GameInspector.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_utils/math/Box3f.h"
 
@@ -256,7 +256,7 @@ void SelectionTool::drawOverlay(const GameDrawSets& drawSets)
 		rect.expand(m_lastUpdateCursorPos);
 
 		BlendStateDesc const bsd = BlendStateDesc::GetDefaultBackToFrontAlpha();
-		drawSets.quickDraw->drawRect(
+		drawSets.quickDraw->getTextureDrawer().drawRect(
 		    drawSets.rdest,
 		    rect.min.x,
 		    rect.min.y,

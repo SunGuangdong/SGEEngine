@@ -1,7 +1,7 @@
 #include "sge_core/Camera.h"
 #include "sge_core/GameUI/UIContext.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_engine/EngineGlobal.h"
 #include "sge_engine/GameDrawer/DefaultGameDrawer.h"
@@ -90,10 +90,10 @@ void GamePlayWindow::update(SGEContext* const sgecon, GameInspector* UNUSED(insp
 		drawSets.drawCamera = gameCamera;
 		drawSets.gameCamera = gameCamera;
 
-		getCore()->getQuickDraw().drawWired_Clear();
-		getCore()->getQuickDraw().drawWiredAdd_Grid(
+		getCore()->getQuickDraw().getWire().drawWired_Clear();
+		getCore()->getQuickDraw().getWire().drawWiredAdd_Grid(
 		    vec3f(0.f), vec3f::getAxis(0) * 1.f, vec3f::getAxis(2) * 1.f, 10, 10, 0x33FFFFFF);
-		getCore()->getQuickDraw().drawWired_Execute(
+		getCore()->getQuickDraw().getWire().drawWired_Execute(
 		    drawSets.rdest, drawSets.drawCamera->getProjView(), getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 		// Draw the game world.

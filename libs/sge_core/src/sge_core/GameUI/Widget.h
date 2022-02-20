@@ -22,7 +22,7 @@ namespace sge {
 
 struct QuickDraw;
 struct InputState;
-struct DebugFont;
+struct QuickFont;
 
 } // namespace sge
 
@@ -216,7 +216,7 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 
 	void setColor(const vec4f& c) { m_color = c; }
 	void setText(std::string s) { m_text = std::move(s); }
-	void setFont(DebugFont* font) { m_font = font; }
+	void setFont(QuickFont* font) { m_font = font; }
 	void setFontSize(Unit fontSize) { m_fontSize = fontSize; }
 
 	bool m_algnTextHCenter = true;
@@ -227,7 +227,7 @@ struct SGE_CORE_API TextWidget final : public IWidget {
 	bool isScrollingY = false;
 
   private:
-	DebugFont* m_font = nullptr;
+	QuickFont* m_font = nullptr;
 	vec4f m_color = vec4f(1.f);
 	Unit m_fontSize = Unit::fromFrac(1.f);
 	std::string m_text;
@@ -282,7 +282,7 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 	}
 	void setText(std::string s) { m_text = std::move(s); }
 	void setArrow(SignedAxis axis) { m_triangleDir = axis; }
-	void setFont(DebugFont* font) { m_font = font; }
+	void setFont(QuickFont* font) { m_font = font; }
 	void setFontSize(Unit fontSize) { m_fontSize = fontSize; }
 
 	bool onHoverEnter() override
@@ -324,7 +324,7 @@ struct SGE_CORE_API ButtonWidget final : public IWidget {
 	bool m_isHovered = false;
 	bool m_isPressed = false;
 
-	DebugFont* m_font = nullptr;
+	QuickFont* m_font = nullptr;
 	vec4f m_textColor = vec4f(1.f);
 	vec4f m_bgColorUp = colorBlack(0.66f);
 	vec4f m_bgColorHovered = colorBlack(0.78f);

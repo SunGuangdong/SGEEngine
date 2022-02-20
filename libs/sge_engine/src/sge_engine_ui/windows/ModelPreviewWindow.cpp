@@ -3,7 +3,7 @@
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/Camera.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
 #include "sge_core/materials/IGeometryDrawer.h"
@@ -77,12 +77,11 @@ void ModelPreviewWidget::doWidget(
 	sgecon->clearColor(m_frameTarget, 0, vec4f(0.f).data);
 	sgecon->clearDepth(m_frameTarget, 1.f);
 
-	QuickDraw& debugDraw = getCore()->getQuickDraw();
-
-
-	debugDraw.drawWired_Clear();
-	debugDraw.drawWiredAdd_Grid(vec3f(0), vec3f::getAxis(0), vec3f::getAxis(2), 5, 5, 0xFF333733);
-	debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
+	WireframeDrawer& wireDraw = getCore()->getQuickDraw().getWire();
+	
+	wireDraw.drawWired_Clear();
+	wireDraw.drawWiredAdd_Grid(vec3f(0), vec3f::getAxis(0), vec3f::getAxis(2), 5, 5, 0xFF333733);
+	wireDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
 
 	RawCamera rawCamera = RawCamera(camera.eyePosition(), lookAt, proj);
 	drawEvalModel(
@@ -263,8 +262,8 @@ void ModelPreviewWindow::update(SGEContext* const sgecon, struct GameInspector* 
 
 			RenderDestination rdest(sgecon, m_frameTarget, m_frameTarget->getViewport());
 
-			debugDraw.drawWiredAdd_Grid(vec3f(0), vec3f::getAxis(0), vec3f::getAxis(2), 5, 5, 0xFF333733);
-			debugDraw.drawWired_Execute(rdest, proj * lookAt, nullptr);
+			debugDraw.getWire().drawWiredAdd_Grid(vec3f(0), vec3f::getAxis(0), vec3f::getAxis(2), 5, 5, 0xFF333733);
+			debugDraw.getWire().drawWired_Execute(rdest, proj * lookAt, nullptr);
 
 			RawCamera rawCamera = RawCamera(camera.eyePosition(), lookAt, proj);
 			drawEvalModel(rdest, rawCamera, mat4f::getIdentity(), ObjectLighting(), m_eval, InstanceDrawMods());

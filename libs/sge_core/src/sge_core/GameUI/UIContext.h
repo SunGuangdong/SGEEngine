@@ -1,6 +1,7 @@
 #pragma once
 
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/Font.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/vec2f.h"
@@ -11,7 +12,7 @@
 namespace sge {
 
 struct QuickDraw;
-struct DebugFont;
+struct QuickFont;
 struct InputState;
 
 namespace gamegui {
@@ -43,9 +44,9 @@ namespace gamegui {
 
 		void setCanvasSize(const vec2i& canvas) { m_canvasSize = canvas; }
 
-		void setDefaultFont(DebugFont* f) { m_fontToUse = f; }
+		void setDefaultFont(QuickFont* f) { m_fontToUse = f; }
 
-		DebugFont* getDefaultFont() { return m_fontToUse; }
+		QuickFont* getDefaultFont() { return m_fontToUse; }
 
 		std::shared_ptr<IWidget> getGamepadTarget() { return m_gamepadTargetWeak.lock(); }
 
@@ -57,10 +58,10 @@ namespace gamegui {
 		std::vector<std::shared_ptr<IWidget>> m_rootWidgets;
 		std::weak_ptr<IWidget> m_pressedWidgetWeak;
 		std::weak_ptr<IWidget> m_gamepadTargetWeak;
-		DebugFont* m_fontToUse = nullptr;
+		QuickFont* m_fontToUse = nullptr;
 		float m_gamepadDirInputCooldown = 0.f;
 
-		DebugFont defaultFont;
+		QuickFont defaultFont;
 	};
 } // namespace gamegui
 

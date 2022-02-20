@@ -1,6 +1,6 @@
 #pragma once
 
-#include "QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sgecore_api.h"
 #include <unordered_map>
 

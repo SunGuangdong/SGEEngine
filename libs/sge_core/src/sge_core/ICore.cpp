@@ -1,7 +1,7 @@
 #include "ICore.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/DebugDraw.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/input.h"
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"

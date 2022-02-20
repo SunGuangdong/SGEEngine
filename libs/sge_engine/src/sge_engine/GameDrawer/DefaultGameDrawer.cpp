@@ -2,7 +2,7 @@
 #include "sge_core/Camera.h"
 #include "sge_core/DebugDraw.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/materials/DefaultPBRMtl/DefaultPBRMtl.h"
 #include "sge_core/materials/IMaterial.h"
 #include "sge_core/shaders/LightDesc.h"
@@ -739,7 +739,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {
 		QuickDraw* qdraw = drawSets.quickDraw;
-		qdraw->drawWired_Clear();
+		qdraw->getWire().drawWired_Clear();
 
 		Actor* ownerActor = dynamic_cast<Actor*>(ri.traitParticles->getObject());
 		bool hasPreviewGroup =
@@ -752,7 +752,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
 
 			switch (pgdesc.birthShape.shapeType) {
 				case birthShape_sphere: {
-					qdraw->drawWiredAdd_Sphere(
+					qdraw->getWire().drawWiredAdd_Sphere(
 					    n2w * mat4f::getTranslation(pgdesc.birthShape.sphere.sphereCenter),
 					    0x00ff00ff,
 					    pgdesc.birthShape.sphere.sphereRadius);
@@ -765,8 +765,8 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
 					vec3f planeNormal = pgdesc.birthShape.plane.planeRotation.getDirection() * arrowLen;
 					planeNormal = mat_mul_dir(n2w, planeNormal);
 
-					qdraw->drawWiredAdd_Grid(planeOrigin, planeX, planeZ, 2, 2, 0x00ff00ff);
-					qdraw->drawWiredAdd_Arrow(planeOrigin, planeNormal, 0x00ff00ff);
+					qdraw->getWire().drawWiredAdd_Grid(planeOrigin, planeX, planeZ, 2, 2, 0x00ff00ff);
+					qdraw->getWire().drawWiredAdd_Arrow(planeOrigin, planeNormal, 0x00ff00ff);
 				} break;
 				case birthShape_point: {
 				} break;
@@ -778,7 +778,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
 					                              pgdesc.birthShape.circle.circleRotation.toQuaternion(),
 					                              vec3f(1.f));
 
-					qdraw->drawWiredAdd_EllipseXZ(
+					qdraw->getWire().drawWiredAdd_EllipseXZ(
 					    circleTform,
 					    pgdesc.birthShape.circle.circleRadius,
 					    pgdesc.birthShape.circle.circleRadius,
@@ -793,14 +793,14 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
 						vec3f arrowTo = vel.directional.directon.getDirection() * vel.directional.velocityAmount;
 
 						arrowTo = mat_mul_dir(n2w, arrowTo) + arrowFrom;
-						qdraw->drawWiredAdd_Arrow(arrowFrom, arrowTo, color);
+						qdraw->getWire().drawWiredAdd_Arrow(arrowFrom, arrowTo, color);
 					} break;
 					case VelictyForce_towardsPoint: {
 						mat4f n2wSphere = n2w;
 						n2wSphere.c3.x = vel.towardsPoint.pointLocation.x;
 						n2wSphere.c3.y = vel.towardsPoint.pointLocation.y;
 						n2wSphere.c3.z = vel.towardsPoint.pointLocation.z;
-						qdraw->drawWiredAdd_Sphere(n2w, color, 0.1f, 2);
+						qdraw->getWire().drawWiredAdd_Sphere(n2w, color, 0.1f, 2);
 					} break;
 					case VelictyForce_spherical: {
 						mat4f n2wSphere = n2w;
@@ -825,13 +825,13 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
 						arrowOrigin = mat_mul_pos(n2w, arrowOrigin);
 
 						for (const vec3f& arrowEnd : arrowEnds) {
-							qdraw->drawWiredAdd_Arrow(arrowOrigin, arrowEnd, color);
+							qdraw->getWire().drawWiredAdd_Arrow(arrowOrigin, arrowEnd, color);
 						}
 
 						n2wSphere.c3.x = vel.spherical.sphereCenter.x;
 						n2wSphere.c3.y = vel.spherical.sphereCenter.y;
 						n2wSphere.c3.z = vel.spherical.sphereCenter.z;
-						qdraw->drawWiredAdd_Sphere(n2w, color, vel.spherical.velocityAmount, 2);
+						qdraw->getWire().drawWiredAdd_Sphere(n2w, color, vel.spherical.velocityAmount, 2);
 
 					} break;
 				}
@@ -843,7 +843,7 @@ void DefaultGameDrawer::drawRenderItem_TraitParticlesSimple(
 				drawParticleForce(qdraw, n2w, vel, 0xff00ff00);
 			}
 
-			qdraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+			qdraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
 	}
 }
@@ -902,8 +902,8 @@ void DefaultGameDrawer::drawHelperActor_drawANavMesh(
 	// Draw the bounding box of the nav-mesh. This box basically shows where is the area where the nav-mesh is going to
 	// be built.
 	if (drawReason_IsEditOrSelectionTool(drawReason)) {
-		drawSets.quickDraw->drawWiredAdd_Box(navMesh.getTransformMtx(), colorToIntRgba(wireframeColor));
-		drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+		drawSets.quickDraw->getWire().drawWiredAdd_Box(navMesh.getTransformMtx(), colorToIntRgba(wireframeColor));
+		drawSets.quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 	}
 
 	if (drawReason_IsVisualizeSelection(drawReason)) {
@@ -911,7 +911,7 @@ void DefaultGameDrawer::drawHelperActor_drawANavMesh(
 		wireframeColorAlphaFloat.w = 0.5f;
 		uint32 wireframeColorAlpha = colorToIntRgba(wireframeColorAlphaFloat);
 
-		drawSets.quickDraw->drawWired_Clear();
+		drawSets.quickDraw->getWire().drawWired_Clear();
 		// A small value that we add to each vertex (in world space) so that the contruction and nav-mesh
 		// geometry does not end-up z-fighting in the viewport.
 		// The proper solution would be an actual depth bias, but since this is an editor only (and used usuually only
@@ -923,8 +923,8 @@ void DefaultGameDrawer::drawHelperActor_drawANavMesh(
 			vec3f b = navMesh.m_debugDrawNavMeshTriListWs[iTri * 3 + 1] + fightingPositionBias;
 			vec3f c = navMesh.m_debugDrawNavMeshTriListWs[iTri * 3 + 2] + fightingPositionBias;
 
-			drawSets.quickDraw->drawSolidAdd_Triangle(a, b, c, wireframeColorAlpha);
-			drawSets.quickDraw->drawWiredAdd_triangle(a, b, c, colorToIntRgba(wireframeColor));
+			drawSets.quickDraw->getSolid().drawSolidAdd_Triangle(a, b, c, wireframeColorAlpha);
+			drawSets.quickDraw->getWire().drawWiredAdd_triangle(a, b, c, colorToIntRgba(wireframeColor));
 		}
 
 		const uint32 buildMeshColorInt = colorIntFromRGBA255(246, 189, 85);
@@ -934,16 +934,16 @@ void DefaultGameDrawer::drawHelperActor_drawANavMesh(
 			vec3f b = navMesh.m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 1] + fightingPositionBias;
 			vec3f c = navMesh.m_debugDrawNavMeshBuildTriListWs[iTri * 3 + 2] + fightingPositionBias;
 
-			drawSets.quickDraw->drawSolidAdd_Triangle(a, b, c, buildMeshColorAlphaInt);
-			drawSets.quickDraw->drawWiredAdd_triangle(a, b, c, buildMeshColorInt);
+			drawSets.quickDraw->getSolid().drawSolidAdd_Triangle(a, b, c, buildMeshColorAlphaInt);
+			drawSets.quickDraw->getWire().drawWiredAdd_triangle(a, b, c, buildMeshColorInt);
 		}
 
-		drawSets.quickDraw->drawSolid_Execute(
+		drawSets.quickDraw->getSolid().drawSolid_Execute(
 		    drawSets.rdest,
 		    drawSets.drawCamera->getProjView(),
 		    false,
 		    getCore()->getGraphicsResources().BS_backToFrontAlpha);
-		drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+		drawSets.quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 	}
 }
 
@@ -955,8 +955,8 @@ void DefaultGameDrawer::drawHelperActor_drawAParticlesSimple(
     const vec4f wireframeColor)
 {
 	QuickDraw* quickDraw = drawSets.quickDraw;
-	quickDraw->drawWiredAdd_EllipseXZ(particles.getTransformMtx(), 10.f, 10.f, colorToIntRgba(wireframeColor));
-	quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+	quickDraw->getWire().drawWiredAdd_EllipseXZ(particles.getTransformMtx(), 10.f, 10.f, colorToIntRgba(wireframeColor));
+	quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 }
 
 
@@ -981,18 +981,18 @@ void DefaultGameDrawer::drawHelperActor(
 	// is oriented, or its area of effect.
 	if (actorType == sgeTypeId(ALight) && drawReason_IsVisualizeSelection(drawReason)) {
 		if (editMode == editMode_actors) {
-			drawSets.quickDraw->drawWired_Clear();
+			drawSets.quickDraw->getWire().drawWired_Clear();
 
 			const ALight* const light = static_cast<const ALight*>(actor);
 			const vec3f color = light->getLightDesc().color;
 			const LightDesc lightDesc = light->getLightDesc();
 			if (lightDesc.type == light_point) {
 				const float sphereRadius = maxOf(lightDesc.range, 0.1f);
-				drawSets.quickDraw->drawWiredAdd_Sphere(actor->getTransformMtx(), wireframeColorInt, sphereRadius, 6);
+				drawSets.quickDraw->getWire().drawWiredAdd_Sphere(actor->getTransformMtx(), wireframeColorInt, sphereRadius, 6);
 			}
 			else if (lightDesc.type == light_directional) {
 				const float arrowLength = maxOf(lightDesc.intensity * 10.f, 1.f);
-				drawSets.quickDraw->drawWiredAdd_Arrow(
+				drawSets.quickDraw->getWire().drawWiredAdd_Arrow(
 				    actor->getTransform().p,
 				    actor->getTransform().p + light->getLightDirection() * arrowLength,
 				    wireframeColorInt);
@@ -1000,7 +1000,7 @@ void DefaultGameDrawer::drawHelperActor(
 			else if (lightDesc.type == light_spot) {
 				const float coneHeight = maxOf(lightDesc.range, 2.f);
 				const float coneRadius = tanf(lightDesc.spotLightAngle) * coneHeight;
-				drawSets.quickDraw->drawWiredAdd_ConeBottomAligned(
+				drawSets.quickDraw->getWire().drawWiredAdd_ConeBottomAligned(
 				    actor->getTransformMtx() * mat4f::getRotationX(deg2rad(-90.f)),
 				    wireframeColorInt,
 				    coneHeight,
@@ -1008,7 +1008,7 @@ void DefaultGameDrawer::drawHelperActor(
 				    6);
 			}
 
-			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+			drawSets.quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
 	}
 	else if (actorType == sgeTypeId(ABlockingObstacle) && editMode == editMode_actors) {
@@ -1098,11 +1098,11 @@ void DefaultGameDrawer::drawHelperActor(
 					    frustumVerts[7],
 					};
 
-					drawSets.quickDraw->drawWired_Clear();
+					drawSets.quickDraw->getWire().drawWired_Clear();
 					for (int t = 0; t < SGE_ARRSZ(lines); t += 2) {
-						drawSets.quickDraw->drawWiredAdd_Line(lines[t], lines[t + 1], wireframeColorInt);
+						drawSets.quickDraw->getWire().drawWiredAdd_Line(lines[t], lines[t + 1], wireframeColorInt);
 					}
-					drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+					drawSets.quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 				}
 			}
 		}
@@ -1127,26 +1127,28 @@ void DefaultGameDrawer::drawHelperActor(
 				vec3f p0 = mat_mul_pos(obj2world, spline->points[i0]);
 				vec3f p1 = mat_mul_pos(obj2world, spline->points[i1]);
 
-				getCore()->getQuickDraw().drawWiredAdd_Line(p0, p1, color);
-				getCore()->getQuickDraw().drawWiredAdd_Sphere(mat4f::getTranslation(p0), color, 0.2f, 3);
+				getCore()->getQuickDraw().getWire().drawWiredAdd_Line(p0, p1, color);
+				getCore()->getQuickDraw().getWire().drawWiredAdd_Sphere(mat4f::getTranslation(p0), color, 0.2f, 3);
 
 				if (iSegment == numSegments - 1) {
-					getCore()->getQuickDraw().drawWiredAdd_Sphere(mat4f::getTranslation(p1), color, 0.2f, 3);
+					getCore()->getQuickDraw().getWire().drawWiredAdd_Sphere(mat4f::getTranslation(p1), color, 0.2f, 3);
 				}
 			}
 
-			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
+			getCore()->getQuickDraw().getWire().drawWired_Execute(
+			    drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
 		else if (editMode == editMode_points) {
 			mat4f const tr = spline->getTransformMtx();
 
-			getCore()->getQuickDraw().drawWired_Clear();
-			getCore()->getQuickDraw().drawWiredAdd_Sphere(
+			getCore()->getQuickDraw().getWire().drawWired_Clear();
+			getCore()->getQuickDraw().getWire().drawWiredAdd_Sphere(
 			    tr * mat4f::getTranslation(spline->points[itemIndex]),
 			    isVisualizingSelection ? wireframeColorInt : 0xFFFFFFFF,
 			    0.2f,
 			    3);
-			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
+			getCore()->getQuickDraw().getWire().drawWired_Execute(
+			    drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
 	}
 	else if (actorType == sgeTypeId(ACRSpline) && drawReason_IsEditOrSelectionTool(drawReason)) {
@@ -1160,7 +1162,7 @@ void DefaultGameDrawer::drawHelperActor(
 
 			const float lenPerLine = 1.f;
 
-			getCore()->getQuickDraw().drawWired_Clear();
+			getCore()->getQuickDraw().getWire().drawWired_Clear();
 
 			vec3f p0;
 			spline->evaluateAtDistance(&p0, nullptr, 0.f);
@@ -1169,43 +1171,45 @@ void DefaultGameDrawer::drawHelperActor(
 				vec3f p1;
 				spline->evaluateAtDistance(&p1, nullptr, t);
 				p1 = mat_mul_pos(tr, p1);
-				getCore()->getQuickDraw().drawWiredAdd_Line(p0, p1, color);
+				getCore()->getQuickDraw().getWire().drawWiredAdd_Line(p0, p1, color);
 				p0 = p1;
 			}
 
 			for (int t = 0; t < spline->getNumPoints(); t++) {
 				vec3f worldPos = mat_mul_pos(tr, spline->points[t]);
 				if (t == 0)
-					getCore()->getQuickDraw().drawWiredAdd_Box(
+					getCore()->getQuickDraw().getWire().drawWiredAdd_Box(
 					    mat4f::getTRS(worldPos, quatf::getIdentity(), vec3f(pointScale)), color);
 				else
-					getCore()->getQuickDraw().drawWiredAdd_Sphere(
+					getCore()->getQuickDraw().getWire().drawWiredAdd_Sphere(
 					    mat4f::getTranslation(worldPos), color, pointScale, 3);
 			}
 
-			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
+			getCore()->getQuickDraw().getWire().drawWired_Execute(
+			    drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
 		else if (editMode == editMode_points) {
-			getCore()->getQuickDraw().drawWired_Clear();
-			getCore()->getQuickDraw().drawWiredAdd_Sphere(
+			getCore()->getQuickDraw().getWire().drawWired_Clear();
+			getCore()->getQuickDraw().getWire().drawWiredAdd_Sphere(
 			    tr * mat4f::getTranslation(spline->points[itemIndex]),
 			    isVisualizingSelection ? wireframeColorInt : 0xFFFFFFFF,
 			    pointScale,
 			    3);
-			getCore()->getQuickDraw().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
+			getCore()->getQuickDraw().getWire().drawWired_Execute(
+			    drawSets.rdest, drawSets.drawCamera->getProjView(), nullptr);
 		}
 	}
 	else if (actorType == sgeTypeId(ALocator) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		if (editMode == editMode_actors) {
-			drawSets.quickDraw->drawWired_Clear();
-			drawSets.quickDraw->drawWiredAdd_Basis(actor->getTransformMtx());
-			drawSets.quickDraw->drawWiredAdd_Box(actor->getTransformMtx(), wireframeColorInt);
-			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+			drawSets.quickDraw->getWire().drawWired_Clear();
+			drawSets.quickDraw->getWire().drawWiredAdd_Basis(actor->getTransformMtx());
+			drawSets.quickDraw->getWire().drawWiredAdd_Box(actor->getTransformMtx(), wireframeColorInt);
+			drawSets.quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
 	}
 	else if (actorType == sgeTypeId(ABone) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		if (editMode == editMode_actors) {
-			drawSets.quickDraw->drawWired_Clear();
+			drawSets.quickDraw->getWire().drawWired_Clear();
 
 			ABone* const bone = static_cast<ABone*>(actor);
 			GameWorld* world = bone->getWorld();
@@ -1227,7 +1231,7 @@ void DefaultGameDrawer::drawHelperActor(
 							    vec3f(1.f, 0.f, 0.f), boneDirVectorWs.normalized0(), vec3f(0.f, 0.f, 1.f));
 							vec3f translWs = boneFromWs;
 							mat4f visualBoneTransformWs = mat4f::getTRS(translWs, rotationWs, vec3f(1.f));
-							drawSets.quickDraw->drawWiredAdd_Bone(
+							drawSets.quickDraw->getWire().drawWiredAdd_Bone(
 							    visualBoneTransformWs, boneDirVectorWs.length(), bone->boneLength, selectionTint);
 						}
 					}
@@ -1237,15 +1241,15 @@ void DefaultGameDrawer::drawHelperActor(
 						Actor* child = world->getActorById(childId);
 						if (child != nullptr) {
 							vec3f boneToWs = child->getPosition();
-							drawSets.quickDraw->drawWiredAdd_Line(boneFromWs, boneToWs, wireframeColorInt);
+							drawSets.quickDraw->getWire().drawWiredAdd_Line(boneFromWs, boneToWs, wireframeColorInt);
 						}
 					}
 				}
 			}
 
 			// Dreaw the location of the bone.
-			drawSets.quickDraw->drawWiredAdd_Sphere(bone->getTransformMtx(), wireframeColorInt, boneLength / 12.f, 6);
-			drawSets.quickDraw->drawWired_Execute(
+			drawSets.quickDraw->getWire().drawWiredAdd_Sphere(bone->getTransformMtx(), wireframeColorInt, boneLength / 12.f, 6);
+			drawSets.quickDraw->getWire().drawWired_Execute(
 			    drawSets.rdest,
 			    drawSets.drawCamera->getProjView(),
 			    nullptr,
@@ -1254,9 +1258,9 @@ void DefaultGameDrawer::drawHelperActor(
 	}
 	else if ((actorType == sgeTypeId(AInvisibleRigidObstacle)) && drawReason_IsEditOrSelectionTool(drawReason)) {
 		if (editMode == editMode_actors) {
-			drawSets.quickDraw->drawWired_Clear();
-			drawSets.quickDraw->drawWiredAdd_Box(actor->getTransformMtx(), actor->getBBoxOS(), wireframeColorInt);
-			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+			drawSets.quickDraw->getWire().drawWired_Clear();
+			drawSets.quickDraw->getWire().drawWiredAdd_Box(actor->getTransformMtx(), actor->getBBoxOS(), wireframeColorInt);
+			drawSets.quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
 	}
 	else if (actorType == sgeTypeId(AInfinitePlaneObstacle) && drawReason_IsEditOrSelectionTool(drawReason)) {
@@ -1264,12 +1268,12 @@ void DefaultGameDrawer::drawHelperActor(
 			AInfinitePlaneObstacle* plane = static_cast<AInfinitePlaneObstacle*>(actor);
 			const float scale = plane->displayScale * plane->getTransform().s.componentMaxAbs();
 
-			drawSets.quickDraw->drawWired_Clear();
-			drawSets.quickDraw->drawWiredAdd_Arrow(
+			drawSets.quickDraw->getWire().drawWired_Clear();
+			drawSets.quickDraw->getWire().drawWiredAdd_Arrow(
 			    actor->getPosition(), actor->getPosition() + actor->getDirY() * scale, wireframeColorInt);
-			drawSets.quickDraw->drawWiredAdd_Grid(
+			drawSets.quickDraw->getWire().drawWiredAdd_Grid(
 			    actor->getPosition(), actor->getDirX() * scale, actor->getDirZ() * scale, 1, 1, wireframeColorInt);
-			drawSets.quickDraw->drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
+			drawSets.quickDraw->getWire().drawWired_Execute(drawSets.rdest, drawSets.drawCamera->getProjView());
 		}
 	}
 	else if (actorType == sgeTypeId(ANavMesh)) {

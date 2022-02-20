@@ -1,7 +1,7 @@
-#include "TextRender2D.h"
-
+#include "TextRender.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/Font.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 
 namespace sge {
 
@@ -43,8 +43,10 @@ float4 psMain(VERTEX_OUT IN) : COLOR {
 
 )";
 
-void TextRenderer::create(SGEDevice* sgedev)
+void TextRenderer::create(SGEContext* sgecon)
 {
+	SGEDevice* sgedev = sgecon->getDevice();
+
 	shader = sgedev->requestResource<ShadingProgram>();
 	shader->createFromCustomHLSL(TEXT_2D_SHADER, TEXT_2D_SHADER);
 
@@ -66,22 +68,10 @@ void TextRenderer::create(SGEDevice* sgedev)
 	vertexDeclIndex = sgedev->getVertexDeclIndex(vertexDecl, SGE_ARRSZ(vertexDecl));
 }
 
-void TextRenderer::drawText(
-    const RenderDestination& rdest,
-    const mat4f& transform,
-    vec4f colorTint,
-    const char* asciiText,
-    DebugFont& font,
-    float fontSize)
+Box2f TextRenderer::computeTextMetricsInternal(
+    QuickFont& font, float fontSize, const char* asciiText, std::vector<TextVertex>* outVertices)
 {
-	if (asciiText == nullptr) {
-		return;
-	}
-
-	const mat4f ortho =
-	    mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
-
-	vertices.clear();
+	Box2f textBbox;
 
 	const float sizeScaling = (fontSize > 0.f) ? fontSize / (float)font.height : 1.f;
 
@@ -114,6 +104,9 @@ void TextRenderer::drawText(
 		// Now Move the bounding box to its location in the text.
 		characteBox.move(nextCharacterPos);
 
+		// Accumulate the total bounding box of the whole text.
+		textBbox.expand(characteBox);
+
 		// Create the verices.
 		if (*asciiText != ' ') {
 			// v3---v2
@@ -135,13 +128,15 @@ void TextRenderer::drawText(
 			v3.position = vec2f(characteBox.min.x, characteBox.min.y);
 			v3.uv = vec2f(float(ch.x0) * invTexWidth, float(ch.y0) * invTexHeight);
 
-			vertices.push_back(v0);
-			vertices.push_back(v1);
-			vertices.push_back(v2);
+			if (outVertices) {
+				outVertices->push_back(v0);
+				outVertices->push_back(v1);
+				outVertices->push_back(v2);
 
-			vertices.push_back(v0);
-			vertices.push_back(v2);
-			vertices.push_back(v3);
+				outVertices->push_back(v0);
+				outVertices->push_back(v2);
+				outVertices->push_back(v3);
+			}
 		}
 
 		// Change the next character starting position.
@@ -149,6 +144,41 @@ void TextRenderer::drawText(
 
 		asciiText++;
 	}
+
+	return textBbox;
+}
+
+void TextRenderer::drawText2d(
+    QuickFont& font,
+    float fontSize,
+    const char* asciiText,
+    const vec2f& position,
+    const RenderDestination& rdest,
+    vec4f colorTint,
+    const Rect2s* scissors = nullptr)
+{
+	mat4f transform = mat4f::getTranslation(position.x, position.y, 0.f);
+	drawText2d(font, fontSize, asciiText, transform, rdest, colorTint, scissors);
+}
+
+void TextRenderer::drawText2d(
+    QuickFont& font,
+    float fontSize,
+    const char* asciiText,
+    const mat4f& transform,
+    const RenderDestination& rdest,
+    vec4f colorTint,
+    const Rect2s* scissors = nullptr)
+{
+	if (asciiText == nullptr) {
+		return;
+	}
+
+	const mat4f ortho =
+	    mat4f::getOrthoRH(rdest.viewport.width, rdest.viewport.height, 0.f, 1000.f, kIsTexcoordStyleD3D);
+
+	vertices.clear();
+	computeTextMetricsInternal(font, fontSize, asciiText, &vertices);
 
 	if (vertices.empty()) {
 		return;
@@ -197,7 +227,7 @@ void TextRenderer::drawText(
 	drawCall.setUniforms(boundUnforms, SGE_ARRSZ(boundUnforms));
 	drawCall.draw(int(vertices.size()), 0);
 
-	rdest.sgecon->executeDrawCall(drawCall, rdest.frameTarget, &rdest.viewport, nullptr);
+	rdest.sgecon->executeDrawCall(drawCall, rdest.frameTarget, &rdest.viewport, scissors);
 }
 
 } // namespace sge

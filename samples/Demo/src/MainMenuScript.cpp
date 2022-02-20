@@ -1,8 +1,8 @@
 #include "sge_core/GameUI/UIContext.h"
 #include "sge_core/GameUI/Widget.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
-#include "sge_core/QuickDraw/TextRender2D.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
+#include "sge_core/QuickDraw/TextRender.h"
 #include "sge_engine/GameDrawer/GameDrawer.h"
 #include "sge_engine/GameWorld.h"
 #include "sge_engine/IWorldScript.h"
@@ -14,7 +14,7 @@ using namespace gamegui;
 
 struct MainMenuScript final : public IWorldScript {
 	gamegui::UIContext uiContext;
-	DebugFont font;
+	QuickFont font;
 	std::shared_ptr<gamegui::InvisibleWidget> rootMenuWidget;
 	std::shared_ptr<gamegui::InvisibleWidget> mainMenuButtonsWidget;
 	std::vector<EventSubscription> eventSubs;
@@ -49,7 +49,7 @@ struct MainMenuScript final : public IWorldScript {
 
 		uiContext.addRootWidget(rootMenuWidget);
 
-		textRenderer.create(getCore()->getDevice());
+		textRenderer.create(getCore()->getDevice()->getContext());
 	}
 
 	void onPostUpdate(const GameUpdateSets& u) override
@@ -67,13 +67,8 @@ struct MainMenuScript final : public IWorldScript {
 		// drawSets.quickDraw->drawTextLazy(drawSets.rdest, *uiContext.getDefaultFont(), vec2f(0.f, 128.f), vec4f(1.f),
 		// "Qwop!\nQwok!", 128.f);
 
-		textRenderer.drawText(
-		    drawSets.rdest,
-		    mat4f::getTranslation(0.f, 128.f, 0.f),
-		    vec4f(1.f),
-		    "Settings?",
-		    *uiContext.getDefaultFont(),
-		    64.f);
+		textRenderer.drawText2d(
+		    *uiContext.getDefaultFont(), 64.f, "Settings?", vec2f(0.f, 128.f), drawSets.rdest, vec4f(1.f), nullptr);
 	}
 };
 

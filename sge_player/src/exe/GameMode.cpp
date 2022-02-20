@@ -1,6 +1,6 @@
 #include "GameMode.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 
 namespace sge {
 void GameMode::create(IGameDrawer* gameDrawer, const char* openingLevelPath)

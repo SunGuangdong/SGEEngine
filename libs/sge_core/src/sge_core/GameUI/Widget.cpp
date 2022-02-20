@@ -1,7 +1,7 @@
 #include <functional>
 
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/application/input.h"
 #include "sge_utils/math/color.h"
 
@@ -102,7 +102,7 @@ std::shared_ptr<ColoredWidget> ColoredWidget::create(UIContext& owningContext, P
 void ColoredWidget::draw(const UIDrawSets& drawSets)
 {
 	const Box2f bboxScissorsSS = getScissorBoxSS();
-	drawSets.quickDraw->drawRect(
+	drawSets.quickDraw->getTextureDrawer().drawRect(
 	    drawSets.rdest,
 	    bboxScissorsSS.min.x,
 	    bboxScissorsSS.min.y,
@@ -118,25 +118,23 @@ void TextWidget::draw(const UIDrawSets& drawSets)
 		return;
 	}
 
-	DebugFont* const font = m_font ? m_font : getContext().getDefaultFont();
+	QuickFont* const font = m_font ? m_font : getContext().getDefaultFont();
 
 	const Box2f bboxSS = getBBoxPixels();
 
 	const float textHeight = m_fontSize.computeSizePixels(false, bboxSS.size());
 
-	const vec2f textDim = font->computeTextDimensions(m_text.c_str(), textHeight);
+	const Box2f textBox = TextRenderer::computeTextMetrics(*font, textHeight, m_text.c_str());
+	const vec2f textDim = textBox.size();
 
 	this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
 	const float textPosX = bboxSS.center().x - textDim.x * 0.5f;
-	const float textPosY = bboxSS.center().y + textHeight * 0.5f - textDim.y * 0.5f;
-
-	// drawSets.quickDraw->drawRect(bboxSS.min.x, bboxSS.min.y, bboxSS.size().x, bboxSS.size().y, vec4f(0.33f),
-	//                             getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	const float textPosY = bboxSS.center().y + textBox.size().y * 0.5f - textBox.max.y;
 
 	const Rect2s scissors = getScissorRect();
-	drawSets.quickDraw->drawTextLazy(
-	    drawSets.rdest, *font, vec2f(textPosX, textPosY), m_color, m_text.c_str(), textHeight, &scissors);
+	drawSets.quickDraw->getTextRenderer().drawText2d(
+	    *font, textHeight, m_text.c_str(), vec2f(textPosX, textPosY), drawSets.rdest, m_color, &scissors);
 }
 
 //----------------------------------------------------
@@ -176,7 +174,7 @@ void ImageWidget::draw(const UIDrawSets& drawSets)
 	if (m_texture.IsResourceValid()) {
 		const Box2f bboxSS = getBBoxPixels();
 		float opacity = calcTotalOpacity();
-		drawSets.quickDraw->drawRectTexture(
+		drawSets.quickDraw->getTextureDrawer().drawRectTexture(
 		    drawSets.rdest,
 		    bboxSS,
 		    m_texture,
@@ -215,32 +213,33 @@ void ButtonWidget::draw(const UIDrawSets& drawSets)
 		bgColor = m_bgColorHovered;
 	}
 
-	drawSets.quickDraw->drawRect(
+	drawSets.quickDraw->getTextureDrawer().drawRect(
 	    drawSets.rdest, bboxScissorsSS, bgColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
-	DebugFont* const font = m_font ? m_font : getContext().getDefaultFont();
+	QuickFont* const font = m_font ? m_font : getContext().getDefaultFont();
 	if (font != nullptr && !m_text.empty()) {
-		const vec2f textDim = font->computeTextDimensions(m_text.c_str(), textHeight);
+		const Box2f textBox = TextRenderer::computeTextMetrics(*font, textHeight, m_text.c_str());
+		const vec2f textDim = textBox.size();
 
 		this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
 		const float textPosX = bboxSS.center().x - textDim.x * 0.5f;
-		const float textPosY = bboxSS.center().y + textDim.y * 0.5f;
+		const float textPosY = bboxSS.center().y + textBox.size().y * 0.5f - textBox.max.y;
 
 		const Rect2s scissors = getScissorRect();
-		drawSets.quickDraw->drawTextLazy(
-		    drawSets.rdest, *font, vec2f(textPosX, textPosY), m_textColor, m_text.c_str(), textHeight, &scissors);
+		drawSets.quickDraw->getTextRenderer().drawText2d(
+		    *font, textHeight, m_text.c_str(), vec2f(textPosX, textPosY), drawSets.rdest, m_textColor, &scissors);
 	}
 
 	if (m_text.empty()) {
 		const Rect2s scissors = getScissorRect();
 
 		if (m_triangleDir == axis_x_pos) {
-			drawSets.quickDraw->drawTriLeft(
+			drawSets.quickDraw->getTextureDrawer().drawTriLeft(
 			    drawSets.rdest, bboxSS, 0, m_textColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 		else if (m_triangleDir == axis_y_neg) {
-			drawSets.quickDraw->drawTriLeft(
+			drawSets.quickDraw->getTextureDrawer().drawTriLeft(
 			    drawSets.rdest,
 			    bboxSS,
 			    deg2rad(90.f),
@@ -248,7 +247,7 @@ void ButtonWidget::draw(const UIDrawSets& drawSets)
 			    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 		else if (m_triangleDir == axis_x_neg) {
-			drawSets.quickDraw->drawTriLeft(
+			drawSets.quickDraw->getTextureDrawer().drawTriLeft(
 			    drawSets.rdest,
 			    bboxSS,
 			    deg2rad(180.f),
@@ -256,7 +255,7 @@ void ButtonWidget::draw(const UIDrawSets& drawSets)
 			    getCore()->getGraphicsResources().BS_backToFrontAlpha);
 		}
 		else if (m_triangleDir == axis_x_neg) {
-			drawSets.quickDraw->drawTriLeft(
+			drawSets.quickDraw->getTextureDrawer().drawTriLeft(
 			    drawSets.rdest,
 			    bboxSS,
 			    deg2rad(-90.f),
@@ -316,19 +315,23 @@ void HorizontalComboBox::draw(const UIDrawSets& drawSets)
 
 		const float textHeight = bboxPixels.size().y * 0.8f;
 
-		const vec2f textDim = getContext().getDefaultFont()->computeTextDimensions(text.c_str(), textHeight);
+		const Box2f textBox =
+		    TextRenderer::computeTextMetrics(*getContext().getDefaultFont(), textHeight, text.c_str());
+		const vec2f textDim = textBox.size();
+
+		this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
 		const float textPosX = bboxPixels.center().x - textDim.x * 0.5f;
-		const float textPosY = bboxPixels.center().y + textHeight * 0.5f - textDim.y * 0.5f;
+		const float textPosY = bboxPixels.center().y + textBox.size().y * 0.5f - textBox.max.y;
 
 		const Rect2s scissors = getScissorRect();
-		drawSets.quickDraw->drawTextLazy(
-		    drawSets.rdest,
+		drawSets.quickDraw->getTextRenderer().drawText2d(
 		    *getContext().getDefaultFont(),
-		    vec2f(textPosX, textPosY),
-		    vec4f(1.f),
-		    text.c_str(),
 		    textHeight,
+		    text.c_str(),
+		    vec2f(textPosX, textPosY),
+		    drawSets.rdest,
+		    vec4f(1.f),
 		    &scissors);
 	}
 }
@@ -378,24 +381,28 @@ void Checkbox::draw(const UIDrawSets& drawSets)
 	const Rect2s scissors = getScissorRect();
 
 	if (m_isPressed) {
-		drawSets.quickDraw->drawRect(
+		drawSets.quickDraw->getTextureDrawer().drawRect(
 		    drawSets.rdest, bboxScissors, colorBlack(0.333f), getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 
 	if (m_text.empty() == false) {
 		const float textHeight = bboxPixels.size().y * 0.8f;
-		const vec2f textDim = getContext().getDefaultFont()->computeTextDimensions(m_text.c_str(), textHeight);
+		const Box2f textBox =
+		    TextRenderer::computeTextMetrics(*getContext().getDefaultFont(), textHeight, m_text.c_str());
+		const vec2f textDim = textBox.size();
 
-		const float textPosX = bboxPixels.min.x;
-		const float textPosY = bboxPixels.center().y + textHeight * 0.5f - textDim.y * 0.5f;
+		this->getSize().minSizeX = Unit::fromPixels(textDim.x);
 
-		drawSets.quickDraw->drawTextLazy(
-		    drawSets.rdest,
+		const float textPosX = bboxPixels.center().x - textDim.x * 0.5f;
+		const float textPosY = bboxPixels.center().y + textBox.size().y * 0.5f - textBox.max.y;
+
+		drawSets.quickDraw->getTextRenderer().drawText2d(
 		    *getContext().getDefaultFont(),
-		    vec2f(textPosX, textPosY),
-		    vec4f(1.f),
-		    m_text.c_str(),
 		    textHeight,
+		    m_text.c_str(),
+		    vec2f(textPosX, textPosY),
+		    drawSets.rdest,
+		    vec4f(1.f),
 		    &scissors);
 	}
 
@@ -406,7 +413,7 @@ void Checkbox::draw(const UIDrawSets& drawSets)
 	const Box2f checkBoxRectPixelSpace =
 	    checboxPos.getBBoxPixels(bboxPixels, getParentContentOrigin().toPixels(bboxPixels.size()), checkboxSize);
 	const vec4f checkBoxColor = m_isOn ? vec4f(0.f, 1.f, 0.f, 1.f) : vec4f(0.3f, 0.3f, 0.3f, 1.f);
-	drawSets.quickDraw->drawRect(
+	drawSets.quickDraw->getTextureDrawer().drawRect(
 	    drawSets.rdest, checkBoxRectPixelSpace, checkBoxColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 

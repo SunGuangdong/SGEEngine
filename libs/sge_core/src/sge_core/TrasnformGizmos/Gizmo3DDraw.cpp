@@ -1,7 +1,7 @@
 #include "Gizmo3DDraw.h"
 #include "Gizmo3D.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 
 namespace sge {
 
@@ -41,7 +41,7 @@ void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslati
 		const float bladeLen = 0.85f;
 		const float bladeHeight = bladeLen * 0.05f;
 
-		getCore()->getQuickDraw().drawWiredAdd_Line(vec3f(0.f), dir, color);
+		getCore()->getQuickDraw().getWire().drawWiredAdd_Line(vec3f(0.f), dir, color);
 
 		// The things that make it look like an arrow.
 		const int numBlades = 32;
@@ -49,8 +49,9 @@ void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslati
 
 		vec3f new_up = up;
 		for (int t = 0; t < numBlades; ++t) {
-			getCore()->getQuickDraw().drawWiredAdd_Line(dir, dir * bladeLen + new_up * bladeHeight, color);
-			getCore()->getQuickDraw().drawWiredAdd_Line(dir * bladeLen + new_up * bladeHeight, dir * bladeLen, color);
+			getCore()->getQuickDraw().getWire().drawWiredAdd_Line(dir, dir * bladeLen + new_up * bladeHeight, color);
+			getCore()->getQuickDraw().getWire().drawWiredAdd_Line(
+			    dir * bladeLen + new_up * bladeHeight, dir * bladeLen, color);
 
 			new_up = mat_mul_dir(rot, new_up);
 		}
@@ -63,12 +64,13 @@ void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslati
 	addArrow(axes[1], axes[2], actionMask.only_y() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x00ff00);
 	addArrow(axes[2], axes[1], actionMask.only_z() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0xff0000);
 
-	getCore()->getQuickDraw().drawWired_Execute(rdest, pvw, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	getCore()->getQuickDraw().getWire().drawWired_Execute(
+	    rdest, pvw, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	// Draw the planar translation triangles.
 	const auto addQuad = [&](const vec3f o, const vec3f e1, const vec3f e2, const int color) {
-		getCore()->getQuickDraw().drawSolidAdd_Triangle(o, o + e1, o + e2, color);
-		getCore()->getQuickDraw().drawSolidAdd_Triangle(o + e1, o + e1 + e2, o + e2, color);
+		getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(o, o + e1, o + e2, color);
+		getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(o + e1, o + e1 + e2, o + e2, color);
 	};
 
 	const float quadOffset = Gizmo3DTranslation::kQuadOffset;
@@ -90,7 +92,7 @@ void drawTranslationGizmo(const RenderDestination& rdest, const Gizmo3DTranslati
 	    axes[1] * quadLength,
 	    actionMask.only_xy() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0xff0000);
 
-	getCore()->getQuickDraw().drawSolid_Execute(
+	getCore()->getQuickDraw().getSolid().drawSolid_Execute(
 	    rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	return;
@@ -125,11 +127,11 @@ void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gi
 
 		for (int t = 0; t < numSegments; ++t) {
 			circleVert = mat_mul_dir(mtxRotation, circleVert);
-			getCore()->getQuickDraw().drawSolidAdd_Triangle(vec3f(0.f), circleVert, prevVert, 0x33000000);
+			getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(vec3f(0.f), circleVert, prevVert, 0x33000000);
 			prevVert = circleVert;
 		}
 
-		getCore()->getQuickDraw().drawSolid_Execute(
+		getCore()->getQuickDraw().getSolid().drawSolid_Execute(
 		    rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 
@@ -151,7 +153,7 @@ void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gi
 			for (int t = 0; t < numSegments; ++t) {
 				dir = (rot * vec4f(dir, 0.f)).xyz();
 
-				getCore()->getQuickDraw().drawWiredAdd_Line(prev, dir, color);
+				getCore()->getQuickDraw().getWire().drawWiredAdd_Line(prev, dir, color);
 
 				prev = dir;
 			}
@@ -161,9 +163,10 @@ void drawRotationGizmo(const RenderDestination& rdest, const Gizmo3DRotation& gi
 		addCircle(vec3f::getAxis(1), actionMask.only_y() ? 0xff00ffff : 0xff00ff00);
 		addCircle(vec3f::getAxis(2), actionMask.only_z() ? 0xff00ffff : 0xffff0000);
 
-		getCore()->getQuickDraw().drawWiredAdd_Basis(mat4f::getDiagonal(0.5f));
+		getCore()->getQuickDraw().getWire().drawWiredAdd_Basis(mat4f::getDiagonal(0.5f));
 
-		getCore()->getQuickDraw().drawWired_Execute(rdest, pvw, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+		getCore()->getQuickDraw().getWire().drawWired_Execute(
+		    rdest, pvw, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 }
 
@@ -176,22 +179,23 @@ void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, c
 	const GizmoActionMask actionMask = gizmo.getActionMask();
 
 	// Draw the lines for scaling along given axis.
-	getCore()->getQuickDraw().drawWiredAdd_Line(
+	getCore()->getQuickDraw().getWire().drawWiredAdd_Line(
 	    vec3f(0.f), vec3f::getAxis(0), actionMask.only_x() ? 0xff00ffff : 0xff0000ff);
-	getCore()->getQuickDraw().drawWiredAdd_Line(
+	getCore()->getQuickDraw().getWire().drawWiredAdd_Line(
 	    vec3f(0.f), vec3f::getAxis(1), actionMask.only_y() ? 0xff00ffff : 0xff00ff00);
-	getCore()->getQuickDraw().drawWiredAdd_Line(
+	getCore()->getQuickDraw().getWire().drawWiredAdd_Line(
 	    vec3f(0.f), vec3f::getAxis(2), actionMask.only_z() ? 0xff00ffff : 0xffff0000);
 
-	getCore()->getQuickDraw().drawWired_Execute(rdest, pvw, getCore()->getGraphicsResources().BS_backToFrontAlpha);
+	getCore()->getQuickDraw().getWire().drawWired_Execute(
+	    rdest, pvw, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 
 	// Draw the planar sclaing trapezoids.
 	const auto addTrapezoid = [&](const vec3f& ax0, const vec3f& ax1, const int color) {
 		const float inner = Gizmo3DScale::kTrapezoidStart;
 		const float outter = Gizmo3DScale::kTrapezoidEnd;
 
-		getCore()->getQuickDraw().drawSolidAdd_Triangle(ax0 * inner, ax0 * outter, ax1 * outter, color);
-		getCore()->getQuickDraw().drawSolidAdd_Triangle(ax1 * inner, ax1 * outter, ax0 * inner, color);
+		getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(ax0 * inner, ax0 * outter, ax1 * outter, color);
+		getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(ax1 * inner, ax1 * outter, ax0 * inner, color);
 	};
 
 	addTrapezoid(
@@ -202,23 +206,23 @@ void drawScaleGizmo(const RenderDestination& rdest, const Gizmo3DScale& gizmo, c
 	    vec3f::getAxis(0), vec3f::getAxis(2), actionMask.only_xz() ? Gizmo_ActiveColor : Gizmo_BaseTransp + 0x00ff00);
 
 	// Add the central triangles for drawing the scale all axes triangles.
-	getCore()->getQuickDraw().drawSolidAdd_Triangle(
+	getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(
 	    vec3f(0.f),
 	    0.22f * vec3f::getAxis(1),
 	    0.22f * vec3f::getAxis(2),
 	    actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00eeee : Gizmo_BaseTransp + 0xeeeeee);
-	getCore()->getQuickDraw().drawSolidAdd_Triangle(
+	getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(
 	    vec3f(0.f),
 	    0.22f * vec3f::getAxis(0),
 	    0.22f * vec3f::getAxis(2),
 	    actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00cccc : Gizmo_BaseTransp + 0xcccccc);
-	getCore()->getQuickDraw().drawSolidAdd_Triangle(
+	getCore()->getQuickDraw().getSolid().drawSolidAdd_Triangle(
 	    vec3f(0.f),
 	    0.22f * vec3f::getAxis(0),
 	    0.22f * vec3f::getAxis(1),
 	    actionMask.only_xyz() ? Gizmo_BaseTransp + 0x00bbbb : Gizmo_BaseTransp + 0xbbbbbb);
 
-	getCore()->getQuickDraw().drawSolid_Execute(
+	getCore()->getQuickDraw().getSolid().drawSolid_Execute(
 	    rdest, pvw, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 }
 
@@ -256,14 +260,15 @@ void drawScaleVolumeGizmo(const RenderDestination& rdest, const Gizmo3DScaleVolu
 		const vec3f e1 = quat_mul_pos(gizmo.getInitialTransform().r, vec3f::getAxis((iAxis + 1) % 3)) * handleSizeWS;
 		const vec3f e2 = quat_mul_pos(gizmo.getInitialTransform().r, vec3f::getAxis((iAxis + 2) % 3)) * handleSizeWS;
 
-		getCore()->getQuickDraw().drawSolidAdd_QuadCentered(
-		    handlePosWs, e1, e2, actionMask.hasOnly(SignedAxis(iAxis)) ? activeColor : axisColors[iAxis]);
-		getCore()->getQuickDraw().drawSolid_Execute(
+		getCore()->getQuickDraw().getSolid().drawSolidAdd_QuadCentered(
+		    handlePosWs, e1, e2, actionMask.hasOnly(static_cast<SignedAxis>(iAxis)) ? activeColor : axisColors[iAxis]);
+		getCore()->getQuickDraw().getSolid().drawSolid_Execute(
 		    rdest, projView, false, getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}
 
-	getCore()->getQuickDraw().drawWiredAdd_Box(os2ws, gizmo.getInitialBBoxOS(), 0xffffffff);
-	getCore()->getQuickDraw().drawWired_Execute(rdest, projView);
+	WireframeDrawer& wire = getCore()->getQuickDraw().getWire();
+	wire.drawWiredAdd_Box(os2ws, gizmo.getInitialBBoxOS(), 0xffffffff);
+	wire.drawWired_Execute(rdest, projView);
 }
 
 

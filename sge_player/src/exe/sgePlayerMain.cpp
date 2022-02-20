@@ -17,7 +17,7 @@ __declspec(dllexport) int AmdPowerXpressRequestHighPerformance = 1;
 #include "GameMode.h"
 #include "sge_core/AssetLibrary/AssetLibrary.h"
 #include "sge_core/ICore.h"
-#include "sge_core/QuickDraw.h"
+#include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/SGEImGui.h"
 #include "sge_core/application/application.h"
 #include "sge_core/setImGuiContexCore.h"
