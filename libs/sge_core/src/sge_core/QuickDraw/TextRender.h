@@ -34,16 +34,16 @@ struct SGE_CORE_API TextRenderer : public NoCopy {
 		{
 		}
 
-		TextDisplaySettings(float fontHeight, VerticalAlign verticalAlign, HorizontalAlign horizontalAlign)
+		TextDisplaySettings(float fontHeight, HorizontalAlign horizontalAlign, VerticalAlign verticalAlign)
 		    : fontHeight(fontHeight)
-		    , verticalAlign(verticalAlign)
 		    , horizontalAlign(horizontalAlign)
+		    , verticalAlign(verticalAlign)
 		{
 		}
 
 		float fontHeight = 0; ///< 0 means use the font default height. this is in pixels.
-		VerticalAlign verticalAlign = verticalAlign_baseLine;
 		HorizontalAlign horizontalAlign = horizontalAlign_left;
+		VerticalAlign verticalAlign = verticalAlign_baseLine;
 	};
 
 	/// A shortcut for @drawText2d where you specify the position of the text.

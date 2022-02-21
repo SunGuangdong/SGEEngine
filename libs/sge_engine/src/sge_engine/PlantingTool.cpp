@@ -109,7 +109,7 @@ InspectorToolResult PlantingTool::updateTool(
 		primaryActorNewTransf.r = quatf::getAxisAngle(rotateAxis.normalized0(), rotationAngle);
 
 		const Box3f bbox = primaryActor->getBBoxOS();
-		if (bbox.IsEmpty() == false) {
+		if (bbox.isEmpty() == false) {
 			if (bbox.min.y < 0.f) {
 				primaryActorNewTransf.p -= hitNormal * bbox.min.y;
 			}

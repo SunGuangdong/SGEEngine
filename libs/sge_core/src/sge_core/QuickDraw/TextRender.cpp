@@ -84,9 +84,9 @@ Box2f TextRenderer::computeTextMetricsInternal(
 
 	int iCurrentLine = 0;
 	float nextCharacterPosX = 0.f; // Where is the baseline and x position of the next character.
-	int currentLine1stVertexIdx = outVertices ? int(outVertices->size()) : 0;
-	const int text1stVertex = currentLine1stVertexIdx;
+	const int text1stVertex = outVertices ? int(outVertices->size()) : 0;
 
+	int currentLine1stVertexIdx = text1stVertex;
 	Box2f currentLineBBox;
 	while (true) {
 		if (*asciiText == '\n' || *asciiText == '\0') {
@@ -119,76 +119,19 @@ Box2f TextRenderer::computeTextMetricsInternal(
 				}
 			}
 
-			// Y alignment
+			// Y alignment is not handled here.
+			// In this place we are just advancing to the next line.
+			// The 1st line is still at the base line always.
 			{
-				switch (displaySets.verticalAlign) {
-					case verticalAlign_top: {
-						const float currentBaselineYPos = float(iCurrentLine) * fontHeight;
-						const float yShiftToAlignment = currentLineBBox.min.y;
-						const float totalMovementToAlign = currentBaselineYPos - yShiftToAlignment;
+				const float currentBaselineYPos = float(iCurrentLine) * fontHeight;
+				const float totalMovementToAlign = currentBaselineYPos;
 
-						currentLineBBox.move(vec2f(0.f, totalMovementToAlign));
+				currentLineBBox.move(vec2f(0.f, totalMovementToAlign));
 
-						if (outVertices) {
-							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
-								outVertices->at(iVert).position.y += totalMovementToAlign;
-							}
-						}
-					} break;
-					case verticalAlign_baseLine: {
-						const float currentBaselineYPos = float(iCurrentLine) * fontHeight;
-						const float totalMovementToAlign = currentBaselineYPos;
-
-						currentLineBBox.move(vec2f(0.f, totalMovementToAlign));
-
-						if (outVertices && currentBaselineYPos != 0.f) {
-							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
-								outVertices->at(iVert).position.y += totalMovementToAlign;
-							}
-						}
-					} break;
-					case verticalAlign_middle: {
-						const float currentBaselineYPos = float(iCurrentLine) * fontHeight;
-						const float yShiftToAlignment = currentLineBBox.center().y;
-						const float totalMovementToAlign = currentBaselineYPos - yShiftToAlignment;
-
-						currentLineBBox.move(vec2f(0.f, totalMovementToAlign));
-
-						if (outVertices) {
-							for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
-								outVertices->at(iVert).position.y += totalMovementToAlign;
-							}
-						}
-
-					} break;
-					case verticalAlign_bottom: {
-						if (!textBbox.IsEmpty()) {
-							// Shift the prevous lines 1 height above to make space for the current line.
-							textBbox.move(vec2f(0.f, -fontHeight));
-						}
-
-						// Shift the current line above, by its "overhang" below the baseline.
-						const float yShiftToAlignment = -currentLineBBox.max.y;
-						currentLineBBox.move(vec2f(0.f, yShiftToAlignment));
-
-						// We shift the vertices the same way we did the bounding box.
-						if (outVertices) {
-							for (int iVert = text1stVertex; iVert < outVertices->size(); ++iVert) {
-								if (iVert >= currentLine1stVertexIdx) {
-									// Shift the prevous lines 1 height above to make space for the current line.
-									outVertices->at(iVert).position.y += yShiftToAlignment;
-								}
-								else {
-									// Move the part of the current line line that is below the baseline upwards.
-									outVertices->at(iVert).position.y -= fontHeight;
-								}
-							}
-						}
-
-
-					} break;
-					default:
-						sgeAssert(false);
+				if (outVertices && currentBaselineYPos != 0.f) {
+					for (int iVert = currentLine1stVertexIdx; iVert < outVertices->size(); ++iVert) {
+						outVertices->at(iVert).position.y += totalMovementToAlign;
+					}
 				}
 			}
 
@@ -230,7 +173,7 @@ Box2f TextRenderer::computeTextMetricsInternal(
 		currentLineBBox.expand(characteBox);
 
 		// Create the verices.
-		if (*asciiText != ' ') {
+		if (outVertices != nullptr && *asciiText != ' ') {
 			// v3---v2
 			// |2  /|
 			// |  / |
@@ -250,21 +193,53 @@ Box2f TextRenderer::computeTextMetricsInternal(
 			v3.position = vec2f(characteBox.min.x, characteBox.min.y);
 			v3.uv = vec2f(float(ch.x0) * invTexWidth, float(ch.y0) * invTexHeight);
 
-			if (outVertices) {
-				outVertices->push_back(v0);
-				outVertices->push_back(v1);
-				outVertices->push_back(v2);
+			outVertices->push_back(v0);
+			outVertices->push_back(v1);
+			outVertices->push_back(v2);
 
-				outVertices->push_back(v0);
-				outVertices->push_back(v2);
-				outVertices->push_back(v3);
-			}
+			outVertices->push_back(v0);
+			outVertices->push_back(v2);
+			outVertices->push_back(v3);
 		}
 
 		// Change the next character starting position.
 		nextCharacterPosX += sizeScaling * ch.xadvance;
 
 		asciiText++;
+	}
+
+	// Compute and then move the text so it is aligned vertically.
+	if (textBbox.isEmpty() == false) {
+		float yMovementToAlign = 0.f;
+		switch (displaySets.verticalAlign) {
+			case verticalAlign_top: {
+				yMovementToAlign = -textBbox.min.y;
+			} break;
+			case verticalAlign_baseLine: {
+				// The text should be already aligned.
+				yMovementToAlign = 0.f;
+			} break;
+			case verticalAlign_middle: {
+				yMovementToAlign = (textBbox.min.y - textBbox.max.y) * 0.5f - textBbox.min.y;
+			} break;
+			case verticalAlign_bottom: {
+				yMovementToAlign = -textBbox.max.y;
+			} break;
+			default:
+				sgeAssert(false);
+		}
+
+		if (yMovementToAlign != 0.f) {
+			// Align the bounding box of the text.
+			textBbox.move(vec2f(0.f, yMovementToAlign));
+
+			// Align the vertices (if any).
+			if (outVertices) {
+				for (int iVert = text1stVertex; iVert < outVertices->size(); ++iVert) {
+					outVertices->at(iVert).position.y += yMovementToAlign;
+				}
+			}
+		}
 	}
 
 	return textBbox;

@@ -90,7 +90,7 @@ void DefaultGameDrawer::updateShadowMaps(const GameDrawSets& drawSets)
 		// If the camera frustum is present, try to clip the object.
 		if (gameCameraFrustumWs != nullptr) {
 			const Box3f bboxOS = light->getBBoxOS();
-			if (!bboxOS.IsEmpty()) {
+			if (!bboxOS.isEmpty()) {
 				if (gameCameraFrustumWs->isObjectOrientedBoxOutside(bboxOS, light->getTransform().toMatrix())) {
 					continue;
 				}
@@ -250,7 +250,7 @@ bool DefaultGameDrawer::isInFrustum(const GameDrawSets& drawSets, Actor* actor) 
 	const Frustum* const pFrustum = drawSets.drawCamera->getFrustumWS();
 	const Box3f bboxOS = actor->getBBoxOS();
 	if (pFrustum != nullptr) {
-		if (!bboxOS.IsEmpty()) {
+		if (!bboxOS.isEmpty()) {
 			const transf3d& tr = actor->getTransform();
 
 			// We can technically transform the box in world space and then take the bounding sphere, however
@@ -278,7 +278,7 @@ void DefaultGameDrawer::getLightingForLocation(const Box3f& bboxWs, ObjectLighti
 	// Find all the lights that can affect the area covered by the bounding box.
 	// Usually this bbox comes from some actor.
 	for (const ShadingLightData& shadingLight : m_shadingLights) {
-		if (shadingLight.lightBoxWs.IsEmpty() || shadingLight.lightBoxWs.overlaps(bboxWs)) {
+		if (shadingLight.lightBoxWs.isEmpty() || shadingLight.lightBoxWs.overlaps(bboxWs)) {
 			m_shadingLightPerObject.emplace_back(&shadingLight);
 		}
 	}

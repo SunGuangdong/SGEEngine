@@ -287,7 +287,7 @@ void GameInspector::focusOnSelection()
 
 		if (m_selection[t].editMode == editMode_actors) {
 			Box3f const box = actor->getBBoxOS().getTransformed(actor->getTransform().toMatrix());
-			if (!box.IsEmpty())
+			if (!box.isEmpty())
 				combinedBoundingBox.expand(box);
 			else
 				combinedBoundingBox.expand(actor->getTransform().p);
@@ -302,7 +302,7 @@ void GameInspector::focusOnSelection()
 	averagePosition *= 1.f / (float)m_selection.size();
 
 	// TODO: Figure out a better way to update the camera this is hacky.
-	if (!combinedBoundingBox.IsEmpty()) {
+	if (!combinedBoundingBox.isEmpty()) {
 		getWorld()->m_editorCamera.m_orbitCamera.orbitPoint = combinedBoundingBox.center();
 		getWorld()->m_editorCamera.m_orbitCamera.radius = combinedBoundingBox.halfDiagonal().length() * 2.7f;
 

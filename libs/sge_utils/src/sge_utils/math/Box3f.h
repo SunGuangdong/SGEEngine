@@ -86,26 +86,19 @@ struct Box3f {
 
 	void setEmpty()
 	{
-		min = vec3f(std::numeric_limits<float>::max());
-		max = vec3f(std::numeric_limits<float>::lowest());
+		min = vec3f(FLT_MAX);
+		max = vec3f(-FLT_MAX);
 	}
 
-	bool IsEmpty() const
+	bool isEmpty() const
 	{
-		return min == vec3f(std::numeric_limits<float>::max()) && max == vec3f(std::numeric_limits<float>::lowest());
+		return min == vec3f(FLT_MAX) && max == vec3f(-FLT_MAX);
 	}
 
 	void expand(const vec3f& point)
 	{
 		min = min.pickMin(point);
 		max = max.pickMax(point);
-	}
-
-	void expandEdgesByCoefficient(float value)
-	{
-		vec3f exp = halfDiagonal() * value;
-		min -= exp;
-		max += exp;
 	}
 
 	void scale(const float& s)
@@ -138,7 +131,7 @@ struct Box3f {
 
 	void expand(const Box3f& other)
 	{
-		if (other.IsEmpty() == false) {
+		if (other.isEmpty() == false) {
 			min = min.pickMin(other.min);
 			min = min.pickMin(other.max);
 
@@ -168,7 +161,7 @@ struct Box3f {
 
 	Box3f getOverlapBox(const Box3f& other) const
 	{
-		if (this->IsEmpty() || other.IsEmpty()) {
+		if (this->isEmpty() || other.isEmpty()) {
 			return Box3f();
 		}
 
@@ -219,7 +212,7 @@ struct Box3f {
 	/// Performs a column-major matrix multiplication for every point.
 	Box3f getTransformed(const mat4f& transform) const
 	{
-		if (this->IsEmpty())
+		if (this->isEmpty())
 			return Box3f();
 
 		Box3f retval;

@@ -9,7 +9,7 @@ HelperDrawRenderItem::HelperDrawRenderItem(const SelectedItemDirect& item, DrawR
 {
 	if (Actor* actor = item.gameObject->getActor()) {
 		Box3f bboxOs = actor->getBBoxOS();
-		if (bboxOs.IsEmpty() == false) {
+		if (bboxOs.isEmpty() == false) {
 			zSortingPositionWs = mat_mul_pos(actor->getTransformMtx(), actor->getBBoxOS().center());
 		}
 	}

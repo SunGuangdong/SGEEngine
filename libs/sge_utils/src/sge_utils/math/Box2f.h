@@ -41,7 +41,6 @@ struct Box2f {
 		return retval;
 	}
 
-
 	void move(const vec2f& offset)
 	{
 		min += offset;
@@ -54,15 +53,13 @@ struct Box2f {
 
 	vec2f bottomMiddle() const
 	{
-		vec2f ret = center();
-		ret.y -= halfDiagonal().y;
+		vec2f ret = vec2f((max.x - min.x) * 0.5f, min.y);
 		return ret;
 	}
 
 	vec2f topMiddle() const
 	{
-		vec2f ret = center();
-		ret.y += halfDiagonal().y;
+		vec2f ret = vec2f((max.x - min.x) * 0.5f, max.y);
 		return ret;
 	}
 
@@ -70,14 +67,11 @@ struct Box2f {
 
 	void setEmpty()
 	{
-		min = vec2f(std::numeric_limits<float>::max());
-		max = vec2f(std::numeric_limits<float>::lowest());
+		min = vec2f(FLT_MAX);
+		max = vec2f(-FLT_MAX);
 	}
 
-	bool IsEmpty() const
-	{
-		return min == vec2f(std::numeric_limits<float>::max()) && max == vec2f(std::numeric_limits<float>::lowest());
-	}
+	bool isEmpty() const { return min == vec2f(FLT_MAX) && max == vec2f(-FLT_MAX); }
 
 	void expand(const vec2f& point)
 	{
@@ -100,7 +94,7 @@ struct Box2f {
 
 	void expand(const Box2f& other)
 	{
-		if (other.IsEmpty() == false) {
+		if (other.isEmpty() == false) {
 			min = min.pickMin(other.min);
 			min = min.pickMin(other.max);
 
@@ -126,7 +120,7 @@ struct Box2f {
 
 	Box2f getOverlapBox(const Box2f& other) const
 	{
-		if (this->IsEmpty() || other.IsEmpty()) {
+		if (this->isEmpty() || other.isEmpty()) {
 			return Box2f();
 		}
 

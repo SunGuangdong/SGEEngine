@@ -61,7 +61,7 @@ bool addCollisionShapeBasedOnModel(std::vector<CollsionShapeDesc>& shapeDescs, c
 			if (boxSize.z < 1e-2f)
 				modelBBox.max.z += 0.01f, modelBBox.min.z -= 1e-2f;
 
-			if (modelBBox.IsEmpty() == false) {
+			if (modelBBox.isEmpty() == false) {
 				shapeDescs.emplace_back(CollsionShapeDesc::createBox(modelBBox));
 			}
 		}

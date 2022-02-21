@@ -89,7 +89,7 @@ Box3f ModelEntry::getBBoxOS(const mat4f& invWorldTrasnform) const
 	}
 
 	// TODO: take in to concideration: ignoreActorTransform
-	if (ignoreActorTransform && !bbox.IsEmpty()) {
+	if (ignoreActorTransform && !bbox.isEmpty()) {
 		return bbox.getTransformed(invWorldTrasnform);
 	}
 

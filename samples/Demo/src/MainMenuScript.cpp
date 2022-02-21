@@ -67,8 +67,17 @@ struct MainMenuScript final : public IWorldScript {
 		// drawSets.quickDraw->drawTextLazy(drawSets.rdest, *uiContext.getDefaultFont(), vec2f(0.f, 128.f), vec4f(1.f),
 		// "Qwop!\nQwok!", 128.f);
 
-		textRenderer.drawText2d(
-		    *uiContext.getDefaultFont(), 64.f, "Settings?", vec2f(0.f, 128.f), drawSets.rdest, vec4f(1.f), nullptr);
+
+		const char* text = "Settings?\nPlay\nQuit";
+		vec2f pos = vec2f(float(uiContext.getCanvasSize().x), float(uiContext.getCanvasSize().y)) * 0.5f;
+		TextRenderer::TextDisplaySettings ds = TextRenderer::TextDisplaySettings(
+		    32, TextRenderer::horizontalAlign_middle, TextRenderer::verticalAlign_baseLine);
+
+		Box2f f = TextRenderer::computeTextMetrics(*uiContext.getDefaultFont(), ds, "Settings?\nPlay\nQuit");
+		f.move(pos);
+		drawSets.quickDraw->getTextureDrawer().drawRect(drawSets.rdest, f, vec4f(0.5f));
+
+		textRenderer.drawText2d(*uiContext.getDefaultFont(), ds, text, pos, drawSets.rdest, vec4f(1.f), nullptr);
 	}
 };
 
