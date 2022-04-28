@@ -174,17 +174,12 @@ void ButtonWidget::draw(const UIDrawSets& drawSets)
 
 	QuickFont* const font = m_font ? m_font : getContext().getDefaultFont();
 	if (font != nullptr && !m_text.empty()) {
-		const Box2f textBox = TextRenderer::computeTextMetrics(*font, textHeight, m_text.c_str());
-		const vec2f textDim = textBox.size();
-
-		this->getSize().minSizeX = Unit::fromPixels(textDim.x);
-
-		const float textPosX = bboxSS.center().x - textDim.x * 0.5f;
-		const float textPosY = bboxSS.center().y + textBox.size().y * 0.5f - textBox.max.y;
+		TextRenderer::TextDisplaySettings displaySets = {
+		    textHeight, TextRenderer::horizontalAlign_middle, TextRenderer::verticalAlign_middle};
 
 		const Rect2s scissors = getScissorRect();
 		drawSets.quickDraw->getTextRenderer().drawText2d(
-		    *font, textHeight, m_text.c_str(), vec2f(textPosX, textPosY), drawSets.rdest, m_textColor, &scissors);
+		    *font, displaySets, m_text.c_str(), bboxSS.center(), drawSets.rdest, m_textColor, &scissors);
 	}
 
 	if (m_text.empty()) {

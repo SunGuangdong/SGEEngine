@@ -239,6 +239,9 @@ struct SGE_ENGINE_API RigidBody {
 
 	void setMaskCollidesWith(ubyte mask) { m_maskCollidesWith = mask; }
 
+	void setIsInWorldInternal(bool v) { m_isInWorld = v; }
+	bool getIsInWorldInternal() const { return m_isInWorld; }
+
   public:
 	std::unique_ptr<btCollisionObject> m_collisionObject;
 
@@ -248,6 +251,8 @@ struct SGE_ENGINE_API RigidBody {
 
 	ubyte m_maskIndetifiedAs = RigidBodyFilterMask_bitDefault;
 	ubyte m_maskCollidesWith = RigidBodyFilterMask_bitDefault;
+
+	bool m_isInWorld = false;
 };
 
 /// @brief Retieves our represetentation of the rigid body form btCollisionObject and it's derivatives like btRigidBody.

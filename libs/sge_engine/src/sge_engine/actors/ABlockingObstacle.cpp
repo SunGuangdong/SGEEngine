@@ -48,6 +48,22 @@ void ABlockingObstacle::onPlayStateChanged(bool const isStartingToPlay)
 	}
 }
 
+void ABlockingObstacle::update(const GameUpdateSets& UNUSED(u))
+{
+	material = SimpleTriplanarMtlData();
+
+	material.diffuseTextureX = m_textureX.getAssetInterface<AssetIface_Texture2D>()
+	                               ? m_textureX.getAssetInterface<AssetIface_Texture2D>()->getTexture()
+	                               : nullptr;
+	material.diffuseTextureY = m_textureY.getAssetInterface<AssetIface_Texture2D>()
+	                               ? m_textureY.getAssetInterface<AssetIface_Texture2D>()->getTexture()
+	                               : nullptr;
+	material.diffuseTextureZ = material.diffuseTextureX;
+
+	material.uvwTransform = mat4f::getScaling(m_textureXScale, m_textureYScale, m_textureXScale);
+	material.sharpness = 64.f;
+}
+
 void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 {
 	m_textureX.update();
@@ -196,19 +212,6 @@ void ABlockingObstacle::postUpdate(const GameUpdateSets& UNUSED(updateSets))
 		tt_rendGeom.geoms[0].pGeom = &geometry;
 		tt_rendGeom.geoms[0].pMtl = &material;
 		tt_rendGeom.geoms[0].bboxGeometry = boundingBox;
-
-		material = SimpleTriplanarMtlData();
-
-		material.diffuseTextureX = m_textureX.getAssetInterface<AssetIface_Texture2D>()
-		                             ? m_textureX.getAssetInterface<AssetIface_Texture2D>()->getTexture()
-		                             : nullptr;
-		material.diffuseTextureY = m_textureY.getAssetInterface<AssetIface_Texture2D>()
-		                             ? m_textureY.getAssetInterface<AssetIface_Texture2D>()->getTexture()
-		                             : nullptr;
-		material.diffuseTextureZ = material.diffuseTextureX;
-
-		material.uvwTransform = mat4f::getScaling(m_textureXScale, m_textureYScale, m_textureXScale);
-		material.sharpness = 64.f;
 	}
 }
 

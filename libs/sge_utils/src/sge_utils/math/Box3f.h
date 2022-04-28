@@ -226,7 +226,6 @@ struct Box3f {
 		retval.expand(mat_mul_pos(transform, getPoint(6)));
 		retval.expand(mat_mul_pos(transform, getPoint(7)));
 
-
 		return retval;
 	}
 

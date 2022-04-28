@@ -27,7 +27,7 @@ struct SGE_ENGINE_API ABlockingObstacle final : public Actor, public IActorCusto
 
 	void create() final;
 	void onPlayStateChanged(bool const isStartingToPlay) override;
-	void update(const GameUpdateSets& UNUSED(updateSets)) final {}
+	void update(const GameUpdateSets& UNUSED(updateSets)) final;
 	void postUpdate(const GameUpdateSets& updateSets);
 	Box3f getBBoxOS() const final;
 

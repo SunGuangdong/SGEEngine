@@ -54,7 +54,12 @@ void SolidDrawer::create(SGEContext* sgecon)
 	    sgedev->getVertexDeclIndex(vtxDecl_pos3d_rgba_int, SGE_ARRSZ(vtxDecl_pos3d_rgba_int));
 
 	// [CAUTION] Allocating big chunk of memory (almost 1MB).
-	const int wiredVertexBufferSizeBytes = 65534 * sizeof(GeomGen::PosColorVert); // Around 1MB.
+	const int bufferSizeBytes = 65534 * sizeof(GeomGen::PosColorVert); // Around 1MB.
+
+	m_vbSolidColorGeometry = sgedev->requestResource<Buffer>();
+	const BufferDesc vbdSolidGeom =
+	    BufferDesc::GetDefaultVertexBuffer(bufferSizeBytes, ResourceUsage::Dynamic);
+	m_vbSolidColorGeometry->create(vbdSolidGeom, NULL);
 }
 
 void SolidDrawer::drawSolidAdd_Triangle(const vec3f a, const vec3f b, const vec3f c, const uint32 rgba)

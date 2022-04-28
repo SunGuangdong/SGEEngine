@@ -477,9 +477,12 @@ btPairCachingGhostObject* RigidBody::getBulletGhostObject()
 bool RigidBody::isInWorld() const
 {
 	if (getBulletRigidBody()) {
-		return getBulletRigidBody()->isInWorld();
+		bool isInWorld = getBulletRigidBody()->isInWorld();
+		sgeAssert(getIsInWorldInternal() == isInWorld);
+		return isInWorld;
 	}
-	return false;
+
+	return getIsInWorldInternal();
 }
 
 Box3f RigidBody::getBBoxWs() const
