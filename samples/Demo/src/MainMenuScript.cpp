@@ -1,5 +1,7 @@
 #include "sge_core/GameUI/UIContext.h"
 #include "sge_core/GameUI/Widget.h"
+#include "sge_core/GameUI/widgets/RowLayout.h"
+#include "sge_core/GameUI/widgets/ColumnLayout.h"
 #include "sge_core/ICore.h"
 #include "sge_core/QuickDraw/QuickDraw.h"
 #include "sge_core/QuickDraw/TextRender.h"
@@ -29,6 +31,41 @@ struct MainMenuScript final : public IWorldScript {
 
 		rootMenuWidget = std::make_shared<gamegui::InvisibleWidget>(uiContext, Pos(0_f, 0_f), Size(1_f, 1_f));
 
+		{
+			auto horizontalLayout = rootMenuWidget->addChildT(std::make_shared<ColumnLayout>(uiContext));
+			horizontalLayout->m_size = Size::fromFrac(vec2f(1.f, 1.f));
+			horizontalLayout->startPosition = Pos::fromFrac(1.f, 0.f);
+			horizontalLayout->spacingX = 5_px;
+			horizontalLayout->leftToRight = false;
+
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn0"));
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn1"));
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn2"));
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn3"));
+		}
+
+		{
+			auto horizontalLayout = rootMenuWidget->addChildT(std::make_shared<ColumnLayout>(uiContext));
+			horizontalLayout->m_size = Size::fromFrac(vec2f(1.f, 1.f));
+			horizontalLayout->startPosition = Pos::fromFrac(0.f, 1.f);
+			horizontalLayout->spacingX = 5_px;
+			horizontalLayout->topToBottom = false;
+
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn0"));
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn1"));
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn2"));
+			horizontalLayout->addWidget(
+			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn3"));
+		}
+
+#if 0
 		mainMenuButtonsWidget = std::make_shared<gamegui::InvisibleWidget>(
 		    uiContext, Pos(0.5_f, 0.75_f, vec2f(0.5f)), Size(0.30_hf, 0.20_hf));
 		rootMenuWidget->addChild(mainMenuButtonsWidget);
@@ -46,6 +83,7 @@ struct MainMenuScript final : public IWorldScript {
 		    std::make_shared<ButtonWidget>(uiContext, Pos(0_f, 0.333_f), Size(1_f, 0.333_f));
 		btn2->setText("Settings");
 		mainMenuButtonsWidget->addChild(btn2);
+#endif
 
 		uiContext.addRootWidget(rootMenuWidget);
 
@@ -68,16 +106,16 @@ struct MainMenuScript final : public IWorldScript {
 		// "Qwop!\nQwok!", 128.f);
 
 
-		const char* text = "Settings?\nPlay\nQuit";
-		vec2f pos = vec2f(float(uiContext.getCanvasSize().x), float(uiContext.getCanvasSize().y)) * 0.5f;
-		TextRenderer::TextDisplaySettings ds = TextRenderer::TextDisplaySettings(
-		    32, TextRenderer::horizontalAlign_middle, TextRenderer::verticalAlign_baseLine);
+		//const char* text = "Settings?\nPlay\nQuit";
+		//vec2f pos = vec2f(float(uiContext.getCanvasSize().x), float(uiContext.getCanvasSize().y)) * 0.5f;
+		//TextRenderer::TextDisplaySettings ds = TextRenderer::TextDisplaySettings(
+		//    32, TextRenderer::horizontalAlign_middle, TextRenderer::verticalAlign_baseLine);
 
-		Box2f f = TextRenderer::computeTextMetrics(*uiContext.getDefaultFont(), ds, "Settings?\nPlay\nQuit");
-		f.move(pos);
-		drawSets.quickDraw->getTextureDrawer().drawRect(drawSets.rdest, f, vec4f(0.5f));
+		//Box2f f = TextRenderer::computeTextMetrics(*uiContext.getDefaultFont(), ds, "Settings?\nPlay\nQuit");
+		//f.move(pos);
+		//drawSets.quickDraw->getTextureDrawer().drawRect(drawSets.rdest, f, vec4f(0.5f));
 
-		textRenderer.drawText2d(*uiContext.getDefaultFont(), ds, text, pos, drawSets.rdest, vec4f(1.f), nullptr);
+		//textRenderer.drawText2d(*uiContext.getDefaultFont(), ds, text, pos, drawSets.rdest, vec4f(1.f), nullptr);
 	}
 };
 
