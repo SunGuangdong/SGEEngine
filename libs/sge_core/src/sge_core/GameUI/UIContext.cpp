@@ -245,7 +245,7 @@ void UIContext::draw(const UIDrawSets& drawSets)
 	}
 
 	if (auto gamepadTarget = getGamepadTarget(); m_isUsingGamepad && gamepadTarget && !gamepadTarget->isSuspended()) {
-		Box2f bb = gamepadTarget->getBBoxPixels();
+		Box2f bb = gamepadTarget->getBBoxPixelsSS();
 		drawSets.quickDraw->getTextureDrawer().drawRect(
 		    drawSets.rdest, bb, vec4f(1.f, 1.f, 0.f, 0.33f), getCore()->getGraphicsResources().BS_backToFrontAlpha);
 	}

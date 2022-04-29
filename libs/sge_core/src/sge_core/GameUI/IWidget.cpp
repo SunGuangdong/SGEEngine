@@ -10,7 +10,7 @@ namespace sge::gamegui {
 Box2f IWidget::getParentBBoxSS() const
 {
 	if (auto parent = getParent(); parent) {
-		Box2f parentBBox = parent->getBBoxPixels();
+		Box2f parentBBox = parent->getBBoxPixelsSS();
 		return parentBBox;
 	}
 	else {

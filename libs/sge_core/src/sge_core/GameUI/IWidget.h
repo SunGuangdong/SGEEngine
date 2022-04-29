@@ -43,12 +43,24 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 
 	void setSize(Size newSize) { m_size = newSize; }
 
-	Box2f getBBoxPixels() const
+	Box2f getBBoxPixelsSS() const
 	{
 		Box2f parentBBoxSS = getParentBBoxSS();
 		const Box2f bboxSS =
-		    m_position.getBBoxPixels(parentBBoxSS, getParentContentOrigin().toPixels(parentBBoxSS.size()), m_size);
+		    m_position.getBBoxPixelsSS(parentBBoxSS, getParentContentOrigin().toPixels(parentBBoxSS.size()), m_size);
 		return bboxSS;
+	}
+
+	Box2f getBBoxPixelsParentSpace() const
+	{
+		Box2f parentBBoxSS = getParentBBoxSS();
+		const Box2f bboxSS =
+		    m_position.getBBoxPixelsSS(parentBBoxSS, getParentContentOrigin().toPixels(parentBBoxSS.size()), m_size);
+
+		Box2f bboxParentSpacePixels = bboxSS;
+		bboxParentSpacePixels.move(-parentBBoxSS.min);
+
+		return bboxParentSpacePixels;
 	}
 
 	Box2f getScissorBoxSS() const;
@@ -108,13 +120,14 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	Box2f getParentBBoxSS() const;
 	Pos getParentContentOrigin() const;
 
-  private:
+  public:
 	float opacity = 1.f;
 	Pos m_position;
 	Size m_size;
 	bool m_isSuspended = false;
 	Pos m_contentsOrigin;
 
+  protected:
 	bool m_wasHoveredPrevFrame = false;
 
 	UIContext& m_owningContext;

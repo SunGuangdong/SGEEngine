@@ -40,14 +40,14 @@ void ColumnLayout::addWidget(std::shared_ptr<IWidget> widget)
 void ColumnLayout::update()
 {
 	float offsetSS = 0;
-	float spacingSS = m_spacing.computeSizePixels(false, m_columnContainer->getBBoxPixels().size());
+	float spacingSS = m_spacing.computeSizePixels(false, m_columnContainer->getBBoxPixelsSS().size());
 
 	for (std::shared_ptr<IWidget> w : m_widgets) {
 		if (w) {
 			w->getPosition().posY = Unit::fromPixels(offsetSS);
 			w->getPosition().posX = Unit::fromPixels(0);
 
-			offsetSS += w->getBBoxPixels().size().y + spacingSS;
+			offsetSS += w->getBBoxPixelsSS().size().y + spacingSS;
 		}
 	}
 }

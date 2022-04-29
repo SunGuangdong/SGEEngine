@@ -23,7 +23,7 @@ const ILayout* IWidget::getLayout() const
 
 Box2f IWidget::getScissorBoxSS() const
 {
-	Box2f scissorBboxSS = getBBoxPixels();
+	Box2f scissorBboxSS = getBBoxPixelsSS();
 	if (auto parent = getParent(); parent) {
 		Box2f parentScissorBBoxSS = parent->getScissorBoxSS();
 		scissorBboxSS = parentScissorBBoxSS.getOverlapBox(scissorBboxSS);
@@ -76,7 +76,7 @@ void TextWidget::draw(const UIDrawSets& drawSets)
 
 	QuickFont* const font = m_font ? m_font : getContext().getDefaultFont();
 
-	const Box2f bboxSS = getBBoxPixels();
+	const Box2f bboxSS = getBBoxPixelsSS();
 
 	const float textHeight = m_fontSize.computeSizePixels(false, bboxSS.size());
 
@@ -128,7 +128,7 @@ std::shared_ptr<ImageWidget>
 void ImageWidget::draw(const UIDrawSets& drawSets)
 {
 	if (m_texture.IsResourceValid()) {
-		const Box2f bboxSS = getBBoxPixels();
+		const Box2f bboxSS = getBBoxPixelsSS();
 		float opacity = calcTotalOpacity();
 		drawSets.quickDraw->getTextureDrawer().drawRectTexture(
 		    drawSets.rdest,
@@ -156,7 +156,7 @@ std::shared_ptr<ButtonWidget>
 
 void ButtonWidget::draw(const UIDrawSets& drawSets)
 {
-	const Box2f bboxSS = getBBoxPixels();
+	const Box2f bboxSS = getBBoxPixelsSS();
 	const Box2f bboxScissorsSS = getScissorBoxSS();
 
 	const float textHeight = m_fontSize.computeSizePixels(false, bboxSS.size());
@@ -255,7 +255,7 @@ std::shared_ptr<HorizontalComboBox> HorizontalComboBox::create(UIContext& owning
 void HorizontalComboBox::draw(const UIDrawSets& drawSets)
 {
 	if (m_currentOption >= 0 && m_currentOption < int(m_options.size())) {
-		const Box2f bboxPixels = getBBoxPixels();
+		const Box2f bboxPixels = getBBoxPixelsSS();
 
 		const std::string& text = m_options[m_currentOption];
 
@@ -327,7 +327,7 @@ void Checkbox::draw(const UIDrawSets& drawSets)
 {
 	using namespace literals;
 
-	const Box2f bboxPixels = getBBoxPixels();
+	const Box2f bboxPixels = getBBoxPixelsSS();
 	const Box2f bboxScissors = getScissorBoxSS();
 	const Rect2s scissors = getScissorRect();
 
@@ -362,7 +362,7 @@ void Checkbox::draw(const UIDrawSets& drawSets)
 	const Size checkboxSize(1_hf, 1_hf);
 
 	const Box2f checkBoxRectPixelSpace =
-	    checboxPos.getBBoxPixels(bboxPixels, getParentContentOrigin().toPixels(bboxPixels.size()), checkboxSize);
+	    checboxPos.getBBoxPixelsSS(bboxPixels, getParentContentOrigin().toPixels(bboxPixels.size()), checkboxSize);
 	const vec4f checkBoxColor = m_isOn ? vec4f(0.f, 1.f, 0.f, 1.f) : vec4f(0.3f, 0.3f, 0.3f, 1.f);
 	drawSets.quickDraw->getTextureDrawer().drawRect(
 	    drawSets.rdest, checkBoxRectPixelSpace, checkBoxColor, getCore()->getGraphicsResources().BS_backToFrontAlpha);

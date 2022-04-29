@@ -183,7 +183,7 @@ struct Pos {
 	/// @param [in] parentBBox is the size in pixels of the parent box that contains the current position.
 	/// @param [in] size is the size associated with this position.
 	/// @result is the box containg the recatangle represented by this position and @size in pixels.
-	Box2f getBBoxPixels(const Box2f& parentBBox, vec2f parentContentOriginPixels, const Size& size) const
+	Box2f getBBoxPixelsSS(const Box2f& parentBBox, vec2f parentContentOriginPixels, const Size& size) const
 	{
 		const vec2f parentBBoxSizePixels = parentBBox.size();
 		const vec2f anchorPosSS(
