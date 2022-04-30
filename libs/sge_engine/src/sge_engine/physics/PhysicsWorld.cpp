@@ -58,10 +58,10 @@ void PhysicsWorld::addPhysicsObject(RigidBody& obj)
 
 void PhysicsWorld::removePhysicsObject(RigidBody& obj)
 {
-	sgeAssert(obj.getIsInWorldInternal());
 	if (obj.getBulletRigidBody()) {
 		if (obj.isInWorld()) {
 			dynamicsWorld->removeRigidBody(obj.getBulletRigidBody());
+			obj.setIsInWorldInternal(false);
 		}
 	}
 	else {
@@ -69,6 +69,7 @@ void PhysicsWorld::removePhysicsObject(RigidBody& obj)
 			// For ghost objects bullet has no way of telling if a body is in
 			// world or not, this is why we have out own way of checking.
 			dynamicsWorld->removeCollisionObject(obj.m_collisionObject.get());
+			obj.setIsInWorldInternal(false);
 		}
 	}
 }

@@ -40,7 +40,7 @@ struct SGE_CORE_API RowLayout final : public IWidget {
 	/// If true and if the widgets woudn't fit on a single line
 	/// the layout would start a new line of widgets below it.
 	/// otherwise all widgets would be in a single line even if the laoyut widget isn't big enough.
-	bool breakInMultipleRows = true;
+	bool breakInMultipleRowsToFit = true;
 
 	/// If > 0, the widget will place at most @maxWidgetsPerRow in a single row.
 	int maxWidgetsPerRow = 0;

@@ -6,15 +6,25 @@
 
 namespace sge::gamegui {
 
+/// See @Unit comment.
 enum UnitMeasure : int {
-	unitMeasure_pixels,
-	unitMeasure_fraction,  // same as percentage but in range [0;1]
-	unitMeasure_wFraction, // fraction but from the width of the parent widget
-	unitMeasure_hFraction, // fraction but from the height of the parent widget
-
+	unitMeasure_pixels,    ///< Fixed size in pixels.
+	unitMeasure_fraction,  ///< Same as percentage but in range [0;1]
+	unitMeasure_wFraction, ///< Fraction but from the width of the parent widget
+	unitMeasure_hFraction, ///< Fraction but from the height of the parent widget
 };
 
+/// Unit represents a length or a position in a given direction.
+/// Un order to support resizable UIs when the screen resolution changes
+/// the Unit type is a bit more complicatated than a single float.
+/// Depending on the way we want out widgets to resize
+/// we can use different units.
+/// For example we might want to have a mini-map for example that is always
+/// on the top of the scene, centered along X and we want it to be a suare that is always
+/// 10% of the screen height. We can use this type to tell the UI that the map widget is going to be
+/// 10% of the parent widget width by passing unitMeasure_wFraction as a measure.
 struct Unit {
+	/// Create a unit which is a fraction of the parent widget size in the specified axis.
 	static Unit fromFrac(float c)
 	{
 		Unit r;
@@ -23,6 +33,7 @@ struct Unit {
 		return r;
 	}
 
+	/// Create a unit which is a fraction of the parent widget width in all axes.
 	static Unit fromWFrac(float c)
 	{
 		Unit r;
@@ -31,6 +42,7 @@ struct Unit {
 		return r;
 	}
 
+	/// Create a unit which is a fraction of the parent widget height in all axes.
 	static Unit fromHFrac(float c)
 	{
 		Unit r;
@@ -39,6 +51,7 @@ struct Unit {
 		return r;
 	}
 
+	/// Create a unit which is always a fixed amount of pixels.
 	static Unit fromPixels(float c)
 	{
 		Unit r;
@@ -47,6 +60,11 @@ struct Unit {
 		return r;
 	}
 
+	/// depending on the unit mode and the parent widget size (specified by @dim)
+	/// computes the value in pixels of the current unit.
+	/// @param [in] isXDim is the axis (x or y) where the unit is going to get used (meaningful for
+	/// unitMeasure_fraction).
+	/// @param [in] dim is the size (usually in pixels) of the parent widget.
 	float computeSizePixels(const bool isXDim, const vec2f& dim) const
 	{
 		switch (mode) {
@@ -82,6 +100,7 @@ struct Unit {
 	float value = 0.f;
 };
 
+/// A collection of @Unit values that represent the size of a widget.
 struct Size {
 	Optional<Unit> minSizeX;
 	Optional<Unit> minSizeY;
@@ -147,10 +166,14 @@ struct Size {
 	}
 };
 
+/// Specifies the position and the aligment (anchor) of a widget.
 struct Pos {
-	vec2f anchorCoeff = vec2f(0.f);
+	/// Tge anchor of the widget in fractions.
+	/// (0,0) is the top-left corner of the widget.
+	/// (1,1) is the bottom-right corner of the widget.
 	Unit posX;
 	Unit posY;
+	vec2f anchorCoeff = vec2f(0.f);
 
 	Pos() = default;
 
@@ -205,7 +228,6 @@ struct Pos {
 		return posSS;
 	}
 
-	///
 	Pos getAsFraction(const vec2f& dimensionsSize) const
 	{
 		float xPixels = posX.computeSizePixels(true, dimensionsSize);
@@ -215,6 +237,8 @@ struct Pos {
 	}
 };
 
+// A set of C++ literal expression to simplify the create of Units, Pos and Size variable.
+// Be sure to add using namespace literals; to enable them.
 namespace literals {
 	inline Unit operator"" _px(const long double v) { return Unit::fromPixels(float(v)); }
 	inline Unit operator"" _px(const unsigned long long v) { return Unit::fromPixels(float(v)); }
@@ -228,4 +252,5 @@ namespace literals {
 	inline Unit operator"" _wf(const long double v) { return Unit::fromWFrac(float(v)); }
 	inline Unit operator"" _wf(const unsigned long long v) { return Unit::fromWFrac(float(v)); }
 } // namespace literals
+
 } // namespace sge::gamegui
