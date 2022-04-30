@@ -1,6 +1,5 @@
 #include <functional>
 
-#include "Layout.h"
 #include "UIContext.h"
 #include "Widget.h"
 #include "sge_core/ICore.h"
@@ -57,10 +56,6 @@ void UIContext::update(const InputState& is, const vec2i& canvasSize, const floa
 		}
 
 		w->update();
-
-		if (w->getLayout()) {
-			w->getLayout()->update();
-		}
 
 		for (const std::shared_ptr<IWidget>& child : w->getChildren()) {
 			updateWidget(child);

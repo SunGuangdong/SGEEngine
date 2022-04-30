@@ -10,17 +10,6 @@
 
 namespace sge::gamegui {
 
-
-ILayout* IWidget::getLayout()
-{
-	return m_layout.get();
-}
-
-const ILayout* IWidget::getLayout() const
-{
-	return m_layout.get();
-}
-
 Box2f IWidget::getScissorBoxSS() const
 {
 	Box2f scissorBboxSS = getBBoxPixelsSS();

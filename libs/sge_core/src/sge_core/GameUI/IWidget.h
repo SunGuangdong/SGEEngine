@@ -1,8 +1,9 @@
+#include <memory>
+
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/Box2f.h"
 
-#include "Layout.h"
 #include "Sizing.h"
 
 namespace sge::gamegui {
@@ -77,11 +78,6 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 
 	const std::vector<std::shared_ptr<IWidget>>& getChildren() const { return m_children; }
 
-	void setLayout(ILayout* layout);
-
-	ILayout* getLayout();
-	const ILayout* getLayout() const;
-
 	UIContext& getContext() { return m_owningContext; }
 	const UIContext& getContext() const { return m_owningContext; }
 
@@ -133,7 +129,6 @@ struct SGE_CORE_API IWidget : public std::enable_shared_from_this<IWidget> {
 	UIContext& m_owningContext;
 	std::weak_ptr<IWidget> m_parentWidget;
 	std::vector<std::shared_ptr<IWidget>> m_children;
-	std::unique_ptr<ILayout> m_layout = nullptr;
 };
 
 

@@ -13,7 +13,6 @@
 #include "sge_utils/math/vec4f.h"
 #include "sge_utils/react/Event.h"
 
-#include "Layout.h"
 #include "Sizing.h"
 
 #include <atomic>
@@ -30,8 +29,6 @@ namespace sge::gamegui {
 
 struct UIDrawSets;
 struct UIContext;
-struct ILayout;
-
 
 
 /// @brief InvisibleWidget is just an invisible widget with size and position

@@ -41,10 +41,5 @@ void IWidget::addChild(std::shared_ptr<IWidget> widget)
 	}
 }
 
-void IWidget::setLayout(ILayout* layout)
-{
-	sgeAssert(m_layout == nullptr);
-	m_layout.reset(layout);
-}
 
 } // namespace sge::gamegui
