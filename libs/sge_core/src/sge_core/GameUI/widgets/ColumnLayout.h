@@ -40,7 +40,10 @@ struct SGE_CORE_API ColumnLayout final : public IWidget {
 	/// If true and if the widgets woudn't fit on a single line
 	/// the layout would start a new line of widgets below it.
 	/// otherwise all widgets would be in a single line even if the laoyut widget isn't big enough.
-	bool breakInMultipleColumns = true;
+	bool breakInMultipleColumnsToFit = true;
+
+	/// If > 0, the widget will place at most @maxWidgetsPerRow in a single column.
+	int maxWidgetsPerColumn = 0;
 
   private:
 	/// The list of all widgets to be alligned.

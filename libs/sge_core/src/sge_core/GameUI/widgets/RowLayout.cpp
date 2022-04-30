@@ -30,24 +30,19 @@ void RowLayout::update()
 
 	const Box2f thisBBoxSSPixels = getBBoxPixelsSS();
 	const vec2f thisSize = thisBBoxSSPixels.diagonal();
-
 	const vec2f spacingPixels = {
 	    spacingX.computeSizePixels(true, thisSize), spacingY.computeSizePixels(true, thisSize)};
-
 	const vec2f fistWidgetPosition = startPosition.toPixels(thisSize);
+
 	vec2f nextWidgetPosition = fistWidgetPosition;
 	float nextLineStartY = topToBottom ? -FLT_MAX : FLT_MAX;
+	int numWidgetsInCurrentRow = 0;
 
 	for (std::shared_ptr<IWidget>& widget : alignedWidgets) {
 		// Check if the widget would fit in the line.
 		widget->m_position.posX = Unit::fromPixels(nextWidgetPosition.x);
 		widget->m_position.posY = Unit::fromPixels(nextWidgetPosition.y);
 		Box2f widgetBboxPixelsPs = widget->getBBoxPixelsParentSpace();
-
-		// if (leftToRight == false) {
-		//	widget->m_position.posX = Unit::fromPixels(nextWidgetPosition.x - widgetBboxPixelsPs.size().x);
-		//	widgetBboxPixelsPs = widget->getBBoxPixelsParentSpace();
-		//}
 
 		bool doesWidgetFit = false;
 		if (leftToRight) {
@@ -57,8 +52,9 @@ void RowLayout::update()
 			doesWidgetFit = widgetBboxPixelsPs.min.x >= 0.f - 1e-6f;
 		}
 
-		if (!doesWidgetFit) {
-			// Widget wouldn't fit, move to the next line.
+		if ((!doesWidgetFit && breakInMultipleRowsToFit) || (maxWidgetsPerRow > 0 && (numWidgetsInCurrentRow >= maxWidgetsPerRow))) {
+			numWidgetsInCurrentRow = 0;
+			// Widget wouldn't fit, move to the next row.
 			nextWidgetPosition.x = fistWidgetPosition.x;
 			if (topToBottom) {
 				if (nextLineStartY != -FLT_MAX) {
@@ -73,7 +69,7 @@ void RowLayout::update()
 				}
 			}
 
-			// Place the widget on the new line:
+			// Place the widget on a new row:
 			widget->m_position.posX = Unit::fromPixels(nextWidgetPosition.x);
 			widget->m_position.posY = Unit::fromPixels(nextWidgetPosition.y);
 			widgetBboxPixelsPs = widget->getBBoxPixelsParentSpace();
@@ -99,6 +95,8 @@ void RowLayout::update()
 				nextLineStartY = widgetBboxPixelsPs.min.y;
 			}
 		}
+
+		numWidgetsInCurrentRow += 1;
 	}
 }
 

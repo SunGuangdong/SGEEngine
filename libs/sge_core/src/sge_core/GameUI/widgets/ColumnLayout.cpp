@@ -23,24 +23,19 @@ void ColumnLayout::update()
 {
 	const Box2f thisBBoxSSPixels = getBBoxPixelsSS();
 	const vec2f thisSize = thisBBoxSSPixels.diagonal();
-
 	const vec2f spacingPixels = {
 	    spacingX.computeSizePixels(true, thisSize), spacingY.computeSizePixels(true, thisSize)};
 
 	const vec2f fistWidgetPosition = startPosition.toPixels(thisSize);
 	vec2f nextWidgetPosition = fistWidgetPosition;
 	float nextLineStartX = leftToRight ? -FLT_MAX : FLT_MAX;
+	int numWidgetsInColumn = 0;
 
 	for (std::shared_ptr<IWidget>& widget : alignedWidgets) {
 		// Check if the widget would fit in the line.
 		widget->m_position.posX = Unit::fromPixels(nextWidgetPosition.x);
 		widget->m_position.posY = Unit::fromPixels(nextWidgetPosition.y);
 		Box2f widgetBboxPixelsPs = widget->getBBoxPixelsParentSpace();
-
-		// if (leftToRight == false) {
-		//	widget->m_position.posX = Unit::fromPixels(nextWidgetPosition.x - widgetBboxPixelsPs.size().x);
-		//	widgetBboxPixelsPs = widget->getBBoxPixelsParentSpace();
-		//}
 
 		bool doesWidgetFit = false;
 		if (topToBottom) {
@@ -50,9 +45,11 @@ void ColumnLayout::update()
 			doesWidgetFit = widgetBboxPixelsPs.min.y >= 0.f - 1e-6f;
 		}
 
-		if (!doesWidgetFit) {
-			// Widget wouldn't fit, move to the next line.
+		if ((!doesWidgetFit && breakInMultipleColumnsToFit) ||
+		    (maxWidgetsPerColumn != 0 && (numWidgetsInColumn >= maxWidgetsPerColumn))) {
+			// Widget wouldn't fit, move to the next column.
 			nextWidgetPosition.y = fistWidgetPosition.y;
+			numWidgetsInColumn = 0;
 			if (leftToRight) {
 				if (nextLineStartX != -FLT_MAX) {
 					nextWidgetPosition.x = nextLineStartX + spacingPixels.x;
@@ -66,7 +63,7 @@ void ColumnLayout::update()
 				}
 			}
 
-			// Place the widget on the new line:
+			// Place the widget in a new column:
 			widget->m_position.posX = Unit::fromPixels(nextWidgetPosition.x);
 			widget->m_position.posY = Unit::fromPixels(nextWidgetPosition.y);
 			widgetBboxPixelsPs = widget->getBBoxPixelsParentSpace();
@@ -92,6 +89,8 @@ void ColumnLayout::update()
 				nextLineStartX = widgetBboxPixelsPs.min.x;
 			}
 		}
+
+		numWidgetsInColumn += 1;
 	}
 }
 
