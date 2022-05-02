@@ -1,10 +1,11 @@
+#pragma once
+
 #include <memory>
 
+#include "Sizing.h"
 #include "sge_core/sgecore_api.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/math/Box2f.h"
-
-#include "Sizing.h"
 
 namespace sge::gamegui {
 

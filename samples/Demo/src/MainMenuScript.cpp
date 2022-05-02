@@ -32,38 +32,17 @@ struct MainMenuScript final : public IWorldScript {
 		rootMenuWidget = std::make_shared<gamegui::InvisibleWidget>(uiContext, Pos(0_f, 0_f), Size(1_f, 1_f));
 
 		{
-			auto horizontalLayout = rootMenuWidget->addChildT(std::make_shared<RowLayout>(uiContext));
+			auto horizontalLayout = rootMenuWidget->addChildT(std::make_shared<ColumnLayout>(uiContext));
 			horizontalLayout->m_size = Size::fromFrac(vec2f(1.f, 1.f));
 			horizontalLayout->startPosition = Pos::fromFrac(1.f, 0.f);
 			horizontalLayout->spacingX = 5_px;
+			horizontalLayout->spacingY = 5_px;
 			horizontalLayout->leftToRight = false;
-			horizontalLayout->maxWidgetsPerRow = 2;
 
 			horizontalLayout->addWidget(
 			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn0"));
 			horizontalLayout->addWidget(
-			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn1"));
-			horizontalLayout->addWidget(
-			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn2"));
-			horizontalLayout->addWidget(
-			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn3"));
-		}
-
-		{
-			auto horizontalLayout = rootMenuWidget->addChildT(std::make_shared<RowLayout>(uiContext));
-			horizontalLayout->m_size = Size::fromFrac(vec2f(1.f, 1.f));
-			horizontalLayout->startPosition = Pos::fromFrac(0.f, 1.f);
-			horizontalLayout->spacingX = 5_px;
-			horizontalLayout->topToBottom = false;
-
-			horizontalLayout->addWidget(
-			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn0"));
-			horizontalLayout->addWidget(
-			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn1"));
-			horizontalLayout->addWidget(
-			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn2"));
-			horizontalLayout->addWidget(
-			    ButtonWidget::create(uiContext, Pos(0_f, 0_f, vec2f(0.f, 1.f)), Size(0.25_wf, 0.05_wf), "btn3"));
+			    Checkbox::create(uiContext, Pos(0_f, 0_f, vec2f(1.f, 0.f)), Size(0.25_wf, 0.05_wf), "btn1", true));
 		}
 
 #if 0

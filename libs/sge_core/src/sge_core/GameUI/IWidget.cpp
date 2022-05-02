@@ -41,5 +41,30 @@ void IWidget::addChild(std::shared_ptr<IWidget> widget)
 	}
 }
 
+Box2f IWidget::getScissorBoxSS() const
+{
+	Box2f scissorBboxSS = getBBoxPixelsSS();
+	if (auto parent = getParent(); parent) {
+		Box2f parentScissorBBoxSS = parent->getScissorBoxSS();
+		scissorBboxSS = parentScissorBBoxSS.getOverlapBox(scissorBboxSS);
+	}
+
+	return scissorBboxSS;
+}
+
+Rect2s IWidget::getScissorRect() const
+{
+	const Box2f scissorBoxSS = getScissorBoxSS();
+	const vec2f bboxSizeSS = scissorBoxSS.size();
+
+	Rect2s scissors;
+	scissors.x = short(scissorBoxSS.min.x);
+	scissors.y = short(scissorBoxSS.min.y);
+	scissors.width = short(bboxSizeSS.x);
+	scissors.height = short(bboxSizeSS.y);
+
+	return scissors;
+}
+
 
 } // namespace sge::gamegui
