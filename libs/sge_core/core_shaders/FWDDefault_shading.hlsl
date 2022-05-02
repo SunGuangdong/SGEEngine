@@ -1,11 +1,6 @@
 #include "ShadeCommon.h"
 
-
-
-#if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
 #include "lib_skinning.hlsl"
-#endif
-
 #include "lib_lighting.hlsl"
 #include "lib_textureMapping.hlsl"
 
@@ -14,8 +9,10 @@ float3 linearToSRGB(in float3 linearCol) {
 	float3 sRGBHi = (pow(abs(linearCol), 1.0 / 2.4) * 1.055) - 0.055;
 	float3 sRGB = (linearCol <= 0.0031308) ? sRGBLo : sRGBHi;
 	return sRGB;
-	
 }
+
+#define SGE_GEOMETRTY_FLAG_HAS_SKINNING (1 << 0)
+
 
 //--------------------------------------------------------------------
 // Uniforms
@@ -41,14 +38,15 @@ cbuffer ParamsCbFWDDefaultShading {
 	float uAmbientFakeDetailAmount;
 
 	// Skinning.
-	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+	/// The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
+	int uSkinningFirstBoneOffsetInTex;
 
 	ShaderLightData lights[kMaxLights];
 	int lightsCnt;
 	int lightCnt_padding[3];
 };
 
-// Material.
+// Material maps.
 uniform sampler2D texDiffuse;
 uniform sampler2D uTexNormalMap;
 uniform sampler2D uTexMetalness;
@@ -57,25 +55,13 @@ uniform sampler2D uTexRoughness;
 // Shadows.
 uniform sampler2D uLightShadowMap[kMaxLights];
 
-// Skinning.
-#if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
+// Skinning nones textures.
 uniform sampler2D uSkinningBones;
-#endif
-
-//--------------------------------------------------------------------
-//
-//--------------------------------------------------------------------
-float2 directionToUV_Spherical(float3 dir) {
-	const float2 invAtan = float2(0.1591, 0.3183);
-	float2 uv = float2(atan2(dir.z, dir.x), asin(-dir.y));
-	uv *= invAtan;
-	uv += float2(0.5, 0.5);
-	return uv;
-}
 
 //--------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------
+// Vertex of the input assembler.
 struct IAVertex {
 	float3 a_position : a_position;
 	float3 a_normal : a_normal;
@@ -99,27 +85,27 @@ struct IAVertex {
 #endif
 };
 
+struct ShaderVertexIn {
+	float3 vertexOs; ///< The vertex position in object space.
+	float3 normalOs; ///< The normal of the vertex in object space.
+	float2 uv; ///< The UV coordinate of the vertex.
+	float4 color; ///< The vertex color.
+	int4 boneIds; ///< The bone indices (not ids...).
+	float4 boneWeights; ///< Bone weights.
+};
+
 struct StageVertexOut {
 	float4 SV_Position : SV_Position;
 	float3 v_posWS : v_posWS;
-
-#if OPT_HasUV == kHasUV_Yes
 	float2 v_uv : v_uv;
-#endif
-
 	float3 v_normal : v_normal;
-#if OPT_HasTangentSpace == kHasTangetSpace_Yes
 	float3 v_tangent : v_tangent;
 	float3 v_binormal : v_binormal;
-#endif
-
-#if OPT_HasVertexColor == kHasVertexColor_Yes
 	float4 v_vertexDiffuse : v_vertexDiffuse;
-#endif
 };
 
 StageVertexOut vsMain(IAVertex vsin) {
-	StageVertexOut res;
+	StageVertexOut stageVertexOut;
 
 	float3 vertexPosOs = vsin.a_position;
 	float3 normalOs = vsin.a_normal;
@@ -137,24 +123,32 @@ StageVertexOut vsMain(IAVertex vsin) {
 
 	float4 worldPosNonDistorted = worldPos;
 
-	res.v_posWS = worldPosNonDistorted.xyz;
-	res.SV_Position = mul(projView, worldPos);
+	stageVertexOut.v_posWS = worldPosNonDistorted.xyz;
+	stageVertexOut.SV_Position = mul(projView, worldPos);
 
-	res.v_normal = worldNormal.xyz;
+	stageVertexOut.v_normal = worldNormal.xyz;
+
 #if OPT_HasTangentSpace == kHasTangetSpace_Yes
-	res.v_tangent = mul(world, float4(vsin.a_tangent, 0.0)).xyz;
-	res.v_binormal = mul(world, float4(vsin.a_binormal, 0.0)).xyz;
+	stageVertexOut.v_tangent = mul(world, float4(vsin.a_tangent, 0.0)).xyz;
+	stageVertexOut.v_binormal = mul(world, float4(vsin.a_binormal, 0.0)).xyz;
+#else
+	stageVertexOut.v_tangent = float3(0.0, 0.0, 0.0);
+	stageVertexOut.v_binormal = float3(0.0, 0.0, 0.0);
 #endif
 
 #if (OPT_HasUV == kHasUV_Yes)
-	res.v_uv = mul(uvwTransform, float4(vsin.a_uv, 0.0, 1.0)).xy;
+	stageVertexOut.v_uv = mul(uvwTransform, float4(vsin.a_uv, 0.0, 1.0)).xy;
+#else
+	stageVertexOut.v_uv = float2(0.0, 0.0);
 #endif
 
 #if OPT_HasVertexColor == kHasVertexColor_Yes
-	res.v_vertexDiffuse = vsin.a_color;
+	stageVertexOut.v_vertexDiffuse = vsin.a_color;
+#else
+	// Set to white if no vertex color is used, as we might tint by this color.
+	stageVertexOut.v_vertexDiffuse = float4(1.0, 1.0, 1.0, 1.0);
 #endif
-
-	return res;
+	return stageVertexOut;
 }
 
 //--------------------------------------------------------------------
@@ -170,35 +164,23 @@ float4 psMain(StageVertexOut inVert)
 	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromConstantColor) {
 		// We already use uDiffuseColorTint. So nothing to do here.
 	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
-#if (OPT_HasUV == kHasUV_Yes)
 		mtlSample.albedo *= tex2D(texDiffuse, inVert.v_uv); // TODO: srgb to linear.
-#else                                                       // Should never happen.
-		return float4(1.f, 0.f, 1.f, 1.f);
-#endif
 	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromVertexColor) {
-#if OPT_HasVertexColor == kHasVertexColor_Yes
 		mtlSample.albedo = inVert.v_vertexDiffuse;
-#else // Should never happen.
-		return float4(1.f, 0.f, 1.f, 1.f);
-#endif
 	}
 
-#if OPT_HasVertexColor == kHasVertexColor_Yes
 	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseTintByVertexColor) {
 		mtlSample.albedo *= inVert.v_vertexDiffuse;
 	}
-#endif
 
 	if (uPBRMtlFlags & kPBRMtl_Flags_HasNormalMap) {
-#if (OPT_HasUV == kHasUV_Yes) && (OPT_HasTangentSpace == kHasTangetSpace_Yes)
+		// Assumes that there is a correct tanget space.
 		const float3 normalMapNorm = 2.f * tex2D(uTexNormalMap, inVert.v_uv).xyz - float3(1.f, 1.f, 1.f);
-		const float3 normalFromNormalMap = normalMapNorm.x * normalize(inVert.v_tangent) + normalMapNorm.y * normalize(inVert.v_binormal) +
-		                                   normalMapNorm.z * normalize(inVert.v_normal);
-
+		const float3 normalFromNormalMap = 
+			  normalMapNorm.x * normalize(inVert.v_tangent) 
+			+ normalMapNorm.y * normalize(inVert.v_binormal) 
+			+ normalMapNorm.z * normalize(inVert.v_normal);
 		mtlSample.shadeNormalWs = normalize(normalFromNormalMap);
-#else
-		return float4(1.f, 1.f, 0.f, 1.f);
-#endif
 	} else {
 		mtlSample.shadeNormalWs = normalize(inVert.v_normal);
 	}
@@ -215,7 +197,6 @@ float4 psMain(StageVertexOut inVert)
 	mtlSample.metallic = uMetalness;
 	mtlSample.roughness = uRoughness;
 
-#if OPT_HasUV == kHasUV_Yes
 	if (uPBRMtlFlags & kPBRMtl_Flags_HasMetalnessMap) {
 		mtlSample.metallic *= tex2D(uTexMetalness, inVert.v_uv).r; // TODO: srgb to linear.
 	}
@@ -223,7 +204,6 @@ float4 psMain(StageVertexOut inVert)
 	if ((uPBRMtlFlags & kPBRMtl_Flags_HasRoughnessMap) != 0) {
 		mtlSample.roughness *= tex2D(uTexRoughness, inVert.v_uv).r; // TODO: srgb to linear.
 	}
-#endif
 
 	// Compute the lighting for each light.
 	float4 finalColor;
@@ -249,7 +229,6 @@ float4 psMain(StageVertexOut inVert)
 		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.z)); 
 
 		float ambientLightAmount = lerp(1.f, ambientLightingFake, uAmbientFakeDetailAmount);
-
 		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor * ambientLightAmount;
 	} 
 	 

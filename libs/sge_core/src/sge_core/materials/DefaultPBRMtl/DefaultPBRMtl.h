@@ -24,13 +24,11 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 	}
 
 	mat4f uvwTransform = mat4f::getIdentity();
-
 	vec4f diffuseColor = vec4f(1.f, 1.f, 1.f, 1.f);
 
 	Texture* diffuseTexture = nullptr;
 	Texture* texMetalness = nullptr;
 	Texture* texRoughness = nullptr;
-
 	Texture* texNormalMap = nullptr;
 
 	vec3f diffuseTexXYZScaling = vec3f(1.f); // Triplanar scaling for each axis.

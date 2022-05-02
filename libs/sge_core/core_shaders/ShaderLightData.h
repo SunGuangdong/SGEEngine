@@ -23,7 +23,7 @@
 #ifdef __cplusplus
 __declspec(align(4))
 #endif
-    struct ShaderLightData {
+struct ShaderLightData {
 	float3 lightPosition; // Used for spot and point lights.
 	int lightType;        // TODO: embed this into the flags.
 
