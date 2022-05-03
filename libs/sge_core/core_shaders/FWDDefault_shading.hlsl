@@ -1,5 +1,4 @@
 #include "ShadeCommon.h"
-
 #include "lib_skinning.hlsl"
 #include "lib_lighting.hlsl"
 #include "lib_textureMapping.hlsl"
@@ -10,40 +9,12 @@ float3 linearToSRGB(in float3 linearCol) {
 	float3 sRGB = (linearCol <= 0.0031308) ? sRGBLo : sRGBHi;
 	return sRGB;
 }
-
-#define SGE_GEOMETRTY_FLAG_HAS_SKINNING (1 << 0)
-
-
 //--------------------------------------------------------------------
-// Uniforms
+// Uniforms and cbuffers.
 //--------------------------------------------------------------------
 // https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-packing-rules?redirectedfrom=MSDN
 cbuffer ParamsCbFWDDefaultShading {
-	float4x4 projView;
-	float4x4 world;
-	float4x4 uvwTransform;
-	float4 cameraPositionWs;
-	float4 uCameraLookDirWs;
-
-	float4 uDiffuseColorTint;
-	float3 texDiffuseXYZScaling;
-	float uMetalness;
-
-	float uRoughness;
-	int uPBRMtlFlags;
-	float alphaMultiplier;
-
-	float4 uRimLightColorWWidth;
-	float3 uAmbientLightColor;
-	float uAmbientFakeDetailAmount;
-
-	// Skinning.
-	/// The row (integer) in @uSkinningBones of the fist bone for the mesh that is being drawn.
-	int uSkinningFirstBoneOffsetInTex;
-
-	ShaderLightData lights[kMaxLights];
-	int lightsCnt;
-	int lightCnt_padding[3];
+	FWDShader_CBuffer_Params fwdParams;
 };
 
 // Material maps.
@@ -104,7 +75,8 @@ struct StageVertexOut {
 	float4 v_vertexDiffuse : v_vertexDiffuse;
 };
 
-StageVertexOut vsMain(IAVertex vsin) {
+StageVertexOut vsMain(IAVertex vsin)
+{
 	StageVertexOut stageVertexOut;
 
 	float3 vertexPosOs = vsin.a_position;
@@ -112,32 +84,36 @@ StageVertexOut vsMain(IAVertex vsin) {
 
 	// If there is a skinning avilable apply it to the vertex in object space.
 #if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
-	float4x4 skinMtx = libSkining_getSkinningTransform(vsin.a_bonesIds, uSkinningFirstBoneOffsetInTex, vsin.a_bonesWeights, uSkinningBones);
+	float4x4 skinMtx = libSkining_getSkinningTransform(
+		vsin.a_bonesIds,
+		fwdParams.mesh.uSkinningFirstBoneOffsetInTex,
+		vsin.a_bonesWeights,
+		uSkinningBones);
 	vertexPosOs = mul(skinMtx, float4(vertexPosOs, 1.0)).xyz;
 	normalOs = mul(skinMtx, float4(normalOs, 0.0)).xyz; // TODO: Proper normal transfrom by inverse transpose.
 #endif
 
 	// Pass the varyings to the next shader.
-	float4 worldPos = mul(world, float4(vertexPosOs, 1.0));
-	const float4 worldNormal = mul(world, float4(normalOs, 0.0)); // TODO: Proper normal transfrom by inverse transpose.
+	float4 worldPos = mul(fwdParams.mesh.node2world, float4(vertexPosOs, 1.0));
+	const float4 worldNormal = mul(fwdParams.mesh.node2world, float4(normalOs, 0.0)); // TODO: Proper normal transfrom by inverse transpose.
 
 	float4 worldPosNonDistorted = worldPos;
 
 	stageVertexOut.v_posWS = worldPosNonDistorted.xyz;
-	stageVertexOut.SV_Position = mul(projView, worldPos);
+	stageVertexOut.SV_Position = mul(fwdParams.camera.projView, worldPos);
 
 	stageVertexOut.v_normal = worldNormal.xyz;
 
 #if OPT_HasTangentSpace == kHasTangetSpace_Yes
-	stageVertexOut.v_tangent = mul(world, float4(vsin.a_tangent, 0.0)).xyz;
-	stageVertexOut.v_binormal = mul(world, float4(vsin.a_binormal, 0.0)).xyz;
+	stageVertexOut.v_tangent = mul(fwdParams.mesh.node2world, float4(vsin.a_tangent, 0.0)).xyz;
+	stageVertexOut.v_binormal = mul(fwdParams.mesh.node2world, float4(vsin.a_binormal, 0.0)).xyz;
 #else
 	stageVertexOut.v_tangent = float3(0.0, 0.0, 0.0);
 	stageVertexOut.v_binormal = float3(0.0, 0.0, 0.0);
 #endif
 
 #if (OPT_HasUV == kHasUV_Yes)
-	stageVertexOut.v_uv = mul(uvwTransform, float4(vsin.a_uv, 0.0, 1.0)).xy;
+	stageVertexOut.v_uv = mul(fwdParams.material.uvwTransform, float4(vsin.a_uv, 0.0, 1.0)).xy;
 #else
 	stageVertexOut.v_uv = float2(0.0, 0.0);
 #endif
@@ -155,25 +131,24 @@ StageVertexOut vsMain(IAVertex vsin) {
 // Pixel Shader
 //--------------------------------------------------------------------
 #ifdef SGE_PIXEL_SHADER
-float4 psMain(StageVertexOut inVert)
-    : SV_Target0 {
+float4 psMain(StageVertexOut inVert) : SV_Target0
+{
 	MaterialSample mtlSample;
+	mtlSample.albedo = fwdParams.material.uDiffuseColorTint;
 
-	mtlSample.albedo = uDiffuseColorTint;
-
-	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromConstantColor) {
+	if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromConstantColor) {
 		// We already use uDiffuseColorTint. So nothing to do here.
-	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
+	} else if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromTexture) {
 		mtlSample.albedo *= tex2D(texDiffuse, inVert.v_uv); // TODO: srgb to linear.
-	} else if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromVertexColor) {
-		mtlSample.albedo = inVert.v_vertexDiffuse;
-	}
-
-	if (uPBRMtlFlags & kPBRMtl_Flags_DiffuseTintByVertexColor) {
+	} else if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_DiffuseFromVertexColor) {
 		mtlSample.albedo *= inVert.v_vertexDiffuse;
 	}
 
-	if (uPBRMtlFlags & kPBRMtl_Flags_HasNormalMap) {
+	if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_DiffuseTintByVertexColor) {
+		mtlSample.albedo *= inVert.v_vertexDiffuse;
+	}
+
+	if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_HasNormalMap) {
 		// Assumes that there is a correct tanget space.
 		const float3 normalMapNorm = 2.f * tex2D(uTexNormalMap, inVert.v_uv).xyz - float3(1.f, 1.f, 1.f);
 		const float3 normalFromNormalMap = 
@@ -185,36 +160,39 @@ float4 psMain(StageVertexOut inVert)
 		mtlSample.shadeNormalWs = normalize(inVert.v_normal);
 	}
 
-
 	// If the fragment is going to be fully transparent discard the sample.
-	if (mtlSample.albedo.w <= 0.f || alphaMultiplier <= 0.f) {
+	if (mtlSample.albedo.w <= 0.f || fwdParams.material.alphaMultiplier <= 0.f) {
 		discard;
 	}
 
 	mtlSample.hitPointWs = inVert.v_posWS;
-	mtlSample.vertexToCameraDirWs = (cameraPositionWs - inVert.v_posWS);
+	mtlSample.vertexToCameraDirWs = (fwdParams.camera.cameraPositionWs - inVert.v_posWS);
 
-	mtlSample.metallic = uMetalness;
-	mtlSample.roughness = uRoughness;
+	mtlSample.metallic = fwdParams.material.uMetalness;
+	mtlSample.roughness = fwdParams.material.uRoughness;
 
-	if (uPBRMtlFlags & kPBRMtl_Flags_HasMetalnessMap) {
+	if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_HasMetalnessMap) {
 		mtlSample.metallic *= tex2D(uTexMetalness, inVert.v_uv).r; // TODO: srgb to linear.
 	}
 
-	if ((uPBRMtlFlags & kPBRMtl_Flags_HasRoughnessMap) != 0) {
+	if ((fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_HasRoughnessMap) != 0) {
 		mtlSample.roughness *= tex2D(uTexRoughness, inVert.v_uv).r; // TODO: srgb to linear.
 	}
 
 	// Compute the lighting for each light.
 	float4 finalColor;
-	if (uPBRMtlFlags & kPBRMtl_Flags_NoLighting) {
+	if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_NoLighting) {
 		finalColor = mtlSample.albedo;
 	} else {
 		finalColor = float4(0.f, 0.f, 0.f, mtlSample.albedo.w);
 
 		[unroll]
-		for (int iLight = 0; iLight < lightsCnt; ++iLight) {
-			finalColor.xyz += Light_computeDirectLighting(lights[iLight], uLightShadowMap[iLight], mtlSample, cameraPositionWs);
+		for (int iLight = 0; iLight < fwdParams.lighting.lightsCnt; ++iLight) {
+			finalColor.xyz += Light_computeDirectLighting(
+				fwdParams.lighting.lights[iLight], 
+				uLightShadowMap[iLight], 
+				mtlSample, 
+				fwdParams.camera.cameraPositionWs);
 		}
 
 		// Add ambient lighting.
@@ -228,16 +206,17 @@ float4 psMain(StageVertexOut inVert)
 		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.x));
 		ambientLightingFake += 0.25f * (1.f - abs(mtlSample.shadeNormalWs.z)); 
 
-		float ambientLightAmount = lerp(1.f, ambientLightingFake, uAmbientFakeDetailAmount);
-		finalColor.xyz += mtlSample.albedo.xyz * uAmbientLightColor * ambientLightAmount;
+		float ambientLightAmount = lerp(1.f, ambientLightingFake, fwdParams.lighting.uAmbientFakeDetailAmount);
+		finalColor.xyz += mtlSample.albedo.xyz * fwdParams.lighting.uAmbientLightColor * ambientLightAmount;
 	} 
-	 
+
+
 	//finalColor.xyz = pow(finalColor.xyz, float3(1.f / 2.2f, 1.f / 2.2f, 1.f / 2.2f));
 	//finalColor.xyz = finalColor.xyz / (finalColor.xyz + float3(1.f, 1.f, 1.f));
 	//finalColor.xyz = linearToSRGB(finalColor.xyz);
 
 	// Applt the alpha multiplier.
-	finalColor.w *= alphaMultiplier;
+	finalColor.w *= fwdParams.material.alphaMultiplier;
 
 	return finalColor;
 }

@@ -44,6 +44,13 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 };
 
 struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
+	
+	IMaterial* materialCreateCopy() override { 
+		DefaultPBRMtl* copyMtl  = new DefaultPBRMtl();
+		*copyMtl = *this;
+		return copyMtl;
+	}
+	
 	virtual IMaterialData* getMaterialDataLocalStorage() override;
 
 	TypeId getTypeId() const override;

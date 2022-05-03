@@ -13,43 +13,9 @@
 // but how does one share a struct between HLSL and C++ without something like this?
 #include "../core_shaders/FWDDefault_buildShadowMaps.h"
 #include "../core_shaders/ShadeCommon.h"
-#include "../core_shaders/ShaderLightData.h"
-
 #include "DefaultPBRMtl.h"
 
 using namespace sge;
-
-// https://docs.microsoft.com/en-us/windows/win32/direct3dhlsl/dx-graphics-hlsl-packing-rules?redirectedfrom=MSDN
-
-__declspec(align(4)) struct ParamsCbFWDDefaultShading {
-	mat4f projView;
-	mat4f world;
-	mat4f uvwTransform;
-	vec4f cameraPositionWs;
-	vec4f uCameraLookDirWs;
-
-	vec4f uDiffuseColorTint;
-	vec3f texDiffuseXYZScaling;
-	float uMetalness;
-
-	float uRoughness;
-	int uPBRMtlFlags;
-	float alphaMultiplier;
-	int alphaMultiplier_padding;
-
-	vec4f uRimLightColorWWidth;
-	vec3f uAmbientLightColor;
-	float uAmbientFakeDetailAmount;
-
-	// Skinning.
-	int uSkinningFirstBoneOffsetInTex; ///< The row (integer) in @uSkinningBones of the fist bone for the mesh that is
-	                                   ///< being drawn.
-	int uSkinningFirstBoneOffsetInTex_padding[3];
-
-	ShaderLightData lights[kMaxLights];
-	int lightsCnt;
-	int lightCnt_padding[3];
-};
 
 //-----------------------------------------------------------------------------
 // BasicModelDraw
@@ -77,11 +43,6 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 		OPT_HasUV,
 		OPT_HasTangentSpace,
 		OPT_HasVertexSkinning,
-
-		// OPT_UseNormalMap,
-		// OPT_DiffuseColorSrc,
-		// OPT_Lighting,
-		// OPT_HasVertexSkinning,
 		kNumOptions,
 	};
 
@@ -101,7 +62,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 		uParamsCbFWDDefaultShading_pixel,
 	};
 
-	ParamsCbFWDDefaultShading paramsCb;
+	FWDShader_CBuffer_Params paramsCb;
 	memset(&paramsCb, 0, sizeof(paramsCb));
 
 	if (shadingPermutFWDShading.isValid() == false || shaderFilesWatcher.update()) {
@@ -262,21 +223,21 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 
 	StaticArray<BoundUniform, 64> uniforms;
 
-	mat4f combinedUVWTransform = /* instDrawMods.uvwTransform * */ mtlData.uvwTransform;
+	const mat4f combinedUVWTransform = /* instDrawMods.uvwTransform * */ mtlData.uvwTransform;
 
-	paramsCb.world = geomWorldTransfrom;
-	paramsCb.cameraPositionWs = vec4f(camera.getCameraPosition(), 1.f);
-	paramsCb.uCameraLookDirWs = vec4f(camera.getCameraLookDir(), 0.f);
-	paramsCb.projView = camera.getProjView();
-	paramsCb.uDiffuseColorTint = mtlData.diffuseColor;
-	paramsCb.uvwTransform = combinedUVWTransform;
-	paramsCb.texDiffuseXYZScaling = mtlData.diffuseTexXYZScaling;
-	paramsCb.uMetalness = mtlData.metalness;
-	paramsCb.uRoughness = mtlData.roughness;
-	paramsCb.uSkinningFirstBoneOffsetInTex = geometry.firstBoneOffset;
-	paramsCb.uPBRMtlFlags = pbrMtlFlags;
-	paramsCb.alphaMultiplier = mtlData.alphaMultipler;
-	paramsCb.uvwTransform = mtlData.uvwTransform;
+
+	paramsCb.camera.cameraPositionWs = vec4f(camera.getCameraPosition(), 1.f);
+	paramsCb.camera.projView = camera.getProjView();
+
+	paramsCb.mesh.node2world = geomWorldTransfrom;
+	paramsCb.mesh.uSkinningFirstBoneOffsetInTex = geometry.firstBoneOffset;
+
+	paramsCb.material.uDiffuseColorTint = mtlData.diffuseColor;
+	paramsCb.material.uMetalness = mtlData.metalness;
+	paramsCb.material.uRoughness = mtlData.roughness;
+	paramsCb.material.uPBRMtlFlags = pbrMtlFlags;
+	paramsCb.material.alphaMultiplier = mtlData.alphaMultipler;
+	paramsCb.material.uvwTransform = combinedUVWTransform;
 
 	if (mtlData.diffuseTexture) {
 		shaderPerm.bind<64>(uniforms, uTexDiffuse, (void*)mtlData.diffuseTexture);
@@ -314,9 +275,9 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 	// Lights and draw call.
 	Texture* shadowMaps[kMaxLights] = {nullptr};
 
-	paramsCb.lightsCnt = minOf((int)SGE_ARRSZ(paramsCb.lights), lighting.lightsCount);
-	for (int iLight = 0; iLight < paramsCb.lightsCnt; ++iLight) {
-		ShaderLightData& shaderLight = paramsCb.lights[iLight];
+	paramsCb.lighting.lightsCnt = minOf((int)SGE_ARRSZ(paramsCb.lighting.lights), lighting.lightsCount);
+	for (int iLight = 0; iLight < paramsCb.lighting.lightsCnt; ++iLight) {
+		ShaderLightData& shaderLight = paramsCb.lighting.lights[iLight];
 		const ShadingLightData* srcLight = lighting.ppLightData[iLight];
 
 		if_checked(srcLight && srcLight->pLightDesc)
@@ -355,8 +316,8 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 	uniforms.push_back(BoundUniform(shaderPerm.uniformLUT[uLightShadowMap], (&shadowMaps)));
 	sgeAssert(uniforms.back().bindLocation.isNull() == false && uniforms.back().bindLocation.uniformType != 0);
 
-	paramsCb.uAmbientLightColor = lighting.ambientLightColor;
-	paramsCb.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
+	paramsCb.lighting.uAmbientLightColor = lighting.ambientLightColor;
+	paramsCb.lighting.uAmbientFakeDetailAmount = lighting.ambientFakeDetailBias;
 
 	stateGroup.setRenderState(
 	    rasterState,

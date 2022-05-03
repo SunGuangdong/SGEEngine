@@ -231,7 +231,7 @@ JsonValue* serializeVariable(const TypeDesc* const typeDesc, const char* const d
 				}
 			}
 			else {
-				sgeLogError("[SERIALIZATION] Found a member without TypeDesc in type %s\n", typeDesc->name);
+				sgeLogError("[SERIALIZATION] Found a member without a TypeDesc - %s::%s\n", typeDesc->name, mfd.name);
 				sgeAssert(false);
 			}
 		}

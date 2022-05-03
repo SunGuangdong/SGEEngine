@@ -32,6 +32,13 @@ struct SGE_CORE_API SimpleTriplanarMtlData : public IMaterialData {
 };
 
 struct SGE_CORE_API SimpleTriplanarMtl : public IMaterial {
+	IMaterial* materialCreateCopy() override
+	{
+		SimpleTriplanarMtl* copyMtl = new SimpleTriplanarMtl();
+		*copyMtl = *this;
+		return copyMtl;
+	}
+
 	virtual IMaterialData* getMaterialDataLocalStorage() override;
 
 	TypeId getTypeId() const override;

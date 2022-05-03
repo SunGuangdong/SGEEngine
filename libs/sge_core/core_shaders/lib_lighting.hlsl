@@ -1,7 +1,7 @@
 #ifndef LIGHTING_SHADER
 #define LIGHTING_SHADER
 
-#include "ShaderLightData.h"
+#include "ShadeCommon.h"
 #include "lib_pbr.hlsl"
 #include "lib_textureMapping.hlsl"
 

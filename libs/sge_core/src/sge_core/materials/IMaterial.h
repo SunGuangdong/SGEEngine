@@ -41,6 +41,8 @@ struct SGE_CORE_API IMaterial {
 	IMaterial() = default;
 	virtual ~IMaterial() = default;
 
+	virtual IMaterial* materialCreateCopy() = 0;
+
 	virtual IMaterialData* getMaterialDataLocalStorage() = 0;
 
 	/// Returns the type-id from the reflection system of the material.

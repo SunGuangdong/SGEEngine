@@ -14,7 +14,6 @@
 // but how does one share a struct between HLSL and C++ without something like this?
 #include "../core_shaders/FWDDefault_buildShadowMaps.h"
 #include "../core_shaders/ShadeCommon.h"
-#include "../core_shaders/ShaderLightData.h"
 
 using namespace sge;
 
