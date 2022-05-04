@@ -56,13 +56,13 @@ struct IAVertex {
 #endif
 };
 
-struct ShaderVertexIn {
+struct Vertex {
 	float3 vertexOs; ///< The vertex position in object space.
 	float3 normalOs; ///< The normal of the vertex in object space.
-	float2 uv; ///< The UV coordinate of the vertex.
+	float3 tangetOs;
+	float3 binormalOs;
+	float2 vertexUv0; ///< The UV coordinate of the vertex.
 	float4 color; ///< The vertex color.
-	int4 boneIds; ///< The bone indices (not ids...).
-	float4 boneWeights; ///< Bone weights.
 };
 
 struct StageVertexOut {
@@ -77,10 +77,18 @@ struct StageVertexOut {
 
 StageVertexOut vsMain(IAVertex vsin)
 {
-	StageVertexOut stageVertexOut;
+	// Read the input vertex.
+	Vertex vertex;
 
-	float3 vertexPosOs = vsin.a_position;
-	float3 normalOs = vsin.a_normal;
+	vertex.vertexOs = vsin.a_position;
+	vertex.normalOs = vsin.a_normal;
+#if OPT_HasTangentSpace == kHasTangetSpace_Yes
+	vertex.tangetOs = vsin.a_tangent;
+	vertex.binormalOs = vsin.a_binormal;
+#else
+	vertex.tangetOs = float3(0.0, 0.0, 0.0);
+	vertex.binormalOs = float3(0.0, 0.0, 0.0);
+#endif
 
 	// If there is a skinning avilable apply it to the vertex in object space.
 #if OPT_HasVertexSkinning == kHasVertexSkinning_Yes
@@ -89,41 +97,53 @@ StageVertexOut vsMain(IAVertex vsin)
 		fwdParams.mesh.uSkinningFirstBoneOffsetInTex,
 		vsin.a_bonesWeights,
 		uSkinningBones);
-	vertexPosOs = mul(skinMtx, float4(vertexPosOs, 1.0)).xyz;
-	normalOs = mul(skinMtx, float4(normalOs, 0.0)).xyz; // TODO: Proper normal transfrom by inverse transpose.
+	vertex.vertexOs = mul(skinMtx, float4(vertex.vertexOs, 1.0)).xyz;
+	vertex.normalOs = mul(skinMtx, float4(vertex.normalOs, 0.0)).xyz; // TODO: Proper normal transfrom by inverse transpose.
 #endif
 
+#if (OPT_HasUV == kHasUV_Yes)
+	vertex.vertexUv0 = mul(fwdParams.material.uvwTransform, float4(vsin.a_uv, 0.0, 1.0)).xy;
+#else
+	vertex.vertexUv0 = float2(0.0, 0.0);
+#endif
+
+#if OPT_HasVertexColor == kHasVertexColor_Yes
+	vertex.color = vsin.a_color;
+#else
+	// Set to white if no vertex color is used, as we might tint by this color.
+	vertex.color = float4(1.0, 1.0, 1.0, 1.0);
+#endif
+
+	// processing...
+#ifdef SGE_MESH_VERTEX_MODIFIER_SHADER
+	SGE_MESH_VERTEX_MODIFIER_SHADER__MAGIC_REPLACE
+#endif
+
+	// Read the processed vertex and pass it to the fragment shader.
+	StageVertexOut stageVertexOut;
+
 	// Pass the varyings to the next shader.
-	float4 worldPos = mul(fwdParams.mesh.node2world, float4(vertexPosOs, 1.0));
-	const float4 worldNormal = mul(fwdParams.mesh.node2world, float4(normalOs, 0.0)); // TODO: Proper normal transfrom by inverse transpose.
+	const float4 vertexPosWs = mul(fwdParams.mesh.node2world, float4(vertex.vertexOs, 1.0));
+	stageVertexOut.SV_Position = mul(fwdParams.camera.projView, vertexPosWs);
+	stageVertexOut.v_posWS = vertexPosWs;
 
-	float4 worldPosNonDistorted = worldPos;
-
-	stageVertexOut.v_posWS = worldPosNonDistorted.xyz;
-	stageVertexOut.SV_Position = mul(fwdParams.camera.projView, worldPos);
-
-	stageVertexOut.v_normal = worldNormal.xyz;
-
+#if (OPT_HasUV == kHasUV_Yes)
+	// Material stuff:
+	stageVertexOut.v_uv  = mul(fwdParams.material.uvwTransform, float4(vertex.vertexUv0, 0.0, 1.0)).xy;
+#else
+	stageVertexOut.v_uv  = vertex.vertexUv0;
+#endif
+	// TODO: Proper normal transfrom by inverse transpose for normals.
+	stageVertexOut.v_normal = mul(fwdParams.mesh.node2world, float4(vertex.normalOs, 0.0)); 
 #if OPT_HasTangentSpace == kHasTangetSpace_Yes
-	stageVertexOut.v_tangent = mul(fwdParams.mesh.node2world, float4(vsin.a_tangent, 0.0)).xyz;
-	stageVertexOut.v_binormal = mul(fwdParams.mesh.node2world, float4(vsin.a_binormal, 0.0)).xyz;
+	stageVertexOut.v_tangent = mul(fwdParams.mesh.node2world, float4(vertex.tangetOs, 0.0)).xyz;
+	stageVertexOut.v_binormal = mul(fwdParams.mesh.node2world, float4(vertex.binormalOs, 0.0)).xyz;
 #else
 	stageVertexOut.v_tangent = float3(0.0, 0.0, 0.0);
 	stageVertexOut.v_binormal = float3(0.0, 0.0, 0.0);
 #endif
+	stageVertexOut.v_vertexDiffuse = vertex.color;
 
-#if (OPT_HasUV == kHasUV_Yes)
-	stageVertexOut.v_uv = mul(fwdParams.material.uvwTransform, float4(vsin.a_uv, 0.0, 1.0)).xy;
-#else
-	stageVertexOut.v_uv = float2(0.0, 0.0);
-#endif
-
-#if OPT_HasVertexColor == kHasVertexColor_Yes
-	stageVertexOut.v_vertexDiffuse = vsin.a_color;
-#else
-	// Set to white if no vertex color is used, as we might tint by this color.
-	stageVertexOut.v_vertexDiffuse = float4(1.0, 1.0, 1.0, 1.0);
-#endif
 	return stageVertexOut;
 }
 
