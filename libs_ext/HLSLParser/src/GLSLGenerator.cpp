@@ -1912,6 +1912,10 @@ const char* GLSLGenerator::GetBuiltInSemantic(const char* semantic, AttributeMod
     if (m_target == Target_FragmentShader && modifier == AttributeModifier_In && String_Equal(semantic, "SV_Position"))
         return "gl_FragCoord";
 
+    // SGE modified, adding support for SV_IsFrontFace
+    if (m_target == Target_FragmentShader && modifier == AttributeModifier_In && String_Equal(semantic, "SV_IsFrontFace"))
+        return "gl_FrontFacing";
+
     if (m_target == Target_FragmentShader && modifier == AttributeModifier_Out)
     {
         int index = -1;
