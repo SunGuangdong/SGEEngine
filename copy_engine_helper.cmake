@@ -13,7 +13,7 @@
 #
 # So for the best debugging experience set your start-up project in Visual Studio to be
 # ${target_name}_AssembleAndDebug and just hit F5 (or Ctrl+F5) and debug happily!
-macro(sge_generate_assemble_and_debug_target_for_game target_name target_output_dir)
+macro(sge_generate_assemble_and_debug_target_for_game target_name target_output_dir does_depends_on_engine)
 if(NOT EMSCRIPTEN)
 	add_custom_target(${target_name}_AssembleAndDebug ALL DEPENDS ${target_name})
 
@@ -33,16 +33,16 @@ if(NOT EMSCRIPTEN)
 	)
 
 	# sge_editor
-if(NOT EMSCRIPTEN)
 	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:sge_editor> ${target_output_dir}/
 	)
-endif()
 	
 	# sge_player
+	if(${does_depends_on_engine})
 	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:sge_player> ${target_output_dir}/
 	)
+	endif()
 	
 	# sge_core
 	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
@@ -59,9 +59,11 @@ endif()
                        ${CMAKE_SOURCE_DIR}/libs/sge_core/core_shaders/ ${target_output_dir}/core_shaders)
 	
 	# sge_engine
-	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:sge_engine> ${target_output_dir}/
-	)
+	if (${does_depends_on_engine})
+		add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:sge_engine> ${target_output_dir}/
+		)
+	endif()
 	
 	# sge_log
 	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
@@ -74,24 +76,32 @@ endif()
 	)
 	
 	# mdlconvlib for import 3D models.
-if(NOT EMSCRIPTEN)
 	if(TARGET mdlconvlib)
 		add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
 			COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:mdlconvlib> ${target_output_dir}/
 		)
 	endif()
-endif()
 	
 	# Transfer the engine assets.
-	add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
-					   COMMAND ${CMAKE_COMMAND} -E copy_directory
-                       ${CMAKE_SOURCE_DIR}/libs/sge_engine/assets/ ${target_output_dir}/assets)
+	if(${does_depends_on_engine})
+		add_custom_command(TARGET ${target_name}_AssembleAndDebug POST_BUILD
+						   COMMAND ${CMAKE_COMMAND} -E copy_directory
+						   ${CMAKE_SOURCE_DIR}/libs/sge_engine/assets/ ${target_output_dir}/assets)
+	endif()
 					   
 	# Visual Studio Debugging
-	set_target_properties(${target_name}_AssembleAndDebug PROPERTIES 
-		VS_DEBUGGER_WORKING_DIRECTORY "${target_output_dir}")
+	if(${does_depends_on_engine})
+		set_target_properties(${target_name}_AssembleAndDebug PROPERTIES 
+			VS_DEBUGGER_WORKING_DIRECTORY "${target_output_dir}")
 		
-	set_target_properties(${target_name}_AssembleAndDebug PROPERTIES 
-		VS_DEBUGGER_COMMAND "${target_output_dir}/$<TARGET_FILE_NAME:sge_editor>")
+		set_target_properties(${target_name}_AssembleAndDebug PROPERTIES 
+			VS_DEBUGGER_COMMAND "${target_output_dir}/$<TARGET_FILE_NAME:sge_editor>")
+	else()
+		set_target_properties(${target_name}_AssembleAndDebug PROPERTIES 
+			VS_DEBUGGER_WORKING_DIRECTORY "${target_output_dir}")
+			
+		set_target_properties(${target_name}_AssembleAndDebug PROPERTIES 
+			VS_DEBUGGER_COMMAND "${target_output_dir}/$<TARGET_FILE_NAME:${target_name}>")
+	endif()
 endif()
 endmacro()

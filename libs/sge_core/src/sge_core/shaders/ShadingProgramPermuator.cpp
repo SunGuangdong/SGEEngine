@@ -145,6 +145,7 @@ bool ShadingProgramPermuator::createInternal(
 			}
 
 			perPermutationShadingProg[iPerm].shadingProgram = sgedev->requestResource<ShadingProgram>();
+			perPermutationShadingProg[iPerm].debugCompilationErrors.clear();
 
 			shaderCodeFull.clear();
 			shaderCodeFull += macrosToPreapend;
@@ -156,6 +157,7 @@ bool ShadingProgramPermuator::createInternal(
 			        shaderCodeFull.c_str(), shaderCodeFull.c_str(), &dependantFilesForShaderCachemaking);
 
 			if (programCreateResult.succeeded == false) {
+				perPermutationShadingProg[iPerm].debugCompilationErrors = programCreateResult.errors;
 				sgeLogError("Shader Compilation Failed:\n%s", programCreateResult.errors.c_str());
 				hadErrors = true;
 			}

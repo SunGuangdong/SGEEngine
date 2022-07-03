@@ -27,5 +27,5 @@ if(EMSCRIPTEN)
 	set_target_properties(Demo PROPERTIES LINK_FLAGS "${PRELOADFILE}")
 endif()
 
-sge_generate_assemble_and_debug_target_for_game(Demo ${CMAKE_SOURCE_DIR}/output/Demo)
+sge_generate_assemble_and_debug_target_for_game(Demo ${CMAKE_SOURCE_DIR}/output/Demo ON)
 

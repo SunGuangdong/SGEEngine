@@ -29,7 +29,7 @@ struct SGE_CORE_API DefaultPBRMtlGeomDrawer : public IGeometryDrawer {
 
 
   private:
-	Optional<ShadingProgramPermuator> shadingPermutFWDShading;
+	std::unordered_map<std::string, Optional<ShadingProgramPermuator>> shadingPermutFWDShadingFilename;
 	GpuHandle<Buffer> paramsBuffer;
 	StateGroup stateGroup;
 

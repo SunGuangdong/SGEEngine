@@ -26,6 +26,7 @@ struct SGE_CORE_API ShadingProgramPermuator {
 		/// debugging we want this index to be the same as the index in the array specified by the user, as they are
 		/// going to access them by that index.
 		int safetyIndex;
+
 		const char* uniformName;
 
 		/// On witch shader stage is this uniform needed.
@@ -36,6 +37,7 @@ struct SGE_CORE_API ShadingProgramPermuator {
 	struct Permutation {
 		GpuHandle<ShadingProgram> shadingProgram;
 		std::vector<BindLocation> uniformLUT;
+		std::string debugCompilationErrors;
 
 		/// Using the cached bind locations for each uniforms, binds the input data to the specified uniform
 		/// in in the @uniforms.

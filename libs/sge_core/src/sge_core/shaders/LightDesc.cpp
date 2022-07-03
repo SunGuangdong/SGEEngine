@@ -28,6 +28,26 @@ Optional<ShadowMapBuildInfo>
 				frustumLSBBox.expand(mat_mul_pos(ws2ls, mainCameraFrustumCornersWs[t]));
 			}
 
+			// Snap the light bbox to texels in world space.
+			// This is neede because when the view camera or the light change,
+			// the position from where we compute the shadow maps changes a lot.
+			// As a result the pixels of the shadow map when mapped to world space change quite rapidly.
+			// Snapping, helps to reduce this issue.
+			// The code assumes that there is no scaling in light-to-world matrix.
+			// See: https://docs.microsoft.com/en-us/windows/win32/dxtecharts/common-techniques-to-improve-shadow-depth-maps
+			{
+				float snapToX = frustumLSBBox.size().x / this->shadowMapRes;
+				float snapToY = frustumLSBBox.size().y / this->shadowMapRes;
+
+				vec3f originalMin = frustumLSBBox.min;
+
+				frustumLSBBox.min.x = floorf(frustumLSBBox.min.x / snapToX) * snapToX;
+				frustumLSBBox.min.y = floorf(frustumLSBBox.min.y / snapToY) * snapToY;
+
+				frustumLSBBox.max.x = floorf(frustumLSBBox.max.x / snapToX) * snapToX;
+				frustumLSBBox.max.y = floorf(frustumLSBBox.max.y / snapToY) * snapToY;
+			}
+
 			// Expand the bbox a in the direction opposite of the light.
 			// This is needed in order to still render the objects that are a little bit behind the camera, so they
 			// could still cast shadows. frustumLSBBox.expand(frustumLSBBox.min - frustumLSBBox.size().x00() * 0.1f);
@@ -35,12 +55,12 @@ Optional<ShadowMapBuildInfo>
 			// Make the bbox a bit wider, so objects near the frustum could still cast shadows.
 			// frustumLSBBox.scaleAroundCenter(vec3f(1.f, 1.1f, 1.1f));
 
-			const vec3f camPosLs = frustumLSBBox.center() - frustumLSBBox.halfDiagonal().x00();
+			vec3f camPosLs = frustumLSBBox.center() + frustumLSBBox.halfDiagonal().zOnly();
 			const vec3f camPosWs = mat_mul_pos(ls2ws, camPosLs);
 
-			const float camWidth = frustumLSBBox.size().z;
+			const float camWidth = frustumLSBBox.size().x;
 			const float camheight = frustumLSBBox.size().y;
-			const float camZRange = frustumLSBBox.size().x;
+			const float camZRange = frustumLSBBox.size().z;
 
 			transf3d shadowCameraTrasnform = lightToWsNoScaling;
 			shadowCameraTrasnform.p = camPosWs;

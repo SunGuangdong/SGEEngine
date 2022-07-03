@@ -75,6 +75,15 @@ struct StageVertexOut {
 	float4 v_vertexDiffuse : v_vertexDiffuse;
 };
 
+#ifdef SGE_MESH_VERTEX_MODIFIER_SHADER
+	SGE_MESH_VERTEX_MODIFIER_SHADER__MAGIC_REPLACE
+#else
+	void vsMainVertexModifier(inout Vertex vertex)
+	{
+
+	}
+#endif
+
 StageVertexOut vsMain(IAVertex vsin)
 {
 	// Read the input vertex.
@@ -114,10 +123,7 @@ StageVertexOut vsMain(IAVertex vsin)
 	vertex.color = float4(1.0, 1.0, 1.0, 1.0);
 #endif
 
-	// processing...
-#ifdef SGE_MESH_VERTEX_MODIFIER_SHADER
-	SGE_MESH_VERTEX_MODIFIER_SHADER__MAGIC_REPLACE
-#endif
+	vsMainVertexModifier(vertex);
 
 	// Read the processed vertex and pass it to the fragment shader.
 	StageVertexOut stageVertexOut;
@@ -151,7 +157,7 @@ StageVertexOut vsMain(IAVertex vsin)
 // Pixel Shader
 //--------------------------------------------------------------------
 #ifdef SGE_PIXEL_SHADER
-float4 psMain(StageVertexOut inVert) : SV_Target0
+float4 psMain(StageVertexOut inVert, bool isFrontFacing : SV_IsFrontFace) : SV_Target0
 {
 	MaterialSample mtlSample;
 	mtlSample.albedo = fwdParams.material.uDiffuseColorTint;
@@ -168,6 +174,8 @@ float4 psMain(StageVertexOut inVert) : SV_Target0
 		mtlSample.albedo *= inVert.v_vertexDiffuse;
 	}
 
+	const float nrmFacingMul = 1.f; // isFrontFacing ? 1.f : -1.f;
+
 	if (fwdParams.material.uPBRMtlFlags & kPBRMtl_Flags_HasNormalMap) {
 		// Assumes that there is a correct tanget space.
 		const float3 normalMapNorm = 2.f * tex2D(uTexNormalMap, inVert.v_uv).xyz - float3(1.f, 1.f, 1.f);
@@ -175,13 +183,13 @@ float4 psMain(StageVertexOut inVert) : SV_Target0
 			  normalMapNorm.x * normalize(inVert.v_tangent) 
 			+ normalMapNorm.y * normalize(inVert.v_binormal) 
 			+ normalMapNorm.z * normalize(inVert.v_normal);
-		mtlSample.shadeNormalWs = normalize(normalFromNormalMap);
+		mtlSample.shadeNormalWs = normalize(normalFromNormalMap) * nrmFacingMul;
 	} else {
-		mtlSample.shadeNormalWs = normalize(inVert.v_normal);
+		mtlSample.shadeNormalWs = normalize(inVert.v_normal) * nrmFacingMul;
 	}
 
 	// If the fragment is going to be fully transparent discard the sample.
-	if (mtlSample.albedo.w <= 0.f || fwdParams.material.alphaMultiplier <= 0.f) {
+	if (mtlSample.albedo.w <= 0.1f || fwdParams.material.alphaMultiplier <= 0.f) {
 		discard;
 	}
 
@@ -235,7 +243,7 @@ float4 psMain(StageVertexOut inVert) : SV_Target0
 	//finalColor.xyz = finalColor.xyz / (finalColor.xyz + float3(1.f, 1.f, 1.f));
 	//finalColor.xyz = linearToSRGB(finalColor.xyz);
 
-	// Applt the alpha multiplier.
+	// Apply the alpha multiplier.
 	finalColor.w *= fwdParams.material.alphaMultiplier;
 
 	return finalColor;

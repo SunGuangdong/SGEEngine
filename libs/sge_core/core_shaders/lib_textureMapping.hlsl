@@ -14,7 +14,7 @@ float2 directionToUV_spherical(float3 dir) {
 
 /// The implementation here is based on https://en.wikipedia.org/wiki/Cube_mapping
 /// A function that gives a UV coordinates for sampling a cube-mapped 2D texture from a direction.
-/// The texture that is itended to be sampled roughly looks like so:
+/// The texture that is intended to be sampled roughly looks like so:
 ///
 ///     *---*
 ///     | +Y|
@@ -110,23 +110,32 @@ float2 directionToUV_cubeMapping(float3 dirNormalized, float2 pixelSizeUV) {
 	// in @uv we have UVs for sampling the image corresponding to that face.
 	float2 uv = float2(0.5f * (uc / maxAxis + 1.0f), 0.5f * (vc / maxAxis + 1.0f));
 
+	uv.x = clamp(uv.x, 0.f, 1.f);
+	uv.y = clamp(uv.y, 0.f, 1.f);
+
 	// The UV coordinates so far were in OpenGL stlye, convert them to D3D style as this is the one we default to in SGE.
-	uv.x = -uv.x + 1.f;
+	//uv.x = -uv.x + 1.f;
 	uv.y = -uv.y + 1.f;
 
-	const float oneThird = 0.333333343f; // 1.f / 3.f value in float32 precision.
+	
+
+	const float oneThird = 0.333333333f; // 1.f / 3.f value in float32 precision.
 
 	// Shrink the uv range to be as big as one sub-face in the bigger texture.
 	uv = uv * float2(0.25f, oneThird);
+
+	float faceWidthUv = 0.25f;
+	float faceHeightUv = oneThird;
 
 	// Move inwards the UVs near the edge of the face avoid having seems.
 	// If we do not do that, the floating point precision + non-point sampling will
 	// end up in nearing pixels that are not part of the cubemap to get used.
 	// You might be tempted to do before we have shrinked the UVs to be as big as one sub-face, but
 	// the floating point precision with the adding below will just destroy it.
-	uv.x = clamp(uv.x, pixelSizeUV.x * 1.5f, 0.25f - pixelSizeUV.x * 1.5f);
-	uv.y = clamp(uv.y, pixelSizeUV.y * 1.5f, oneThird - pixelSizeUV.y * 1.5f);
+	//uv.x = clamp(uv.x, pixelSizeUV.x * 0.5f, faceWidthUv - pixelSizeUV.x * 0.5f);
+	//uv.y = clamp(uv.y, pixelSizeUV.y * 0.5f, faceHeightUv - pixelSizeUV.y * 0.5f);
 
+	float2 halfPixelSize = pixelSizeUV * 0.5f;
 
 	// The function so far returned a face index and a UVs inside that face.
 	// We need to return UVs that correspond to the big cube-mapped texture.

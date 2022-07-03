@@ -3,7 +3,7 @@
 #include "common.h"
 #include "math_base.h"
 #include "vec2f.h"
-#include <limits>
+#include <float.h>
 
 #if defined(min) || defined(max)
 	#error min/max macros are defined

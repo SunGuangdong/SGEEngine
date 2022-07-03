@@ -140,6 +140,20 @@ void MaterialEditWindow::update(
 						ImGuiEx::Label(md.prettyName.c_str());
 						hadChange |= ImGui::Checkbox("##Edit", &b);
 					}
+					else if (md.typeId == sgeTypeId(std::string)) {
+		
+						std::string& srcString = *(std::string*)chain.follow(mtl);
+
+						std::string stringEdit = srcString;
+
+						ImGuiEx::Label(md.prettyName.c_str());
+						bool const change = ImGuiEx::InputText( "##editString", stringEdit, ImGuiInputTextFlags_EnterReturnsTrue);
+						if (change) {
+							std::string newData = stringEdit;
+							srcString = stringEdit;
+							hadChange = true;
+						}
+					}
 					else {
 						ImGui::LabelText("UI not written for member %s type.", md.name);
 					}

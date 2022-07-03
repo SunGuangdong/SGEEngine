@@ -14,16 +14,22 @@ struct IGeometryDrawer;
 struct IMaterial;
 struct JsonValue;
 
+
 struct SGE_CORE_API MaterialFamilyDesc {
 	using GeometryDrawerAllocFn = IGeometryDrawer* (*)();
 	using MaterialAllocFn = std::unique_ptr<IMaterial> (*)();
 
 	uint32 familyUniqueNumber;
 	std::string displayName;
+
+	/// A function that can allocate an @IGeometryDrawer that can these materials.
 	GeometryDrawerAllocFn geomDrawAllocFn = nullptr;
+	/// A function that can allocate a material of this family.
 	MaterialAllocFn mtlAllocFn = nullptr;
 };
 
+/// A list of all materials and the functions needed by the engine and the editor
+/// to allocate and manage them.
 struct MaterialFamilyLibrary {
 	struct MaterialFamilyData {
 		MaterialFamilyDesc familyDesc;

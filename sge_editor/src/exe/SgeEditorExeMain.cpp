@@ -165,9 +165,11 @@ struct SGEGameWindow : public WindowBase {
 		const sint64 modtime = FileReadStream::getFileModTime(pluginFileName.c_str());
 
 		if (!pluginFileName.empty() && (modtime > m_workingDLLModTime || m_workingDLLModTime == 0)) {
-			// if (m_workingDLLModTime != 0) {
-			//	DialogYesNo("Realod DLL", "Game DLL is about to be reloaded!");
-			//}
+#if 1
+			 if (m_workingDLLModTime != 0) {
+				DialogYesNo("Realod DLL", "Game DLL is about to be reloaded!");
+			}
+#endif
 
 			// Save the editor world as we are going to invaludated all the game function pointers
 			//  by unloading the game DLL.

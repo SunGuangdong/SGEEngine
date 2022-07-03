@@ -65,6 +65,9 @@ struct ShaderLightData {
 struct Camera_CBuffer {
 	float4x4 projView;
 	float4 cameraPositionWs;
+	float3 cameraLookDirWs;
+	float gameTime;
+
 };
 
 

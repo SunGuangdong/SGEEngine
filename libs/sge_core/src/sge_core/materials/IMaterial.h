@@ -9,6 +9,8 @@ struct JsonValueBuffer;
 struct JsonValue;
 struct TypeId;
 
+struct Texture;
+
 /// Before reading this, read the comment for @IMaterial.
 ///
 /// This structure describes the raw material data to be passed to the @IGeometryDrawer to execute the draw call.
@@ -26,6 +28,8 @@ struct SGE_CORE_API IMaterialData {
 	{
 	}
 	virtual ~IMaterialData() = default;
+
+	virtual Texture* getTextureForShadowMap() { return nullptr; }
 
 	uint32 materialFamilyId = 0;
 	float alphaMultipler = 1.f;

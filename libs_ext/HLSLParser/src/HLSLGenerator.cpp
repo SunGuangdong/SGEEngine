@@ -360,7 +360,7 @@ bool HLSLGenerator::Generate(HLSLTree* tree, Target target, const char* entryNam
             m_writer.WriteLine(1, "return ts.t.GatherAlpha(ts.s, texCoord, offset);");
             m_writer.WriteLine(0, "}");
         }
-        if (m_tree->GetContainsString("tex2Dsize"))
+        if (m_tree->GetContainsString("tex2Dsize")) // This and all code related to is has been added by SGE.
         {
             m_writer.WriteLine(0, "int2 %s(%s ts) {", m_tex2DSizeFunction, m_textureSampler2DStruct);
             m_writer.WriteLine(1, "int2 size; ts.t.GetDimensions(size.x, size.y); return size;");

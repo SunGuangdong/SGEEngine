@@ -123,6 +123,7 @@ bool SGEDeviceImpl::Create(const MainFrameTargetDesc& frameTargetDesc)
 	m_screenTarget = requestResource(ResourceType::FrameTarget);
 	m_screenTarget.as<FrameTargetGL>()->GL_CreateWindowFrameTarget(frameTargetDesc.width, frameTargetDesc.height);
 
+	glHint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT, GL_DONT_CARE);
 	setVsync(frameTargetDesc.vSync);
 
 	//[[maybe_unused]] const GLubyte* vendor = glGetString(GL_VENDOR);     // Returns the vendor

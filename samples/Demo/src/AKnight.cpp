@@ -72,7 +72,7 @@ struct AKnight : public Actor {
 			vec3f newPos = getPosition();
 
 			if (ANavMesh* navMesh = getWorld()->getActor<ANavMesh>(navMeshActorId)) {
-				newPos = navMesh->moveAlongNavMesh(getPosition(), getPosition() + walkDir * 13.f * u.dt);
+				newPos = navMesh->moveAlongNavMesh(getPosition(), getPosition() + walkDir * 40.f * u.dt);
 			}
 
 			walkDir = newPos - getPosition();

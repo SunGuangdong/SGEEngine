@@ -83,14 +83,19 @@ bool ShadingProgramD3D11::isValid() const
 
 ID3D11VertexShader* ShadingProgramD3D11::D3D11_GetVertexShader() const
 {
-	sgeAssert(m_vertShdr.IsResourceValid());
-	return (ID3D11VertexShader*)m_vertShdr.as<ShaderD3D11>()->D3D11_GetShader();
+	if (m_vertShdr.IsResourceValid()) {
+		return (ID3D11VertexShader*)m_vertShdr.as<ShaderD3D11>()->D3D11_GetShader();
+	}
+	return nullptr;
 }
 
 ID3D11PixelShader* ShadingProgramD3D11::D3D11_GetPixelShader() const
 {
-	sgeAssert(m_pixShadr.IsResourceValid());
-	return (ID3D11PixelShader*)m_pixShadr.as<ShaderD3D11>()->D3D11_GetShader();
+	if (m_pixShadr.IsResourceValid()) {
+		return (ID3D11PixelShader*)m_pixShadr.as<ShaderD3D11>()->D3D11_GetShader();
+	}
+
+	return nullptr;
 }
 
 } // namespace sge

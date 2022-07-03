@@ -548,13 +548,13 @@ void DefaultGameDrawer::drawWorld(const GameDrawSets& drawSets, const DrawReason
 	// Draw the debug draw commands.
 	getCore()->getDebugDraw().draw(drawSets.rdest, drawSets.drawCamera->getProjView());
 
-#if 0
+#if 1
 	// This code here is something needed only for debugging shadow maps.
 	// I ended up writing this from stach more than 10 times that is why I decided to keep it.
 	// It basically draws the shadow map of thr 1st light in the top left corner of the game screen.
 	if (drawReason == drawReason_editing) {
 		if (m_shadingLights.size() > 0 && m_shadingLights[0].shadowMap) {
-			drawSets.quickDraw->drawTexture(drawSets.rdest, 0.f, 0.f, 256.f, m_shadingLights[0].shadowMap);
+			drawSets.quickDraw->getTextureDrawer().drawTexture(drawSets.rdest, 0.f, 0.f, 256.f, m_shadingLights[0].shadowMap);
 		}
 	}
 #endif
@@ -617,7 +617,7 @@ void DefaultGameDrawer::drawRenderItem_Geometry(
 		    ri.worldTransform,
 		    *drawSets.shadowMapBuildInfo,
 		    *ri.geometry,
-		    /* ri.mtl.diffuseTexture*/ nullptr,
+		    ri.pMtlData->getTextureForShadowMap(),
 		    false);
 	}
 	else {
@@ -676,7 +676,7 @@ void DefaultGameDrawer::drawRenderItem_TraitSprite(
 		texPlaneMtl.metalness = 0.f;
 		texPlaneMtl.roughness = 1.f;
 		texPlaneMtl.forceNoLighting = ri.forceNoLighting;
-		texPlaneMtl.forceNoLighting = ri.forceNoCulling;
+		texPlaneMtl.disableCulling = ri.forceNoCulling;
 
 		drawGeometry(
 		    drawSets.rdest,

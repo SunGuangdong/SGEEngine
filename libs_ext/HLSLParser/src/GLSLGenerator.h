@@ -31,6 +31,7 @@ public:
         Version_110, // OpenGL 2.0
         Version_140, // OpenGL 3.1
         Version_150, // OpenGL 3.2
+        Version_330_Core, // OpenGL 3.3 Core
         Version_100_ES, // OpenGL ES 2.0
         Version_300_ES, // OpenGL ES 3.0
     };

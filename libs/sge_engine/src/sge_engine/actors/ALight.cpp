@@ -4,7 +4,6 @@
 
 namespace sge {
 
-
 // clang-format off
 ReflAddTypeId(LightType, 20'03'01'0015);
 ReflAddTypeId(LightDesc, 20'03'01'0016);

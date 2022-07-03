@@ -9,6 +9,7 @@
 #include "sge_utils/time/Timer.h"
 
 #include "AssetAudio.h"
+#include "AssetGeomLitShader.h"
 #include "AssetLibrary.h"
 #include "AssetMaterial.h"
 #include "AssetModel3D.h"
@@ -37,6 +38,8 @@ const char* assetIface_getName(const AssetIfaceType type)
 			return "Audio";
 		case assetIface_mtl:
 			return "Material";
+		case assetIface_genericGeomLitShader:
+			return "Geom Lit Shader";
 		default:
 			sgeAssertFalse("Not implemented");
 			return "NotImplemented";
@@ -74,7 +77,8 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 	}
 
 	if (sge_stricmp(ext, "png") == 0 || sge_stricmp(ext, "dds") == 0 || sge_stricmp(ext, "jpg") == 0 ||
-	    sge_stricmp(ext, "tga") == 0 || sge_stricmp(ext, "bmp") == 0 || sge_stricmp(ext, "hdr") == 0) {
+	    sge_stricmp(ext, "jpeg") == 0 || sge_stricmp(ext, "tga") == 0 || sge_stricmp(ext, "bmp") == 0 ||
+	    sge_stricmp(ext, "hdr") == 0) {
 		return assetIface_texture2d;
 	}
 
@@ -92,6 +96,9 @@ AssetIfaceType assetIface_guessFromExtension(const char* const ext, bool include
 
 	if (sge_stricmp(ext, "mtl") == 0) {
 		return assetIface_mtl;
+	}
+	if (sge_stricmp(ext, "shdrgeomlit") == 0) {
+		return assetIface_genericGeomLitShader;
 	}
 
 	return assetIface_unknown;
@@ -142,39 +149,43 @@ void AssetLibrary::scanForAvailableAssets(const char* const path)
 
 AssetPtr AssetLibrary::newAsset(std::string assetPath, AssetIfaceType type)
 {
-	AssetPtr newlyLoadedAsset;
+	AssetPtr newlyCreatedAsset;
 
 	switch (type) {
 		case sge::assetIface_texture2d: {
 			auto assetTyped = newAsset<AssetTexture2d>(assetPath.c_str());
-			newlyLoadedAsset = assetTyped;
+			newlyCreatedAsset = assetTyped;
 		} break;
 		case sge::assetIface_model3d: {
 			auto assetTyped = newAsset<AssetModel3D>(assetPath.c_str());
-			newlyLoadedAsset = assetTyped;
+			newlyCreatedAsset = assetTyped;
 		} break;
 		case sge::assetIface_spriteAnim: {
 			auto assetTyped = newAsset<AssetSpriteAnim>(assetPath.c_str());
-			newlyLoadedAsset = assetTyped;
+			newlyCreatedAsset = assetTyped;
 		} break;
 		case sge::assetIface_audio: {
 			auto assetTyped = newAsset<AssetAudio>(assetPath.c_str());
-			newlyLoadedAsset = assetTyped;
+			newlyCreatedAsset = assetTyped;
 		} break;
 		case sge::assetIface_text: {
 			auto assetTyped = newAsset<AssetText>(assetPath.c_str());
-			newlyLoadedAsset = assetTyped;
+			newlyCreatedAsset = assetTyped;
 		} break;
 		case sge::assetIface_mtl: {
 			auto assetTyped = newAsset<AssetMaterial>(assetPath.c_str());
-			newlyLoadedAsset = assetTyped;
+			newlyCreatedAsset = assetTyped;
+		} break;
+		case sge::assetIface_genericGeomLitShader: {
+			auto assetTyped = newAsset<AssetGeomLitShader>(assetPath.c_str());
+			newlyCreatedAsset = assetTyped;
 		} break;
 		default:
 			sgeAssert(false);
 			break;
 	}
 
-	return newlyLoadedAsset;
+	return newlyCreatedAsset;
 }
 
 std::string AssetLibrary::resloveAssetPathToRelative(const char* pathRaw) const
@@ -329,6 +340,9 @@ SGE_CORE_API bool isAssetSupportingInteface(const Asset& asset, AssetIfaceType t
 		case sge::assetIface_mtl:
 			return dynamic_cast<const AssetIface_Material*>(&asset) != nullptr;
 			break;
+		case sge::assetIface_genericGeomLitShader:
+			return dynamic_cast<const IAssetIface_GeomLitShader*>(&asset) != nullptr;
+			break;
 		default:
 			sgeAssert(false && "Not implemented asset interface type");
 			break;
@@ -369,6 +383,9 @@ SGE_CORE_API bool isAssetLoaded(Asset& asset, AssetIfaceType type)
 		case sge::assetIface_mtl:
 			return dynamic_cast<AssetIface_Material*>(&asset) != nullptr;
 			break;
+		case sge::assetIface_genericGeomLitShader:
+			return dynamic_cast<IAssetIface_GeomLitShader*>(&asset) != nullptr;
+			break;
 		default:
 			break;
 	}
@@ -388,16 +405,19 @@ bool isAssetLoaded(const AssetPtr& asset, AssetIfaceType type)
 }
 
 // clang-format off
-ReflAddTypeId(AssetPtr,                                             10'11'21'0001);
-ReflAddTypeId(std::vector<AssetPtr>,                                10'11'21'0002);
-ReflAddTypeId(std::shared_ptr<AssetIface_Texture2D>,                10'11'21'0003);
-ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Texture2D>>,   10'11'21'0004);
-ReflAddTypeId(std::shared_ptr<AssetIface_Model3D>,                  10'11'21'0005);
-ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Model3D>>,     10'11'21'0006);
-ReflAddTypeId(std::shared_ptr<AssetIface_SpriteAnim>,               10'11'21'0007);
-ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_SpriteAnim>>,  10'11'21'0008);
-ReflAddTypeId(std::shared_ptr<AssetIface_Material>,                 10'11'21'0009);
-ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Material>>,    10'11'21'0010);
+ReflAddTypeId(AssetPtr,                                                10'11'21'0001);
+ReflAddTypeId(std::vector<AssetPtr>,                                   10'11'21'0002);
+ReflAddTypeId(std::shared_ptr<AssetIface_Texture2D>,                   10'11'21'0003);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Texture2D>>,      10'11'21'0004);
+ReflAddTypeId(std::shared_ptr<AssetIface_Model3D>,                     10'11'21'0005);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Model3D>>,        10'11'21'0006);
+ReflAddTypeId(std::shared_ptr<AssetIface_SpriteAnim>,                  10'11'21'0007);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_SpriteAnim>>,     10'11'21'0008);
+ReflAddTypeId(std::shared_ptr<AssetIface_Material>,                    10'11'21'0009);
+ReflAddTypeId(std::vector<std::shared_ptr<AssetIface_Material>>,       10'11'21'0010);
+ReflAddTypeId(std::shared_ptr<AssetIface_Material>,                    10'11'21'0011);
+ReflAddTypeId(std::vector<std::shared_ptr<IAssetIface_GeomLitShader>>, 10'11'21'0012);
+
 ReflBlock() {
 	ReflAddType(AssetPtr);
 	ReflAddType(std::vector<AssetPtr>);
@@ -409,6 +429,8 @@ ReflBlock() {
 	ReflAddType(std::vector<std::shared_ptr<AssetIface_SpriteAnim>>);
 	ReflAddType(std::shared_ptr<AssetIface_Material>);
 	ReflAddType(std::vector<std::shared_ptr<AssetIface_Material>>);
+	ReflAddType(std::shared_ptr<IAssetIface_GeomLitShader>);
+	ReflAddType(std::vector<std::shared_ptr<IAssetIface_GeomLitShader>>);
 }
 // clang-format on
 

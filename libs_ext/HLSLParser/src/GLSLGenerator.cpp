@@ -206,15 +206,27 @@ bool GLSLGenerator::Generate(HLSLTree* tree, Target target, Version version, con
     else if (m_version == Version_150)
     {
         m_writer.WriteLine(0, "#version 150");
+    } 
+    else if (m_version == Version_330_Core)
+    {
+        m_writer.WriteLine(0, "#version 330 core");
     }
     else if (m_version == Version_100_ES)
     {
         m_writer.WriteLine(0, "#version 100");
+        if ((m_tree->NeedsFunction("ddx") || m_tree->NeedsFunction("ddy")))
+        {
+            m_writer.WriteLine(0, "#extension GL_OES_standard_derivatives : require");
+        }
         m_writer.WriteLine(0, "precision highp float;");
     }
     else if (m_version == Version_300_ES)
     {
         m_writer.WriteLine(0, "#version 300 es");
+        if ((m_tree->NeedsFunction("ddx") || m_tree->NeedsFunction("ddy")))
+        {
+            m_writer.WriteLine(0, "#extension GL_OES_standard_derivatives : require");
+        }
         m_writer.WriteLine(0, "precision highp float;");
         m_writer.WriteLine(0, "precision highp int;"); // Added by SGE, needed for WebGL builds.
     }
@@ -223,6 +235,7 @@ bool GLSLGenerator::Generate(HLSLTree* tree, Target target, Version version, con
         Error("Unrecognized target version");
         return false;
     }
+
 
     // Output the special function used to access rows in a matrix.
     m_writer.WriteLine(0, "vec3 %s(mat3 m, int i) { return vec3( m[0][i], m[1][i], m[2][i] ); }", m_matrixRowFunction);
@@ -385,12 +398,6 @@ bool GLSLGenerator::Generate(HLSLTree* tree, Target target, Version version, con
 	m_writer.WriteLine( 0, "vec2 %s(bvec2 cond, vec2 trueExpr, vec2 falseExpr) { vec2 ret; ret.x = cond.x ? trueExpr.x : falseExpr.x; ret.y = cond.y ? trueExpr.y : falseExpr.y; return ret; }", m_bvecTernary );
 	m_writer.WriteLine( 0, "vec3 %s(bvec3 cond, vec3 trueExpr, vec3 falseExpr) { vec3 ret; ret.x = cond.x ? trueExpr.x : falseExpr.x; ret.y = cond.y ? trueExpr.y : falseExpr.y; ret.z = cond.z ? trueExpr.z : falseExpr.z; return ret; }", m_bvecTernary );
 	m_writer.WriteLine( 0, "vec4 %s(bvec4 cond, vec4 trueExpr, vec4 falseExpr) { vec4 ret; ret.x = cond.x ? trueExpr.x : falseExpr.x; ret.y = cond.y ? trueExpr.y : falseExpr.y; ret.z = cond.z ? trueExpr.z : falseExpr.z; ret.w = cond.w ? trueExpr.w : falseExpr.w; return ret; }", m_bvecTernary );
-
-    // Output the extension used for dFdx/dFdy in GLES2
-    if (m_version == Version_100_ES && (m_tree->NeedsFunction("ddx") || m_tree->NeedsFunction("ddy")))
-    {
-        m_writer.WriteLine(0, "#extension GL_OES_standard_derivatives : require");
-    }
 
     OutputAttributes(entryFunction);
 

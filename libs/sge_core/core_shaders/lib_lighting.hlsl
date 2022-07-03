@@ -15,6 +15,17 @@ struct MaterialSample {
 	float roughness;
 };
 
+void MaterialSample_constructor(out MaterialSample mtlSample)
+{
+	mtlSample.hitPointWs = float3(0.f, 0.f, 0.f);
+	mtlSample.shadeNormalWs = float3(0.f, 0.f, -1.f);
+	mtlSample.vertexToCameraDirWs = float3(0.f, 0.f, -1.f);
+
+	mtlSample.albedo = float4(0.f, 0.f, 0.f, 1.f);
+	mtlSample.metallic = 0.f;
+	mtlSample.roughness = 1.f;
+}
+
 /// Returns the amount of light at the specified point @positionWs that is reached from @light
 /// based on the @lightShadowMap.
 /// @param cameraPositionWs is nedeed for direction lights to add their light fading effect near the edges of the shadow map.
@@ -26,80 +37,126 @@ float Light_computeShadowMultipler(
 	in float3 positionWs,
 	in float3 cameraPositionWs)
 {
-	int lightType = light.lightType;
-
-	if (lightType == LightType_point) {
+	if (light.lightType == LightType_point) {
 		// [FWDDEF_POINTLIGHT_LINEAR_ZDEPTH]
 		float3 lightToVertexWs = positionWs - light.lightPosition;
 		float lightToVertexWsLength = length(lightToVertexWs);
 
 		float2 sampleUv = directionToUV_cubeMapping(lightToVertexWs / lightToVertexWsLength, 1.f / tex2Dsize(lightShadowMap));
-		const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
-		const float shadowSampleDistanceToLight = light.lightShadowRange * shadowZ;
-		const float currentFragmentDistanceToLight = lightToVertexWsLength;
 
-		if (shadowSampleDistanceToLight < (currentFragmentDistanceToLight - light.lightShadowBias)/* || NdotL <= 0.0*/) {
+		const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
+		const float shadowSampleDistanceToLight = shadowZ;
+		const float currentFragmentDistanceToLight = lightToVertexWsLength / light.lightShadowRange;
+
+		if (shadowSampleDistanceToLight < (currentFragmentDistanceToLight - light.lightShadowBias)) {
 			return 0.f;
 		}
 		return 1.f;
-	} else {
-		// Direction and Spot lights.
-		const float4 pixelShadowProj = mul(light.lightShadowMapProjView, float4(positionWs, 1.f));
-		const float4 pixelShadowNDC = pixelShadowProj / pixelShadowProj.w;
-
-		float2 shadowMapSampleLocation = pixelShadowNDC.xy;
-
-		#ifndef OpenGL
-			shadowMapSampleLocation = shadowMapSampleLocation * float2(0.5, -0.5) + float2(0.5, 0.5);
+	}
+	else if (light.lightType == LightType_directional) {
+		// Compute the derivatices of the position we are trying to find if it is in shadow or not.
+		// These are needed for the PCF filtering, as we need to know where the position is for the neigbour
+		// pixels to be able to figure out if they are in shadow or not.
+		// Caution:
+		// Most resources on the internet do not do that, they simply use the depth of the current frangment being
+		// rasterized and compare its depth with the depth of the neighboring pixels on the shadow map.
+		// while this is faster it always makes the shading a bit dimmer
+		// in the cases where we have a flat plane and a light hitting the plane at 45deg angle.
+		// (at least with my implementation, maybe I am doing something wrong).
+		// This happens because the current pixel depth is 100% bigger than the 
+		// depth of the pixel below it (relative to the shadow map), as a result
+		// we think that the neighbor is in shadow (while it is not) and we darken the image.
+		#ifdef SGE_PIXEL_SHADER
+			// Some people say that dd*(dFd*) in some GLSL version work only for floats.
+			const float3 positionWsDerivX = ddx(positionWs);
+			const float3 positionWsDerivY = ddy(positionWs);
 		#else
-			shadowMapSampleLocation = shadowMapSampleLocation * float2(0.5, 0.5) + float2(0.5, 0.5);
+			// ddx/ddy are fine to get called in Vertex Shader in HLSL, I guess they return zero.
+			// However  in GLSL this is a compilation error.
+			const float3 positionWsDerivX = float3(0.f, 0.f, 0.f);
+			const float3 positionWsDerivY = float3(0.f, 0.f, 0.f);
 		#endif
-
 		const float2 pixelSizeUVShadow = (1.f / tex2Dsize(lightShadowMap));
 
-		float samplesWeights = 0.f;
-		const int pcfWidth = 2;
-		const int pcfTotalSampleCnt = (2 * pcfWidth + 1) * (2 * pcfWidth + 1);
-		int pcfTotalSampleCnt2 = 0;
+		// Perform the shadow map sampling in the pixel and around @pcfWidth pixels around it.
+		// This will be used to soften the shadow.
+		const float pcfWidth = 1.f; ///< An integer value, but because of computations made float.
+		const float pcfTotalSampleCnt = (2.f * pcfWidth + 1.f) * (2.f * pcfWidth + 1.f);
+
+		float numSamplesNotInShadow = 0.f;
 		[unroll]
-		for (int ix = -pcfWidth; ix <= pcfWidth; ix += 1) {
+		for (float ix = -pcfWidth; ix <= pcfWidth; ix += 1) {
 			[unroll]
-			for (int iy = -pcfWidth; iy <= pcfWidth; iy += 1) {
-				const float2 sampleUv =
-					shadowMapSampleLocation + float2(float(ix) * pixelSizeUVShadow.x, float(iy) * pixelSizeUVShadow.y);
+			for (float iy = -pcfWidth; iy <= pcfWidth; iy += 1) {
+
+				float3 shadowMapSamplePositionWs = positionWs;
+				shadowMapSamplePositionWs += (float)ix * positionWsDerivX;
+				shadowMapSamplePositionWs += (float)iy * positionWsDerivY;
+
+				const float4 pixelShadowProj = mul(light.lightShadowMapProjView, float4(shadowMapSamplePositionWs, 1.f));
+				const float4 pixelShadowNDC = pixelShadowProj / pixelShadowProj.w;
+
+				float2 shadowMapSampleUV = pixelShadowNDC.xy;
+
+				#ifndef OpenGL
+					shadowMapSampleUV = shadowMapSampleUV * float2(0.5, -0.5) + float2(0.5, 0.5);
+				#else
+					shadowMapSampleUV = shadowMapSampleUV * float2(0.5, 0.5) + float2(0.5, 0.5);
+				#endif
 
 		#ifndef OpenGL
-				const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
+				const float shadowZ = tex2D(lightShadowMap, shadowMapSampleUV).x;
 				const float currentZ = pixelShadowNDC.z;
 		#else
-				const float shadowZ = tex2D(lightShadowMap, sampleUv).x;
+				const float shadowZ = tex2D(lightShadowMap, shadowMapSampleUV).x;
 				const float currentZ = (pixelShadowNDC.z + 1.f) * 0.5f;
 		#endif
-
-				if (shadowZ < (currentZ - light.lightShadowBias)/* || NdotL <= 0.f*/) {
-					samplesWeights += 1.f;
+				const bool isInShadow = shadowZ < (currentZ - light.lightShadowBias);
+				if (!isInShadow) {
+					numSamplesNotInShadow += 1.f;
 				}
-				
-				pcfTotalSampleCnt2++;
 			}
 		}
 
-		float lightMultDueToShadow = 1.f - (samplesWeights / (float)(pcfTotalSampleCnt2));
+		float lightMultDueToShadow = (numSamplesNotInShadow / pcfTotalSampleCnt);
 		
 		// Make directional light fade as they capture some limited area,
 		// and when the shadow map ends in the distance this will hide the rough edge
 		// where the shadow map ends.
-		if  (lightType == LightType_directional) {
-			const float distanceFromCamera = length(positionWs - cameraPositionWs);
-			const float fadeStart = light.lightShadowRange * 0.80f;
-			if(distanceFromCamera > fadeStart) {
-				const float fadeOffDistance = light.lightShadowRange * 0.2f;
-				float k = min(1.f, (distanceFromCamera - fadeStart) / fadeOffDistance);
-				
-				// Slowly add up to lightMultDueToShadow until it reaches 1.
-				lightMultDueToShadow = lightMultDueToShadow + (1.f - lightMultDueToShadow) * k;
-			}
+		// TODO: people usually just multiple by the .w coord of the fragment (the one after the projection matrix).
+		const float distanceFromCamera = length(positionWs - cameraPositionWs);
+		const float fadeStart = light.lightShadowRange * 0.80f;
+		if(distanceFromCamera > fadeStart) {
+			const float fadeOffDistance = light.lightShadowRange * 0.2f;
+			float k = min(1.f, (distanceFromCamera - fadeStart) / fadeOffDistance);
+			// Slowly add up to lightMultDueToShadow until it reaches 1.
+			lightMultDueToShadow = lightMultDueToShadow + (1.f - lightMultDueToShadow) * k;
 		}
+
+		return lightMultDueToShadow;
+	}
+	else if (light.lightType == LightType_spot) {
+		const float4 pixelShadowProj = mul(light.lightShadowMapProjView, float4(positionWs, 1.f));
+		const float4 pixelShadowNDC = pixelShadowProj / pixelShadowProj.w;
+
+		float2 shadowMapSampleUV = pixelShadowNDC.xy;
+
+		#ifndef OpenGL
+			shadowMapSampleUV = shadowMapSampleUV * float2(0.5, -0.5) + float2(0.5, 0.5);
+		#else
+			shadowMapSampleUV = shadowMapSampleUV * float2(0.5, 0.5) + float2(0.5, 0.5);
+		#endif
+
+		const float shadowZ = tex2D(lightShadowMap, shadowMapSampleUV).x;
+
+#ifndef OpenGL
+		const float currentZ = pixelShadowNDC.z;
+#else
+		const float currentZ = (pixelShadowNDC.z + 1.f) * 0.5f;
+#endif
+
+		const bool isInShadow = shadowZ < (currentZ - light.lightShadowBias);
+		const float lightMultDueToShadow = isInShadow ? 0.f : 1.f;
 
 		return lightMultDueToShadow;
 	}

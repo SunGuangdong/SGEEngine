@@ -285,3 +285,4 @@ include(copy_engine_helper.cmake)
 
 # Samples
 add_subdirectory(samples)
+add_subdirectory(no_engine_games)

@@ -27,6 +27,7 @@ enum AssetIfaceType : int {
 	assetIface_audio,
 	assetIface_text,
 	assetIface_mtl,
+	assetIface_genericGeomLitShader,
 	assetIface_count,
 };
 

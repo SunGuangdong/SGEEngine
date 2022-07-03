@@ -28,6 +28,7 @@ ReflBlock() {
 		ReflMember(DefaultPBRMtl, uvShift).uiRange(-FLT_MAX, FLT_MAX, 0.01f)
 		ReflMember(DefaultPBRMtl, uvScale).uiRange(-FLT_MAX, FLT_MAX, 0.01f)
 		ReflMember(DefaultPBRMtl, uvRotation).addMemberFlag(MFF_FloatAsDegrees)
+		ReflMember(DefaultPBRMtl, pluggedShaderCodeFilename)
 	;
 }
 // clang-format on
@@ -80,6 +81,7 @@ IMaterialData* DefaultPBRMtl::getMaterialDataLocalStorage()
 
 	mdlData.needsAlphaSorting = needsAlphaSorting || isDiffuseSemiTransp || (alphaMultiplier < 1.f);
 
+	mdlData.pluggedShaderCodeFilename = pluggedShaderCodeFilename;
 
 	// clang-format off
 	mdlData.uvwTransform =

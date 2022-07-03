@@ -5,6 +5,7 @@
 #include "sge_core/model/Model.h"
 #include "sge_renderer/renderer/renderer.h"
 #include "sge_utils/io/FileStream.h"
+#include "sge_utils/text/Path.h"
 #include <sge_utils/math/mat4f.h>
 
 // Caution:
@@ -57,7 +58,7 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 		uTexRoughnessSampler,
 		uLightShadowMap,
 		uLightShadowMapSampler,
-		uTexSkinningBones,
+		uTexSkinningBones, // TODO: bind the sampler.
 		uParamsCbFWDDefaultShading_vertex,
 		uParamsCbFWDDefaultShading_pixel,
 	};
@@ -65,8 +66,9 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 	FWDShader_CBuffer_Params paramsCb;
 	memset(&paramsCb, 0, sizeof(paramsCb));
 
-	if (shadingPermutFWDShading.isValid() == false || shaderFilesWatcher.update()) {
-		shadingPermutFWDShading = ShadingProgramPermuator();
+	if (shadingPermutFWDShadingFilename[mtlData.pluggedShaderCodeFilename].isValid() == false ||
+	    shaderFilesWatcher.update()) {
+		shadingPermutFWDShadingFilename[mtlData.pluggedShaderCodeFilename] = ShadingProgramPermuator();
 
 		// clang-format off
 		const std::vector<OptionPermuataor::OptionDesc> compileTimeOptions = {
@@ -110,16 +112,41 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 		    {uParamsCbFWDDefaultShading_pixel, "ParamsCbFWDDefaultShading", ShaderType::PixelShader},
 		};
 
+		std::string filenameGeomShader = extractFileNameNoExt(mtlData.pluggedShaderCodeFilename.c_str());
+
+		std::string shaderCode;
+		FileReadStream::readTextFile("core_shaders/FWDDefault_shading.hlsl", shaderCode);
+
 		std::set<std::string> includedFilesByShaders;
-		shadingPermutFWDShading->createFromFile(
+
+		if (mtlData.pluggedShaderCodeFilename.empty() == false) {
+
+			includedFilesByShaders.insert(mtlData.pluggedShaderCodeFilename);
+
+			std::string extraCode;
+			FileReadStream::readTextFile(mtlData.pluggedShaderCodeFilename.c_str(), extraCode);
+
+			std::string SGE_MESH_VERTEX_MODIFIER_SHADER__MAGIC_REPLACE =
+			    "SGE_MESH_VERTEX_MODIFIER_SHADER__MAGIC_REPLACE";
+
+			shaderCode = "#define SGE_MESH_VERTEX_MODIFIER_SHADER\n" + shaderCode;
+			shaderCode.replace(
+			    shaderCode.find(SGE_MESH_VERTEX_MODIFIER_SHADER__MAGIC_REPLACE),
+			    SGE_MESH_VERTEX_MODIFIER_SHADER__MAGIC_REPLACE.length(),
+			    extraCode);
+		}
+
+		
+		shadingPermutFWDShadingFilename[mtlData.pluggedShaderCodeFilename]->create(
 		    sgedev,
+		    shaderCode.c_str(),
 		    "core_shaders/FWDDefault_shading.hlsl",
-		    "shader_cache/FWDDefault_shading.shadercache",
+		    "shader_cache/FWDDefault_shading." + filenameGeomShader + ".shadercache ",
 		    compileTimeOptions,
 		    uniformsToCache,
 		    &includedFilesByShaders);
 
-		shaderFilesWatcher.initialize(includedFilesByShaders);
+		shaderFilesWatcher.initialize(includedFilesByShaders, 1.f);
 	}
 
 	// Find the values of the shader options that are going to be used.
@@ -189,9 +216,11 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 	    {OPT_HasTangentSpace, OPT_HasNormals_choice},
 	    {OPT_HasVertexSkinning, OPT_HasVertexSkinning_choice}};
 
-	const int iShaderPerm = shadingPermutFWDShading->getCompileTimeOptionsPerm().computePermutationIndex(
-	    optionChoice, SGE_ARRSZ(optionChoice));
-	const ShadingProgramPermuator::Permutation& shaderPerm = shadingPermutFWDShading->getShadersPerPerm()[iShaderPerm];
+	const int iShaderPerm = shadingPermutFWDShadingFilename[mtlData.pluggedShaderCodeFilename]
+	                            ->getCompileTimeOptionsPerm()
+	                            .computePermutationIndex(optionChoice, SGE_ARRSZ(optionChoice));
+	const ShadingProgramPermuator::Permutation& shaderPerm =
+	    shadingPermutFWDShadingFilename[mtlData.pluggedShaderCodeFilename]->getShadersPerPerm()[iShaderPerm];
 
 	// Assemble the draw call.
 	DrawCall dc;
@@ -225,9 +254,13 @@ void DefaultPBRMtlGeomDrawer::drawGeometry(
 
 	const mat4f combinedUVWTransform = /* instDrawMods.uvwTransform * */ mtlData.uvwTransform;
 
+	static float gameTime = 0;
+	gameTime += 1.f / 60.f;
 
 	paramsCb.camera.cameraPositionWs = vec4f(camera.getCameraPosition(), 1.f);
+	paramsCb.camera.cameraLookDirWs = camera.getCameraLookDir();
 	paramsCb.camera.projView = camera.getProjView();
+	paramsCb.camera.gameTime = gameTime;
 
 	paramsCb.mesh.node2world = geomWorldTransfrom;
 	paramsCb.mesh.uSkinningFirstBoneOffsetInTex = geometry.firstBoneOffset;

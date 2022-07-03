@@ -27,5 +27,5 @@ if(EMSCRIPTEN)
 	set_target_properties(SpriteGame2D PROPERTIES LINK_FLAGS "${PRELOADFILE}")
 endif()
 
-sge_generate_assemble_and_debug_target_for_game(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/output/${PROJECT_NAME})
+sge_generate_assemble_and_debug_target_for_game(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/output/${PROJECT_NAME} ON)
 

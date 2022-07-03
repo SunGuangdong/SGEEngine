@@ -287,6 +287,11 @@ bool FrameTargetGL::create2D(
 	if (TextureFormat::IsDepth(depthTextureFmt)) {
 		depthStencilTexture = getDevice()->requestResource<Texture>();
 		const TextureDesc depthStencilDesc = TextureDesc::GetDefaultDepthStencil(width, height, depthTextureFmt);
+		SamplerDesc samplerDesc;
+		samplerDesc.filter = TextureFilter::Min_Mag_Mip_Point;
+		samplerDesc.addressModes[0] = TextureAddressMode::ClampEdge;
+		samplerDesc.addressModes[1] = TextureAddressMode::ClampEdge;
+		samplerDesc.addressModes[2] = TextureAddressMode::ClampEdge;
 		const bool succeeded = depthStencilTexture->create(depthStencilDesc, nullptr);
 	}
 	else {

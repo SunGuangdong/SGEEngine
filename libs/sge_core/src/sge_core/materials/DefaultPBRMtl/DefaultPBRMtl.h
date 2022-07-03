@@ -23,6 +23,8 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 	{
 	}
 
+	virtual Texture* getTextureForShadowMap() override { return diffuseTexture; }
+
 	mat4f uvwTransform = mat4f::getIdentity();
 	vec4f diffuseColor = vec4f(1.f, 1.f, 1.f, 1.f);
 
@@ -41,6 +43,8 @@ struct SGE_CORE_API DefaultPBRMtlData : public IMaterialData {
 
 	bool disableCulling = false;
 	bool forceNoLighting = false;
+
+	std::string pluggedShaderCodeFilename;
 };
 
 struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
@@ -68,6 +72,8 @@ struct SGE_CORE_API DefaultPBRMtl : public IMaterial {
 	std::shared_ptr<AssetIface_Texture2D> texMetallic;
 	std::shared_ptr<AssetIface_Texture2D> texRoughness;
 	std::shared_ptr<AssetIface_Texture2D> texNormalMap;
+
+	std::string pluggedShaderCodeFilename;
 
 	vec4f diffuseColor = vec4f(1.f);
 	vec4f emissionColor = vec4f(0.f);

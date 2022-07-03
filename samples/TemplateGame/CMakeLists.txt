@@ -12,5 +12,5 @@ target_link_libraries(${PROJECT_NAME} PUBLIC sge_engine)
 target_link_libraries(${PROJECT_NAME} PUBLIC sge_renderer)
 target_link_libraries(${PROJECT_NAME} PUBLIC sge_utils)
 
-sge_generate_assemble_and_debug_target_for_game(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/output/${PROJECT_NAME})
+sge_generate_assemble_and_debug_target_for_game(${PROJECT_NAME} ${CMAKE_SOURCE_DIR}/output/${PROJECT_NAME} ON)
 
